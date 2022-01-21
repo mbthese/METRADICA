@@ -1,4 +1,4 @@
-```{r setupvarpart, include=FALSE}
+```{r , include=FALSE}
 rm(list = ls()) ; invisible(gc()) ; set.seed(42)
 library(knitr)
 library(kableExtra)
