@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Traits | A Minimal Book Example</title>
+  <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Traits | A Minimal Book Example" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Traits | A Minimal Book Example" />
+  
+  <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  
+
+<meta name="author" content="John Doe" />
+
+
+<meta name="date" content="2022-01-21" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="sampling.html"/>
+<link rel="next" href="part-part-three-results.html"/>
+<script src="libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> url: your book url like <span>https://bookdown.org/yihui/bookdown</span></a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#usage"><i class="fa fa-check"></i><b>1.1</b> Usage</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#render-book"><i class="fa fa-check"></i><b>1.2</b> Render book</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#preview-book"><i class="fa fa-check"></i><b>1.3</b> Preview book</a></li>
+</ul></li>
+<li class="part"><span><b>I Part one: general introduction</b></span></li>
+<li class="chapter" data-level="2" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>2</b> Background</a></li>
+<li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
+<li class="chapter" data-level="3" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>3</b> Sampling</a><ul>
+<li class="chapter" data-level="3.1" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>3.1</b> Habitats</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="sampling.html"><a href="sampling.html#hydrological-indexes"><i class="fa fa-check"></i><b>3.1.1</b> Hydrological indexes</a></li>
+<li class="chapter" data-level="3.1.2" data-path="sampling.html"><a href="sampling.html#how-do-we-define-seasonally-flooded-soils"><i class="fa fa-check"></i><b>3.1.2</b> How do we define seasonally flooded soils?</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>3.2</b> Sites</a></li>
+<li class="chapter" data-level="3.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>3.3</b> Species</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="sampling.html"><a href="sampling.html#indicator-species-analysis"><i class="fa fa-check"></i><b>3.3.1</b> Indicator Species Analysis</a></li>
+<li class="chapter" data-level="3.3.2" data-path="sampling.html"><a href="sampling.html#more-details-about-indval"><i class="fa fa-check"></i><b>3.3.2</b> More details about IndVal</a></li>
+<li class="chapter" data-level="3.3.3" data-path="sampling.html"><a href="sampling.html#chosen-species"><i class="fa fa-check"></i><b>3.3.3</b> Chosen species</a></li>
+<li class="chapter" data-level="3.3.4" data-path="sampling.html"><a href="sampling.html#phylogeny"><i class="fa fa-check"></i><b>3.3.4</b> Phylogeny</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>3.4</b> Individuals</a></li>
+<li class="chapter" data-level="3.5" data-path="sampling.html"><a href="sampling.html#summary"><i class="fa fa-check"></i><b>3.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>4</b> Traits</a><ul>
+<li class="chapter" data-level="4.1" data-path="traits.html"><a href="traits.html#morphological-traits"><i class="fa fa-check"></i><b>4.1</b> Morphological traits</a></li>
+<li class="chapter" data-level="4.2" data-path="traits.html"><a href="traits.html#hydraulic-traits"><i class="fa fa-check"></i><b>4.2</b> Hydraulic traits</a></li>
+<li class="chapter" data-level="4.3" data-path="traits.html"><a href="traits.html#photochemical-trait"><i class="fa fa-check"></i><b>4.3</b> Photochemical trait</a></li>
+<li class="chapter" data-level="4.4" data-path="traits.html"><a href="traits.html#measured-traits"><i class="fa fa-check"></i><b>4.4</b> Measured traits</a></li>
+<li class="chapter" data-level="4.5" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>4.5</b> Protocols</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="part-part-three-results.html"><a href="part-part-three-results.html"><i class="fa fa-check"></i>(Part) Part three : Results</a><ul>
+<li class="chapter" data-level="4.6" data-path="part-part-three-results.html"><a href="part-part-three-results.html#trait-covariation"><i class="fa fa-check"></i><b>4.6</b> Trait covariation</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="blocks.html"><a href="blocks.html"><i class="fa fa-check"></i><b>5</b> Blocks</a><ul>
+<li class="chapter" data-level="5.1" data-path="blocks.html"><a href="blocks.html#equations"><i class="fa fa-check"></i><b>5.1</b> Equations</a></li>
+<li class="chapter" data-level="5.2" data-path="blocks.html"><a href="blocks.html#theorems-and-proofs"><i class="fa fa-check"></i><b>5.2</b> Theorems and proofs</a></li>
+<li class="chapter" data-level="5.3" data-path="blocks.html"><a href="blocks.html#callout-blocks"><i class="fa fa-check"></i><b>5.3</b> Callout blocks</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="sharing-your-book.html"><a href="sharing-your-book.html"><i class="fa fa-check"></i><b>6</b> Sharing your book</a><ul>
+<li class="chapter" data-level="6.1" data-path="sharing-your-book.html"><a href="sharing-your-book.html#publishing"><i class="fa fa-check"></i><b>6.1</b> Publishing</a></li>
+<li class="chapter" data-level="6.2" data-path="sharing-your-book.html"><a href="sharing-your-book.html#pages"><i class="fa fa-check"></i><b>6.2</b> 404 pages</a></li>
+<li class="chapter" data-level="6.3" data-path="sharing-your-book.html"><a href="sharing-your-book.html#metadata-for-sharing"><i class="fa fa-check"></i><b>6.3</b> Metadata for sharing</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A Minimal Book Example</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="traits" class="section level1">
+<h1><span class="header-section-number">Chapter 4</span> Traits</h1>
+<p>This chapter defines measured and sampled traits with associated protocols.</p>
+<div id="morphological-traits" class="section level2">
+<h2><span class="header-section-number">4.1</span> Morphological traits</h2>
+<ul>
+<li><strong>LA</strong>: leaf area <span class="math inline">\(cm^{2}\)</span> : carbo- acquisition related trait which informs on the light capture strategy.</li>
+<li><strong>LDMC</strong>: leaf dry matter content <span class="math inline">\(mg.g^{-1}\)</span> : a carbon-acquisition related trait which informs on the carbon investment in physical resistance and defense.</li>
+</ul>
+</div>
+<div id="hydraulic-traits" class="section level2">
+<h2><span class="header-section-number">4.2</span> Hydraulic traits</h2>
+<ul>
+<li><strong>RWC</strong>: relative water content (%) is of special interest as it reflects the amount of water present the leaf relative to the maximum it can hold (<em>INSERER BIBLIO Barrs &amp; Weatherley 1962</em>)</li>
+<li><strong><span class="math inline">\(\pi_{TLP}\)</span></strong>: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait.</li>
+<li><strong><span class="math inline">\(g_{min}\)</span></strong>: leaf minimum conductance <span class="math inline">\(mmol.m^{-2}.s^{-1}\)</span> taking into account water losses through the cuticle and incompletely closed stomata.</li>
+<li><strong>Stomatal characteristics (size, density)</strong>: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(<em>INSERER BIBLIO Julio V. Schneider 2016</em>)</li>
+<li><strong>Nervation density</strong>: determining the capacity of water supply in leaves. (<em>INSERER BIBLIO Julio V. Schneider 2016</em>)</li>
+<li><strong>Leaf chemistry</strong> : To assess the leaves’ concentration in carbon, nitrogen and phosphorous.</li>
+<li><strong>P<sub>midday</sub></strong>: Water potential at the driest point of the day.</li>
+<li><strong><span class="math inline">\(\delta\)</span> <sup>18</sup> O and <span class="math inline">\(\delta\)</span> <sup>13</sup> C</strong> : Informs patterns of carbon and water use, related to water use efficiency. (<em>INSERER BIBLIO Farquhar et al 1989</em>) Measured in Vienna.</li>
+</ul>
+</div>
+<div id="photochemical-trait" class="section level2">
+<h2><span class="header-section-number">4.3</span> Photochemical trait</h2>
+<ul>
+<li><strong><span class="math inline">\(\frac{Fv}{Fm}\)</span></strong>: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency (<span class="math inline">\(\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}\)</span>). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (<em>INSERER BIBLIO Manzi et al 2021</em>) but decline after other leaf hydraulic traits (<em>INSERER BIBLIO Trueba et al 2019</em>).</li>
+</ul>
+</div>
+<div id="measured-traits" class="section level2">
+<h2><span class="header-section-number">4.4</span> Measured traits</h2>
+<ul>
+<li>Day 1
+<ul>
+<li>Fresh
+<ul>
+<li>On field: P<sub>midday</sub></li>
+<li>scan gmin leaves</li>
+<li>fresh weight RWC</li>
+<li><strong><span class="math inline">\(g_{min}\)</span></strong> weight<br />
+</li>
+<li><strong>Stomatal density</strong> nail polish (3 replicates per indivual)</li>
+<li><strong><span class="math inline">\(\frac{Fv}{Fm}\)</span></strong></li>
+</ul></li>
+<li>Day 2
+<ul>
+<li>saturated weight RWC</li>
+<li><strong><span class="math inline">\(g_{min}\)</span></strong> finish weights (at least 2 points next day)</li>
+<li><strong><span class="math inline">\(\pi_{TLP}\)</span></strong></li>
+</ul></li>
+<li>Day 5 (+72h)
+<ul>
+<li>Dry weight RWC</li>
+</ul></li>
+</ul></li>
+<li>Later on :
+<ul>
+<li>Stomatal observation and density counts</li>
+<li>Measure of vein densities</li>
+<li>Chemistry of dry-grinded leaves</li>
+</ul></li>
+</ul>
+</div>
+<div id="protocols" class="section level2">
+<h2><span class="header-section-number">4.5</span> Protocols</h2>
+<ul>
+<li><a href="../Metradica_Paracou/Document/Protocol/Field.Rmd"><strong>Field</strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/Protocole_Ptlp.pdf"><strong><span class="math inline">\(\pi_{TLP}\)</span></strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/RWC_Boisseaux.docx"><strong>RWC</strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/Analyse%20Stomates_Marion.docx"><strong>Stomata</strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/Fluo_Bellifa.docx"><strong>FvFm</strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/Gmin%20protocol.docx"><strong>gmin</strong> protocol</a></li>
+<li><a href="../Metradica_Paracou/Document/Protocol/ProtocolLeafVeins_MB_2.docx"><strong>leaf venation</strong> protocol</a></li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="sampling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="part-part-three-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/03-Traits.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+```{r setupvarpart, include=FALSE}
+rm(list = ls()) ; invisible(gc()) ; set.seed(42)
+library(knitr)
+library(kableExtra)
+if(knitr:::is_html_output()) options(knitr.table.format = "html") 
+if(knitr:::is_latex_output()) options(knitr.table.format = "latex") 
+library(tidyverse)
+theme_set(bayesplot::theme_default())
+knitr::opts_chunk$set(
+	echo = F,
+	fig.height = 6,
+	fig.width = 8,
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE,
+	cache.lazy = F
+)
+```
+
+# (PART) Part three : Results {-}
+
+# PCA results
+
+The aim is to define a set of key traits that together explain why a species would be specialist or generalist. 
+
+Generalist species should display a greater degree of intraspecific variability in traits related to habitat use than specialists because they experience a wider range of environmental conditions and/or have inherently higher levels of phenotypic plasticity.
+
+Here is an analysis aimed to explore co-variations of individual traits. Specifically, I investigated individual traits co-variation at two taxonomic scales: among species, and within species.
+
+# Trait covariation
+
+- Clean dataset
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+Traits <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Traits_Paracou.csv", header=TRUE)
+
+head(Traits)
+
+```
+
+
+We aimed to explore co-variations of leaf traits belonging to 244 individuals from 24 species. We investigated trait co-variation at 2 taxonomic scales: (i) between species, (ii) within species between individuals.
+
+
+Between all species, **26.34%** of the total variance was conserved on the two first axes from the PCA of the traits. The *first axis opposed SLA to CC and LT, from high SLA leaves to thick leaves rich in chlorophyll, whereas the second axis is related to LA and LDMC, increasing with leaf area and dry matter. The first axis highlighted a correlation between CC and LT. SLA and LA decoupled relation is enlightened within the PCA plane. Moreover for the two complexes, we observed a general trend of diameters distribution along the first PCA axis. Smaller diameter seemed linked to thinner leaves with increased SLA and less chlorophyll. Besides both axes showed significative complex segregation ($p-value < 0.0001$), the second PCA axis segregated the two complexes with no overlap.*
+Les 2 premiers axes de l' analyse expriment **26.34%** de l'inertie totale du jeu de données ; cela signifie que 26.34% de la variabilité totale du nuage des individus (ou des variables) est représentée dans ce plan.
+C'est un pourcentage relativement faible, et le premier plan ne représente donc seulement qu'une part de la variabilité contenue dans l'ensemble du jeu de données actif.
+Cette valeur est supérieure à la valeur référence de **14.1%**, la variabilité expliquée par ce plan est donc significative
+(cette intertie de référence est le quantile 0.95-quantile de la distribution des pourcentages d'inertie obtenue en simulant 2209 jeux de données aléatoires de dimensions comparables sur la base d'une distribution normale).
+
+Du fait de ces observations, il serait alors très probablement nécessaire de considérer également les dimensions supérieures ou égales à la troisième  dans l'analyse.

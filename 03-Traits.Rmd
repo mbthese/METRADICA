@@ -1,0 +1,62 @@
+# Traits
+
+
+This chapter defines measured and sampled traits with associated protocols.
+
+
+## Morphological traits
+
+* **LA**: leaf area $cm^{2}$ : carbo- acquisition related trait which informs on the light capture strategy. 
+* **LDMC**: leaf dry matter content $mg.g^{-1}$ : a carbon-acquisition related trait which informs on the carbon investment in physical resistance and defense. 
+
+
+## Hydraulic traits
+
+* **RWC**: relative water content (%) is of special interest as it reflects the amount of water present the leaf relative to the maximum it can hold (*INSERER BIBLIO Barrs & Weatherley 1962*)
+* **$\pi_{TLP}$**: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait. 
+* **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata.
+* **Stomatal characteristics (size, density)**: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Nervation density**: determining the capacity of water supply in leaves. (*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Leaf chemistry** : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
+* **P<sub>midday</sub>**: Water potential at the driest point of the day. 
+* **$\delta$ <sup>18</sup> O and $\delta$ <sup>13</sup> C** : Informs patterns of carbon and water use, related to water use efficiency. (*INSERER BIBLIO Farquhar et al 1989*) Measured in Vienna.
+
+
+## Photochemical trait
+ 
+* **$\frac{Fv}{Fm}$**: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency ($\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}$). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (*INSERER BIBLIO Manzi et al 2021*) but decline after other leaf hydraulic traits (*INSERER BIBLIO Trueba et al 2019*).
+
+
+## Measured traits
+
+* Day 1
+    * Fresh
+        * On field: P<sub>midday</sub>
+        * scan gmin leaves
+        * fresh weight RWC 
+        * **$g_{min}$** weight  
+        * **Stomatal density** nail polish (3 replicates per indivual)
+        * **$\frac{Fv}{Fm}$**
+    
+    * Day 2
+        * saturated weight RWC
+        * **$g_{min}$** finish weights (at least 2 points next day)
+        * **$\pi_{TLP}$**
+    
+    * Day 5 (+72h)
+        * Dry weight RWC
+        
+* Later on :
+    * Stomatal observation and density counts 
+    * Measure of vein densities 
+    * Chemistry of dry-grinded leaves
+
+## Protocols
+
+* [**Field** protocol](../Metradica_Paracou/Document/Protocol/Field.Rmd)
+* [**$\pi_{TLP}$** protocol](../Metradica_Paracou/Document/Protocol/Protocole_Ptlp.pdf)
+* [**RWC** protocol](../Metradica_Paracou/Document/Protocol/RWC_Boisseaux.docx)
+* [**Stomata** protocol](../Metradica_Paracou/Document/Protocol/Analyse Stomates_Marion.docx)
+* [**FvFm** protocol](../Metradica_Paracou/Document/Protocol/Fluo_Bellifa.docx)
+* [**gmin** protocol](../Metradica_Paracou/Document/Protocol/Gmin protocol.docx)
+* [**leaf venation** protocol](../Metradica_Paracou/Document/Protocol/ProtocolLeafVeins_MB_2.docx) 
