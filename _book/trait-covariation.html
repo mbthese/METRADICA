@@ -4,13 +4,13 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 7 PCA results | Metradica</title>
+  <title>Chapter 8 Trait covariation | Metradica</title>
   <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
 set in the _output.yml file.</p>" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 7 PCA results | Metradica" />
+  <meta property="og:title" content="Chapter 8 Trait covariation | Metradica" />
   <meta property="og:type" content="book" />
   
   
@@ -20,7 +20,7 @@ set in the _output.yml file.</p>" />
   <meta name="github-repo" content="mbthese/METRADICA" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 7 PCA results | Metradica" />
+  <meta name="twitter:title" content="Chapter 8 Trait covariation | Metradica" />
   
   <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
@@ -37,8 +37,8 @@ set in the _output.yml file.</p>" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="traits.html"/>
-<link rel="next" href="trait-covariation.html"/>
+<link rel="prev" href="pca-results.html"/>
+<link rel="next" href="section.html"/>
 <script src="libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -134,19 +134,79 @@ set in the _output.yml file.</p>" />
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="pca-results" class="section level1">
-<h1><span class="header-section-number">Chapter 7</span> PCA results</h1>
-<p>The aim is to define a set of key traits that together explain why a species would be specialist or generalist.</p>
-<p>Generalist species should display a greater degree of intraspecific variability in traits related to habitat use than specialists because they experience a wider range of environmental conditions and/or have inherently higher levels of phenotypic plasticity.</p>
-<p>Here is an analysis aimed to explore co-variations of individual traits. Specifically, I investigated individual traits co-variation at two taxonomic scales: among species, and within species.</p>
+<div id="trait-covariation" class="section level1">
+<h1><span class="header-section-number">Chapter 8</span> Trait covariation</h1>
+<ul>
+<li>Clean dataset</li>
+</ul>
+<pre><code>##   Code idTree Plot Subplot FieldNr pref.Habitat Habitat  spName Fresh_Weight.g.
+## 1    1 145493   15       1     182           BF      BF Iry.hos           1.268
+## 2    2 147663   15       3     178           TF      TF Gus.hex           1.293
+## 3    3 147783   15       3     298           BF      BF Iry.hos           0.877
+## 4    4 147625   15       3     140   Generalist      TF Tac.mel           0.258
+## 5    5 148586   15       3    1103   Generalist      TF Chr.pri           1.087
+## 6    6 149072   15       4     369   Generalist      TF Con.gui           2.196
+##   Saturated_Weight.g. Delta_Weight_SW.FW.g. delta_en_._real delta_en_._clean
+## 1               1.263                -0.005          -0.379           -0.379
+## 2               1.320                 0.027           2.057            2.057
+## 3               0.874                -0.003          -0.399           -0.399
+## 4               0.256                -0.002          -0.814           -0.814
+## 5               1.123                 0.036           3.340            3.340
+## 6               2.211                 0.015           0.688            0.688
+##   Dry_Weight.g.     RWC  LSWC P_osmo  P_tlp mean_Pmidday Fv.Fm LA..cm.2.
+## 1         0.501 100.629 1.523 -1.130 -1.568           NA 0.786    45.231
+## 2         0.464  96.890 1.842 -1.560 -1.911           NA 0.797    48.827
+## 3         0.349 100.667 1.503 -1.028 -1.486           NA 0.807    41.215
+## 4         0.121 101.554 1.118 -1.510 -1.871           NA 0.840     9.776
+## 5         0.535  93.831 1.100 -2.403 -2.585       26.067 0.773    31.427
+## 6         1.010  98.742 1.188 -1.328 -1.726       21.580 0.800    64.251
+##   gmin..mmol.m.2.s.1. X1st_Order_Vein_Density..mm.mm.2.
+## 1               1.235                             0.018
+## 2               0.916                             0.031
+## 3               1.046                             0.031
+## 4               3.368                             0.058
+## 5               1.869                                NA
+## 6               6.776                             0.023
+##   X2nd_Order_Vein_Density..mm.mm.2. X3rd_Order_Vein_Density..mm.mm.2.
+## 1                             0.241                             0.682
+## 2                             0.150                             0.347
+## 3                             0.196                             0.640
+## 4                             0.277                             0.789
+## 5                                NA                                NA
+## 6                             0.081                             0.301
+##   Major_Vein_Density..mm.mm.2. Stomata_Density..nb.mm.2. Stomata_Size..um.2.
+## 1                        0.941                        NA                  NA
+## 2                        0.527                        NA                  NA
+## 3                        0.867                        NA                  NA
+## 4                        1.124                        NA                  NA
+## 5                           NA                        NA                  NA
+## 6                        0.405                        NA                  NA
+##   Height_Tree Dawkin_Tree Height_Branch Dawkin_Branch Position_Crown
+## 1          12           4            10             4            Sup
+## 2          11           2             9             2            Sup
+## 3          12           2            13             3            Sup
+## 4          33           5            23             4            Mid
+## 5          24           4            21             4            Sup
+## 6          15           2            14             3            Sup</code></pre>
+<p>We aimed to explore co-variations of leaf traits belonging to 244 individuals from 24 species. We investigated trait co-variation at 2 taxonomic scales: (i) between species, (ii) within species between individuals.</p>
+<p>Between all species, <strong>26.34%</strong> of the total variance was conserved on the two first axes from the PCA of the traits. The <em>first axis opposed SLA to CC and LT, from high SLA leaves to thick leaves rich in chlorophyll, whereas the second axis is related to LA and LDMC, increasing with leaf area and dry matter. The first axis highlighted a correlation between CC and LT. SLA and LA decoupled relation is enlightened within the PCA plane. Moreover for the two complexes, we observed a general trend of diameters distribution along the first PCA axis. Smaller diameter seemed linked to thinner leaves with increased SLA and less chlorophyll. Besides both axes showed significative complex segregation (<span class="math inline">\(p-value &lt; 0.0001\)</span>), the second PCA axis segregated the two complexes with no overlap.</em>
+Les 2 premiers axes de l’ analyse expriment <strong>26.34%</strong> de l’inertie totale du jeu de données ; cela signifie que 26.34% de la variabilité totale du nuage des individus (ou des variables) est représentée dans ce plan.
+C’est un pourcentage relativement faible, et le premier plan ne représente donc seulement qu’une part de la variabilité contenue dans l’ensemble du jeu de données actif.
+Cette valeur est supérieure à la valeur référence de <strong>14.1%</strong>, la variabilité expliquée par ce plan est donc significative
+(cette intertie de référence est le quantile 0.95-quantile de la distribution des pourcentages d’inertie obtenue en simulant 2209 jeux de données aléatoires de dimensions comparables sur la base d’une distribution normale).</p>
+<p>Du fait de ces observations, il serait alors très probablement nécessaire de considérer également les dimensions supérieures ou égales à la troisième dans l’analyse.</p>
+
 </div>
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="traits.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="trait-covariation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="pca-results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="section.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
