@@ -50,7 +50,7 @@ The classification in the waterlogged habitat may be loose and not as precise as
 
 Permanent forest plots of the Guyafor network monitor since 1970 (Bafog, Paracou) individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network coves > 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes. METRADICA leaf samplings took place in the control plots. 
 
-![Guyafor stations for tropical forest monitoring](../../METRADICA/Metradica_Paracou/Document/Pictures/Guyafor.PNG "Guyafor stations")
+![Guyafor stations for tropical forest monitoring](../../METRADICA/Metradica_Paracou/Document/Pictures/Guyafor.png "Guyafor stations")
 
 **Paracou **: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually)
 
