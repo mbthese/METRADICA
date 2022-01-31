@@ -87,7 +87,7 @@
 
 \title{Metradica}
 \author{Marion Boisseaux}
-\date{2022-01-21}
+\date{2022-01-31}
 
 \begin{document}
 \maketitle
@@ -664,6 +664,108 @@ Cette valeur est supérieure à la valeur référence de \textbf{14.1\%}, la var
 (cette intertie de référence est le quantile 0.95-quantile de la distribution des pourcentages d'inertie obtenue en simulant 2209 jeux de données aléatoires de dimensions comparables sur la base d'une distribution normale).
 
 Du fait de ces observations, il serait alors très probablement nécessaire de considérer également les dimensions supérieures ou égales à la troisième dans l'analyse.
+
+\hypertarget{part-part-four-notes}{%
+\part{Part four : Notes}\label{part-part-four-notes}}
+
+\hypertarget{section}{%
+\chapter{26/01/2022}\label{section}}
+
+Metradica meeting
+
+Presents:
+
+\begin{itemize}
+\tightlist
+\item
+  Ghislain
+\item
+  Clément\\
+\item
+  Sabrina
+\item
+  Damien\\
+\item
+  Jeanne
+\item
+  Marion
+\end{itemize}
+
+Objectives:
+
+1- les données 13C\\
+2- les modèles joints
+
+\textbf{Notes:}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+\end{enumerate}
+
+L'estimation de l'efficience d'utilisation de l'eau intrinsèque peut être obtenue à l'aide de msures directes des échanges gazeux entre feuille et atm. Farquar 1982 propose un modèle simple reliant WUE (water use efficiency) à la discrimination isotopique du C au cours de la photosynthèse.
+
+Relation WUE et \(\delta\) 13C positive.
+
+Drivers de la compo iso:
+
+\begin{itemize}
+\tightlist
+\item
+  Lumière (feuille d'ombre valeurs 13C nettement plus négatives)
+\item
+  génétique
+\item
+  sécheresse atm + sol
+\item
+  VPD
+\item
+  teneur en mx du sol
+\item
+  ontogénie de l'individu
+\item
+  conductance hydraulique
+\end{itemize}
+
+Attention: la compo iso n'est pas un trait lié à la sécheresse. Il caractérise \emph{l'acclimation} à la sécheresse. Il est utile pour une expé en serre de comparer le \(\delta\) 13C entre le groupe controle et le groupe dry. Une espèce sensible: on trouvera une forte différence vs.~une espèce peu sensible, une faible différence. Et le \emph{delta} ser aun trait de réponse à la sécheresse.
+
+Travaux de Damien:
+
+\begin{itemize}
+\tightlist
+\item
+  16 parcelles à travers la Guyane
+\item
+  9-10 sites\\
+\item
+  \textasciitilde100 arbres / parcelles
+\item
+  \textasciitilde1600 valeurs de compo iso de feuille d'arbres dominant
+\item
+  70 espèces différentes avec qq indet. par site; total de 392 espèces identifiées
+\item
+  Moyenne valeur \(\delta\) 13C \textasciitilde{} -30 \%0 pour les forêts en Guyane
+\item
+  Lorsque le climat est le même, on observe le même fonctionnement
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\item
+\end{enumerate}
+
+Avant nous procédions par espèces, le but des modèles joints: faire avec plusieurs espèces en même temps.Les modèles joints de distribution des espèces permettent d'estimer la niche des espèces, de prédire leur distribution, tout en prenant en compte les intéractions entre espèces. Ils peuvent être utilisés pour déterminer les communautés ou assemblages d'espèces et comment ces assemblages changent spatialement, selon des gradients environnementaux.
+
+Prendre en compte: la co-occurence des espèces + relation trait-env't pour déterminer la présence d'une espèce sur 1 site.
+
+\begin{figure}
+\centering
+\includegraphics{../Metradica_Paracou/Document/Pictures/ModeleJoint.PNG}
+\caption{Modèle joint}
+\end{figure}
+
+Si l'on inclu les données 13C dans les modèles joints: on s'attend à une abscence de réponse.
 
   \bibliography{book.bib,packages.bib}
 
