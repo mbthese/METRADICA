@@ -1,5 +1,9 @@
+fig:unnamed-chunk-3
+tab:unnamed-chunk-4
 about
 background
+project-introduction
+hypotheses
 sampling
 habitats
 hydrological-indexes
@@ -19,4 +23,5 @@ photochemical-trait
 measured-traits
 protocols
 pca-results
+trait-covariation
 section
