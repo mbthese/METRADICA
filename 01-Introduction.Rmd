@@ -22,7 +22,7 @@ There are 4 tasks :
 3. prediction of species distribution from traits using *four-corners* joint species distribution models 
 4. shifts in species distribution through the lens of demographic process: interaction between models 
 
-![METRADICA](../Metradica_Paracou/Document/Pictures/Overall_project.png "Metradica") 
+![METRADICA](Metradica_Paracou/Document/Pictures/Overall_project.png "Metradica") 
 
 I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
 
