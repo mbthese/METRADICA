@@ -34,12 +34,17 @@ I am involved in task 2 : to acquire additional traits information in order to h
 * Identify species with statistically significant habitat associations
 * Traits syndromes for specialists vs. generalists
 
+*I will focus on topographic-driven variation in the water table, which is hypothesized to explain variation in forest responses to drought (Nobre et al.,2011) and species distribution (Schietti et al., 2014; Lourenço Jr. et al., 2021), where trees with higher hydraulic efficiency and drought sensitivity are mostly found in seasonally flooded habitats (Oliveira et al., 2019), which seems to buffer the impact of short-term droughts on Amazon forest survival and productivity (Esteban et al., 2020; Sousa et al., 2020).*
+
 
 **(2) Patterns of functional responses to drought along a precipitation and topographic gradient**
 
 * Explore how trait values vary across a precipitation gradient (Bafog “dry” to Kaw “wet”) 
 * Are associations among traits consistent along the gradient in each habitat? Species should converge to a set of trait values that maximize their resource use efficiency. (Vleminckx et al 2021) 
 * Identify species in their limit range regarding drought resistance. 
+
+*shifts in trait variation across environmental gradients can provide powerful insights into the drivers of community assembly* (Junior et al 2021)
+
 **(3) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits**
 
 Metradica data : exploring generalists species ITV (~60 individuals per species)

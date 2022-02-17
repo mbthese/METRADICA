@@ -19,6 +19,24 @@ knitr::opts_chunk$set(
 
 # (PART) Part three : Results {-}
 
+# Trait distribution
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
+Hypotheses : 
+
+Part I (Habitat-Paracou) : *specialists* species should have a more adequate set of trait to a given habitat than the generalists in the same habitat.
+
+
 # PCA results
 
 The aim is to define a set of key traits that together explain why a species would be specialist or generalist. 

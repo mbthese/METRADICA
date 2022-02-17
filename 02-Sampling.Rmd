@@ -97,6 +97,37 @@ species <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx",
 library(kableExtra)
 kable(species)
 
+
+
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+  "Laetia_procera",
+  "Protium_opacum",
+  "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis",
+  "Vouacapoua_americana"
+)) %>% 
+  separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+kable(select(species, Genus, Species), caption = "Studied species.")
+
 ```
 
 
@@ -114,28 +145,27 @@ library(ggfortify)
 library(tidyverse)
 library(ggtree)
 library(readxl)
-species <- select(species, Family, Genus, Species)
+species <- select(species, taxon , Genus, Species)
 paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
   dplyr::select(Family, Genus, Species) %>% 
   unique() %>% 
   full_join(species) %>% 
   mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
-  dplyr::select(species, genus, family)
-
-
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
 #tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
-#save(tree, file = "./save/phylogeny.Rdata")
-
-load("../Metradica_Paracou/save/phylogeny.Rdata")
+#save(tree, file = "./document/phylogeny/phylogeny.Rdata")
+load("Greenhouse_document/phylogeny/phylogeny.Rdata")
 fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
   left_join(paracou) %>% 
-  ggtree(aes(col = species), layout="circular") + 
-  geom_tiplab2(aes(alpha = !is.na(species), size = !is.na(species))) +
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
   theme_tree(legend.position='right', legend.text = element_text(face = "italic")) +
-  scale_alpha_manual("species", values = c(0.2, 1)) +
-  scale_size_manual("species", values = c(1, 2))
+  scale_alpha_manual("taxon", values = c(0.2, 1)) +
+  scale_size_manual("taxon", values = c(1, 2))
 ```
+
 
 ## Individuals
 

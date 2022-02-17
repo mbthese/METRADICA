@@ -14,7 +14,7 @@ This chapter defines measured and sampled traits with associated protocols.
 
 * **RWC**: relative water content (%) is of special interest as it reflects the amount of water present the leaf relative to the maximum it can hold (*INSERER BIBLIO Barrs & Weatherley 1962*)
 * **$\pi_{TLP}$**: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait. 
-* **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata.
+* **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait. 
 * **Stomatal characteristics (size, density)**: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(*INSERER BIBLIO Julio V. Schneider 2016*)
 * **Nervation density**: determining the capacity of water supply in leaves. (*INSERER BIBLIO Julio V. Schneider 2016*)
 * **Leaf chemistry** : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
