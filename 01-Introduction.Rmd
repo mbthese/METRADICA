@@ -9,7 +9,7 @@
 
 # Project introduction
 
-My thesis is 100% involved in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
+My thesis is included in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
 
 The global objectives of Metradica are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. 
 

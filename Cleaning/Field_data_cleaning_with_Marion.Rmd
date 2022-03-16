@@ -1,0 +1,722 @@
+---
+title: "Field_data_cleaning"
+author: "Daniela Krebber"
+date: "5/18/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+Library <- function(Packages) {
+  InstallAndLoad <- function(Package) {
+    if (!Package %in% installed.packages()[, 1]) {install.packages(Package, repos="https://cran.rstudio.com/")}
+    require(Package, character.only = TRUE)
+  }
+  invisible(sapply(Packages, InstallAndLoad))
+}
+# Ajouter les packages nécessaires ici
+Library(c("kableExtra", "formatR", "readr", "tidyverse", "lubridate", "here"))
+
+source(here("paths.R")) # Marion you probably don't need this, but I have a .R file in which I specify all my paths for my documents, csv files etc... so that if I change the position of a certain file I just change it in the .R file - I do this with the function here.... so you will need to adapt it to your paths. 
+source(here(functionPath, "Functions_DataCleaning.R")) # functions 
+```
+
+
+# Clean FieldData Marion
+a) read in file
+* make sure that empty cells are read in as NAs
+```{r read in data}
+ParacouDB <- read.csv(ParacouDBCleanPath, header=T) 
+
+FieldSheet <- read.csv("./../input/2021_06_17_Traits_Paracou_Marion.csv", header=T, na.strings=c("","NA")) # detect empty cells as NAs
+
+```
+
+b) get rid of rows that contain ONLY NAs 
+* get number of columns
+* take out rows with rowSums of nas == to the number of columns
+
+```{r get rid of empty rows}
+FieldSheet <- deleting_EmptyRows(FieldSheet)
+```
+
+
+## Data format Fielddata_Sheet
+
+Make sure the format of the columns are correct
+
+### 1) Rename column names to match Paracou Database and make the data sheet more understandable
+* change column names and write function for this so that afterwards we always work with the same information
+a) rename column names in FieldSheet to match database Paracou
+
+```{r Rename Column names}
+
+names(FieldSheet)
+
+FieldSheet_Clean  <- FieldSheet %>% 
+  rename(TreeFieldNum = FieldNr, 
+         SubPlot = Subplot, 
+         SpecCode = spName, 
+         RWCnr_original = Code, 
+         DawkinIndiv = Dawkin_Tree, 
+         DawkinBranch = Dawkin_Branch, 
+         HeightTree = Height_Tree, 
+         HeightBranch = Height_Branch)# %>% 
+  #mutate(Sampled = 1)
+```
+
+
+### 2) Check structure and format of the dataframe
+Characters that should be characters, integers that should be integers, numerical data should be numeric, dates should be dates and times should be times etc… 
+str(FieldSheet)
+
+  * specify which is which here - error message if it isn't
+
+  * id should be a Character 
+  * DateField should be a Date object - correct it
+  * TimeArrival should be a Time object - correct it
+  * WXArrival should be a character
+  * Plot should be an integer
+  * SubPlot should be an integer
+  * idTree should be an integer
+  * FieldNr should be an integer
+  * SpecCode_DB should be a character
+  * Recorder should be a character and should contain the initials of the recorder (Letter Code)
+  * DawkinIndiv should be an integer
+  * RWCnr_original should be a character (not an integer because we also have cases where RWC number consistis of a letter and an integer)
+    + this is especially important for comparisions between RWCbigBag_used and additional RWC bags
+  * Resampled should be logical - correct it
+  * RWC_additional 1 and 2 should be a character
+    + these are columns created for individuals that have been on purpose resampled 
+    + for these individuals we keep the original RWC bag number and add a RWC number
+  * NrDiscs should be integer
+    + normally 4 discs per leaf have been sampled for the RWC disc method
+    + this is a column only for the first individuals measured as we were still using the disc technique and later switched entirely to the entire leaf technique
+  * DiscDiameter should be an integer
+    + tells you the diameter in mm of each disc, should be 8 mm for all samples
+  * NrLeaves4Discs should be an integer
+    + this column refers to the number of leaves/leaflets that have been used for the discs
+    + sometimes leaves and leaflets are too small or the secondary veins are too dense to create more than 1 or 2 discs per leaf/leaflet then additional leaves/leaflets had to be taken to get 4 discs for an individual
+  * SampledTraits should be a character
+    + NO_Psimd refers to samples for which no Psimd has been measured (as the conditions weren't right)
+    + All refers to samples where all traits have been measured
+    + Gmin to samples where only gmin has been measured again
+    + RWC to samples were RWC has been resampled
+    + Ptlp to samples were Ptlp has been resampled
+  * Ficelle should be a character
+    + 0 means there has been no rope placed on the tree
+    + 1 means that a rope has been placed on the tree to facilitate resampling for Psimd
+    + 0,easy meants that no rope has been placed on the tree as it is very easy to bigshot the tree
+  * TimeCollection should be a time object
+    + gives you the time at which the leaves were collected from the tree
+  * WXCollection should be a character 
+    + We stopped entering the information when it became clear that we are not continuing to try to measure water potential at midday
+    + more precise information can be retrieved from the Guyaflux tower measurements and other weather stations around Paracou
+  * DawkinBranch should be an integer
+    + describes the Dawkin index of the sampled branch
+    + should be an integer between of 3 or 4, rarely 2 and 5
+  * DawkinTree should be an integer
+    + gives the Dawkin index of the Tree that has been sampled 
+    + should be between 2 and 5
+  * HeightBranch in m should be an integer
+  * Height Tree in m should be an integer
+    + was not taken at the beginning and a lot missing values due to various reasons
+  * PosCrown should be a character
+    + describes the position within the crown of the individual tree should only be low (lower 1/3), middle (middle 1/3) and top (top 1/3)
+  * LeafLight_exposition should be a character
+    + here we try to describe whether the leaf samples themselves self received fullsun light (sunlit leaves), direct sunlight, partial sunlight or are found in half shade or shade
+    + depends very much on the date of time and wheather conditions so I feel this addional classification of exposure to light may be rather imprecise
+  * Nrleaves2Lab should be a character
+    + gives an idea how many leaves were collected and sent to the lab
+    + normally we collected over 10 but this was not possible in all cases
+    + higher number of leaves collected often results in a better choice of beautiful leaves for the measurements
+  * RWCSecVeins2Dense should be logical TRUE and FALSE or 1 and 2
+    + this refers to the discs that have been taken for RWC
+    + the aim was to take a disc excluding all primary and secondary veins, for some species with too dense secondary veins this was impossible to achieve
+
+## Clean Fielddata_Sheet of the two sampling seasons
+
+### 1) only keep sampled individuals 
+* all individuals that were visited were entered even if they were not good for sampling (only complete for the first field season - information exists on sampling maps for the second field season) 
+* this was done to prevent revisiting the same individual that is not suitable for sampling later on
+
+### 2) Correct typos and wrongly entered information automatically
+
+a) Create dataframe with which the FieldSheet can be compared e.g. the Paracou Database
+
+  * the dataframe contains each idTree only once - must be unique
+  * the dataframe contains only relevant information - Plot, SubPlot, Genus, Species, spName, spName, idTree, TreeFieldNum
+```{r ParacouDB unique idTrees}
+# create a Paracou Database dataframe only containing unique idTrees
+ParacouDB_unique <- ParacouDB %>% group_by(Plot, SubPlot, Genus, Species, spName, idTree, TreeFieldNum) %>% filter(CensusYear==2019) %>% distinct(idTree) # the distinct should not be needed here as I already filtered for the trees from the inventory of 2019 (all Plots have been censused in 2019)
+```
+
+b) Create Species Code that matches your species code in the FieldSheet
+
+ * as we did not note the entire binomial species name in the field recording sheet but just a 6 letter species code, I will create a corresponding species code column for the Paracou Database
+    + the species Code consists of a 6 letter code - 3 letters for the genus seperated from 3 letters for the species by a "**.**"
+    + be aware that binomial species names can lead to the same 3 letter abbreviation e.g. Pou.gui can stand for *Pourouma guianensis* as well as for *Pouteria guianensis*
+    + however none of the target species share the same abbreviation - but one Pourouma guinanensis has been sampled due to a missidentification of the individual in the     Paracou database
+
+```{r Create SpecCode for Paracou_DB}
+# create species abbreviation code
+ParacouDB_unique <- ParacouDB_unique %>% mutate(SpecCode =  paste0(str_sub(Genus, 1, 3), ".", str_sub(Species, 1, 3)))
+```
+
+
+c) Join your sampling sheet with the dataframe in which the correct information on the individual trees exists (here after refered to as *Database*), by a unique identifier that exists in both e.g. idTree
+
+This will reveal the mismatches between the two if any exist
+
+d) Add columns for missmatches between your sampling sheet and the Database with the correct information
+
+There are multiple possibilities for errors:
+  * **no_mismatch**: all information corresponds to each other
+  * **idNOTinDB**: unique identifier (e.g. idTree, hereafter refered to as *id*) does not exist in the Database
+    + clearly the id has been wrongly noted
+    + either only the id is wrong --> *easy fix*
+    + or in multiple columns wrong information has been noted --> *manual fix*
+    + careful only because the id does exist in the Database does not mean that there hasn't been a Typo in the id and it just matches something by chance (however not the correct tree)
+    
+  * **idTree_missmatch**: all information except for the id do not match between the two dataframes
+  * **TreeFieldNum_missmatch**: only information on Tree Field Number does not match
+  * **Plot_missmatch**: only information on Plot does not match
+  * **SubPlot_missmatch**: only information on Sub Plot does not match
+  * **SpecCode_missmatch**: only information on Species Code Number does not match
+  * **Manualcheck_missmatch**: several columns do not match and require a manual check
+    + to create the manualcheck_missmatch I enter a 1 for each of the individuals that have either received a 1 in *idNOTinDB*, 
+    **OR** did not receive a code one in any of the other above mentioned columns 
+
+Example for ids not matching any in the database:
+
+**A dataframe consisting of sampled individuals within the Fielddata_Sheet that do not match any existing idTrees within the ParacouDB:**
+```{r Dataframe with mismatch of idTrees between FieldSheet and ParacouDB}
+# get a dataframe with all the individuals where idTree does not correspond to any within the database
+
+iddoesNotExist <- FieldSheet_Clean %>% 
+  mutate(idExists = ifelse(FieldSheet_Clean$idTree %in% ParacouDB_unique$idTree == T, 1,0)) %>% # creates a new Column with a 0 (not found in database) and 1 (exists in database) code 
+  filter(idExists == 0) # filter only the 0s to get a dataframe only containing incorrect ids
+
+print(iddoesNotExist)
+# there are 8 clear mistakes of idTrees
+```
+**There is a idTrees within the FieldSheet that do not match any idTree in the Database - as it is NA**
+
+e) retrieve correct information automatically if possible:
+  * **no_mismatch**
+    + --> nothing needs to be done
+  * **idNOTinDB** if the combination of all other information (which is also unique):
+    + --> matches the information in the database --> *extract correct id from Database and state that this is not a manualcheck_missmatch*
+    + --> DOES NOT match the information in the database --> *manual check required as more than one column differs from Database*
+    
+  * **idTree_missmatch**: the combination of all other information (which is also unique):
+    + --> matches the information in the database --> *extract correct id from Database*
+    + --> DOES NOT match the information in the database --> *manual check required as more than one column differs from Database*
+    
+  * **TreeFieldNum_missmatch**: 
+    + --> *extract correct Tree Field Number from Database*
+  * **Plot_missmatch**: only information on Plot does not match
+    + --> *extract correct Plot from Database*
+  * **SubPlot_missmatch**: only information on Sub Plot does not match
+    + --> *extract correct Sub Plot from Database*
+  * **SpecCode_missmatch**: only information on Species Code Number does not match
+    + --> *extract correct Species Code from Database*
+  * **Manualcheck_missmatch**: 
+    + --> *needs to be checked manually - Return a dataframe for manual corrections*
+    
+For each correction a Correction Code e.g. *Code_idTreeCorr* is added and the wrongly noted information is kept in an additional column e.g. *idTree_Wrong*.
+
+```{r Add missmatch of FS and DB to dataframe}
+
+FieldSheet_Clean <- rownames_to_column(FieldSheet_Clean)
+#c) Join your sampling sheet with the dataframe in which the correct information on the individual trees exists (here after refered to as *Database*), by a unique identifier that exists in both e.g. idTree
+
+# join Fieldsheet and Paracou_DB by idTree only 
+FieldSheet_Clean <- left_join(FieldSheet_Clean, #%>% rename(SpecCode = SpecCode_DB), #rename the SpecCode_DB from witin the sample sheet to SpecCode_FS to avoid confusion
+                               ParacouDB_unique %>% ungroup() %>% select(idTree, Plot, SubPlot, TreeFieldNum, SpecCode), # join with the ParacouDB that only contains each idTree once & select relevant columns
+                               by="idTree", suffix = c("_FS", "_DB")) # only join by idTree and give information from the DB the suffix .DB to clearly state what comes from where
+
+#d) Add columns for missmatches between your sampling sheet and the Database with the correct information
+
+# create missmatch rows to indicate missmatches between the 2 joined dataframes - alternatively this could be done in two steps by setting the difference between the two dataframes and creating a third containing these differences
+
+FieldSheet_Clean <- FieldSheet_Clean %>% mutate(no_missmatch = ifelse(Plot_FS == Plot_DB &         ## in case there is no missmatch at all
+                                                          SubPlot_FS == SubPlot_DB &
+                                                          TreeFieldNum_FS == TreeFieldNum_DB &
+                                                          SpecCode_FS == SpecCode_DB, 1, NA),
+                                     #could combine idNotInDB and idTree_missmatch
+                                                idNotInDB = ifelse(is.na(idTree) |
+                                                          is.na(Plot_DB) &                  ## in case idTree does not exist in Database or is NA
+                                                          is.na(SubPlot_DB) &
+                                                          is.na(TreeFieldNum_DB) &
+                                                          is.na(SpecCode_DB), 1, 0),
+
+                                                idTree_missmatch = ifelse(idNotInDB == 1 &
+                                                          Plot_FS != Plot_DB &                  ## in case only idTree is wrong there is the chance that all other columns don't match
+                                                          SubPlot_FS != SubPlot_DB &
+                                                          TreeFieldNum_FS != TreeFieldNum_DB &
+                                                          SpecCode_FS != SpecCode_DB, 1, NA),
+                                
+                                TreeFieldNum_missmatch = ifelse(TreeFieldNum_FS != TreeFieldNum_DB & ## in case of missmatch in TreeFieldNum only
+                                                          Plot_FS == Plot_DB &
+                                                          SubPlot_FS == SubPlot_DB &
+                                                          SpecCode_FS == SpecCode_DB | 
+                                                            is.na(TreeFieldNum_FS) &
+                                                          Plot_FS == Plot_DB &
+                                                          SubPlot_FS == SubPlot_DB &
+                                                          SpecCode_FS == SpecCode_DB, 1, NA), 
+                                
+                                Plot_missmatch = ifelse(Plot_FS != Plot_DB &                        ## in case of missmatch in Plot only
+                                                        SubPlot_FS == SubPlot_DB &
+                                                        TreeFieldNum_FS == TreeFieldNum_DB &
+                                                        SpecCode_FS == SpecCode_DB |
+                                                          is.na(Plot_FS) &
+                                                        SubPlot_FS == SubPlot_DB &
+                                                        TreeFieldNum_FS == TreeFieldNum_DB &
+                                                        SpecCode_FS == SpecCode_DB, 1, NA),
+                                
+                                SubPlot_missmatch = ifelse(SubPlot_FS != SubPlot_DB &               ## in case of missmatch in SubPlot only
+                                                           Plot_FS == Plot_DB &
+                                                           TreeFieldNum_FS == TreeFieldNum_DB &
+                                                           SpecCode_FS == SpecCode_DB |
+                                                          is.na(SubPlot_FS) &
+                                                           Plot_FS == Plot_DB &
+                                                           TreeFieldNum_FS == TreeFieldNum_DB &
+                                                           SpecCode_FS == SpecCode_DB, 1, NA),
+                                
+                                SpecCode_missmatch = ifelse(SpecCode_FS != SpecCode_DB &            ## in case of missmatch in SpecCode only
+                                                            SubPlot_FS == SubPlot_DB &
+                                                            Plot_FS == Plot_DB &
+                                                            TreeFieldNum_FS == TreeFieldNum_DB |
+                                                          is.na(SpecCode_FS) & 
+                                                            SubPlot_FS == SubPlot_DB &
+                                                            Plot_FS == Plot_DB &
+                                                            TreeFieldNum_FS == TreeFieldNum_DB, 1, NA),
+                                
+                                Manualcheck_missmatch = ifelse(is.na(no_missmatch) &              ## in case of missmatch in multiple columns - can still be that its just a typo in idTree, but the 
+                                                                 is.na(idTree_missmatch) &        ## tree individual that matches with the entered idTree of the Field Sheet and the database shares
+                                                                 is.na(TreeFieldNum_missmatch) &  ## additional information column with the tree individual that has bee sampled e.g. Plot or SubPlot
+                                                                 is.na(Plot_missmatch) &
+                                                                 is.na(SubPlot_missmatch) &
+                                                                 is.na(SpecCode_missmatch), 1, 0) ## also for now assumes that if the idTree does not exist in the database it is an error that needs to be manually corrected 
+                                )                                                          
+#FieldSheet_Clean %>% filter(Manualcheck_missmatch==1) #18 in total
+
+
+#e) retrieve correct information automatically if possible:
+
+## Now correction 
+for (i in 1:nrow(FieldSheet_Clean)) {
+  
+  
+  ### CORRECT IDTREE if manual check is actually not required because all other information except for the idTree match an individual in the database  
+  if(!is.na(FieldSheet_Clean[i, "Manualcheck_missmatch"]) && FieldSheet_Clean[i, "Manualcheck_missmatch"] != 0){
+     
+        # search for correct one in database
+        ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(TreeFieldNum == FieldSheet_Clean[i, "TreeFieldNum_FS"] & 
+                                                          Plot == FieldSheet_Clean[i, "Plot_FS"] &
+                                                          SubPlot == FieldSheet_Clean[i, "SubPlot_FS"] &
+                                                          SpecCode == FieldSheet_Clean[i, "SpecCode_FS"])
+        if(nrow(ParacouDB_unique_corrInd == 1)){ # only if a suitable match is found - if required only here because the other correction codes already depend on that                                                    all other information has been found in the database
+
+            # store wrongly entered idTree and overwrite with correct one
+            FieldSheet_Clean[i, "idTreeWrong"] <- FieldSheet_Clean[i, "idTree"]
+            FieldSheet_Clean[i, "idTree"] <- ParacouDB_unique_corrInd$idTree
+            # and correct the code for Manualcheck_missmatch
+            FieldSheet_Clean[i, "Manualcheck_missmatch"] <- 0
+            FieldSheet_Clean[i, "Code_idTreeCorr"] <- 1 # add correction code
+        }
+  }
+  
+  
+    ### CORRECT IDTREE if it was identified as a clear idTree mismatch      
+   else if(!is.na(FieldSheet_Clean[i,"idTree_missmatch"]) && FieldSheet_Clean[i,"idTree_missmatch"] != 0){
+
+        # search for correct one in database 
+        ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(TreeFieldNum == FieldSheet_Clean[i, "TreeFieldNum_FS"] & 
+                                                          Plot == FieldSheet_Clean[i, "Plot_FS"] &
+                                                          SubPlot == FieldSheet_Clean[i, "SubPlot_FS"] &
+                                                          SpecCode == FieldSheet_Clean[i,"SpecCode_FS"])
+        if(nrow(ParacouDB_unique_corrInd == 1)){ # only if a suitable match is found - if required only here because the other correction codes already depend on that                                                    all other information has been found in the database
+
+
+        # store wrongly entered idTree and overwrite with correct one
+        FieldSheet_Clean[i, "idTreeWrong"] <- FieldSheet_Clean[i, "idTree"] # store information on Wrong idTree
+        FieldSheet_Clean[i, "idTree"] <- ParacouDB_unique_corrInd$idTree # overwrite idTree with the correct one
+        FieldSheet_Clean[i, "Code_idTreeCorr"] <- 1 # add correction code
+    
+        } 
+   }
+                                                                                                
+
+
+    ### COREECT TREEFIELDNUMBER
+    else if(!is.na(FieldSheet_Clean[i, "TreeFieldNum_missmatch"]) && FieldSheet_Clean[i, "TreeFieldNum_missmatch"] != 0){
+     
+          # search for correct one in database 
+          ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(idTree == FieldSheet_Clean[i, "idTree"] & 
+                                                          Plot == FieldSheet_Clean[i, "Plot_FS"] &
+                                                          SubPlot == FieldSheet_Clean[i, "SubPlot_FS"] &
+                                                          SpecCode == FieldSheet_Clean[i, "SpecCode_FS"])
+     
+          # store wrongly entered TreeFieldNum and overwrite with correct one
+          FieldSheet_Clean[i, "TreeFieldNumWrong"] <- FieldSheet_Clean[i, "TreeFieldNum_FS"]
+          FieldSheet_Clean[i, "TreeFieldNum_FS"] <- ParacouDB_unique_corrInd$TreeFieldNum
+          FieldSheet_Clean[i, "Code_TreeFieldNumCorr"] <- 1 # add correction code
+   }
+
+    ### CORRECT PLOT
+    else if(!is.na(FieldSheet_Clean[i, "Plot_missmatch"]) && FieldSheet_Clean[i, "Plot_missmatch"] != 0){
+      
+          # search for correct one in database  
+          ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(idTree == FieldSheet_Clean[i, "idTree"] &
+                                                          TreeFieldNum == FieldSheet_Clean[i, "TreeFieldNum_FS"] &
+                                                          SubPlot == FieldSheet_Clean[i, "SubPlot_FS"] &
+                                                          SpecCode == FieldSheet_Clean[i, "SpecCode_FS"])
+    
+          # store wrongly entered Plot and overwrite with correct one
+          FieldSheet_Clean[i, "PlotWrong"] <- FieldSheet_Clean[i, "Plot_FS"]
+          FieldSheet_Clean[i, "Plot_FS"] <- ParacouDB_unique_corrInd$Plot
+          FieldSheet_Clean[i, "Code_PlotCorr"] <- 1 # add correction code
+     }
+  
+    ### CORRECT SUBPLOT
+    else if(!is.na(FieldSheet_Clean[i, "SubPlot_missmatch"]) && FieldSheet_Clean[i, "SubPlot_missmatch"] != 0){
+     
+          # search for correct one in database  
+          ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(idTree == FieldSheet_Clean[i, "idTree"] &
+                                                          TreeFieldNum == FieldSheet_Clean[i, "TreeFieldNum_FS"] &
+                                                          Plot == FieldSheet_Clean[i, "Plot_FS"] &
+                                                          SpecCode == FieldSheet_Clean[i, "SpecCode_FS"])
+
+          # store wrongly entered SubPlot and overwrite with correct one
+          FieldSheet_Clean[i, "SubPlotWrong"] <- FieldSheet_Clean[i, "SubPlot_FS"]
+          FieldSheet_Clean[i, "SubPlot_FS"] <- ParacouDB_unique_corrInd$SubPlot
+          FieldSheet_Clean[i, "Code_SubPlotCorr"] <- 1 # add correction code
+    }
+
+    ### CORRECT SPECCODE        
+    else if(!is.na(FieldSheet_Clean[i, "SpecCode_missmatch"]) && FieldSheet_Clean[i, "SpecCode_missmatch"] != 0){
+
+          # search for correct one in database            
+          ParacouDB_unique_corrInd <- ParacouDB_unique %>% filter(idTree == FieldSheet_Clean[i, "idTree"] &
+                                                          TreeFieldNum == FieldSheet_Clean[i, "TreeFieldNum_FS"] &
+                                                          Plot == FieldSheet_Clean[i, "Plot_FS"] &
+                                                          SubPlot == FieldSheet_Clean[i, "SubPlot_FS"])
+
+          # store wrongly entered SpecCode and overwrite with correct one
+          FieldSheet_Clean[i, "SpecCodeWrong"] <- FieldSheet_Clean[i, "SpecCode_FS"]
+          FieldSheet_Clean[i, "SpecCode_FS"] <- ParacouDB_unique_corrInd$SpecCode
+          FieldSheet_Clean[i, "Code_SpecCodeCorr"] <- 1 # add correction code
+      }
+}
+
+
+
+###OUTPUT
+#CLEAN DATAFRAME && 
+ManualCorrection <- FieldSheet_Clean %>% 
+  select(rowname, Plot_FS, 
+         SubPlot_FS, 
+         idTree, 
+         TreeFieldNum_FS, 
+         SpecCode_FS, 
+         RWCnr_original, 
+         Plot_DB, 
+         SubPlot_DB, 
+         TreeFieldNum_DB, 
+         SpecCode_DB, 
+         Manualcheck_missmatch) %>% 
+  filter(Manualcheck_missmatch == 1) 
+
+ManualCorrection
+``` 
+
+2) rowname 227 - idTree and Fieldnumber wrong
+
+```{r}
+ParacouDB_unique %>% filter(Plot == 14 , SubPlot == 4, SpecCode == "Dic.gui") # check with field sheet: its FieldNr 11 instead of 13
+```
+
+```{r}
+ManualCorrection$idTree_Corr[ManualCorrection$rowname==106] <- 144254 # idTree from Database
+ManualCorrection$TreeFieldNum_Corr[ManualCorrection$rowname==106] <- 11 # TreeFieldNum from Database
+```
+
+What about the empty ones?
+```{r}
+FieldSheet_Clean %>% filter(RWCnr_original %in% c("25","58","59")) # empty - so ok
+
+```
+
+
+**Here the rows that what have been corrected manually**
+```{r Overview Manual corrections}
+ManualCorrection 
+```
+
+Do another test if this now matches the database or if information was again wrongly entered
+... if not join them together
+
+**Join manual correction with the FieldSheet:**
+still missing add manual correction code
+```{r Join manual corrections and Fieldsheet}
+FieldSheet_Clean <- left_join(FieldSheet_Clean, ManualCorrection)
+
+if(!is.null(FieldSheet_Clean$Manualcheck_missmatch)) {
+
+    for (i in 1:nrow(FieldSheet_Clean)) {
+  
+        if(FieldSheet_Clean[i, "Manualcheck_missmatch"] == 1) {
+
+            ### CORRECT IDTREE if it was identified as a clear idTree mismatch
+            if(!is.null(FieldSheet_Clean$idTree_Corr) && 
+            !is.na(FieldSheet_Clean[i, "idTree_Corr"]) && 
+             FieldSheet_Clean[i, "idTree_Corr"] != 0) {
+
+                # store wrongly entered idTree and overwrite with correct one
+                FieldSheet_Clean[i, "idTreeWrong"] <- FieldSheet_Clean[i, "idTree"] # store information on Wrong idTree
+                FieldSheet_Clean[i, "idTree"] <- FieldSheet_Clean[i, "idTree_Corr"] # overwrite idTree with the correct one which was manually entered
+            } 
+  
+            ### CORRECT TREEFIELDNUMBER
+            if(!is.null(FieldSheet_Clean$TreeFieldNum_Corr) && 
+               !is.na(FieldSheet_Clean[i, "TreeFieldNum_Corr"]) &&
+               FieldSheet_Clean[i, "TreeFieldNum_Corr"] != 0){
+     
+ 
+                # store wrongly entered TreeFieldNum and overwrite with correct one
+                FieldSheet_Clean[i, "TreeFieldNumWrong"] <- FieldSheet_Clean[i, "TreeFieldNum_FS"]
+                FieldSheet_Clean[i, "TreeFieldNum_FS"] <- FieldSheet_Clean[i, "TreeFieldNum_Corr"]
+            }
+
+            ### CORRECT PLOT
+            if(!is.null(FieldSheet_Clean$Plot_Corr) && 
+               !is.na(FieldSheet_Clean[i, "Plot_Corr"]) &&
+               FieldSheet_Clean[i, "Plot_Corr"] != 0){
+      
+                # store wrongly entered Plot and overwrite with correct one
+                FieldSheet_Clean[i, "PlotWrong"] <- FieldSheet_Clean[i, "Plot_FS"]
+                FieldSheet_Clean[i, "Plot_FS"] <- FieldSheet_Clean[i, "Plot_Corr"]
+             }
+  
+            ### CORRECT SUBPLOT
+            if(!is.null(FieldSheet_Clean$SubPlot_Corr) && 
+               !is.na(FieldSheet_Clean[i, "SubPlot_Corr"]) &&
+               FieldSheet_Clean[i, "SubPlot_Corr"] != 0){
+     
+                # store wrongly entered SubPlot and overwrite with correct one
+                FieldSheet_Clean[i, "SubPlotWrong"] <- FieldSheet_Clean[i, "SubPlot_FS"]
+                FieldSheet_Clean[i, "SubPlot_FS"] <- FieldSheet_Clean[i, "SubPlot_Corr"]  
+             }
+
+            ### CORRECT SPECCODE        
+            if(!is.null(FieldSheet_Clean$SpecCode_Correction) && 
+               !is.na(FieldSheet_Clean[i, "SpecCode_Correction"]) &&
+               FieldSheet_Clean[i, "SpecCode_Correction"] != 0){
+
+                # store wrongly entered SpecCode and overwrite with correct one
+                FieldSheet_Clean[i, "SpecCodeWrong"] <- FieldSheet_Clean[i, "SpecCode_FS"]
+                FieldSheet_Clean[i, "SpecCode_FS"] <- FieldSheet_Clean[i, "SpecCode_Correction"]      
+            } 
+        }
+    }
+}
+
+```
+
+
+
+ Little checks
+```{r}
+#FieldSheet_Clean %>% filter(Code_PlotCorr==1) # yes does not exist because we dont have that case
+#FieldSheet_Clean %>% filter(Code_SpecCodeCorr==1) # yes does not exist because we dont have that case 
+FieldSheet_Clean %>% filter(Code_idTreeCorr==1) %>% select(idTree, idTreeWrong, Code_idTreeCorr) # yes all correct
+FieldSheet_Clean %>% filter(!is.na(idTreeWrong)) %>% select(idTree, idTreeWrong, Code_idTreeCorr)
+FieldSheet_Clean %>% filter(Code_idTreeCorr==0 & !is.na(idTreeWrong)) #seems good 
+
+FieldSheet_Clean %>% filter(Code_SubPlotCorr==1) %>% select(idTree, SubPlot_FS, SubPlot_DB, SubPlotWrong, SubPlot_missmatch)
+FieldSheet_Clean %>% filter(!is.na(SubPlotWrong==1))%>% select(idTree, SubPlot_FS, SubPlot_DB, SubPlotWrong, SubPlot_missmatch) # yes all correct because one was an NA
+
+```
+
+Recheck if now all the idTrees can be found in the Database. 
+
+```{r recheck for mismatching idTree after correction}
+# get a dataframe with all the individuals where idTree does not correspond to any within the database
+iddoesNotExist_afterCleaning <- FieldSheet_Clean %>%  
+  mutate(idexist = ifelse(FieldSheet_Clean$idTree %in% ParacouDB_unique$idTree == T, 1,0)) %>% # creates a new Column with a 0 (not found in database) and 1 (exists in database) code 
+  filter(idexist == 0) # filter only the 0s to get a dataframe only containing incorrect ids
+
+nrow(iddoesNotExist_afterCleaning)
+```
+
+Ok looks fine - its now just the 3 empty rows now
+```{r}
+iddoesNotExist_afterCleaning
+```
+Dublicates? - NO
+```{r}
+FieldSheet_Clean %>% group_by(idTree) %>% summarize(nSamples = n_distinct(idTree)) %>% filter(nSamples >1)
+```
+
+
+# Homogenise Tree Information
+Position Crown:
+ Branch_Position_crown
+  <chr>                
+1 middle               
+2 low                  
+3 top                  
+4 NA       
+
+
+```{r}
+FieldSheet_Clean %>% ungroup() %>% distinct(Position_Crown)
+```
+
+Homogenise information
+```{r}
+FieldSheet_Clean <- replaceStuff(list_wrong_strings = c("Sup"), 
+             replacement = "top", 
+             df = FieldSheet_Clean, 
+             col_name = "Position_Crown")
+
+FieldSheet_Clean <- replaceStuff(list_wrong_strings = c("Mid"), 
+             replacement = "middle", 
+             df = FieldSheet_Clean, 
+             col_name = "Position_Crown")
+
+FieldSheet_Clean <- replaceStuff(list_wrong_strings = c("Inf"), 
+             replacement = "low", 
+             df = FieldSheet_Clean, 
+             col_name = "Position_Crown")
+```
+
+# Add taxonomic information:
+
+TaxonInfo <- ParacouDB_unique %>% ungroup() %>% select(idTree, Genus, Species, spName)
+
+FieldSheet_Clean_BotaCorr <- left_join(FieldSheet_Clean_BotaCorr, TaxonInfo, by = "idTree")
+
+FamilyInfo <- ParacouDB %>% group_by(Genus, Family) %>% distinct(Genus) %>% rename(Genus_CorrBota = Genus, Family_CorrBota = Family)
+FieldSheet_Clean_BotaCorr <- left_join(FieldSheet_Clean_BotaCorr, FamilyInfo)
+
+```{r}
+
+TaxonInfo <- ParacouDB %>% ungroup() %>% select(idTree, Genus_CorrBota = Genus, Species_CorrBota=Species, spName_CorrBota=spName, Family_CorrBota=Family) %>% distinct()
+
+FieldSheet_Clean_BotaCorr <- left_join(FieldSheet_Clean, TaxonInfo, by = "idTree")
+
+```
+
+# Select and Rename
+
+```{r}
+names(FieldSheet_Clean_BotaCorr)
+```
+
+
+```{r}
+FieldSheet_Clean_BotaCorr_OUT <- FieldSheet_Clean_BotaCorr %>% 
+  
+  select(RWCnr_original, # identifier sample
+       #RWC_additional1, 
+       
+       idTree,         #information on Tree
+       #Resampled,
+       Plot = Plot_FS, 
+       SubPlot = SubPlot_FS, 
+       TreeFieldNum = TreeFieldNum_FS,
+       SpecCode_CorrBota = SpecCode_FS,
+       
+       spName_CorrBota, # taxonomic information
+       Genus_CorrBota,
+       Species_CorrBota,
+       Family_CorrBota, 
+       
+       Tree_Dawkins = DawkinIndiv,  # detailed information on tree
+       Tree_Height = HeightTree, 
+       
+       Branch_Dawkins = DawkinBranch, # detailed information on branch
+       Branch_Height = HeightBranch, 
+       #Branch_Light_exposition = LeafLight_exposition, 
+       Branch_Position_crown = Position_Crown,
+       #LeafLight_exposition,
+       
+       Habitat_preference = pref.Habitat, # additional Info on Species and tree
+       Habitat_real = Habitat,
+       
+       #DateField, # Info on Sampling Day
+       #TimeArrival, 
+       #Weather_Arrival = WXArrival,
+       #Name_Team = NamesTeam, 
+       #Name_Recorder = Recorder,
+       #Time_Sampling = TimeCollection, 
+       #Weather_Sampling = WXCollecion, 
+       #NrDiscs, # disc information
+       #DiscDiameter, 
+       #NrLeaves4Discs, 
+       #RWCSecVeins2Dense,
+       
+       #SampledTraits, # additional information
+       #RWCbigBag_used,
+       #Ficelle, 
+       #Nrleaves2Lab,
+       
+       #Comment_RWC = commentRWCnr, # Comments
+       #Comment_Individual = Comment_individual.collection.exposure,
+       
+       #no_missmatch, # Information on Mismatches with Database and Correction
+       Code_ManualCorr = Manualcheck_missmatch, 
+       Code_idTreeCorr,
+       #Code_TreeFieldNumCorr,
+       Code_SubPlotCorr,
+       
+       Wrong_idTree = idTreeWrong, # wrongly entered information
+       Wrong_TreeFeldNum = TreeFieldNumWrong,
+       Wrong_SubPlot = SubPlotWrong,
+       SpecCode_DB = SpecCode_FS,
+       
+       #Code_ErrorBota, # Botanical correction
+       #Code_idBotaCheck = Code_id_corr, 
+       #Wrong_idBota = Wrong_id,
+       #Comment_Botanist
+       
+       # traits
+       Trait_FW_E.g = Fresh_Weight.g.,
+       Trait_SW_E.g = Saturated_Weight.g.,
+       Trait_Delta_FW_SW_E.g. = Delta_Weight_SW.FW.g.,
+       Trait_Delta_en_real = delta_en_._real,
+       Trait_Delta_en_clean = delta_en_._clean, 
+       Trait_DW_E.g. = Dry_Weight.g.,
+       Trait_RWC = RWC, 
+       Trait_LSWC = LSWC,
+       Trait_Posmo = P_osmo,
+       Trait_Ptlp = P_tlp,
+       Trait_Pmidday.mean = mean_Pmidday, 
+       Trait_Fv.Fm = Fv.Fm, 
+       Trait_LA.cm2 = LA..cm.2.,
+       Trait_gmin.molm2s1 = gmin..mmol.m.2.s.1.,
+       Trait_1st_Order_VD.mm.mm2 = X1st_Order_Vein_Density..mm.mm.2.,
+       Trait_2nd_Order_VD.mm.mm2 = X2nd_Order_Vein_Density..mm.mm.2.,
+       Trait_3rd_Order_VD.mm.mm2 = X3rd_Order_Vein_Density..mm.mm.2.,
+       Trait_Major_VD = Major_Vein_Density..mm.mm.2.   
+       )
+```
+
+
+```{r}
+
+#FieldSheet_Clean<- FieldSheet_Clean %>% select(-c("Plot_DB", "SubPlot_DB", "TreeFieldNum_DB", "SpecCode_DB"))
+#FieldSheet_Clean<- FieldSheet_Clean %>% rename(Plot = Plot_FS, SubPlot = SubPlot_FS, TreeFieldNum = TreeFieldNum_FS, SpecCode = SpecCode_FS)
+FieldSheet_Clean_BotaCorr_OUT <- FieldSheet_Clean_BotaCorr_OUT %>% mutate(RWCnr_original = paste0("M", RWCnr_original))
+FieldSheet_Clean_BotaCorr_OUT <- FieldSheet_Clean_BotaCorr_OUT %>% mutate(Name_project = "Metradica")
+
+write.csv(FieldSheet_Clean_BotaCorr_OUT, "./../output/FieldSheet_Clean_OUT_Metradica.csv", row.names = FALSE)
+```
+
+ 

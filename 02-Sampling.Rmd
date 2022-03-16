@@ -65,6 +65,10 @@ The three sites were chosen in order to sample species along the rainfall gradie
 
 ## Species
 
+Specialist species are species that have a habitat preference, either for *terra firme* soils or for seasonally flooded soils in French Guiana. Generalist species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species. 
+
+We **hypothesize** that they should display large ITV since they inhabit a large ecological spectrum. We are interested to see how ITV of functional traits is structured for these generalist species. 
+
 ### Indicator Species Analysis
 
 We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.

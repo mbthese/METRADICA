@@ -7,18 +7,18 @@ editor_options:
   chunk_output_type: inline
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# To do 
 
-# Import Paracou dataset
 
 What is missing:
 * stomatal densities
 * FTH data
-* vein densities for the FTH data
+* vein densities 
 * check gmin function 
 * check for outliers -> see Daniela
+
+# Import Paracou dataset
+
 
 ```{r Paracou2020}
 library(readr)

@@ -125,7 +125,10 @@ export(LA_gmin, "LA_gmin.csv")
 With Daniela's function, calculte gmin for all bafog individuals. 
 
 
-
+# ptlp
+-> daniela takes à partir du 5th run (including 5th)
+-> plot all the values and look at the outliers visually, check back to comments, and add columns saying why if i take it out
+-> keep track of what you do!
 
 # Re-ordering columns
 
