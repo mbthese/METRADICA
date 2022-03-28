@@ -1,0 +1,74 @@
+---
+title: "Venation results"
+author: "Marion Boisseaux"
+date: "28/03/2022"
+output: html_document
+---
+# Vein traits
+
+Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011). 
+
+
+# Hypothesis
+
+- Smaller leaves tend to have a higher major VLA 
+- Leaves from Terra firme have a higher major VLA (Sack and Scoffoni 2013)
+- Leaves from Bafog (lower precipitation regime) are smaller with a higher major VLA than leaves in Kaw (higher precipitation regime). Paracou leaves major VLA values are in the middle
+
+# Materials and Method
+
+Leaf area (LA, mm2 ) 
+Major vein density (Major VLA, mm/mm2) : vein length per unit area 
+Sum of vein densities for 1°, 2° and 3° veins (mm mm-2)
+Double sided lamp flatbed scanner
+ImageJ
+
+
+*Why a higher VLA? To confer redundancy and drought tolerance*
+
+Measurements from Scoffoni's Lab. These measures were calculated by a student group project from January - March 2022.
+
+# Results
+
+```{r Import dataset}
+veindata <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/summarize_spp_avg.xlsx",     sheet = "for R")
+```
+
+## Across species from all habitats
+
+```{r}
+library(ggplot2)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+veindata <- veindata %>%
+    mutate(Species = recode(Species, 'Protium_picramnioides' = 'Protium_stevensonii')) %>%
+    mutate(Species = recode(Species, 'Jacaranda_copaia' = 'Jacaranda_copaia subsp. Copaia'))
+
+
+veindata$Species <- as.factor(veindata$Species)
+fct_reorder(veindata$Species, veindata$LA, min)
+
+ggplot(veindata) +
+ aes(x = fct_reorder(Species, LA), y = LA, fill = Species) +
+ geom_boxplot(shape = "circle") +
+ theme_minimal() + 
+ facet_grid(vars(Site), vars()) + 
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+```
+
+
+
+
+## SFF vs TF habitats
+
+
+
+## Specialists SFF vs Specialists TF vs Generalists
+
+## Bafof vs Kaw
+
+

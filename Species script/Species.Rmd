@@ -44,31 +44,32 @@ library(rgdal)
 library(ggplot2)
 library(sf)
 library(leaflet)
+library(RColorBrewer) #for colors
+library(tidyverse)
+library(dplyr)
 
 #import shapefile - plots
 
 Plots <- readOGR(dsn = "./SIG",layer = "OverallPlots")
-Plots
 Plots <- spTransform(Plots, CRS("+proj=longlat +datum=WGS84")) 
 
-#plot the map
-plot(Plots)
 
+# Subset only Paracou parcelles object
+Plots_sub <- Plots[Plots$Project %in% c("ParacouCIRAD"), ]
+
+Plots_sub2 = subset(Plots_sub, Plot=="1" & Plot=="2")
+
+Plots_sub[Plots_sub$Plot >= "1" & Plots_sub$Plot <= "16", ]
+
+plot(Plots_sub)
 
 #import shapefile - topography
 
 Topo <- readOGR(dsn = "./SIG",layer = "TopographicLevels")
 Topo <- spTransform(Topo, CRS("+proj=longlat +datum=WGS84")) 
 
-library(RColorBrewer)
-pal <- brewer.pal(3, "OrRd") # we select 3 colors from the palette
 
-plot(Topo["TypeTopoEN"], pal=pal)
-
-
-ggplot()+
-  geom_polygon(data = df, aes(x= long, y = lat, group = group, fill = "green", lwd = 1))+
-  theme_bw()
+plot(Topo)
 
 palSp <- colorFactor("viridis", MySpecies$GS)
 limits <- st_read("./SIG/OverallPlots.shp", quiet = T)
