@@ -25,3 +25,16 @@ protocols
 pca-results
 trait-covariation
 section
+trait-distribution
+vein-traits
+hypothesis
+materials-and-method
+results
+across-species-from-all-habitats
+sff-vs-tf-habitats
+specialists-sff-vs-specialists-tf-vs-generalists
+bafof-vs-kaw
+to-do
+waterlogging-litterature
+general-potential-hypotheses
+bafog-vs-kaw
