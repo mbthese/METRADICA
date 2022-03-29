@@ -50,8 +50,18 @@ veindata <- veindata %>%
 veindata$Species <- as.factor(veindata$Species)
 fct_reorder(veindata$Species, veindata$LA, min)
 
+veindata$MajVLA <- as.numeric(veindata$MajVLA)
+
 ggplot(veindata) +
  aes(x = fct_reorder(Species, LA), y = LA, fill = Species) +
+ geom_boxplot(shape = "circle") +
+ theme_minimal() + 
+ facet_grid(vars(Site), vars()) + 
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+ggplot(veindata) +
+ aes(x = fct_reorder(Species, MajVLA), y = MajVLA, fill = Species) +
  geom_boxplot(shape = "circle") +
  theme_minimal() + 
  facet_grid(vars(Site), vars()) + 
@@ -65,10 +75,80 @@ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ## SFF vs TF habitats
 
+```{r}
+
+library(ggplot2)
+
+ggplot(veindata) +
+ aes(x = Habitat, y = LA, fill = Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ BF = "#6DB9F8", TF = "#FFA961")) +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15L), 
+ plot.caption = element_text(size = 14L), axis.title.y = element_text(size = 14L), axis.title.x = element_text(size = 18L)) +
+ facet_wrap(vars(Site))
+
+
+ggplot(veindata) +
+ aes(x = Habitat, y = MajVLA, fill = Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ BF = "#6DB9F8", TF = "#FFA961")) +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15L), 
+ plot.caption = element_text(size = 14L), axis.title.y = element_text(size = 14L), axis.title.x = element_text(size = 18L)) +
+ facet_wrap(vars(Site))
+
+```
+
 
 
 ## Specialists SFF vs Specialists TF vs Generalists
 
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+ggplot(veindata) +
+ aes(x = Pref_Habitat, y = LA, fill = Pref_Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(BF = "#495BE3", Generalist = "#AED3CC", TF = "#F0C323")) +
+ theme_minimal() +
+ facet_wrap(vars(Site))
+
+ggplot(veindata) +
+ aes(x = Pref_Habitat, y = MajVLA, fill = Pref_Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(BF = "#495BE3", Generalist = "#AED3CC", TF = "#F0C323")) +
+ theme_minimal() +
+ facet_wrap(vars(Site))
+
+
+```
+
+
 ## Bafof vs Kaw
+```{r}
+library(ggplot2)
+
+ggplot(veindata) +
+ aes(x = Site, y = LA, fill = Site) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ Bafog = "#E5B922", KAW = "#0040C1", PARACOU = "#E5D1DD")) +
+ theme_minimal()
+
+ggplot(veindata) +
+ aes(x = Site, y = MajVLA, fill = Site) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ Bafog = "#E5B922", KAW = "#0040C1", PARACOU = "#E5D1DD")) +
+ theme_minimal()
+
+```
+
 
 
