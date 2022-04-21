@@ -60,6 +60,14 @@ Additional data to confront VLA with :
 - Stomatal density *waiting for data*
 - leaf chemistry *waiting for data*
 
+Paracou data: 
+```{r}
+
+```
+
+Bafog data: 
+Kaw data: 
+
 ## Results
 
 ```{r Import dataset veins, include=FALSE}

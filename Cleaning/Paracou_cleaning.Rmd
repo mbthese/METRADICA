@@ -4,6 +4,46 @@ author: "Marion Boisseaux"
 date: "29/03/2022"
 output: html_document
 ---
+# Paracou joint data 
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+
+Daniela <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/FieldSheet_Clean_OUT_Metradica.csv")
+
+# drop the M in the codeand change column names
+
+Daniela$RWCnr_original<-gsub("M","",as.character(Daniela$RWCnr_original))
+
+Daniela <- Daniela %>% rename(Code = RWCnr_original, Species = Species_CorrBota, Genus = Genus_CorrBota, Family = Family_CorrBota) %>% select(-SpecCode_CorrBota, -spName_CorrBota) %>%
+  mutate(Name = paste(Genus, Species)) %>%
+  relocate(Name, .after = Species)
+
+
+Traits_Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Traits_Paracou.csv", 
+    col_types = cols(`Delta_Weight_SW-FW(g)` = col_skip(), 
+        `delta_en_%_real` = col_skip(), `delta_en_%_clean` = col_skip(), 
+        RWC = col_skip(), `1st_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `2nd_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `3rd_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `Major_Vein_Density (mm/mm^2)` = col_skip(), 
+        `Stomata_Density (nb/mm^2)` = col_skip(), 
+        `Stomata_Size (um^2)` = col_skip()))
+
+Daniela$Genus
+Daniela$Species
+Daniela$Family 
+
+Paracou <- cbind(Paracou, Daniela[c("Genus", "Species", "Name", "Family")])
+
+Paracou <- Paracou %>% relocate("Genus", "Species", "Name", "Family", .after = "FieldNr") %>% rename(Spcode = spName)
+Find duplicates
+duplicated(Paracou$Code)
+Paracou$Code[duplicated(Paracou$Code)]
+#238 196 196 196 196 196 196 196 215 215 215 215 215 215 215
+```
 
 
 #LA
