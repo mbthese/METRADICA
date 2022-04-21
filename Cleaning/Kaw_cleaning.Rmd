@@ -1,0 +1,77 @@
+---
+title: "Kaw_cleaning"
+author: "Marion Boisseaux"
+date: "29/03/2022"
+output: html_document
+---
+
+## LA
+
+Check resolution of images.
+```{r}
+library(dplyr)
+library(tidyverse)
+
+path1 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/05102021")
+
+path2 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/06102021")
+
+path3 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/07102021")
+
+path4 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/08102021")
+
+path5 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/11102021")
+
+path6 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/12102021")
+
+path7 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/13102021")
+
+path8 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/14102021")
+
+path9<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/18102021")
+
+path10<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/19102021")
+
+path11<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/20102021")
+
+
+###
+
+resolution1 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/05102021/",path1),tags = "XResolution")
+ResolutionProblems1 <- resolution1 %>% filter(XResolution!=1328)
+
+resolution2 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/06102021/",path2),tags = "XResolution")
+ResolutionProblems2 <- resolution2 %>% filter(XResolution!=1328)
+
+resolution3 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/07102021/",path3),tags = "XResolution")
+ResolutionProblems3 <- resolution3 %>% filter(XResolution!=1328)
+
+
+resolution4 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/08102021/",path4),tags = "XResolution")
+ResolutionProblems4 <- resolution4 %>% filter(XResolution!=1328)
+
+resolution5 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/11102021/",path5),tags = "XResolution")
+ResolutionProblems5 <- resolution5 %>% filter(XResolution!=1328)
+
+resolution6 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/12102021/",path6),tags = "XResolution")
+ResolutionProblems6 <- resolution6 %>% filter(XResolution!=1328)
+
+resolution7 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/13102021/",path7),tags = "XResolution")
+ResolutionProblems7 <- resolution7 %>% filter(XResolution!=1328)
+
+resolution8 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/14102021/",path8),tags = "XResolution")
+ResolutionProblems8 <- resolution8 %>% filter(XResolution!=1328)
+
+resolution9 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/18102021/",path9),tags = "XResolution")
+ResolutionProblems9 <- resolution9 %>% filter(XResolution!=1328)
+
+resolution10 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/19102021/",path10),tags = "XResolution")
+ResolutionProblems10 <- resolution10 %>% filter(XResolution!=1328)
+
+resolution11 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/20102021/",path11),tags = "XResolution")
+ResolutionProblems11 <- resolution11 %>% filter(XResolution!=1328)
+
+```
+
+All images 1328 ppp corresponding to 1600 dpi. 
+Except : 564 et 565 resolution 1201 ppp corresponding to 800 dpi.

@@ -1,9 +1,5 @@
-fig:unnamed-chunk-3
-tab:unnamed-chunk-4
 about
 background
-project-introduction
-hypotheses
 sampling
 habitats
 hydrological-indexes
@@ -22,9 +18,6 @@ hydraulic-traits
 photochemical-trait
 measured-traits
 protocols
-pca-results
-trait-covariation
-section
 trait-distribution
 vein-traits
 hypothesis
@@ -33,8 +26,8 @@ results
 across-species-from-all-habitats
 sff-vs-tf-habitats
 specialists-sff-vs-specialists-tf-vs-generalists
-bafof-vs-kaw
+bafog-vs-kaw
 to-do
 waterlogging-litterature
 general-potential-hypotheses
-bafog-vs-kaw
+section

@@ -2,12 +2,12 @@
 title: "Cleaning Bafog"
 author: "Marion Boisseaux"
 date: "16/02/2022"
-output: html_document
+output: word_document
 ---
 
 # Cleaning individual information
 
-```{r Individuals_Bafog}
+```{r Individuals_Bafog, eval=FALSE, include=FALSE}
 library(readxl)
 library(tidyverse)
 library(dplyr)
@@ -31,7 +31,7 @@ Bafog_individuals <- left_join(Individuals, Habitat, by="Code")
 
 Importing complete dataset, ready for cleaning.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(readxl)
 Bafog_individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Bafog_individuals.xlsx", 
     sheet = "Bafog_individuals")
@@ -44,7 +44,7 @@ Bafog_individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jabot
 
 Leaf-saturated water content (LSWC; g.g−1) was calculated as the mass of leaf water (SW – DW) divided by leaf dry mass (DW).
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(readxl)
 library(dplyr)
 library(tidyverse)
@@ -59,7 +59,7 @@ Bafog_Traits <- left_join(Bafog_individuals, RWC, by = "Code") %>% mutate(LSWC =
 
 ## FvFm
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(readxl)
 FvFm <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/FvFm - cahier/Bafog_FvFm.xlsx")
 
