@@ -62,10 +62,23 @@ Additional data to confront VLA with :
 
 Paracou data: 
 ```{r}
+library(readr)
+Paracou <- read_csv("Clean_data/Paracou.csv")
+```
+FTH data :
+```{r}
+FTH <- read_csv("Clean_data/FTH.csv")
+```
 
+Both FTH and Paracou data combined:
+
+```{r}
+Paracou_FTH<- read_csv("Clean_data/Paracou_FTH.csv")
 ```
 
 Bafog data: 
+
+
 Kaw data: 
 
 ## Results

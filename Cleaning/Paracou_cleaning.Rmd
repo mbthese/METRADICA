@@ -4,12 +4,13 @@ author: "Marion Boisseaux"
 date: "29/03/2022"
 output: html_document
 ---
-# Paracou joint data 
+# Paracou data 
 
 ```{r}
 library(readr)
 library(dplyr)
 library(tidyverse)
+library(rio)
 
 Daniela <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/FieldSheet_Clean_OUT_Metradica.csv")
 
@@ -39,11 +40,60 @@ Daniela$Family
 Paracou <- cbind(Paracou, Daniela[c("Genus", "Species", "Name", "Family")])
 
 Paracou <- Paracou %>% relocate("Genus", "Species", "Name", "Family", .after = "FieldNr") %>% rename(Spcode = spName)
-Find duplicates
-duplicated(Paracou$Code)
-Paracou$Code[duplicated(Paracou$Code)]
-#238 196 196 196 196 196 196 196 215 215 215 215 215 215 215
+
+export(Paracou, "Paracou.csv")
 ```
+
+# FTH data
+```{r}
+library(readxl)
+library(readr)
+
+#only partial info
+Scoffoni_FTHdata <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Scoffoni_FTHdata.xlsx", 
+    sheet = "Summary_FTH")
+
+Scoffoni_FTHdata <- Scoffoni_FTHdata %>% select(CodeFTH, Habitat)
+
+#completing info
+Completing <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19eULgGa02RS6hwn2ngeEu4akF2YdaQGHS5xSac2hIYI/edit#gid=1299058287", range = "traits")
+
+Completing <- filter(Completing, Completing$StudyLevel == "tree")
+
+Completing <- Completing %>% select(-StudyLevel, -Sample, -Leaf)%>% rename(CodeFTH = Tree)
+
+Gmin_94 <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/gmin/Calculgmin/Gmin_FTHwithLA94.csv")
+
+Gmin_94 <- Gmin_94 %>% select(Code, gmin.slope_function) %>% rename(CodeFTH = Code, gmin = gmin.slope_function)
+
+#fill missing gmin values 
+Completing$gmin[is.na(Completing$gmin)] <- Gmin_94$gmin[match(Completing$CodeFTH,Gmin_94$CodeFTH)][which(is.na(Completing$gmin))]
+
+FTH <- left_join(Scoffoni_FTHdata, Completing, by = "CodeFTH")
+
+FTH <- FTH %>% select(-DateField)
+
+export(FTH, "FTH.csv")
+```
+
+# Merge Paracou + FTH Data
+
+```{r}
+Paracou <-  read_csv("Clean_data/Paracou.csv")
+Paracou <- Paracou %>% mutate(Forest = "Paracou") %>% rename(TreeHeight = Height_Tree, TreeDawkins = Dawkin_Tree, BranchHeight = Height_Branch, BranchDawkins = Dawkin_Branch, SubPlot =Subplot, TreeFieldNum = FieldNr)
+
+FTH <- read_csv("Clean_data/FTH.csv")
+
+#Change FTH code from single numbers to adding FTH 
+
+FTH <- FTH %>% mutate(Name = paste(Genus, Species))
+
+#merge
+Paracou_FTH <- full_join(Paracou,FTH)
+
+export(Paracou_FTH, "Paracou_FTH.csv")
+```
+
 
 
 #LA
