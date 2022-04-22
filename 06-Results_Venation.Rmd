@@ -77,11 +77,17 @@ Paracou_FTH<- read_csv("Clean_data/Paracou_FTH.csv")
 ```
 
 Bafog data: 
+```{r}
+Bafog <- read_csv("Clean_data/Bafog.csv")
+```
 
 
 Kaw data: 
 
 ## Results
+
+To do :
+-merge vein data set with the rest of data of each site through the individual code 
 
 ```{r Import dataset veins, include=FALSE}
 library(readxl)
@@ -101,6 +107,8 @@ veindata$Species <- as.factor(veindata$Species)
 fct_reorder(veindata$Species, veindata$LA, min)
 
 veindata$MajVLA <- as.numeric(veindata$MajVLA)
+
+veindata <- veindata %>% rename(Forest = Site)
 
 ```
 
@@ -148,7 +156,7 @@ ggplot(veindata) +
  theme_minimal() +
  theme(plot.subtitle = element_text(size = 15L), 
  plot.caption = element_text(size = 14L), axis.title.y = element_text(size = 14L), axis.title.x = element_text(size = 18L)) +
- facet_wrap(vars(Site))
+ facet_wrap(vars(Forest))
 
 
 ggplot(veindata) +
@@ -159,7 +167,7 @@ ggplot(veindata) +
  theme_minimal() +
  theme(plot.subtitle = element_text(size = 15L), 
  plot.caption = element_text(size = 14L), axis.title.y = element_text(size = 14L), axis.title.x = element_text(size = 18L)) +
- facet_wrap(vars(Site))
+ facet_wrap(vars(Forest))
 
 ```
 
@@ -209,5 +217,45 @@ ggplot(veindata) +
 
 ```
 
+### VLA against other variables
 
+#### VLA and LA
+
+```{r}
+ggplot(veindata) +
+  aes(x = MajVLA, y = LA) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  scale_x_continuous(trans = "log10") +
+  theme_minimal()
+
+mean_LA_Scoffoni <- veindata %>% rename(Name =Species) %>%
+  group_by(Name) %>%
+  summarise_at(vars(LA), list(LA_Scoffoni = mean))
+
+mean_LA_Scoffoni$Name <- as.character(mean_LA_Scoffoni$Name)
+
+mean_LA_Marion <- Paracou_FTH %>% 
+      group_by(Name) %>%
+  summarise_at(vars(LA), list(LA_Marion = mean))
+
+mean_LA_Scoffoni$Name<- gsub("_", " ", mean_LA_Scoffoni$Name) 
+
+LA <- left_join(mean_LA_Marion, mean_LA_Scoffoni, by = "Name") #mes valeurs de LA sont tjs plus petites que celle de Christine...?
+    
+```
+
+#### VLA and Ptlp
+
+Preliminary and wrong because left joining by species. I want to left join by Code. !!!
+I tried by I can't this way... 
+
+```{r}
+veindata_Paracou <- veindata %>% filter(Forest == "PARACOU")
+
+veindata_Paracou$Species<- gsub("_", " ", veindata_Paracou$Species)  
+
+veindata_Paracou <- veindata_Paracou %>% rename(Name = Species) %>% select(Name, MajVLA, LA)
+
+Paracou_data <- left_join(Paracou_FTH, veindata_Paracou, by= "Name")
+```
 

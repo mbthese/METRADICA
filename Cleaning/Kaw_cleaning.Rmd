@@ -4,6 +4,85 @@ author: "Marion Boisseaux"
 date: "29/03/2022"
 output: html_document
 ---
+#Kaw individuals
+```{r}
+Kaw_individuals <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=733041492", range = "individuals")
+```
+
+#Kaw traits
+
+##Ptlp
+
+```{r}
+Ptlp <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=733041492", range = "ptlp")
+
+Ptlp <- Ptlp %>% select(-Ptlp, -Posm)
+
+Ptlp_extra <- Ptlp %>% slice(185:192) #646 , 655, 654
+
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "646", "505")
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "655", "484")
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "654", "536")
+
+Ptlp$C0 <- as.numeric(Ptlp$C0)
+  
+Ptlp <- Ptlp %>% mutate(Posmo=(-2.5/1000)*C0) %>% mutate(Ptlp=(0.799*Posmo)-0.665)
+
+Ptlp <- Ptlp %>% select(-DateCalibration, -Contamination, -DateField, -DateMesure)
+
+library(stringr)
+
+Ptlp <- Ptlp %>% 
+  filter(!str_detect(Code, 'bis')) %>% filter(!str_detect(Code, 'ter'))
+
+Ptlp$Code <- as.numeric(Ptlp$Code)
+
+Ptlp_for_join <- Ptlp %>% select(Code, Ptlp)
+
+sum(is.na(Ptlp_for_join$Ptlp)) #7 NA
+
+Ptlp_for_join <- na.omit(Ptlp_for_join)
+
+Kaw_withPtlp <- left_join(Kaw_individuals, Ptlp_for_join, by ="Code")
+
+Kaw_individuals <- Kaw_withPtlp
+```
+
+## LSWC
+
+```{r}
+
+LSWC <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=1549400060", range = "rwc")
+
+LSWC <- LSWC %>% select(Unique_Code,FW, SW, DW) %>% rename(Code=Unique_Code)
+
+LSWC <- LSWC %>% mutate(LSWC = (SW-DW)/DW)
+
+LSWC <- LSWC %>% select(Code, LSWC)
+
+Kaw_withLSWC <- left_join(Kaw_individuals, LSWC, by ="Code")
+
+Kaw_individuals <- Kaw_withLSWC
+
+```
+
+#fvfm
+
+```{r}
+fvfm <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=1549400060", range = "fvfm")
+
+fvfm <- fvfm %>% select(Code,fvfm)
+
+Kaw_withfvfm <- left_join(Kaw_individuals, fvfm, by ="Code")
+
+Kaw_individuals <- Kaw_withfvfm
+```
+
+#gmin 
+
+```{r}
+
+```
 
 ## LA
 
@@ -74,4 +153,4 @@ ResolutionProblems11 <- resolution11 %>% filter(XResolution!=1328)
 ```
 
 All images 1328 ppp corresponding to 1600 dpi. 
-Except : 564 et 565 resolution 1201 ppp corresponding to 800 dpi.
+Except : 564 et 565 resolution 1201 ppp corresponding to 1200 dpi.
