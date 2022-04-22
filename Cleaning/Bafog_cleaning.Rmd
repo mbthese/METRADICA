@@ -62,8 +62,8 @@ Bafog_Traits <- left_join(Bafog_individuals, RWC, by = "Code") %>% mutate(LSWC =
 ```{r eval=FALSE, include=FALSE}
 library(readxl)
 FvFm <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/FvFm - cahier/Bafog_FvFm.xlsx")
-
-Bafog_Traits <- left_join(Bafog_individuals, FvFm, by = "Code")
+FvFm <- FvFm %>% rename(FvFm = `Fv/Fm`) %>% select(-Comment_FvFm)
+Bafog_Traits <- left_join(Bafog_Traits, FvFm, by = "Code")
 ```
 
 ## gmin
@@ -123,14 +123,45 @@ export(LA_gmin, "LA_gmin.csv")
 ```
 
 With Daniela's function, calculte gmin for all bafog individuals. 
+```{r}
+gmin <- read_delim("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/g_min/Gmin_withLA.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
+
+Bafog_Traits <- left_join(Bafog_Traits, gmin, by = "Code")
+```
 
 
-# ptlp
+## ptlp
 -> daniela takes à partir du 5th run (including 5th)
 -> plot all the values and look at the outliers visually, check back to comments, and add columns saying why if i take it out
 -> keep track of what you do!
 
-# Re-ordering columns
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+install.packages("purrr")                           # Install & load purrr package
+library("purrr")
 
-df %>% relocate(a, .after = c)
+Ptlp <- list.files(path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/Ptlp/", pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_delim, delim = ";", escape_double = FALSE, trim_ws = TRUE) %>%                              
+  reduce(full_join)
+
+Ptlp <- Ptlp %>% mutate(Posmo=(-2.5/1000)*C0) %>% mutate(Ptlp=(0.799*Posmo)-0.665) %>% rename(Code = Unique_Code)
+
+Ptlp <- Ptlp %>% select(Code, Ptlp)
+Bafog_Traits <- left_join(Bafog_Traits, Ptlp, by = "Code")
+
+```
+
+
+#export Bafog data (but not clean, maybe go through it again with Dnaiela's functions)
+
+```{r}
+library(rio)
+
+export(Bafog_Traits, "Bafog.csv")
+
+```
 
