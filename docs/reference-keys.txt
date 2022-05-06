@@ -53,3 +53,5 @@ leaf-area
 specifig-leaf-area
 leaf-saturated-water-content
 major-vein-density
+hypotheses
+gmin---exploration

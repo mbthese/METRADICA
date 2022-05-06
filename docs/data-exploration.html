@@ -4,13 +4,13 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 8 Data exploration | Metradica</title>
+  <title>Chapter 9 Data exploration | Metradica</title>
   <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
 set in the _output.yml file.</p>" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 8 Data exploration | Metradica" />
+  <meta property="og:title" content="Chapter 9 Data exploration | Metradica" />
   <meta property="og:type" content="book" />
   
   
@@ -20,7 +20,7 @@ set in the _output.yml file.</p>" />
   <meta name="github-repo" content="mbthese/METRADICA" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 8 Data exploration | Metradica" />
+  <meta name="twitter:title" content="Chapter 9 Data exploration | Metradica" />
   
   <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
@@ -37,8 +37,8 @@ set in the _output.yml file.</p>" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="vein-traits.html"/>
-<link rel="next" href="waterlogging-litterature.html"/>
+<link rel="prev" href="hypotheses.html"/>
+<link rel="next" href="gmin---exploration.html"/>
 <script src="libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -59,6 +59,13 @@ set in the _output.yml file.</p>" />
 <script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -186,29 +193,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.4.7" data-path="vein-traits.html"><a href="vein-traits.html#herbivory"><i class="fa fa-check"></i><b>7.4.7</b> Herbivory?</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="data-exploration.html"><a href="data-exploration.html"><i class="fa fa-check"></i><b>8</b> Data exploration</a><ul>
-<li class="chapter" data-level="8.1" data-path="data-exploration.html"><a href="data-exploration.html#general-pca"><i class="fa fa-check"></i><b>8.1</b> General PCA</a><ul>
-<li class="chapter" data-level="8.1.1" data-path="data-exploration.html"><a href="data-exploration.html#contribution-of-individuals-and-variables-1-2-dimensions"><i class="fa fa-check"></i><b>8.1.1</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
-<li class="chapter" data-level="8.1.2" data-path="data-exploration.html"><a href="data-exploration.html#contribution-of-individuals-and-variables-1-2-dimensions-1"><i class="fa fa-check"></i><b>8.1.2</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
-<li class="chapter" data-level="8.1.3" data-path="data-exploration.html"><a href="data-exploration.html#habitat-collected"><i class="fa fa-check"></i><b>8.1.3</b> Habitat collected</a></li>
-<li class="chapter" data-level="8.1.4" data-path="data-exploration.html"><a href="data-exploration.html#habitat-preference--type"><i class="fa fa-check"></i><b>8.1.4</b> Habitat preference -type</a></li>
-<li class="chapter" data-level="8.1.5" data-path="data-exploration.html"><a href="data-exploration.html#forest-sites"><i class="fa fa-check"></i><b>8.1.5</b> Forest sites</a></li>
-<li class="chapter" data-level="8.1.6" data-path="data-exploration.html"><a href="data-exploration.html#dawkins-of-tree"><i class="fa fa-check"></i><b>8.1.6</b> Dawkins of tree</a></li>
-<li class="chapter" data-level="8.1.7" data-path="data-exploration.html"><a href="data-exploration.html#species-1"><i class="fa fa-check"></i><b>8.1.7</b> Species</a></li>
+<li class="chapter" data-level="8" data-path="hypotheses.html"><a href="hypotheses.html"><i class="fa fa-check"></i><b>8</b> Hypotheses :</a></li>
+<li class="chapter" data-level="9" data-path="data-exploration.html"><a href="data-exploration.html"><i class="fa fa-check"></i><b>9</b> Data exploration</a><ul>
+<li class="chapter" data-level="9.1" data-path="data-exploration.html"><a href="data-exploration.html#general-pca"><i class="fa fa-check"></i><b>9.1</b> General PCA</a><ul>
+<li class="chapter" data-level="9.1.1" data-path="data-exploration.html"><a href="data-exploration.html#contribution-of-individuals-and-variables-1-2-dimensions"><i class="fa fa-check"></i><b>9.1.1</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
+<li class="chapter" data-level="9.1.2" data-path="data-exploration.html"><a href="data-exploration.html#contribution-of-individuals-and-variables-1-2-dimensions-1"><i class="fa fa-check"></i><b>9.1.2</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
+<li class="chapter" data-level="9.1.3" data-path="data-exploration.html"><a href="data-exploration.html#habitat-collected"><i class="fa fa-check"></i><b>9.1.3</b> Habitat collected</a></li>
+<li class="chapter" data-level="9.1.4" data-path="data-exploration.html"><a href="data-exploration.html#habitat-preference--type"><i class="fa fa-check"></i><b>9.1.4</b> Habitat preference -type</a></li>
+<li class="chapter" data-level="9.1.5" data-path="data-exploration.html"><a href="data-exploration.html#forest-sites"><i class="fa fa-check"></i><b>9.1.5</b> Forest sites</a></li>
+<li class="chapter" data-level="9.1.6" data-path="data-exploration.html"><a href="data-exploration.html#dawkins-of-tree"><i class="fa fa-check"></i><b>9.1.6</b> Dawkins of tree</a></li>
+<li class="chapter" data-level="9.1.7" data-path="data-exploration.html"><a href="data-exploration.html#species-1"><i class="fa fa-check"></i><b>9.1.7</b> Species</a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="data-exploration.html"><a href="data-exploration.html#distribution-of-major-traits"><i class="fa fa-check"></i><b>8.2</b> Distribution of major traits</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="data-exploration.html"><a href="data-exploration.html#leaf-minimal-conductance"><i class="fa fa-check"></i><b>8.2.1</b> leaf minimal conductance</a></li>
-<li class="chapter" data-level="8.2.2" data-path="data-exploration.html"><a href="data-exploration.html#turgor-loss-point"><i class="fa fa-check"></i><b>8.2.2</b> Turgor loss point</a></li>
-<li class="chapter" data-level="8.2.3" data-path="data-exploration.html"><a href="data-exploration.html#leaf-area"><i class="fa fa-check"></i><b>8.2.3</b> Leaf area</a></li>
-<li class="chapter" data-level="8.2.4" data-path="data-exploration.html"><a href="data-exploration.html#specifig-leaf-area"><i class="fa fa-check"></i><b>8.2.4</b> Specifig leaf area</a></li>
-<li class="chapter" data-level="8.2.5" data-path="data-exploration.html"><a href="data-exploration.html#leaf-saturated-water-content"><i class="fa fa-check"></i><b>8.2.5</b> leaf saturated water content</a></li>
-<li class="chapter" data-level="8.2.6" data-path="data-exploration.html"><a href="data-exploration.html#major-vein-density"><i class="fa fa-check"></i><b>8.2.6</b> Major vein density</a></li>
+<li class="chapter" data-level="9.2" data-path="data-exploration.html"><a href="data-exploration.html#distribution-of-major-traits"><i class="fa fa-check"></i><b>9.2</b> Distribution of major traits</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="data-exploration.html"><a href="data-exploration.html#leaf-minimal-conductance"><i class="fa fa-check"></i><b>9.2.1</b> leaf minimal conductance</a></li>
+<li class="chapter" data-level="9.2.2" data-path="data-exploration.html"><a href="data-exploration.html#turgor-loss-point"><i class="fa fa-check"></i><b>9.2.2</b> Turgor loss point</a></li>
+<li class="chapter" data-level="9.2.3" data-path="data-exploration.html"><a href="data-exploration.html#leaf-area"><i class="fa fa-check"></i><b>9.2.3</b> Leaf area</a></li>
+<li class="chapter" data-level="9.2.4" data-path="data-exploration.html"><a href="data-exploration.html#specifig-leaf-area"><i class="fa fa-check"></i><b>9.2.4</b> Specifig leaf area</a></li>
+<li class="chapter" data-level="9.2.5" data-path="data-exploration.html"><a href="data-exploration.html#leaf-saturated-water-content"><i class="fa fa-check"></i><b>9.2.5</b> leaf saturated water content</a></li>
+<li class="chapter" data-level="9.2.6" data-path="data-exploration.html"><a href="data-exploration.html#major-vein-density"><i class="fa fa-check"></i><b>9.2.6</b> Major vein density</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="waterlogging-litterature.html"><a href="waterlogging-litterature.html"><i class="fa fa-check"></i><b>9</b> Waterlogging litterature</a></li>
-<li class="chapter" data-level="10" data-path="general-potential-hypotheses.html"><a href="general-potential-hypotheses.html"><i class="fa fa-check"></i><b>10</b> general potential hypotheses</a></li>
+<li class="chapter" data-level="10" data-path="gmin---exploration.html"><a href="gmin---exploration.html"><i class="fa fa-check"></i><b>10</b> Gmin - exploration</a></li>
+<li class="chapter" data-level="11" data-path="waterlogging-litterature.html"><a href="waterlogging-litterature.html"><i class="fa fa-check"></i><b>11</b> Waterlogging litterature</a></li>
+<li class="chapter" data-level="12" data-path="general-potential-hypotheses.html"><a href="general-potential-hypotheses.html"><i class="fa fa-check"></i><b>12</b> general potential hypotheses</a></li>
 <li class="part"><span><b>IV Part four : Notes</b></span></li>
-<li class="chapter" data-level="11" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>11</b> 26/01/2022</a></li>
+<li class="chapter" data-level="13" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>13</b> 26/01/2022</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
 
@@ -230,44 +239,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="data-exploration" class="section level1">
-<h1><span class="header-section-number">Chapter 8</span> Data exploration</h1>
+<h1><span class="header-section-number">Chapter 9</span> Data exploration</h1>
 <p>How to visualize the data and show the links between the variables and identify the same responses of the individuals?</p>
 <div id="general-pca" class="section level2">
-<h2><span class="header-section-number">8.1</span> General PCA</h2>
+<h2><span class="header-section-number">9.1</span> General PCA</h2>
 <div id="contribution-of-individuals-and-variables-1-2-dimensions" class="section level3">
-<h3><span class="header-section-number">8.1.1</span> Contribution of individuals and variables : 1-2 dimensions</h3>
+<h3><span class="header-section-number">9.1.1</span> Contribution of individuals and variables : 1-2 dimensions</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="_main_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 </div>
 <div id="contribution-of-individuals-and-variables-1-2-dimensions-1" class="section level3">
-<h3><span class="header-section-number">8.1.2</span> Contribution of individuals and variables : 1-2 dimensions</h3>
+<h3><span class="header-section-number">9.1.2</span> Contribution of individuals and variables : 1-2 dimensions</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-3-1.png" width="672" /><img src="_main_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
 </div>
 <div id="habitat-collected" class="section level3">
-<h3><span class="header-section-number">8.1.3</span> Habitat collected</h3>
+<h3><span class="header-section-number">9.1.3</span> Habitat collected</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="habitat-preference--type" class="section level3">
-<h3><span class="header-section-number">8.1.4</span> Habitat preference -type</h3>
+<h3><span class="header-section-number">9.1.4</span> Habitat preference -type</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="forest-sites" class="section level3">
-<h3><span class="header-section-number">8.1.5</span> Forest sites</h3>
+<h3><span class="header-section-number">9.1.5</span> Forest sites</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="dawkins-of-tree" class="section level3">
-<h3><span class="header-section-number">8.1.6</span> Dawkins of tree</h3>
+<h3><span class="header-section-number">9.1.6</span> Dawkins of tree</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
 <div id="species-1" class="section level3">
-<h3><span class="header-section-number">8.1.7</span> Species</h3>
+<h3><span class="header-section-number">9.1.7</span> Species</h3>
 <p><img src="_main_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
 </div>
 <div id="distribution-of-major-traits" class="section level2">
-<h2><span class="header-section-number">8.2</span> Distribution of major traits</h2>
+<h2><span class="header-section-number">9.2</span> Distribution of major traits</h2>
+<p>A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).</p>
+<p>The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the <em>mean </em> and the <em>variance</em> of the community trait distribution is rooted in the
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes.</p>
 <p><em>after log tranform</em></p>
 <div id="leaf-minimal-conductance" class="section level3">
-<h3><span class="header-section-number">8.2.1</span> leaf minimal conductance</h3>
+<h3><span class="header-section-number">9.2.1</span> leaf minimal conductance</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="data-exploration.html#cb1-1"></a><span class="kw">library</span>(ggplot2)</span>
 <span id="cb1-2"><a href="data-exploration.html#cb1-2"></a></span>
 <span id="cb1-3"><a href="data-exploration.html#cb1-3"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
@@ -278,7 +290,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="_main_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="turgor-loss-point" class="section level3">
-<h3><span class="header-section-number">8.2.2</span> Turgor loss point</h3>
+<h3><span class="header-section-number">9.2.2</span> Turgor loss point</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="data-exploration.html#cb3-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
 <span id="cb3-2"><a href="data-exploration.html#cb3-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log10</span>(<span class="kw">abs</span>(Ptlp))) <span class="op">+</span></span>
 <span id="cb3-3"><a href="data-exploration.html#cb3-3"></a><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> 30L, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
@@ -287,7 +299,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="_main_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 <div id="leaf-area" class="section level3">
-<h3><span class="header-section-number">8.2.3</span> Leaf area</h3>
+<h3><span class="header-section-number">9.2.3</span> Leaf area</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="data-exploration.html#cb5-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
 <span id="cb5-2"><a href="data-exploration.html#cb5-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log10</span>(LA)) <span class="op">+</span></span>
 <span id="cb5-3"><a href="data-exploration.html#cb5-3"></a><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> 30L, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
@@ -296,7 +308,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="_main_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="specifig-leaf-area" class="section level3">
-<h3><span class="header-section-number">8.2.4</span> Specifig leaf area</h3>
+<h3><span class="header-section-number">9.2.4</span> Specifig leaf area</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="data-exploration.html#cb7-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
 <span id="cb7-2"><a href="data-exploration.html#cb7-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log10</span>(SLA)) <span class="op">+</span></span>
 <span id="cb7-3"><a href="data-exploration.html#cb7-3"></a><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> 30L, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
@@ -305,7 +317,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="_main_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 </div>
 <div id="leaf-saturated-water-content" class="section level3">
-<h3><span class="header-section-number">8.2.5</span> leaf saturated water content</h3>
+<h3><span class="header-section-number">9.2.5</span> leaf saturated water content</h3>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="data-exploration.html#cb9-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
 <span id="cb9-2"><a href="data-exploration.html#cb9-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log10</span>(LSWC)) <span class="op">+</span></span>
 <span id="cb9-3"><a href="data-exploration.html#cb9-3"></a><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> 30L, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
@@ -317,44 +329,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="_main_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="major-vein-density" class="section level3">
-<h3><span class="header-section-number">8.2.6</span> Major vein density</h3>
+<h3><span class="header-section-number">9.2.6</span> Major vein density</h3>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="data-exploration.html#cb12-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
 <span id="cb12-2"><a href="data-exploration.html#cb12-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">log10</span>(MajVLA)) <span class="op">+</span></span>
 <span id="cb12-3"><a href="data-exploration.html#cb12-3"></a><span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> 30L, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
 <span id="cb12-4"><a href="data-exploration.html#cb12-4"></a><span class="st"> </span><span class="kw">theme_minimal</span>()</span></code></pre></div>
 <pre><code>## Warning: Removed 20 rows containing non-finite values (stat_bin).</code></pre>
 <p><img src="_main_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="data-exploration.html#cb14-1"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb14-2"><a href="data-exploration.html#cb14-2"></a></span>
-<span id="cb14-3"><a href="data-exploration.html#cb14-3"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
-<span id="cb14-4"><a href="data-exploration.html#cb14-4"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> LT, <span class="dt">y =</span> MajVLA, <span class="dt">fill =</span> Name) <span class="op">+</span></span>
-<span id="cb14-5"><a href="data-exploration.html#cb14-5"></a><span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">shape =</span> <span class="st">&quot;circle&quot;</span>, <span class="dt">size =</span> <span class="fl">1.5</span>, <span class="dt">colour =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
-<span id="cb14-6"><a href="data-exploration.html#cb14-6"></a><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">direction =</span> <span class="dv">1</span>) <span class="op">+</span></span>
-<span id="cb14-7"><a href="data-exploration.html#cb14-7"></a><span class="st"> </span><span class="kw">theme_minimal</span>()</span></code></pre></div>
-<pre><code>## Warning: Removed 656 rows containing missing values (geom_point).</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="data-exploration.html#cb16-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
-<span id="cb16-2"><a href="data-exploration.html#cb16-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> DBH, <span class="dt">y =</span> MajVLA, <span class="dt">colour =</span> Name) <span class="op">+</span></span>
-<span id="cb16-3"><a href="data-exploration.html#cb16-3"></a><span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">shape =</span> <span class="st">&quot;circle&quot;</span>, <span class="dt">size =</span> <span class="fl">1.5</span>) <span class="op">+</span></span>
-<span id="cb16-4"><a href="data-exploration.html#cb16-4"></a><span class="st"> </span><span class="kw">scale_color_hue</span>(<span class="dt">direction =</span> <span class="dv">1</span>) <span class="op">+</span></span>
-<span id="cb16-5"><a href="data-exploration.html#cb16-5"></a><span class="st"> </span><span class="kw">theme_minimal</span>()</span></code></pre></div>
-<pre><code>## Warning: Removed 656 rows containing missing values (geom_point).</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="data-exploration.html#cb18-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
-<span id="cb18-2"><a href="data-exploration.html#cb18-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> Forest, <span class="dt">y =</span> Gmin, <span class="dt">colour =</span> Name) <span class="op">+</span></span>
-<span id="cb18-3"><a href="data-exploration.html#cb18-3"></a><span class="st"> </span><span class="kw">geom_boxplot</span>(<span class="dt">shape =</span> <span class="st">&quot;circle&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
-<span id="cb18-4"><a href="data-exploration.html#cb18-4"></a><span class="st"> </span><span class="kw">scale_color_hue</span>(<span class="dt">direction =</span> <span class="dv">1</span>) <span class="op">+</span></span>
-<span id="cb18-5"><a href="data-exploration.html#cb18-5"></a><span class="st"> </span><span class="kw">theme_minimal</span>()</span></code></pre></div>
-<pre><code>## Warning: Removed 16 rows containing non-finite values (stat_boxplot).</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="data-exploration.html#cb20-1"></a><span class="kw">ggplot</span>(Metradica) <span class="op">+</span></span>
-<span id="cb20-2"><a href="data-exploration.html#cb20-2"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">x =</span> Forest, <span class="dt">y =</span> Ptlp, <span class="dt">colour =</span> Name) <span class="op">+</span></span>
-<span id="cb20-3"><a href="data-exploration.html#cb20-3"></a><span class="st"> </span><span class="kw">geom_boxplot</span>(<span class="dt">shape =</span> <span class="st">&quot;circle&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;#112446&quot;</span>) <span class="op">+</span></span>
-<span id="cb20-4"><a href="data-exploration.html#cb20-4"></a><span class="st"> </span><span class="kw">scale_color_hue</span>(<span class="dt">direction =</span> <span class="dv">1</span>) <span class="op">+</span></span>
-<span id="cb20-5"><a href="data-exploration.html#cb20-5"></a><span class="st"> </span><span class="kw">theme_minimal</span>()</span></code></pre></div>
-<pre><code>## Warning: Removed 33 rows containing non-finite values (stat_boxplot).</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-4.png" width="672" /></p>
-
 </div>
 </div>
 </div>
@@ -363,8 +344,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="vein-traits.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="waterlogging-litterature.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="hypotheses.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="gmin---exploration.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

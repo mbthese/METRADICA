@@ -14,6 +14,14 @@ The data
 Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
 ```
 
+# Hypotheses : 
+
+Part I (Habitat preference - type) : *specialists* species should have a more adequate set of trait to a given habitat than the generalists in the same habitat. Generalists would express a wider range of traits.
+
+PArt II (Precipitation gradient) : 
+
+
+
 # Data exploration 
 
 How to visualize the data and show the links between the variables and identify the same responses of the individuals? 
@@ -126,6 +134,11 @@ g2
 
 ## Distribution of major traits 
 
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
 *after log tranform*
 
 ### leaf minimal conductance
@@ -186,6 +199,112 @@ ggplot(Metradica) +
 
 ```
 
+## Summary of main variables
+```{r}
+ plot(Metradica[,8:13])
+```
+
+
+## Gmin - exploration
+
+ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat collect. Tukey post-hoc test shows groups a Bafog and b for Paracou and Kaw. It also shows groups TF a and BF b.  
+
+Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Forest) %>% summarise_at(vars(Gmin), funs(mean(Gmin, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Model_gmin<-lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
+autoplot(Model_gmin)
+#summary(Model_gmin)
+anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat.
+tukey_gmin <- TukeyHSD(aov(Model_gmin))
+library(agricolae)
+#tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
+#tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
+```
+
+
+```{r echo=FALSE}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#gmin with all species- interactive graph
+plot_ly(Metradica, y = ~Gmin, color = ~Name, type = "box")
+
+
+#forest
+options(digits = 10)
+means <- aggregate(Gmin ~Forest, Metradica, mean)
+
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log10(Gmin), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "Minimal conductance (mmol.m-2.s-1)"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+
+B <- ggplot(Metradica) +
+ aes(x = Forest, y = Gmin, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
+
+
+```
+
+
+The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances. 
+
+```{r echo=FALSE}
+#moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
+library(emmeans)
+m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
+pairs(m_ajust_forest_gmin) 
+a <- plot(m_ajust_forest_gmin)
+
+m_ajust_habitat_gmin <- emmeans(object = Model_gmin, specs = "Habitat")
+pairs(m_ajust_habitat_gmin) 
+b <- plot(m_ajust_habitat_gmin)
+
+library(ggplot2)
+library(cowplot)
+
+plot_grid(a,b, labels = c('A', 'B'), label_size = 12)
+```
+
+
+Is gmin linked to other variables? No.
+
+```{r}
+Mcomp <- lm(Gmin ~ LA + Ptlp +SLA + FvFm + LSWC + MajVLA, data = Metradica)
+plot(summary(Metradica))
+```
+
 
 
 
@@ -205,11 +324,7 @@ ggplot(Metradica) +
  scale_color_hue(direction = 1) +
  theme_minimal()
 
-ggplot(Metradica) +
- aes(x = Forest, y = Gmin, colour = Name) +
- geom_boxplot(shape = "circle", fill = "#112446") +
- scale_color_hue(direction = 1) +
- theme_minimal()
+
 
 ggplot(Metradica) +
  aes(x = Forest, y = Ptlp, colour = Name) +
