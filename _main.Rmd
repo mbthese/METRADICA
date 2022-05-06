@@ -1,3 +1,87 @@
+--- 
+title: "Metradica"
+author: "Marion Boisseaux"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: mbthese/METRADICA
+---
+--- 
+title: "Metradica"
+author: "Marion Boisseaux"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: mbthese/METRADICA
+---
+
+# About
+
+*to describe*
+
+<!--chapter:end:index.Rmd-->
+
+
+# (PART) Part one: general introduction {-}
+# Background 
+
+Placeholder
+
+
+
+<!--chapter:end:01-Introduction.Rmd-->
+
+
+# (PART) Part two : Materials & Method {-}
+# Sampling
+
+Placeholder
+
+
+## Habitats
+### Hydrological indexes
+### How do we define seasonally flooded soils? 
+## Sites
+## Species
+### Indicator Species Analysis
+### More details about IndVal
+### Chosen species 
+### Phylogeny
+## Individuals
+## Summary
+
+<!--chapter:end:02-Sampling.Rmd-->
+
+
+# Traits
+
+Placeholder
+
+
+## Morphological traits
+## Hydraulic traits
+## Photochemical trait
+## Measured traits
+## Protocols
+
+<!--chapter:end:03-Traits.Rmd-->
+
 ---
 title: "Results_prelim"
 author: "Marion Boisseaux"
@@ -7,6 +91,7 @@ editor_options:
   chunk_output_type: console
 ---
 
+# (PART) Part three : Results {-}
 
 The data
 
@@ -138,6 +223,15 @@ A focus on the frequency distribution of traits of individuals within communitie
 
 The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
 concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
 
 *after log tranform*
 
@@ -333,4 +427,71 @@ ggplot(Metradica) +
  theme_minimal()
 
 ```
+
+
+<!--chapter:end:04-Results_prelim.Rmd-->
+
+
+# To do 
+
+Placeholder
+
+
+
+<!--chapter:end:05-Results_PARACOU.Rmd-->
+
+
+# Vein traits
+
+Placeholder
+
+
+## Hypothesis
+## Materials and Method
+## Statistical analysis
+## Results
+### Vein data joing with other traits
+#### Merge
+### Across species from all habitats
+### SFF vs TF habitats
+### Specialists SFF vs Specialists TF vs Generalists
+### Bafog vs Kaw vs Paracou
+### VLA against other variables
+### Herbivory? 
+
+<!--chapter:end:06-Results_Venation.Rmd-->
+
+---
+title: "Literature"
+author: "Marion Boisseaux"
+date: "08/03/2022"
+output: html_document
+---
+# Waterlogging litterature
+
+- From **Abiotic Stress Physiology of Horticultural Crops** *edited by N.K. Srinivasa Rao, K.S. Shivashankara, R.H. Laxman*
+
+Section 1.3 : one of the earliest responses to soil flooding is a reduction in stomatal conductance, inhibition of stomatal aperture. Low O2 level may also reduce hydraulic conductivity and csqtly decrease root permeability. This descrease in hydraulic permeability may b liked to aqaporins [...] limiting water uptake and this leading to internal water deficit. Oxygen deficiency generally induces a rapid reduction in the rate of photoS which is generally considered as the result of reduced stomatal aperture, decrease in leaf chloro content + early leaf senescence and a reduction in LA. Waterlogged soils reduce the translocation of photoS product from 'source' to 'sink' root. As a result, the maintenance of photoS acitivity and accumulation of soluble sugar in roots are clearly important adaptations to flooding. 
+
+Plant responses to waterlogging include low stomatal conductance, decrease in leaf, root, and shoot dev't, changes in osmotic potential and nu uptake, reduced chloro content and photoS.
+
+The oxygen diffusion is 10,000 times slower in waterlogged soils as compared to aerated soil. 
+
+The decrease in O evel in soils affects the bioavailability of nu and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reducedleaf concentrations of N, P, K, Ca, Mg in avocado + pea. 
+
+# general potential hypotheses
+
+with waterlogging: i should find a decrease of stomatal conductance corrolated with an increase of leaf water potential.
+
+<!--chapter:end:80-Literature.Rmd-->
+
+
+# (PART) Part four : Notes {-}
+# 26/01/2022
+
+Placeholder
+
+
+
+<!--chapter:end:99-MeetingNotes.Rmd-->
 
