@@ -1,0 +1,221 @@
+---
+title: "Results_prelim"
+author: "Marion Boisseaux"
+date: "04/05/2022"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+The data
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
+```
+
+# Data exploration 
+
+How to visualize the data and show the links between the variables and identify the same responses of the individuals? 
+
+
+## General PCA 
+
+### Contribution of individuals and variables : 1-2 dimensions
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(FactoMineR)
+library(Factoshiny)
+
+
+#resultPCA <- Factoshiny(Metradica[,c(5:13,20)])
+
+#dim 1-2
+
+#Contribution
+res.PCA<-PCA(Metradica[,c(8:13,20)],graph=FALSE)
+
+a1<- plot.PCA(res.PCA,choix='var',habillage = 'contrib',title="Graphe des variables de l'ACP")
+
+a2<-plot.PCA(res.PCA,invisible=c('quali'),habillage='contrib',title="Graphe des individus de l'ACP",cex=2,cex.main=2,cex.axis=2,col.quali='#9AE019',label =c('ind.sup'))
+
+a1
+a2
+```
+
+### Contribution of individuals and variables : 1-2 dimensions
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#dim 3-4
+res.PCA<-PCA(Metradica[,c(8:13,20)],graph=FALSE)
+
+b1<-plot.PCA(res.PCA,axes=c(3,4),choix='var',title="Graphe des variables de l'ACP")
+
+b2<-plot.PCA(res.PCA,axes=c(3,4),invisible=c('ind.sup'),title="Graphe des individus de l'ACP",cex=2,cex.main=2,cex.axis=2,col.quali='#9AE019', label = c('quali'))
+
+b1
+b2
+
+```
+
+### Habitat collected
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#Habitat collected
+
+res.PCA<-PCA(Metradica[, c(6, 8:13, 20)],quali.sup=c(1),graph=FALSE)
+
+c1<- plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="",cex=2.25,cex.main=2.25,cex.axis=2.25,col.quali='#FFC400',label =c('quali'))
+
+c2<-plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=1.9,cex.main=1.9,cex.axis=1.9,col.quali='#7A067A',label =c('quali'))
+
+ggpubr::ggarrange(nrow = 1, plotlist = list(c2,c1), ncol = 2)
+
+
+```
+
+
+### Habitat preference -type
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+res.PCA<-PCA(Metradica[,c(7, 8:13, 20)],quali.sup=c(1),graph=FALSE)
+
+d2<- plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=1.8,cex.main=1.8,cex.axis=1.8,col.quali='#FF6600',label =c('quali'))
+
+
+d1<-plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title ="" ,cex=1.9,cex.main=1.7,cex.axis=1.7,col.quali='#7A067A',label =c('quali'))
+
+ggpubr::ggarrange(nrow = 1, plotlist = list(d2,d1), ncol = 2)
+
+```
+
+### Forest sites 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+res.PCA<-PCA(Metradica[,c(5, 8:13, 20)],quali.sup=c(1),graph=FALSE)
+
+e2<-plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=2.1,cex.main=2.1,cex.axis=2.1,col.quali='#3622E6',label =c('quali'))
+
+e1<-plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=1.9,cex.main=1.9,cex.axis=1.9,col.quali='#7A067A',label =c('quali'))
+
+ggpubr::ggarrange(nrow = 1, plotlist = list(e2,e1), ncol = 2)
+
+```
+
+
+### Dawkins of tree
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+res.PCA<-PCA(Metradica[c(8:13, 24)],quali.sup=c(7),graph=FALSE)
+
+plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",col.quali='#FFC400',label =c('quali'))
+```
+
+### Species
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+res.PCA<-PCA(Metradica[c(4,8:13)],quali.sup=c(1),graph=FALSE)
+
+g2<- plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=0.9,cex.main=1.6,cex.axis=1.6,col.quali='#2BF0D2',label =c('quali'))
+
+
+g2
+```
+
+
+## Distribution of major traits 
+
+*after log tranform*
+
+### leaf minimal conductance
+
+
+```{r}
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = log10(Gmin)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+```
+
+### Turgor loss point
+```{r}
+
+ggplot(Metradica) +
+ aes(x = log10(abs(Ptlp))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+```
+
+### Leaf area
+
+```{r}
+ggplot(Metradica) +
+ aes(x = log10(LA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+```
+
+### Specifig leaf area
+```{r}
+
+ggplot(Metradica) +
+ aes(x = log10(SLA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+```
+
+### leaf saturated water content
+```{r}
+ggplot(Metradica) +
+ aes(x = log10(LSWC)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+```
+
+
+### Major vein density
+```{r}
+ggplot(Metradica) +
+ aes(x = log10(MajVLA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+```
+
+
+
+
+```{r}
+
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = LT, y = MajVLA, fill = Name) +
+ geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+ scale_fill_hue(direction = 1) +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = DBH, y = MajVLA, colour = Name) +
+ geom_point(shape = "circle", size = 1.5) +
+ scale_color_hue(direction = 1) +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = Forest, y = Gmin, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = Forest, y = Ptlp, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ theme_minimal()
+
+```
+

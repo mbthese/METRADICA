@@ -7,12 +7,12 @@ This chapter defines measured and sampled traits with associated protocols.
 ## Morphological traits
 
 * **LA**: leaf area $cm^{2}$ : carbo- acquisition related trait which informs on the light capture strategy. 
-* **LDMC**: leaf dry matter content $mg.g^{-1}$ : a carbon-acquisition related trait which informs on the carbon investment in physical resistance and defense. 
+* **SLA**: leaf specific area $cm².g{^-1}$ (leaf area/ dry mass).
 
 
 ## Hydraulic traits
 
-* **RWC**: relative water content (%) is of special interest as it reflects the amount of water present the leaf relative to the maximum it can hold (*INSERER BIBLIO Barrs & Weatherley 1962*)
+* **LSWC** : Leaf-saturated water content (g g−1) was calculated as the mass of leaf water (WT – WD) divided by leaf dry mass (WD).
 * **$\pi_{TLP}$**: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait. 
 * **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait. 
 * **Stomatal characteristics (size, density)**: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(*INSERER BIBLIO Julio V. Schneider 2016*)

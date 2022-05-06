@@ -299,3 +299,22 @@ resolution24 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/M
 ResolutionProblems24 <- resolution24 %>% filter(XResolution!=1328)
 ```
 
+# Calcultating LA once and for all!!
+
+## Paracou
+
+1 cm with the line is 600 pixel. So you just divide by pixel area with 600^2.
+
+Except for some scans at 1200 dpi (1-sided lamp)
+
+
+
+
+
+
+
+
+
+
+
+

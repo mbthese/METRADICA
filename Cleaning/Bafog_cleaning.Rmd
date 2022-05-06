@@ -141,7 +141,6 @@ Bafog_Traits <- left_join(Bafog_Traits, gmin, by = "Code")
 library(readr)
 library(dplyr)
 library(tidyverse)
-install.packages("purrr")                           # Install & load purrr package
 library("purrr")
 
 Ptlp <- list.files(path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/Ptlp/", pattern = "*.csv", full.names = TRUE) %>% 
