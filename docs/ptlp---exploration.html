@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 Ptlp - exploration | Metradica</title>
+  <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 Ptlp - exploration | Metradica" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="github-repo" content="mbthese/METRADICA" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Ptlp - exploration | Metradica" />
+  
+  <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  
+
+<meta name="author" content="Marion Boisseaux" />
+
+
+<meta name="date" content="2022-05-07" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="hypotheses.html"/>
+<link rel="next" href="to-do.html"/>
+<script src="libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Metradica</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
+<li class="part"><span><b>I Part one: general introduction</b></span></li>
+<li class="chapter" data-level="2" data-path="background.html"><a href="background.html"><i class="fa fa-check"></i><b>2</b> Background</a></li>
+<li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
+<li class="chapter" data-level="3" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>3</b> Sampling</a><ul>
+<li class="chapter" data-level="3.1" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>3.1</b> Habitats</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="sampling.html"><a href="sampling.html#hydrological-indexes"><i class="fa fa-check"></i><b>3.1.1</b> Hydrological indexes</a></li>
+<li class="chapter" data-level="3.1.2" data-path="sampling.html"><a href="sampling.html#how-do-we-define-seasonally-flooded-soils"><i class="fa fa-check"></i><b>3.1.2</b> How do we define seasonally flooded soils?</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>3.2</b> Sites</a></li>
+<li class="chapter" data-level="3.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>3.3</b> Species</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="sampling.html"><a href="sampling.html#indicator-species-analysis"><i class="fa fa-check"></i><b>3.3.1</b> Indicator Species Analysis</a></li>
+<li class="chapter" data-level="3.3.2" data-path="sampling.html"><a href="sampling.html#more-details-about-indval"><i class="fa fa-check"></i><b>3.3.2</b> More details about IndVal</a></li>
+<li class="chapter" data-level="3.3.3" data-path="sampling.html"><a href="sampling.html#chosen-species"><i class="fa fa-check"></i><b>3.3.3</b> Chosen species</a></li>
+<li class="chapter" data-level="3.3.4" data-path="sampling.html"><a href="sampling.html#phylogeny"><i class="fa fa-check"></i><b>3.3.4</b> Phylogeny</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>3.4</b> Individuals</a></li>
+<li class="chapter" data-level="3.5" data-path="sampling.html"><a href="sampling.html#summary"><i class="fa fa-check"></i><b>3.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>4</b> Traits</a><ul>
+<li class="chapter" data-level="4.1" data-path="traits.html"><a href="traits.html#morphological-traits"><i class="fa fa-check"></i><b>4.1</b> Morphological traits</a></li>
+<li class="chapter" data-level="4.2" data-path="traits.html"><a href="traits.html#hydraulic-traits"><i class="fa fa-check"></i><b>4.2</b> Hydraulic traits</a></li>
+<li class="chapter" data-level="4.3" data-path="traits.html"><a href="traits.html#photochemical-trait"><i class="fa fa-check"></i><b>4.3</b> Photochemical trait</a></li>
+<li class="chapter" data-level="4.4" data-path="traits.html"><a href="traits.html#measured-traits"><i class="fa fa-check"></i><b>4.4</b> Measured traits</a></li>
+<li class="chapter" data-level="4.5" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>4.5</b> Protocols</a></li>
+</ul></li>
+<li class="part"><span><b>III Part three : Results</b></span></li>
+<li class="chapter" data-level="5" data-path="hypotheses.html"><a href="hypotheses.html"><i class="fa fa-check"></i><b>5</b> Hypotheses :</a><ul>
+<li class="chapter" data-level="5.1" data-path="hypotheses.html"><a href="hypotheses.html#general-pca"><i class="fa fa-check"></i><b>5.1</b> General PCA</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="hypotheses.html"><a href="hypotheses.html#contribution-of-individuals-and-variables-1-2-dimensions"><i class="fa fa-check"></i><b>5.1.1</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
+<li class="chapter" data-level="5.1.2" data-path="hypotheses.html"><a href="hypotheses.html#contribution-of-individuals-and-variables-1-2-dimensions-1"><i class="fa fa-check"></i><b>5.1.2</b> Contribution of individuals and variables : 1-2 dimensions</a></li>
+<li class="chapter" data-level="5.1.3" data-path="hypotheses.html"><a href="hypotheses.html#habitat-collected"><i class="fa fa-check"></i><b>5.1.3</b> Habitat collected</a></li>
+<li class="chapter" data-level="5.1.4" data-path="hypotheses.html"><a href="hypotheses.html#habitat-preference--type"><i class="fa fa-check"></i><b>5.1.4</b> Habitat preference -type</a></li>
+<li class="chapter" data-level="5.1.5" data-path="hypotheses.html"><a href="hypotheses.html#forest-sites"><i class="fa fa-check"></i><b>5.1.5</b> Forest sites</a></li>
+<li class="chapter" data-level="5.1.6" data-path="hypotheses.html"><a href="hypotheses.html#dawkins-of-tree"><i class="fa fa-check"></i><b>5.1.6</b> Dawkins of tree</a></li>
+<li class="chapter" data-level="5.1.7" data-path="hypotheses.html"><a href="hypotheses.html#species-1"><i class="fa fa-check"></i><b>5.1.7</b> Species</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="hypotheses.html"><a href="hypotheses.html#distribution-of-major-traits"><i class="fa fa-check"></i><b>5.2</b> Distribution of major traits</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="hypotheses.html"><a href="hypotheses.html#leaf-minimal-conductance"><i class="fa fa-check"></i><b>5.2.1</b> leaf minimal conductance</a></li>
+<li class="chapter" data-level="5.2.2" data-path="hypotheses.html"><a href="hypotheses.html#turgor-loss-point"><i class="fa fa-check"></i><b>5.2.2</b> Turgor loss point</a></li>
+<li class="chapter" data-level="5.2.3" data-path="hypotheses.html"><a href="hypotheses.html#leaf-area"><i class="fa fa-check"></i><b>5.2.3</b> Leaf area</a></li>
+<li class="chapter" data-level="5.2.4" data-path="hypotheses.html"><a href="hypotheses.html#specifig-leaf-area"><i class="fa fa-check"></i><b>5.2.4</b> Specifig leaf area</a></li>
+<li class="chapter" data-level="5.2.5" data-path="hypotheses.html"><a href="hypotheses.html#leaf-saturated-water-content"><i class="fa fa-check"></i><b>5.2.5</b> leaf saturated water content</a></li>
+<li class="chapter" data-level="5.2.6" data-path="hypotheses.html"><a href="hypotheses.html#major-vein-density"><i class="fa fa-check"></i><b>5.2.6</b> Major vein density</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="hypotheses.html"><a href="hypotheses.html#summary-of-main-variables"><i class="fa fa-check"></i><b>5.3</b> Summary of main variables</a></li>
+<li class="chapter" data-level="5.4" data-path="hypotheses.html"><a href="hypotheses.html#gmin---exploration"><i class="fa fa-check"></i><b>5.4</b> Gmin - exploration</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ptlp---exploration.html"><a href="ptlp---exploration.html"><i class="fa fa-check"></i><b>6</b> Ptlp - exploration</a></li>
+<li class="chapter" data-level="7" data-path="to-do.html"><a href="to-do.html"><i class="fa fa-check"></i><b>7</b> To do</a></li>
+<li class="chapter" data-level="8" data-path="vein-traits.html"><a href="vein-traits.html"><i class="fa fa-check"></i><b>8</b> Vein traits</a><ul>
+<li class="chapter" data-level="8.1" data-path="vein-traits.html"><a href="vein-traits.html#hypothesis"><i class="fa fa-check"></i><b>8.1</b> Hypothesis</a></li>
+<li class="chapter" data-level="8.2" data-path="vein-traits.html"><a href="vein-traits.html#materials-and-method"><i class="fa fa-check"></i><b>8.2</b> Materials and Method</a></li>
+<li class="chapter" data-level="8.3" data-path="vein-traits.html"><a href="vein-traits.html#statistical-analysis"><i class="fa fa-check"></i><b>8.3</b> Statistical analysis</a></li>
+<li class="chapter" data-level="8.4" data-path="vein-traits.html"><a href="vein-traits.html#results"><i class="fa fa-check"></i><b>8.4</b> Results</a><ul>
+<li class="chapter" data-level="8.4.1" data-path="vein-traits.html"><a href="vein-traits.html#vein-data-joing-with-other-traits"><i class="fa fa-check"></i><b>8.4.1</b> Vein data joing with other traits</a></li>
+<li class="chapter" data-level="8.4.2" data-path="vein-traits.html"><a href="vein-traits.html#across-species-from-all-habitats"><i class="fa fa-check"></i><b>8.4.2</b> Across species from all habitats</a></li>
+<li class="chapter" data-level="8.4.3" data-path="vein-traits.html"><a href="vein-traits.html#sff-vs-tf-habitats"><i class="fa fa-check"></i><b>8.4.3</b> SFF vs TF habitats</a></li>
+<li class="chapter" data-level="8.4.4" data-path="vein-traits.html"><a href="vein-traits.html#specialists-sff-vs-specialists-tf-vs-generalists"><i class="fa fa-check"></i><b>8.4.4</b> Specialists SFF vs Specialists TF vs Generalists</a></li>
+<li class="chapter" data-level="8.4.5" data-path="vein-traits.html"><a href="vein-traits.html#bafog-vs-kaw-vs-paracou"><i class="fa fa-check"></i><b>8.4.5</b> Bafog vs Kaw vs Paracou</a></li>
+<li class="chapter" data-level="8.4.6" data-path="vein-traits.html"><a href="vein-traits.html#vla-against-other-variables"><i class="fa fa-check"></i><b>8.4.6</b> VLA against other variables</a></li>
+<li class="chapter" data-level="8.4.7" data-path="vein-traits.html"><a href="vein-traits.html#herbivory"><i class="fa fa-check"></i><b>8.4.7</b> Herbivory?</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="waterlogging-litterature.html"><a href="waterlogging-litterature.html"><i class="fa fa-check"></i><b>9</b> Waterlogging litterature</a></li>
+<li class="chapter" data-level="10" data-path="general-potential-hypotheses.html"><a href="general-potential-hypotheses.html"><i class="fa fa-check"></i><b>10</b> general potential hypotheses</a></li>
+<li class="part"><span><b>IV Part four : Notes</b></span></li>
+<li class="chapter" data-level="11" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>11</b> 26/01/2022</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Metradica</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ptlp---exploration" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> Ptlp - exploration</h1>
+<p>Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought.</p>
+<p><em>Litterature</em>
+* The paper by Zhu et al. (2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China.</p>
+<p>*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al. 2008) and altered nutrient concentrations (Villagra et al. 2013) drive changes in leaf water relations traits, including TLP. Blackman 2018</p>
+<p>*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree &amp; Dainty 1975; Abrams, Kubiske &amp; Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni &amp; Sack 2012b; Guyot, Scoffoni &amp; Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="ptlp---exploration.html#cb19-1"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb19-2"><a href="ptlp---exploration.html#cb19-2"></a><span class="kw">library</span>(plotly)</span>
+<span id="cb19-3"><a href="ptlp---exploration.html#cb19-3"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb19-4"><a href="ptlp---exploration.html#cb19-4"></a><span class="kw">library</span>(cowplot)</span>
+<span id="cb19-5"><a href="ptlp---exploration.html#cb19-5"></a></span>
+<span id="cb19-6"><a href="ptlp---exploration.html#cb19-6"></a><span class="co">#gmin with all species- interactive graph</span></span>
+<span id="cb19-7"><a href="ptlp---exploration.html#cb19-7"></a><span class="kw">plot_ly</span>(Metradica, <span class="dt">y =</span> <span class="op">~</span>Ptlp, <span class="dt">color =</span> <span class="op">~</span>Name, <span class="dt">type =</span> <span class="st">&quot;box&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning: Ignoring 33 observations</code></pre>
+<pre><code>## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): n too large, allowed maximum for palette Set2 is 8
+## Returning the palette you asked for with that many colors
+
+## Warning in RColorBrewer::brewer.pal(N, &quot;Set2&quot;): n too large, allowed maximum for palette Set2 is 8
+## Returning the palette you asked for with that many colors</code></pre>
+<div id="htmlwidget-69178eb301009af620d9" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-69178eb301009af620d9">{"x":{"visdat":{"5080309c6635":["function () ","plotlyVisDat"]},"cur_data":"5080309c6635","attrs":{"5080309c6635":{"y":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"box"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"yaxis":{"domain":[0,1],"automargin":true,"title":"Ptlp"},"xaxis":{"domain":[0,1],"automargin":true},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"fillcolor":"rgba(159,183,147,0.5)","y":[-1.9334125,-1.6697425,-1.779605,-1.9334125,-1.8095675,-1.691715,-1.82355,-1.6657475,-1.7456475,-2.0572575,-2.075235,-2.05526,-1.4620025,-1.8175575,-1.5538875,-1.3301675,-1.420055,-1.7536375,-1.44802,-1.9973325,-1.555885,-1.65576,-1.60782,-1.63179,-1.8095675,-1.8974575,-1.547895],"type":"box","name":"Bocoa_prouacensis","marker":{"color":"rgba(159,183,147,1)","line":{"color":"rgba(159,183,147,1)"}},"line":{"color":"rgba(159,183,147,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(199,169,129,0.5)","y":[-1.87948,-1.8575075,-1.771615,-1.8854725,-1.9134375,-2.0372825,-1.675735,-1.587845,-1.7935875,-1.8635],"type":"box","name":"Carapa_guianensis","marker":{"color":"rgba(199,169,129,1)","line":{"color":"rgba(199,169,129,1)"}},"line":{"color":"rgba(199,169,129,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(231,154,111,0.5)","y":[-1.7296675,-1.75164,-1.6337875,-1.77561,-1.7336625,-1.74365,-1.55988,-2.091215,-1.7096925,-1.843525,-1.619805],"type":"box","name":"Carapa_surinamensis","marker":{"color":"rgba(231,154,111,1)","line":{"color":"rgba(231,154,111,1)"}},"line":{"color":"rgba(231,154,111,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(246,143,106,0.5)","y":[-2.0252975,-1.69571,-1.460005,-1.963375,-1.69571,-2.051265,-0.9186825,-1.8015775,-1.899455,-1.428045,-1.5698675,-2.147145,-1.88747,-2.2010775,-1.8814775,-2.1012025,-1.7176825],"type":"box","name":"Casearia_javitensis","marker":{"color":"rgba(246,143,106,1)","line":{"color":"rgba(246,143,106,1)"}},"line":{"color":"rgba(246,143,106,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(222,148,135,0.5)","y":[-2.5845975,-2.63054,-2.043275,-2.35888,-1.907445,-2.442775,-2.314935,-1.923425,-1.5538875,-1.827545,-1.6218025,-1.795585,-2.115185,-1.8135625,-2.1091925,-1.9214275,-1.963375,-1.87149,-2.0532625,-2.05526,-2.0332875,-1.6657475,-2.1651225,-2.6245475,-2.562625,-2.243025,-2.4367825,-2.139155],"type":"box","name":"Chrysophyllum_prieurii","marker":{"color":"rgba(222,148,135,1)","line":{"color":"rgba(222,148,135,1)"}},"line":{"color":"rgba(222,148,135,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(195,154,163,0.5)","y":[-1.7256725,-1.875485,-1.7935875,-1.691715,-1.915435,-1.5538875,-1.68772,-1.915435,-1.819555,-1.6218025,-1.771615,-1.4899675,-1.8255475,-1.8654975,-1.4620025,-1.5458975,-2.290965,-1.827545,-1.6457725,-1.8734875,-1.467995,-1.683725,-1.795585,-2.07124,-1.6657475,-1.627795,-1.483975,-1.563875,-1.8734875,-2.035285,-1.5099425,-1.4819775,-1.60782,-1.60782,-1.9533875,-2.21506],"type":"box","name":"Conceveiba_guianensis","marker":{"color":"rgba(195,154,163,1)","line":{"color":"rgba(195,154,163,1)"}},"line":{"color":"rgba(195,154,163,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(160,158,191,0.5)","y":[-1.3221775,-1.3421525,-1.603825,-1.83953,-1.6178075,-1.91144,-1.49596,-1.2862225,-1.24827,-1.523925,-1.45601,-1.3061975],"type":"box","name":"Dicorynia_guianensis","marker":{"color":"rgba(160,158,191,1)","line":{"color":"rgba(160,158,191,1)"}},"line":{"color":"rgba(160,158,191,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(157,157,202,0.5)","y":[-1.6697425,-1.8854725,-1.69571,-2.29496,-1.71968,-1.6617525,-1.739655,-1.73566,-1.51993,-1.755635,-1.4100675,-1.72767,-1.8255475,-1.587845,-1.9134375,-1.8535125,-2.0732375,-1.71169,-1.6937125,-1.7416525,-1.6937125],"type":"box","name":"Eperua_falcata","marker":{"color":"rgba(157,157,202,1)","line":{"color":"rgba(157,157,202,1)"}},"line":{"color":"rgba(157,157,202,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(183,152,200,0.5)","y":[-1.6777325,-1.5538875,-1.8015775,-1.6857225,-1.6617525,-1.4540125,-1.5898425,-1.5738625,-1.5978325,-1.9453975,-1.587845,-1.6977075,-1.619805,-1.8375325,-2.075235,-2.0173075,-1.51993,-1.835535,-1.6457725,-1.683725,-1.00058,-1.6457725,-1.6977075,-1.6657475,-1.6178075,-1.6417775,-1.4460225,-1.595835,-1.6457725,-1.5578825,-1.5458975,-1.420055,-1.3781075,-1.5059475,-1.5458975,-1.44003,-1.4699925,-1.8215525,-1.4899675,-1.9014525,-1.6537625,-1.483975,-1.452015,-1.5339125,-1.5458975,-1.57586,-1.619805,-1.515935,-2.1491425],"type":"box","name":"Eschweilera_coriacea","marker":{"color":"rgba(183,152,200,1)","line":{"color":"rgba(183,152,200,1)"}},"line":{"color":"rgba(183,152,200,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(206,146,197,0.5)","y":[-1.91144,-1.915435,-2.131165,-2.1451475,-1.7696175,-2.019305,-1.9414025,-1.7376575,-1.93541,-2.011315,-1.683725,-1.83953,-1.8495175,-1.91144,-1.899455,-1.5818525,-1.9014525,-1.667745,-2.1571325],"type":"box","name":"Gustavia_hexapetala","marker":{"color":"rgba(206,146,197,1)","line":{"color":"rgba(206,146,197,1)"}},"line":{"color":"rgba(206,146,197,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(228,139,195,0.5)","y":[-1.5978325,-1.5099425,-1.53591,-1.531915,-1.41606,-1.4220525,-1.51194,-1.51194,-1.8495175,-1.61581,-1.37611,-2.2689925,-1.667745,-1.9853475,-1.883475,-1.5299175,-1.5219275,-1.779605,-1.579855,-1.571865,-1.6297925,-1.3541375,-1.675735,-1.5738625,-1.6817275,-1.63179,-1.7296675,-1.667745,-1.5419025,-1.420055,-2.163125,-1.5498925,-1.6257975,-1.6238,-1.4420275,-1.6657475,-1.53591,-1.4580075,-1.515935,-1.276235,-1.39209,-1.396085],"type":"box","name":"Hymenopus_heteromorphus","marker":{"color":"rgba(228,139,195,1)","line":{"color":"rgba(228,139,195,1)"}},"line":{"color":"rgba(228,139,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(220,159,172,0.5)","y":[-1.56787,-1.4859725,-1.63978,-1.683725,-1.4380325,-1.4819775,-1.6337875,-1.6857225,-1.827545,-1.4420275,-1.388095,-1.412065,-1.36812,-1.4260475,-1.460005,-1.4979575,-1.56787,-1.7017025,-1.6737375,-1.5139375,-1.5698675,-1.6058225,-1.5618775,-1.73566,-1.63179,-1.7056975],"type":"box","name":"Iryanthera_hostmannii","marker":{"color":"rgba(220,159,172,1)","line":{"color":"rgba(220,159,172,1)"}},"line":{"color":"rgba(220,159,172,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(205,180,144,0.5)","y":[-1.5898425,-1.59983,-1.71968,-1.444025,-1.40008,-1.6138125,-1.6018275,-1.4460225,-1.6377825,-1.4300425,-1.8015775,-1.61581,-1.643775,-1.563875,-1.6457725,-1.5458975,-1.6617525,-1.3022025,-1.611815,-1.5099425],"type":"box","name":"Iryanthera_sagotiana","marker":{"color":"rgba(205,180,144,1)","line":{"color":"rgba(205,180,144,1)"}},"line":{"color":"rgba(205,180,144,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(186,200,114,0.5)","y":[-1.348145,-1.4020775,-1.3501425,-1.6577575,-1.92742,-1.7656225,-1.45601,-1.40807,-1.5259225,-1.467995,-1.523925,-2.035285,-1.723675,-2.35888,-1.8375325,-1.4779825,-1.4659975,-1.3621275,-1.3821025,-1.31219,-1.2023275,-1.4100675,-1.52792,-1.6977075,-1.4699925,-1.3341625,-1.332165,-1.2702425,-1.531915,-1.4180575,-1.715685,-1.35214,-1.348145,-1.4620025,-1.4899675,-1.2742375,-1.3581325,-1.66375,-1.6617525],"type":"box","name":"Jacaranda_copaia subsp. copaia","marker":{"color":"rgba(186,200,114,1)","line":{"color":"rgba(186,200,114,1)"}},"line":{"color":"rgba(186,200,114,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(170,216,83,0.5)","y":[-1.8814775,-1.979355,-1.7216775,-1.7376575,-1.61581,-1.8175575,-1.6417775,-1.915435,-2.1032,-2.0173075,-1.811565,-1.8375325,-1.84752,-1.8734875,-1.67973,-1.5698675,-2.011315,-1.6377825,-1.8654975,-1.7656225,-1.95139,-1.7096925,-1.83953,-1.99933,-1.955385,-1.89546,-1.883475,-1.91144,-1.875485],"type":"box","name":"Laetia_procera","marker":{"color":"rgba(170,216,83,1)","line":{"color":"rgba(170,216,83,1)"}},"line":{"color":"rgba(170,216,83,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(196,217,74,0.5)","y":[-1.947395,-1.939405,-1.90345,-1.771615,-1.539905,-1.8934625,-2.24702,-2.0252975,-1.723675,-2.259005,-2.1032,-2.23903,-1.9973325,-1.64777],"type":"box","name":"Licania_membranacea","marker":{"color":"rgba(196,217,74,1)","line":{"color":"rgba(196,217,74,1)"}},"line":{"color":"rgba(196,217,74,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(242,217,54,0.5)","y":[-1.9893425,-1.95139,-1.9973325,-2.1012025,-1.8575075,-2.1211775,-2.2809775,-2.20707,-1.63179,-1.5259225,-1.2462725,-1.8095675,-1.98335,-1.8974575,-1.995335,-1.859505,-1.7256725,-1.795585,-1.6497675,-1.995335,-1.7456475,-1.85551,-1.9294175,-1.93541,-1.71169,-2.410815,-2.25501,-1.8854725,-1.8575075,-1.8814775,-1.57586],"type":"box","name":"Poraqueiba_guianensis","marker":{"color":"rgba(242,217,54,1)","line":{"color":"rgba(242,217,54,1)"}},"line":{"color":"rgba(242,217,54,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(253,215,64,0.5)","y":[-2.051265,-1.9334125,-2.003325,-2.1930875,-2.1091925,-2.035285,-1.75164,-1.763625,-1.66375,-1.56787,-1.787595,-1.93541,-2.0133125,-2.0812275,-1.96737,-1.84752,-2.23903,-1.8615025,-2.27099,-1.81556,-1.8694925],"type":"box","name":"Protium_opacum subsp. rabelianum","marker":{"color":"rgba(253,215,64,1)","line":{"color":"rgba(253,215,64,1)"}},"line":{"color":"rgba(253,215,64,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(246,209,94,0.5)","y":[-2.1571325,-2.07923,-1.52792,-1.8814775,-2.1571325,-2.1890925,-2.4727375,-2.21506,-2.46275,-1.8335375,-1.9613775,-1.9094425,-2.1211775,-1.9334125,-1.7496425,-2.0812275,-1.9374075,-2.1691175,-2.56662,-2.474735,-2.5206775,-2.4967075,-2.3289175,-2.003325],"type":"box","name":"Protium_stevensonii","marker":{"color":"rgba(246,209,94,1)","line":{"color":"rgba(246,209,94,1)"}},"line":{"color":"rgba(246,209,94,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(239,203,119,0.5)","y":[-1.5658725,-1.8375325,-2.0013275,-2.15114,-1.36013,-1.63978,-1.95139,-1.5618775,-1.8455225,-1.8934625,-1.547895,-1.56787,-1.87149,-1.63978,-1.436035,-1.659755,-1.4340375,-1.4220525,-1.619805,-1.6737375,-1.475985,-1.6697425,-1.5578825,-1.4020775,-1.396085,-1.539905,-1.571865,-1.4699925,-1.2902175,-1.452015],"type":"box","name":"Pterocarpus_officinalis","marker":{"color":"rgba(239,203,119,1)","line":{"color":"rgba(239,203,119,1)"}},"line":{"color":"rgba(239,203,119,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(231,198,142,0.5)","y":[-1.7456475,-1.7376575,-1.4939625,-1.464,-1.9374075,-1.7216775,-2.2410275,-1.464,-1.4979575,-1.76762,-1.55189,-1.6457725,-1.531915,-1.5259225,-1.7696175,-1.6817275,-1.7216775,-1.651765,-1.5658725,-1.883475,-1.93541,-1.80757,-1.7935875,-1.8814775,-1.8654975,-1.83154,-2.0252975,-1.7416525,-1.73566],"type":"box","name":"Symphonia_globulifera","marker":{"color":"rgba(231,198,142,1)","line":{"color":"rgba(231,198,142,1)"}},"line":{"color":"rgba(231,198,142,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(220,193,154,0.5)","y":[-1.87149,-1.60782,-1.77561,-2.1091925,-1.7935875,-1.75164,-1.2982075,-1.875485,-1.5938375,-1.659755,-1.819555,-1.87948,-1.8635,-1.9693675,-1.196335,-1.8015775,-2.0772325,-1.9613775,-1.6937125,-1.74365,-1.7056975,-1.5938375,-1.71968,-1.603825,-1.6218025,-1.8635,-1.683725,-1.595835,-1.5259225,-1.723675,-1.643775,-1.8615025,-1.723675,-1.843525,-1.7456475,-1.67973,-1.71968,-1.747645,-1.60782,-1.827545,-1.891465,-1.98335],"type":"box","name":"Tachigali_melinonii","marker":{"color":"rgba(220,193,154,1)","line":{"color":"rgba(220,193,154,1)"}},"line":{"color":"rgba(220,193,154,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(207,188,163,0.5)","y":[-1.723675,-2.131165,-2.0252975,-1.851515,-2.23903,-1.35214,-1.683725,-1.6577575,-1.69571,-1.539905,-1.34415,-2.0173075,-1.47998,-1.63179,-1.5179325,-1.587845,-1.7376575,-1.464,-1.5538875,-1.467995,-1.55988,-1.64777,-2.11119,-1.8095675,-1.7056975,-1.55988,-1.6377825,-1.6337875,-1.843525,-2.059255,-1.9573825,-1.7536375,-1.739655],"type":"box","name":"Virola_michelii","marker":{"color":"rgba(207,188,163,1)","line":{"color":"rgba(207,188,163,1)"}},"line":{"color":"rgba(207,188,163,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(193,184,171,0.5)","y":[-1.83154,-1.388095,-1.7935875,-1.5898425,-1.8615025,-1.5938375,-1.452015,-1.63978,-1.7056975,-1.6297925,-1.5938375,-1.627795,-1.6697425,-1.64777,-1.7017025,-1.61581,-1.6697425,-1.6777325,-1.60782,-1.63179,-1.6697425,-1.7836,-1.67174,-1.6977075,-1.82355,-1.7895925],"type":"box","name":"Virola_surinamensis","marker":{"color":"rgba(193,184,171,1)","line":{"color":"rgba(193,184,171,1)"}},"line":{"color":"rgba(193,184,171,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(179,179,179,0.5)","y":[-2.1012025,-2.1211775,-2.1651225,-1.7736125,-1.56787,-1.3860975,-1.8575075,-1.6457725,-1.7416525,-1.8455225,-1.827545,-1.8575075,-2.251015,-1.60782,-2.3369075,-2.019305,-1.95938,-1.9613775,-2.0173075,-1.8535125,-2.1171825,-1.99134],"type":"box","name":"Vouacapoua_americana","marker":{"color":"rgba(179,179,179,1)","line":{"color":"rgba(179,179,179,1)"}},"line":{"color":"rgba(179,179,179,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<ul>
+<li><p>The variability in πtlp among species indicates the potential for a
+range of species responses to drought within Amazonian forest communities.</p></li>
+<li><p>For <em>Symphonia globulifera</em> we couldn’t exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta &amp; Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative.</p></li>
+<li><p>We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):</p>
+<ul>
+<li><em>Dicorynia guianensis</em> (as Maréchaux et al 2015)</li>
+<li><em>Eschweleira coriacea </em> (as Maréchaux et al 2015)</li>
+<li><em>Hymenopus heteromorphus</em></li>
+<li><em>Iryanthera sagotiana</em></li>
+<li><em>Iryanthera hostmannii</em></li>
+<li><em>Jacaranda copaia subsp. copaia</em></li>
+<li><em>Pterocarpus officinalis</em></li>
+</ul></li>
+</ul>
+<p>$quanti
+correlation p.value
+LSWC 0.27501973321 7.851736613e-13
+SLA 0.09188025127 1.876481004e-02
+LA -0.03566984332 3.624298436e-01
+Gmin -0.05363521589 1.713452745e-01
+MidribWidth -0.10310642023 8.271045214e-03
+FvFm -0.24274639978 2.797869211e-10</p>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="hypotheses.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="to-do.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

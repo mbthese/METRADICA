@@ -37,7 +37,7 @@ library(FactoMineR)
 library(Factoshiny)
 
 
-#resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
+resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
 
 #dim 1-2
 
@@ -167,10 +167,13 @@ ggplot(Metradica) +
 ```{r}
 
 ggplot(Metradica) +
- aes(x = log10(abs(Ptlp))) +
+ aes(x = Ptlp) +
  geom_histogram(bins = 30L, fill = "#112446") +
  theme_minimal()
 ```
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
+
 
 ### Leaf area
 
@@ -214,135 +217,4 @@ ggplot(Metradica) +
  plot(Metradica[,8:13])
 ```
 
-
-## Gmin - exploration
-
-The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
-
-ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat collect. Tukey post-hoc test shows groups a Bafog and b for Paracou and Kaw. It also shows groups TF a and BF b.  
-
-Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-library(tidyr)
-library(dplyr)
-Metradica %>% group_by(Forest) %>% summarise_at(vars(Gmin), funs(mean(Gmin, na.rm=TRUE))) 
-
-# Global test
-library(ggpubr)
-library(ggfortify)
-Metradica$Forest <- as.factor(Metradica$Forest)
-Metradica$Habitat <- as.factor(Metradica$Habitat)
-Metradica$Name <- as.factor(Metradica$Name)
-Model_gmin<-lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
-#autoplot(Model_gmin)
-#summary(Model_gmin)
-anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
-#tukey_gmin <- TukeyHSD(aov(Model_gmin))
-library(agricolae)
-#tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
-#tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-library(ggplot2)
-library(plotly)
-library(ggplot2)
-library(cowplot)
-
-#gmin with all species- interactive graph
-plot_ly(Metradica, y = ~Gmin, color = ~Name, type = "box")
-
-
-#forest
-options(digits = 10)
-means <- aggregate(Gmin ~Forest, Metradica, mean)
-
-
-A<-  ggplot(Metradica) +
-  aes(x = Forest, y = log10(Gmin), fill = Forest, group = Forest) +
- geom_boxplot(shape = "circle") +
- scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
-  labs(
-    x = "",
-    y = "Minimal conductance (mmol.m-2.s-1)"
-  ) +
-  stat_summary(fun.y="mean", colour = "red", geom="point") +
- theme_minimal() +
-  stat_compare_means(method = "anova", label = "p.signif")
-
-
-B <- ggplot(Metradica) +
- aes(x = Forest, y = Gmin, colour = Name) +
- geom_boxplot(shape = "circle", fill = "#112446") +
-  labs(
-    x = "Forest sites",
-    y = ""
-  ) +
- scale_color_hue(direction = 1) +
- theme_minimal() +
-  theme(legend.position="bottom")
-
-
-ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
-
-
-```
-
-
-The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
-library(emmeans)
-m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
-#pairs(m_ajust_forest_gmin) 
-a <- plot(m_ajust_forest_gmin)
-
-m_ajust_habitat_gmin <- emmeans(object = Model_gmin, specs = "Habitat")
-#pairs(m_ajust_habitat_gmin) 
-b <- plot(m_ajust_habitat_gmin)
-
-library(ggplot2)
-library(cowplot)
-
-plot_grid(a,b, labels = c('A', 'B'), label_size = 12)
-```
-
-*interpretation* Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326,  p-value: < 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m–2 s–1 in Paracou to 3.60 mmol m–2 s–1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic:  50.0139,  p-value: < 2.2204e-16). 
-
-It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
-
-*literature* Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m–2 s–1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
-
-* **Test the phylogenetic signal.**
-* **compare with stomatal density** 
-* **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
-
-```{r}
-
-library(ggplot2)
-
-ggplot(Metradica) +
- aes(x = LT, y = MajVLA, fill = Name) +
- geom_point(shape = "circle", size = 1.5, colour = "#112446") +
- scale_fill_hue(direction = 1) +
- theme_minimal()
-
-ggplot(Metradica) +
- aes(x = DBH, y = MajVLA, colour = Name) +
- geom_point(shape = "circle", size = 1.5) +
- scale_color_hue(direction = 1) +
- theme_minimal()
-
-
-
-ggplot(Metradica) +
- aes(x = Forest, y = Ptlp, colour = Name) +
- geom_boxplot(shape = "circle", fill = "#112446") +
- scale_color_hue(direction = 1) +
- theme_minimal()
-
-```
 
