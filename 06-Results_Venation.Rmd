@@ -77,23 +77,23 @@ Linear regression analysis to performe to test the correlations between the othe
   + Palatability was positively correlated with N content, SLA and water content of leaves and negatively correlated with leaf C content and leaf C/N-ratio. (Schadler et al 2003)
 
 Paracou data: recheck LA and gmin!
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(readr)
 Paracou <- read_csv("Clean_data/Paracou.csv")
 ```
 FTH data :
-```{r}
+```{r eval=FALSE, include=FALSE}
 FTH <- read_csv("Clean_data/FTH.csv")
 ```
 
 Both FTH and Paracou data combined:
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 Paracou_FTH<- read_csv("Clean_data/V1/Paracou_FTH.csv")
 ```
 
 Bafog data: 
-```{r}
+```{r eval=FALSE, include=FALSE}
 Bafog <- read_csv("Clean_data/Bafog.csv")
 ```
 
@@ -105,7 +105,7 @@ To do :
 -merge vein data set with the rest of data of each site through the individual code 
 
 ### Vein data joing with other traits
-```{r Import dataset veins, include=FALSE}
+```{r Import dataset veins, eval=FALSE, include=FALSE}
 library(readxl)
 library(forcats)
 library(dplyr)
@@ -151,7 +151,7 @@ Kaw_veins <- Kaw_veins %>% rename(gmin = Gmin)
 
 #### Merge
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 #veindata 3 sites
 library(readxl)
@@ -178,7 +178,7 @@ export(ALL, "ALL_for_students.csv")
 
 ### Across species from all habitats
 
-```{r echo=FALSE}
+```{r eval=FALSE, include=FALSE}
 library(ggplot2)
 library(forcats)
 library(dplyr)
@@ -221,7 +221,7 @@ anova(model1, model2) #the RSS of the model2 (taking into account the factor spe
 
 ### SFF vs TF habitats
 
-```{r echo=FALSE}
+```{r eval=FALSE, include=FALSE}
 
 library(ggplot2)
 
@@ -275,7 +275,7 @@ anova(model1, model2) #il y a un effet habitat leger avec pvalue significative
 ### Specialists SFF vs Specialists TF vs Generalists
 
 
-```{r echo=FALSE}
+```{r eval=FALSE, include=FALSE}
 
 library(ggplot2)
 E <- ggplot(veindata) +
@@ -386,7 +386,7 @@ Paracou_data <- left_join(Paracou_FTH, veindata_Paracou, by= "Name")
 
 
 ### Herbivory? 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(readr)
 tlp_paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Ptlp_tidy_Paracou.csv")
 
@@ -422,7 +422,7 @@ VP : The vein-projected area per leaf area *(the proportion of leaf lamina obstr
 VV: Vein volume per leaf area was determined by multiplying the vein density by π× the square of half the diameter. 
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(dplyr)
 
 MidribWidth <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/MidribWidth.xlsx", 

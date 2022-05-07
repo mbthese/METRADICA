@@ -275,7 +275,7 @@ data %>% welch_anova_test(LSWC~ Habitat_real)
 #The overall p-value (0.067) from the ANOVA table is more than α = .05, which means we cannot reject the null hypothesis that the gmin values are equal between the 2 habitats.
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 library(mvnormtest)
 library(dplyr)

@@ -2,6 +2,8 @@ tab:unnamed-chunk-2
 tab:unnamed-chunk-4
 about
 background
+project-introduction
+hypotheses
 sampling
 habitats
 hydrological-indexes
@@ -20,7 +22,8 @@ hydraulic-traits
 photochemical-trait
 measured-traits
 protocols
-hypotheses
+hypotheses-1
+data-exploration
 general-pca
 contribution-of-individuals-and-variables-1-2-dimensions
 contribution-of-individuals-and-variables-1-2-dimensions-1
@@ -39,6 +42,7 @@ major-vein-density
 summary-of-main-variables
 gmin---exploration
 to-do
+import-paracou-dataset
 vein-traits
 hypothesis
 materials-and-method
@@ -52,6 +56,7 @@ specialists-sff-vs-specialists-tf-vs-generalists
 bafog-vs-kaw-vs-paracou
 vla-against-other-variables
 herbivory
+other-venation-traits
 waterlogging-litterature
 general-potential-hypotheses
 section

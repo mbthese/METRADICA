@@ -62,7 +62,7 @@ Avant nous procédions par espèces, le but des modèles joints: faire avec plus
 
 Prendre en compte: la co-occurence des espèces + relation trait-env't pour déterminer la présence d'une espèce sur 1 site.
 
-![Modèle joint](Metradica_Paracou/Document/Pictures/ModeleJoint.png "Modele Joint")
+![Modèle joint](../Metradica_Paracou/Document/Pictures/ModeleJoint.png "Modele Joint")
 
 Si l'on inclu les données 13C dans les modèles joints: on s'attend à une abscence de réponse.
 
