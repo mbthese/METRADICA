@@ -37,7 +37,7 @@ library(FactoMineR)
 library(Factoshiny)
 
 
-#resultPCA <- Factoshiny(Metradica[,c(5:13,20)])
+#resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
 
 #dim 1-2
 
@@ -217,6 +217,8 @@ ggplot(Metradica) +
 
 ## Gmin - exploration
 
+The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
+
 ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat collect. Tukey post-hoc test shows groups a Bafog and b for Paracou and Kaw. It also shows groups TF a and BF b.  
 
 Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
@@ -231,18 +233,19 @@ library(ggpubr)
 library(ggfortify)
 Metradica$Forest <- as.factor(Metradica$Forest)
 Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
 Model_gmin<-lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
-autoplot(Model_gmin)
+#autoplot(Model_gmin)
 #summary(Model_gmin)
-anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat.
-tukey_gmin <- TukeyHSD(aov(Model_gmin))
+anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+#tukey_gmin <- TukeyHSD(aov(Model_gmin))
 library(agricolae)
 #tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
 #tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
 ```
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(plotly)
 library(ggplot2)
@@ -290,15 +293,15 @@ ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
 
 The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances. 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
 library(emmeans)
 m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
-pairs(m_ajust_forest_gmin) 
+#pairs(m_ajust_forest_gmin) 
 a <- plot(m_ajust_forest_gmin)
 
 m_ajust_habitat_gmin <- emmeans(object = Model_gmin, specs = "Habitat")
-pairs(m_ajust_habitat_gmin) 
+#pairs(m_ajust_habitat_gmin) 
 b <- plot(m_ajust_habitat_gmin)
 
 library(ggplot2)
@@ -307,16 +310,15 @@ library(cowplot)
 plot_grid(a,b, labels = c('A', 'B'), label_size = 12)
 ```
 
+*interpretation* Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326,  p-value: < 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m–2 s–1 in Paracou to 3.60 mmol m–2 s–1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic:  50.0139,  p-value: < 2.2204e-16). 
 
-Is gmin linked to other variables? No.
+It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
 
-```{r}
-Mcomp <- lm(Gmin ~ LA + Ptlp +SLA + FvFm + LSWC + MajVLA, data = Metradica)
-plot(summary(Metradica))
-```
+*literature* Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m–2 s–1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
 
-
-
+* **Test the phylogenetic signal.**
+* **compare with stomatal density** 
+* **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
 
 ```{r}
 

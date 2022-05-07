@@ -50,7 +50,7 @@ The classification in the waterlogged habitat may be loose and not as precise as
 
 Permanent forest plots of the Guyafor network monitor since 1970 (Bafog, Paracou) individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network coves > 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes. METRADICA leaf samplings took place in the control plots. 
 
-![Guyafor stations for tropical forest monitoring](Metradica_Paracou/Document/Pictures/Guyafor.png "Guyafor stations")
+![Guyafor stations for tropical forest monitoring](../Metradica_Paracou/Document/Pictures/Guyafor.png "Guyafor stations")
 
 **Paracou **: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually)
 
@@ -143,14 +143,16 @@ For *Eperua falcata*: BF?? see Laurens porter 2007 (are species adapted ...)
 
 We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.  
 
-```{r echo=FALSE, fig.cap="phylogeny"}
+![Phylogeny](../Metradica_Paracou/Document/phylo_metradica.jpeg "Phylogeny")
+
+```{r eval=FALSE, fig.cap="phylogeny", include=FALSE}
 library(V.PhyloMaker)
 library(ggfortify)
 library(tidyverse)
 library(ggtree)
 library(readxl)
 species <- select(species, taxon , Genus, Species)
-paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+#paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
   dplyr::select(Family, Genus, Species) %>% 
   unique() %>% 
   full_join(species) %>% 
@@ -159,8 +161,8 @@ paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xl
   mutate(taxon = as.character(taxon))
 #tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
 #save(tree, file = "./document/phylogeny/phylogeny.Rdata")
-load("Greenhouse_document/phylogeny/phylogeny.Rdata")
-fortify(tree$scenario.3) %>% 
+#load("Greenhouse_document/phylogeny/phylogeny.Rdata")
+#fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
   left_join(paracou) %>% 
   ggtree(aes(col = taxon), layout="circular") + 
