@@ -15,11 +15,11 @@ Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
 
 The data
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r Data exploration : data import, echo=FALSE, message=FALSE, warning=FALSE}
 Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r gmin-anova, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyr)
 library(dplyr)
 Metradica %>% group_by(Forest) %>% summarise_at(vars(Gmin), funs(mean(Gmin, na.rm=TRUE))) 
@@ -41,7 +41,7 @@ library(agricolae)
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r gmin-plot, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(plotly)
 library(ggplot2)
@@ -89,7 +89,7 @@ ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
 
 The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r gmin-ajustmeans, echo=FALSE, message=FALSE, warning=FALSE}
 #moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
 library(emmeans)
 m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
@@ -117,7 +117,7 @@ LA     -0.08838865629 0.02213220611
 SLA    -0.09932187546 0.01009827694
 
 
-```{r}
+```{r gmin-MajVLA and SLA}
 M_gmin <- lm(Gmin ~ MajVLA + SLA, data = Metradica)
 library(ggplot2)
 
@@ -150,24 +150,6 @@ It is unclear whether a higher gmin in the Bafog site is assigned to stomatal op
 * **compare with stomatal density** 
 * **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
 
-```{r}
-
-library(ggplot2)
-
-ggplot(Metradica) +
- aes(x = LT, y = MajVLA, fill = Name) +
- geom_point(shape = "circle", size = 1.5, colour = "#112446") +
- scale_fill_hue(direction = 1) +
- theme_minimal()
-
-ggplot(Metradica) +
- aes(x = DBH, y = MajVLA, colour = Name) +
- geom_point(shape = "circle", size = 1.5) +
- scale_color_hue(direction = 1) +
- theme_minimal()
-
-
-```
 
 ## Ptlp - exploration
 
@@ -175,7 +157,7 @@ Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cel
 
 ### Paracou
 
-```{r}
+```{r Ptlp-Paracou, message=FALSE, warning=FALSE}
 library(plotly)
 library(ggplot2)
 
@@ -193,7 +175,7 @@ Several outliers are either marked as "herbivory", are "young", or have Run = 4 
 
 ### Bafog
 
-```{r}
+```{r Ptlp-Bafog, message=FALSE, warning=FALSE}
 library(plotly)
 library(ggplot2)
 
@@ -211,7 +193,7 @@ Several outliers are either marked as "Erreur bota", "pas de stabilisation", and
 
 ### Kaw
 
-```{r}
+```{r Ptlp-Kaw, message=FALSE, warning=FALSE}
 library(plotly)
 library(ggplot2)
 
@@ -229,7 +211,7 @@ Several outliers are either marked as "Epiphytes", "herbivory", One run is 4.
 
 ### All sites
 
-```{r}
+```{r Ptlp-plot}
 library(ggplot2)
 library(plotly)
 library(ggplot2)
@@ -257,7 +239,7 @@ range of species responses to drought within Amazonian forest communities.
 
 Correlation with other variable : LSWC and SLA 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r Ptlp-LSWC and SLA, echo=FALSE, message=FALSE, warning=FALSE}
 M_ptlp <- lm(Ptlp ~ LSWC + SLA, data = Metradica)
 
 
@@ -277,7 +259,7 @@ ggplot(Metradica,aes(x = SLA, y = Ptlp)) +
 ```
 
 ####  Anova 
-```{r message=FALSE, warning=FALSE}
+```{r Ptlp-anova, message=FALSE, warning=FALSE}
 # Global test
 library(ggpubr)
 library(ggfortify)

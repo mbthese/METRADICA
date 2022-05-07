@@ -87,7 +87,7 @@
 
 \title{Metradica}
 \author{Marion Boisseaux}
-\date{2022-05-06}
+\date{2022-05-07}
 
 \begin{document}
 \maketitle
@@ -739,6 +739,8 @@ concept of phenotype-environment matching and environmental optimality, where sp
 
 \includegraphics{_main_files/figure-latex/unnamed-chunk-14-1.pdf}
 
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were ``wetter'' than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al.~1992; Abrams \& Kubiske 1994; Cao 2000; Merchant et al.~2007; Zhu \& Cao 2009; Bartlett, Scoffoni \& Sack 2012b; Bartlett et al.~2014).
+
 \hypertarget{leaf-area}{%
 \subsection{Leaf area}\label{leaf-area}}
 
@@ -773,6 +775,8 @@ ANOVA reports a p-value far below 0.05, indicating there are differences in the 
 
 Model\_gmin \textless- lm(log10(Gmin) \textasciitilde{} Forest + Habitat, data = Metradica)
 
+The data
+
 \begin{verbatim}
 ## # A tibble: 3 x 2
 ##   Forest   Gmin
@@ -794,11 +798,23 @@ Model\_gmin \textless- lm(log10(Gmin) \textasciitilde{} Forest + Habitat, data =
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-21-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-2.pdf}
+\includegraphics{_main_files/figure-latex/gmin-plot-1.pdf} \includegraphics{_main_files/figure-latex/gmin-plot-2.pdf}
 
 The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances.
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-22-1.pdf}
+\includegraphics{_main_files/figure-latex/gmin-ajustmeans-1.pdf}
+
+Gmin and other variables? Yes : MajVLA and SLA.
+\$quanti
+correlation p.value
+MajVLA 0.09328913682 0.01618976310
+FvFm 0.06178897606 0.10874004687
+LSWC -0.04404830581 0.25416539130
+Ptlp -0.05363521589 0.17134527454
+LA -0.08838865629 0.02213220611
+SLA -0.09932187546 0.01009827694
+
+\includegraphics{_main_files/figure-latex/gmin-MajVLA and SLA-1.pdf} \includegraphics{_main_files/figure-latex/gmin-MajVLA and SLA-2.pdf}
 
 \emph{interpretation} Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326, p-value: \textless{} 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m--2 s--1 in Paracou to 3.60 mmol m--2 s--1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic: 50.0139, p-value: \textless{} 2.2204e-16).
 
@@ -816,7 +832,118 @@ It is unclear whether a higher gmin in the Bafog site is assigned to stomatal op
   \textbf{see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?}
 \end{itemize}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-23-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-23-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-23-3.pdf}
+\hypertarget{ptlp---exploration}{%
+\section{Ptlp - exploration}\label{ptlp---exploration}}
+
+Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought.
+
+\hypertarget{paracou}{%
+\subsection{Paracou}\label{paracou}}
+
+\includegraphics{_main_files/figure-latex/Ptlp-Paracou-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-5.pdf}
+
+Several outliers are either marked as ``herbivory'', are ``young'', or have Run = 4 and trace of fungi (659).
+
+\hypertarget{bafog}{%
+\subsection{Bafog}\label{bafog}}
+
+\includegraphics{_main_files/figure-latex/Ptlp-Bafog-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-5.pdf}
+
+Several outliers are either marked as ``Erreur bota'', ``pas de stabilisation'', and two leaves are Run 4 and 3.
+
+\hypertarget{kaw}{%
+\subsection{Kaw}\label{kaw}}
+
+\includegraphics{_main_files/figure-latex/Ptlp-Kaw-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-5.pdf}
+
+Several outliers are either marked as ``Epiphytes'', ``herbivory'', One run is 4.
+
+\hypertarget{all-sites}{%
+\subsection{All sites}\label{all-sites}}
+
+\includegraphics{_main_files/figure-latex/Ptlp-plot-1.pdf}
+
+\begin{itemize}
+\item
+  The variability in πtlp among species indicates the potential for a
+  range of species responses to drought within Amazonian forest communities.
+\item
+  For \emph{Symphonia globulifera} we couldn't exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta \& Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative.
+\item
+  We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \emph{Dicorynia guianensis} (as Maréchaux et al 2015)
+  \item
+    \emph{Eschweleira coriacea } (as Maréchaux et al 2015)
+  \item
+    \emph{Hymenopus heteromorphus}
+  \item
+    \emph{Iryanthera sagotiana}
+  \item
+    \emph{Iryanthera hostmannii}
+  \item
+    \emph{Jacaranda copaia subsp. copaia}
+  \item
+    \emph{Pterocarpus officinalis}
+  \end{itemize}
+\item
+  We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including \emph{Voucapoua americana} and both \emph{Protium} species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006).
+\end{itemize}
+
+Correlation with other variable : LSWC and SLA
+
+\includegraphics{_main_files/figure-latex/Ptlp-LSWC and SLA-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-LSWC and SLA-2.pdf}
+
+\hypertarget{anova}{%
+\subsubsection{Anova}\label{anova}}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Ptlp ~ Forest + Habitat, data = Metradica)
+## 
+## Residuals:
+##         Min          1Q      Median          3Q         Max 
+## -0.83951909 -0.14950221  0.02155209  0.16410242  0.78474577 
+## 
+## Coefficients:
+##                  Estimate  Std. Error   t value   Pr(>|t|)    
+## (Intercept)   -1.64836556  0.02032153 -81.11425 < 2.22e-16 ***
+## ForestKaw     -0.06762974  0.02552452  -2.64960  0.0082535 ** 
+## ForestParacou -0.13666285  0.02311207  -5.91305 5.4111e-09 ***
+## HabitatTF     -0.05506271  0.01967143  -2.79912  0.0052753 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.2507383 on 654 degrees of freedom
+##   (33 observations deleted due to missingness)
+## Multiple R-squared:  0.05737529, Adjusted R-squared:  0.05305133 
+## F-statistic: 13.26913 on 3 and 654 DF,  p-value: 2.036469e-08
+\end{verbatim}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Response: Ptlp
+##            Df    Sum Sq    Mean Sq  F value    Pr(>F)    
+## Forest      2  2.010091 1.00504546 15.98616 1.666e-07 ***
+## Habitat     1  0.492589 0.49258922  7.83508 0.0052753 ** 
+## Residuals 654 41.116794 0.06286972                       
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\includegraphics{_main_files/figure-latex/Ptlp-anova-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-4.pdf}
+
+\emph{Litterature}
+* The paper by Zhu et al.~(2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China.
+
+*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al.~2008) and altered nutrient concentrations (Villagra et al.~2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
+
+*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree \& Dainty 1975; Abrams, Kubiske \& Steiner 1990; Brodribb et al.~2003; Bartlett, Scoffoni \& Sack 2012b; Guyot, Scoffoni \& Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance.
 
 \hypertarget{to-do}{%
 \chapter{To do}\label{to-do}}
@@ -1061,7 +1188,7 @@ il manque encore les quelques individus résoltés avec Sylvain dans les indv de
 ## F-statistic: 7.228237 on 3 and 247 DF,  p-value: 0.0001143635
 \end{verbatim}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-24-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-24-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-24-3.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-24-4.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-24-5.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-24-6.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-20-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-20-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-20-3.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-20-4.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-20-5.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-20-6.pdf}
 
 \begin{verbatim}
 ## # A tibble: 1 x 3
@@ -1070,7 +1197,7 @@ il manque encore les quelques individus résoltés avec Sylvain dans les indv de
 ## 1 residuals(modele4)     0.968 0.0000234
 \end{verbatim}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-24-7.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-20-7.pdf}
 
 \begin{verbatim}
 ## # A tibble: 1 x 4
@@ -1094,7 +1221,7 @@ il manque encore les quelques individus résoltés avec Sylvain dans les indv de
 ## 1 LSWC    265      1.45     1  219. 0.229 Welch ANOVA
 \end{verbatim}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-26-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-22-1.pdf}
 
 \hypertarget{vein-traits}{%
 \chapter{Vein traits}\label{vein-traits}}

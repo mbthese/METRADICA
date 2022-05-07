@@ -41,6 +41,12 @@ leaf-saturated-water-content
 major-vein-density
 summary-of-main-variables
 gmin---exploration
+ptlp---exploration
+paracou
+bafog
+kaw
+all-sites
+anova
 to-do
 import-paracou-dataset
 vein-traits
@@ -60,9 +66,3 @@ other-venation-traits
 waterlogging-litterature
 general-potential-hypotheses
 section
-ptlp---exploration
-paracou
-bafog
-kaw
-anova
-all-sites

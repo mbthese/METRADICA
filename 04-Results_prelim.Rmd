@@ -37,7 +37,7 @@ library(FactoMineR)
 library(Factoshiny)
 
 
-resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
+#resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
 
 #dim 1-2
 
