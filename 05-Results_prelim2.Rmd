@@ -15,7 +15,7 @@ Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
 
 The data
 
-```{r Data exploration : data import, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Data import for traits, echo=FALSE, message=FALSE, warning=FALSE}
 Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
 ```
 
@@ -30,17 +30,18 @@ library(ggfortify)
 Metradica$Forest <- as.factor(Metradica$Forest)
 Metradica$Habitat <- as.factor(Metradica$Habitat)
 Metradica$Name <- as.factor(Metradica$Name)
-Model_gmin<-lm(log10(Gmin) ~ Type,  data = Metradica)
+Model_gmin<-lm(log10(Gmin) ~ Forest+Habitat,  data = Metradica)
 #autoplot(Model_gmin)
 summary(Model_gmin)
 anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
 #tukey_gmin <- TukeyHSD(aov(Model_gmin))
 library(agricolae)
-#tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
-#tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
+tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
+tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
 ```
 
-```{r HabitatPref_gmin}
+### Plots 
+```{r Gmin pref habitat}
 
 gmin <- Metradica %>%
  filter(!is.na(Type)) %>%
@@ -67,7 +68,7 @@ gmin <- Metradica %>%
 ```
 
 
-```{r gmin-plot, echo=FALSE, message=FALSE, warning=FALSE}
+```{r gmin-plot, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(plotly)
 library(ggplot2)
@@ -117,6 +118,8 @@ The adjusted mean arises when statistical averages must be corrected to compensa
 
 ```{r gmin-ajustmeans, echo=FALSE, message=FALSE, warning=FALSE}
 #moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
+Model_gmin<-lm(log10(Gmin) ~ Forest+Habitat,  data = Metradica)
+
 library(emmeans)
 m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
 #pairs(m_ajust_forest_gmin) 
@@ -132,7 +135,9 @@ library(cowplot)
 plot_grid(a,b, labels = c('A', 'B'), label_size = 12)
 ```
 
-Gmin and other variables? Yes : MajVLA and SLA.
+### Gmin and other variables? 
+
+Yes : MajVLA and SLA.
 $quanti
           correlation       p.value
 MajVLA  0.09328913682 0.01618976310
@@ -181,7 +186,20 @@ It is unclear whether a higher gmin in the Bafog site is assigned to stomatal op
 
 Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought. 
 
-### Paracou
+```{r Ptlp-plot}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#ptlp with all species- interactive graph
+plot_ly(Metradica, y = ~Ptlp, color = ~Name, type = "box")
+```
+
+### Paracou data set
+
+
+Several outliers are either marked as "herbivory", are "young", or have Run = 4 and trace of fungi (659).
 
 ```{r Ptlp-Paracou, message=FALSE, warning=FALSE}
 library(plotly)
@@ -197,9 +215,9 @@ plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
 
 ```
 
-Several outliers are either marked as "herbivory", are "young", or have Run = 4 and trace of fungi (659). 
+ 
 
-### Bafog
+### Bafog data set
 
 ```{r Ptlp-Bafog, message=FALSE, warning=FALSE}
 library(plotly)
@@ -217,7 +235,7 @@ plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
 
 Several outliers are either marked as "Erreur bota", "pas de stabilisation", and two leaves are Run 4 and 3.
 
-### Kaw
+### Kaw data set
 
 ```{r Ptlp-Kaw, message=FALSE, warning=FALSE}
 library(plotly)
@@ -235,17 +253,7 @@ plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
 
 Several outliers are either marked as "Epiphytes", "herbivory", One run is 4. 
 
-### All sites
 
-```{r Ptlp-plot}
-library(ggplot2)
-library(plotly)
-library(ggplot2)
-library(cowplot)
-
-#ptlp with all species- interactive graph
-plot_ly(Metradica, y = ~Ptlp, color = ~Name, type = "box")
-```
 
 * The variability in πtlp among species indicates the potential for a 
 range of species responses to drought within Amazonian forest communities. 
@@ -284,7 +292,7 @@ ggplot(Metradica,aes(x = SLA, y = Ptlp)) +
   stat_regline_equation(label.y = 0.3, aes(label = ..rr.label..))
 ```
 
-####  Anova 
+####  Anova and plots
 ```{r Ptlp-anova, message=FALSE, warning=FALSE}
 # Global test
 library(ggpubr)
@@ -390,11 +398,11 @@ tlp <- Metradica %>%
 *This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree & Dainty 1975; Abrams, Kubiske & Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni & Sack 2012b; Guyot, Scoffoni & Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance. 
 
 
-##LSWC 
+## LSWC - exploration 
 
 One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
 
-```{r lswc-anova, echo=FALSE, message=FALSE, warning=FALSE}
+```{r lswc-anova calcul, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyr)
 library(dplyr)
 Metradica %>% group_by(Type) %>% summarise_at(vars(LSWC), funs(mean(LSWC, na.rm=TRUE))) 
@@ -414,6 +422,8 @@ library(agricolae)
 tukey2 <- HSD.test(aov(Model_LSWC), trt = 'Type') 
 #tukey3 <- HSD.test(aov(Model_LSWC), trt = 'Habitat')  
 ```
+
+### Plots 
 
 ```{r HabitatPref_LSWC}
 
@@ -439,7 +449,7 @@ lswc <- Metradica %>%
 ``` 
 
 
-###MajVLA
+### MajVLA - exploration
 
 ```{r lswc-anova, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyr)
@@ -461,6 +471,8 @@ library(agricolae)
 tukey2 <- HSD.test(aov(Model_MajVLA), trt = 'Type') 
 #tukey3 <- HSD.test(aov(Model_MajVLA), trt = 'Habitat')  
 ```
+
+### Plots
 
 ```{r HabitatPref_MajVLA}
 
@@ -485,7 +497,7 @@ vein <- Metradica %>%
                   method = "anova", label.y = 1.25, size = 7)
 ``` 
 
-### Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
+## Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
 
 ```{r}
 library(ggpubr)

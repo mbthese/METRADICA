@@ -2,8 +2,10 @@
 title: "Results_prelim"
 author: "Marion Boisseaux"
 date: "04/05/2022"
-output: html_document
-editor_options: 
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
 ---
 

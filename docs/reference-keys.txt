@@ -66,3 +66,14 @@ other-venation-traits
 waterlogging-litterature
 general-potential-hypotheses
 section
+summary-anova---4-major-traits-ptlp-gmin-lswc-majvla
+plots
+gmin-and-other-variables
+paracou-data-set
+bafog-data-set
+kaw-data-set
+anova-and-plots
+lswc---exploration
+plots-1
+majvla---exploration
+plots-2
