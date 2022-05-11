@@ -425,7 +425,7 @@ tukey2 <- HSD.test(aov(Model_LSWC), trt = 'Type')
 
 ### Plots 
 
-```{r HabitatPref_LSWC}
+```{r HabitatPref_LSWC, warning=FALSE}
 
 lswc <- Metradica %>%
  filter(!is.na(Type)) %>%
@@ -446,6 +446,7 @@ lswc <- Metradica %>%
   theme_minimal() +
   stat_compare_means(method = "anova", label.y = 0.75, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
                   method = "anova", label.y = 0.5, size = 7)
+lswc
 ``` 
 
 
@@ -495,6 +496,7 @@ vein <- Metradica %>%
   theme_minimal() +
   stat_compare_means(method = "anova", label.y = 1.5, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
                   method = "anova", label.y = 1.25, size = 7)
+plot(vein)
 ``` 
 
 ## Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
