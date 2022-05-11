@@ -30,14 +30,40 @@ library(ggfortify)
 Metradica$Forest <- as.factor(Metradica$Forest)
 Metradica$Habitat <- as.factor(Metradica$Habitat)
 Metradica$Name <- as.factor(Metradica$Name)
-Model_gmin<-lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
+Model_gmin<-lm(log10(Gmin) ~ Type,  data = Metradica)
 #autoplot(Model_gmin)
-#summary(Model_gmin)
+summary(Model_gmin)
 anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
 #tukey_gmin <- TukeyHSD(aov(Model_gmin))
 library(agricolae)
 #tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
 #tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
+```
+
+```{r HabitatPref_gmin}
+
+gmin <- Metradica %>%
+ filter(!is.na(Type)) %>%
+ ggplot() +
+  aes(x = Type, y = log10(Gmin), fill = Type) +
+  geom_boxplot(shape = "circle") +
+  labs(
+    x = "",
+    y = "Minimal conductance (mmol.m-2.s-1)"
+  ) +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )
+  ) +
+  theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 2, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 1.5, size = 7)
+                                                                       
+
+
 ```
 
 
@@ -48,7 +74,7 @@ library(ggplot2)
 library(cowplot)
 
 #gmin with all species- interactive graph
-plot_ly(Metradica, y = ~Gmin, color = ~Name, type = "box")
+plot_ly(Metradica, y = ~Gmin, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='Minimal conductance (mmol.m-2.s-1)'))
 
 
 #forest
@@ -317,18 +343,41 @@ Metradica %>%
  axis.title.y = element_text(size = 16L), axis.title.x = element_text(size = 13L)) + stat_compare_means()
 
 #habitat preference
-Metradica %>%
- filter(!is.na(Habitat)) %>%
+tlp <- Metradica %>%
+ filter(!is.na(Type)) %>%
  ggplot() +
- aes(x = Type, y = Ptlp, fill = Type) +
+ aes(x = Type, y = log10(abs(Ptlp)), fill = Type) +
  geom_boxplot(shape = "circle") +
- scale_fill_manual(values = list(
- BF = "#4E83F0", Generalist = "#A4B3B0", TF = "#F9D833")) +
+ scale_fill_manual(values = list(BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361")) +
  labs(x = " ", y = "Turgor loss point (MPa)", 
  fill = "Habitat preference") +
  theme_minimal() +
  theme(plot.subtitle = element_text(size = 19L), 
- plot.caption = element_text(size = 17L), axis.title.y = element_text(size = 16L), axis.title.x = element_text(size = 20L)) + stat_compare_means()
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + stat_compare_means(method = "anova", label.y = 0.6, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 0.5, size = 7)
+
+### 3 sites
+ ggplot(Metradica) +
+  aes(x = Forest, y = log10(abs(Ptlp)), fill = Forest) +
+  geom_boxplot(shape = "circle") + labs(
+    x = "",
+    y = "Turgor loss point (MPa)"
+  ) +
+   scale_fill_manual(
+    values = list(
+      Bafog = "#F4C71C",
+      Kaw = "#0051C1",
+      Paracou = "#66FF61"
+    )
+  ) +
+  theme_minimal() + theme(axis.title = element_text(size = 10)) +
+  theme(
+    plot.caption = element_text(size = 16L),
+    axis.title.x = element_text(size = 21L), 
+    axis.title.y = element_text(size = 15)
+  ) +  stat_compare_means(method = "anova", label.y = 0.5, size = 4)+   stat_compare_means(aes(label = ..p.signif..), method = "anova",  size = 7)
 
 ```
 
@@ -339,3 +388,108 @@ Metradica %>%
 *adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al. 2008) and altered nutrient concentrations (Villagra et al. 2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
 
 *This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree & Dainty 1975; Abrams, Kubiske & Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni & Sack 2012b; Guyot, Scoffoni & Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance. 
+
+
+##LSWC 
+
+One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
+
+```{r lswc-anova, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Type) %>% summarise_at(vars(LSWC), funs(mean(LSWC, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_LSWC<-lm(log10(LSWC) ~ Type,  data = Metradica)
+#autoplot(Model_LSWC)
+summary(Model_LSWC)
+anova(Model_LSWC) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+tukey_LSWC <- TukeyHSD(aov(Model_LSWC))
+library(agricolae)
+tukey2 <- HSD.test(aov(Model_LSWC), trt = 'Type') 
+#tukey3 <- HSD.test(aov(Model_LSWC), trt = 'Habitat')  
+```
+
+```{r HabitatPref_LSWC}
+
+lswc <- Metradica %>%
+ filter(!is.na(Type)) %>%
+ ggplot() +
+  aes(x = Type, y = log10(LSWC), fill = Type) +
+  geom_boxplot(shape = "circle") +
+  labs(
+    x = "",
+    y = "Leaf saturated water content (g.g)", fill ="Habitat preference"
+  ) +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )
+  ) +
+  theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 0.75, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 0.5, size = 7)
+``` 
+
+
+###MajVLA
+
+```{r lswc-anova, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Type) %>% summarise_at(vars(MajVLA), funs(mean(MajVLA, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_MajVLA<-lm(log10(MajVLA) ~ Type,  data = Metradica)
+#autoplot(Model_MajVLA)
+summary(Model_MajVLA)
+anova(Model_MajVLA) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+tukey_MajVLA <- TukeyHSD(aov(Model_MajVLA))
+library(agricolae)
+tukey2 <- HSD.test(aov(Model_MajVLA), trt = 'Type') 
+#tukey3 <- HSD.test(aov(Model_MajVLA), trt = 'Habitat')  
+```
+
+```{r HabitatPref_MajVLA}
+
+vein <- Metradica %>%
+ filter(!is.na(Type)) %>%
+ ggplot() +
+  aes(x = Type, y = log10(MajVLA), fill = Type) +
+  geom_boxplot(shape = "circle") +
+  labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)", fill ="Habitat preference"
+  ) +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )
+  ) +
+  theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 1.5, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 1.25, size = 7)
+``` 
+
+### Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
+
+```{r}
+library(ggpubr)
+
+ggarrange(tlp, gmin, lswc, vein, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+

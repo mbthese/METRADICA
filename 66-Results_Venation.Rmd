@@ -4,7 +4,7 @@ author: "Marion Boisseaux"
 date: "28/03/2022"
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 # Vein traits
 
@@ -76,27 +76,11 @@ Linear regression analysis to performe to test the correlations between the othe
 - leaf chemistry *waiting for data*
   + Palatability was positively correlated with N content, SLA and water content of leaves and negatively correlated with leaf C content and leaf C/N-ratio. (Schadler et al 2003)
 
-Paracou data: recheck LA and gmin!
-```{r eval=FALSE, include=FALSE}
-library(readr)
-Paracou <- read_csv("Clean_data/Paracou.csv")
-```
-FTH data :
-```{r eval=FALSE, include=FALSE}
-FTH <- read_csv("Clean_data/FTH.csv")
-```
+Data:
 
-Both FTH and Paracou data combined:
-
-```{r eval=FALSE, include=FALSE}
-Paracou_FTH<- read_csv("Clean_data/V1/Paracou_FTH.csv")
+```{r Veins : data import, echo=FALSE, message=FALSE, warning=FALSE}
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
 ```
-
-Bafog data: 
-```{r eval=FALSE, include=FALSE}
-Bafog <- read_csv("Clean_data/Bafog.csv")
-```
-
 
 
 ## Results
@@ -104,7 +88,7 @@ Bafog <- read_csv("Clean_data/Bafog.csv")
 To do :
 -merge vein data set with the rest of data of each site through the individual code 
 
-### Vein data joing with other traits
+Vein data joing with other traits
 ```{r Import dataset veins, eval=FALSE, include=FALSE}
 library(readxl)
 library(forcats)
@@ -149,7 +133,7 @@ Kaw_veins <- Kaw_veins %>% rename(gmin = Gmin)
 ```
 
 
-#### Merge
+Student data
 
 ```{r eval=FALSE, include=FALSE}
 
@@ -185,8 +169,8 @@ library(dplyr)
 library(tidyverse)
 
 
-A <- ggplot(ALL) +
- aes(x = fct_reorder(Species, LA), y = LA, fill = Species) +
+A <- ggplot(Metradica) +
+ aes(x = fct_reorder(Name, LA), y = LA, fill = Name) +
  geom_boxplot(shape = "circle") +
  theme_minimal() + 
  facet_grid(vars(Forest), vars()) + 
@@ -194,8 +178,8 @@ A <- ggplot(ALL) +
 theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 
-B <- ggplot(ALL) +
- aes(x = fct_reorder(Species, MajVLA), y = MajVLA, fill = Species) +
+B <- ggplot(Metradica) +
+ aes(x = fct_reorder(Name, MajVLA), y = MajVLA, fill = Name) +
  geom_boxplot(shape = "circle") +
  theme_minimal() + 
  facet_grid(vars(Forest), vars()) +
@@ -207,10 +191,10 @@ A
 B
 
 #Stats
-model2<- lm(MajVLA~Species, data=veindata)
+model2<- lm(MajVLA~Name, data=Metradica)
 summary(modele) #il y a clairement un effet espèce
 
-model1 <-lm(MajVLA~1, data=veindata)
+model1 <-lm(MajVLA~1, data=Metradica)
 summary(model2)
 
 anova(model1, model2) #the RSS of the model2 (taking into account the factor species) is less (1421.3) so it is a better model. So there is a link between Species and MajVLA. and p-value est tres  significative *** 
@@ -225,7 +209,7 @@ anova(model1, model2) #the RSS of the model2 (taking into account the factor spe
 
 library(ggplot2)
 
-C <- veindata %>%
+C <- Metradica %>%
  ggplot() +
   aes(x = Habitat, y = LA, fill = Habitat) +
   geom_boxplot(shape = "circle") +
@@ -241,30 +225,32 @@ C <- veindata %>%
   facet_wrap(vars(Forest))
 
 
-D <- veindata %>%
+D <- Metradica %>%
  filter(!(Forest %in% "NA")) %>%
- filter(!(`pref Habitat` %in% "NA") | is.na(`pref Habitat`)) %>%
+ filter(!(Type %in% "NA") | is.na(Type)) %>%
  filter(Habitat %in% c("BF", "TF") | is.na(Habitat)) %>%
- filter(!is.na(Species)) %>%
+ filter(!is.na(Name)) %>%
  ggplot() +
   aes(x = Habitat, y = MajVLA, fill = Habitat) +
+  labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)",
+    fill = "Habitat collected") +
   geom_boxplot(shape = "circle") +
   scale_fill_manual(
     values = list(
-      BF = "#1558EB",
-      `NA` = "#00C19F",
-      TF = "#FFD121"
+      BF = "#6DB4EE",
+      TF = "#FFD361"
     )
   ) +
-  scale_y_continuous(trans = "log10") +
-  theme_minimal() +
+  theme_minimal() + 
   facet_wrap(vars(Forest))
 
 #Stats
-model2<- lm(MajVLA~Habitat, data=veindata)
+model2<- lm(MajVLA~Habitat, data=Metradica)
 summary(model2) 
 
-model1 <-lm(MajVLA~1, data=veindata)
+model1 <-lm(MajVLA~1, data=Metradica)
 summary(model1)
 
 anova(model1, model2) #il y a un effet habitat leger avec pvalue significative
@@ -278,7 +264,7 @@ anova(model1, model2) #il y a un effet habitat leger avec pvalue significative
 ```{r eval=FALSE, include=FALSE}
 
 library(ggplot2)
-E <- ggplot(veindata) +
+E <- ggplot(Metradica) +
  aes(x =`pref Habitat`, y = LA, fill = `pref Habitat`) +
  geom_boxplot(shape = "circle") +
   
@@ -287,7 +273,7 @@ E <- ggplot(veindata) +
  theme_minimal() +
  facet_wrap(vars(Forest))
 
-F <- ggplot(veindata) +
+F <- ggplot(Metradica) +
  aes(x =`pref Habitat`, y = MajVLA, fill = `pref Habitat`) +
  geom_boxplot(shape = "circle") +
   
@@ -300,10 +286,10 @@ F <- ggplot(veindata) +
 E
 F
 #Stats
-model2<- lm(MajVLA~Pref_Habitat, data=veindata)
+model2<- lm(MajVLA~Pref_Habitat, data=Metradica)
 summary(modele) 
 
-model1 <-lm(MajVLA~1, data=veindata)
+model1 <-lm(MajVLA~1, data=Metradica)
 summary(model2)
 
 anova(model1, model2) #il y a un effet pref-habitat leger avec pvalue significative
@@ -314,27 +300,37 @@ anova(model1, model2) #il y a un effet pref-habitat leger avec pvalue significat
 ```{r eval=FALSE, include=FALSE}
 library(ggplot2)
 
-G <- ggplot(veindata) +
-  aes(x = Forest, y = LA, fill = Forest) +
+Metradica$Forest <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw")) #for ordering the groups on the x.axis
+
+G <- ggplot(Metradica) +
+  aes(x = Forest, y = log10(LA), fill = Forest) +
   geom_boxplot(shape = "circle") +
   scale_fill_manual(
     values = list(
       Bafog = "#F4C71C",
-      Kaw = "#0051C1",
-      Paracou = "#66FF61"
+      Paracou = "#66FF61", 
+      Kaw = "#0051C1"
     )
+  ) + labs(
+    x = "",
+    y = "Leaf area (cm²)"
   ) +
-  theme_minimal()
-  scale_y_continuous(trans = "log10") +
   theme_minimal() +
   theme(
     plot.caption = element_text(size = 16L),
-    axis.title.x = element_text(size = 21L)
-  )
+    axis.title.x = element_blank(), 
+    axis.text.x=element_blank(),
+    axis.title.y = element_text(size = 15)) + 
+    stat_compare_means(method = "anova",label.y = 2.7, size = 4) +  stat_compare_means(aes(label = ..p.signif..), method = "anova")
 
-H <- ggplot(veindata) +
-  aes(x = Forest, y = MajVLA, fill = Forest) +
-  geom_boxplot(shape = "circle") +
+G
+
+H <- ggplot(Metradica) +
+  aes(x = Forest, y = log10(MajVLA), fill = Forest) +
+  geom_boxplot(shape = "circle") + labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)"
+  ) +
    scale_fill_manual(
     values = list(
       Bafog = "#F4C71C",
@@ -342,16 +338,18 @@ H <- ggplot(veindata) +
       Paracou = "#66FF61"
     )
   ) +
-  scale_y_continuous(trans = "log10") +
-  theme_minimal() +
+  theme_minimal() + theme(axis.title = element_text(size = 10)) +
   theme(
     plot.caption = element_text(size = 16L),
-    axis.title.x = element_text(size = 21L)
-  )
-G
+    axis.title.x = element_text(size = 21L), 
+    axis.title.y = element_text(size = 15)
+  ) +  stat_compare_means(method = "anova", label.y = 1.25, size = 4)+   stat_compare_means(aes(label = ..p.signif..), method = "anova", label.y = 1.1, size = 7)
+
 H
 
+library(ggpubr)
 
+ggarrange(G, H, ncol=1, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B'))
 ```
 
 ### VLA against other variables
@@ -359,7 +357,7 @@ H
 VLA and LA
 
 ```{r eval=FALSE, include=FALSE}
-ggplot(veindata) +
+ggplot(Metradica) +
   aes(x = MajVLA, y = LA) +
   geom_point(shape = "circle", size = 1.5, colour = "#112446") +
   scale_x_continuous(trans = "log10") +
@@ -368,10 +366,26 @@ ggplot(veindata) +
 
 ```
 
+VLA and LA relation
+
+```{r}
+ggplot(Metradica) +
+  aes(x = LA, y = MajVLA) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  labs(
+    x = "Leaf area (cm²)",
+    y = "Major vein density (mm.mm-2)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 15),
+    axis.title.x = element_text(size = 15)
+  ) + geom_smooth(method='lm', formula= y~x, se=FALSE)
+```
+
+
 VLA and Ptlp
 
-Preliminary and wrong because left joining by species. I want to left join by Code. !!!
-I tried by I can't this way... 
 
 ```{r eval=FALSE, include=FALSE}
 veindata_Paracou <- veindata %>% filter(Forest == "PARACOU")

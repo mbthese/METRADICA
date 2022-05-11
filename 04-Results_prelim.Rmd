@@ -37,7 +37,7 @@ library(FactoMineR)
 library(Factoshiny)
 
 
-#resultPCA <- Factoshiny(Metradica[,c(8:13,20,21)])
+#resultPCA <- Factoshiny(Metradica[,c(8:13,20)])
 
 #dim 1-2
 
@@ -89,9 +89,10 @@ ggpubr::ggarrange(nrow = 1, plotlist = list(c2,c1), ncol = 2)
 ### Habitat preference -type
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 res.PCA<-PCA(Metradica[,c(7, 8:13, 20)],quali.sup=c(1),graph=FALSE)
 
-d2<- plot.PCA(res.PCA,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",cex=1.8,cex.main=1.8,cex.axis=1.8,col.quali='#FF6600',label =c('quali'))
+d2<- plot.PCA(res.PCA,invisible=c('ind.sup'),title="Graphe des individus de l'ACP",cex=1.8,cex.main=1.8,cex.axis=1.8,col.quali='#FF6600',label =c('quali'))
 
 
 d1<-plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title ="" ,cex=1.9,cex.main=1.7,cex.axis=1.7,col.quali='#7A067A',label =c('quali'))
