@@ -1,0 +1,1364 @@
+---
+title: "ATBC2022"
+author: "Marion Boisseaux"
+date: "16/06/2022"
+output: html_document
+---
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+```
+
+# Data
+
+```{r message=FALSE, warning=FALSE}
+
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  select(Code, Genus, Species, Name, Habitat, Type, HabitatType,Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth, TreeHeight, TreeDawkins, TWI) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight)) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight", "TWI"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+
+Metradica_notLOG <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  select(Code, Genus, Species, Name, Habitat, Type, HabitatType,Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth, TreeHeight, TreeDawkins, TWI) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight)) %>%
+  na.omit() 
+
+```
+
+# Subdata
+
+```{r}
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Casearia_javitensis", "Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis"))
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Eschweilera_coriacea", "Conceveiba_guianensis", "Virola_michelii", "Protium_stevensonii", "Hymenopus_heteromorphus", "Jacaranda_copaia subsp. copaia"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica <- sub_data
+export(Metradica, "Metradica_ATBC.csv")
+
+```
+
+## Subdata phylo
+
+```{r}
+Habitatpref <- sub_data %>% select(Name, Type)
+
+species <- data.frame(Name = c(
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+  "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+)) %>% 
+  separate(Name, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- left_join(species, Habitatpref, by= "Name")
+kable(select(species, Genus, Species), caption = "Studied species.")
+
+```
+
+```{r}
+
+species <- select(species, Name, Genus, Species, Type)
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, Name, Type) %>% 
+  mutate(Name = as.character(Name))
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+save(tree, file = "./Documents/phylogenyATBC2022.Rdata")
+load("./Documents/phylogenyATBC2022.Rdata")
+fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = Name), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(Name), size = !is.na(Name))) +
+  theme_tree(legend.position='right', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("Name", values = c(0.2, 4)) +
+  scale_size_manual("Name", values = c(1, 4))
+
+#color by habitat preference
+fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = Type), layout="circular") + 
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) +
+  geom_tiplab2(aes(alpha = !is.na(Name), size = !is.na(Name))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("Name", values = c(0.2, 4)) +
+  scale_size_manual("Name", values = c(1, 6))
+```
+
+
+# Dawkins effect
+
+```{r Dawkins effect}
+
+Metradica_log$TreeDawkins<- as.factor(Metradica_log$TreeDawkins)
+
+Dawkins_Gmin <- lm(Gmin~TreeDawkins, data = Metradica_log) 
+Dawkins_MajVLA <- lm(MajVLA~TreeDawkins, data = Metradica_log) 
+Dawkins_LSWC <- lm(LSWC~TreeDawkins, data = Metradica_log) 
+Dawkins_TLP <- lm(TLP~TreeDawkins, data = Metradica_log) 
+
+summary(Dawkins_Gmin) #yes, dawkins level 2,3,4 significant * on gmin
+summary(Dawkins_MajVLA) #yes, dawkins level 4,5 significant * on MajVLA The p-value of the F-statistic is less than 0.05, which means our model is significant.
+summary(Dawkins_LSWC) #not significant
+summary(Dawkins_TLP) #not significant
+
+autoplot(Dawkins_Gmin)
+autoplot(Dawkins_MajVLA)
+autoplot(Dawkins_LSWC)
+autoplot(Dawkins_TLP)
+
+dawkins.gmin<- aov(lm(Gmin~TreeDawkins, data=Metradica_log)) %>% tukey_hsd() 
+dawkins.MajVLA<- aov(lm(MajVLA~TreeDawkins, data=Metradica_log)) %>% tukey_hsd() 
+dawkins.LSWC<- aov(lm(LSWC~TreeDawkins, data=Metradica_log)) %>% tukey_hsd() 
+dawkins.TLP<- aov(lm(TLP~TreeDawkins, data=Metradica_log)) %>% tukey_hsd() 
+
+#Il y a juste un effet dawkins sur MajVLA.
+```
+
+
+
+# PCA
+
+To characterize the functional trait space in each habitat, we performed a Principal Component Analysis (PCA) with trait values at the individual level (i.e. each score in the PCA refers to an individual tree),  to analyze trait covariation and to reveal the relationships between traits. 
+
+Using the among PCA, a “classic” PCA, we aim to evaluate trait syndroms characterizing species strategies. For the within PCA, all the gravity centers are placed back at the origin and the individuals are being represented with a maximal variance. We eliminate the species effect to study the individual strategies. The among-PCA searches the axes at the center of gravity and emphasizes on the differences between groups (here, species) whereas the within-PCA searches for the shared-axes in each group.
+
+```{r PCA_entire dataset}
+# PCA with entire dataset
+
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+
+# Visualize eigenvalues/variances
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+fviz_screeplot(res.PCA, addlabels = TRUE, ylim = c(0, 50)) # 70 % de notre jeu de données est expliqué avec les 4
+
+# dim 1-2 
+
+## variables
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_var(res.PCA, axes = c(1,2), col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))+
+ theme_classic() 
+
+## Biplot 1,2
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA,axes = c(1,2),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+## dim 3,4
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA,axes = c(3,4),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+
+
+## Habitat collected (5th variable to remove)
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,6,7,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA, axes = c(1,2),label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_manual(values=c("#42adf5", "#e89e15"))   #ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+
+
+#habitat preference
+res.PCA<-PCA(Metradica_log[, c(1:17)][,-c(1,2,3,4,5,6,17)],quali.sup=c(1),graph=FALSE)
+
+fviz_pca_biplot(res.PCA, axes = c(3,4), label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + theme_classic() 
+
+
+```
+
+```{r PCA_subset }
+# PCA with subdata
+
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,14,15,16,17)],quali.sup=c(1),graph=FALSE)
+
+# Visualize eigenvalues/variances
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,14,15,16,17)],quali.sup=c(1),graph=FALSE)
+fviz_screeplot(res.PCA, addlabels = TRUE, ylim = c(0, 50)) # 75.7 % de notre jeu de données est expliqué avec les 4
+
+# dim 1-2 
+
+## variables
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,14,15,16,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_var(res.PCA, axes = c(1,2), col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))+
+ theme_classic() 
+
+## Biplot 1,2
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,14,15,16,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA,axes = c(1,2),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+## dim 3,4
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,14,15,16,17)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA,axes = c(3,4),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+
+
+## Habitat collected (5th variable to remove)
+res.PCA<-PCA(sub_data[, c(1:18)][,-c(1,2,3,4,6,7,8,12,15,16,17,18)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA, axes = c(1,2),label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_manual(values=c("#42adf5", "#e89e15"))   #ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+
+
+```
+
+```{r Mastering PCA}
+# data
+data <- Metradica
+
+data$Type <- recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+# v0
+res.PCA <- FactoMineR::PCA(data[, c(1:18)][,-c(1,2,3,4,5,7,8,12,15,16,17,18)], quali.sup = 1, graph = F)
+factoextra::fviz_pca_biplot(res.PCA, axes = c(1,2), label = "var", habillage = 1,  repel = T,
+                            addEllipses = T, ellipse.level = 0.8)  +
+  scale_color_manual(values=c("#6DB4EE", "#34e042", "#b58404")) +
+  theme_classic()
+
+# v2
+ 
+autoplot(princomp(~ Gmin + TLP + LA + LSWC + MajVLA, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+# v3
+g <- autoplot(princomp(~ Gmin + TLP + LA + LSWC + MajVLA, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+
+# v4
+g0 <- autoplot(princomp(~ Gmin + TLP + LA + LSWC + MajVLA, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(legend.position = c(0.85,0.2))
+
+g1 <- g0 + stat_ellipse(aes(col = Type, alpha = Type), level = 0.85, size = 1.5) + scale_alpha_manual(guide = "none", values = c(0, 1, 1))
+
+g3 <- g0 + stat_ellipse(aes(col = Type, alpha = Type), level = 0.85, size = 1.5) + scale_alpha_manual(guide = "none", values = c(1, 0, 0))
+
+g2 <- g0 + stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)
+cowplot::plot_grid(g0,g1, g2)
+ggsave(filename = "PCA_0.png", plot = g0, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_1.png", plot = g1, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_2.png", plot = g2, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_3.png", plot = g3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# v5
+data$Habitat <- recode(data$Habitat, BF='SF soils', TF= 'TF soils')
+
+g5<- autoplot(princomp(~ Gmin + TLP + LA + LSWC + MajVLA, data = data, cor = T),
+         data = data, alpha = "Type", size = 2, col = "Habitat",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         loadings.label.colour = 'black', loadings.colour = 'black') +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse()+
+  scale_alpha_manual(guide = "none", values = c(0, 0.4, 0.4)) +
+  scale_color_manual("Habitat of\ncollect", values = c("#6DB4EE", "#b58404")) 
+
+ggsave(filename = "PCA_Generalists_habitatcollect.png", plot = g5, bg = "white", width = 8, height = 8, dpi = 600)
+```
+
+# boxplot
+
+# 1 - Differences between habitats ? 
+
+## A - TF vs BF
+```{r}
+data <- Metradica %>% filter(Type !="Generalist")
+
+```
+
+## gmin 
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_gmin <- lmer(Gmin ~ 1 + (1|Type/Name), data= data)
+summary(model_gmin)
+
+#plot 
+
+gmin.summary <- aggregate(Gmin ~ Type, mean, data=data)
+ggplot(data,aes(x=Type,y=Gmin, col=Name)) +
+   scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=gmin.summary, aes(ymin = Gmin, ymax = Gmin),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(gmin~(mmol.m^-2~.s^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))
+
+
+#predict(model_gmin)
+#head(predict(model_gmin))
+#head(data)
+#data$gminpred <- predict(model)
+#confint(model_gmin)
+
+#plot
+sjPlot::plot_model(model_gmin)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_gmin, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on Gmin")
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = Gmin)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist")) + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+  
+stat.test.gmin<- aov(lm(Gmin~Type, data=data)) %>% tukey_hsd()
+```
+
+## TLP
+```{r}
+
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_TLP <- lmer(TLP ~ 1 + (1|Type/Name), data= data)
+summary(model_TLP)
+
+#plot 
+#can i do an anova on lmer ? what's the point of having done the model above?
+stat.test.tlp<- aov(lm(TLP~Type, data=data)) %>% tukey_hsd()
+
+TLP.summary <- aggregate(TLP ~ Type, mean, data=data)
+ggplot(data,aes(x=Type,y=TLP, col=Name)) +
+   scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=TLP.summary, aes(ymin = TLP, ymax = TLP),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(TLP~(MPa))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stat.test.tlp, label = "p.adj.signif",
+                       y.position = c(-0.18), hide.ns = TRUE)
+ 
+```
+
+## LSWC 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_LSWC <- lmer(LSWC ~ 1 + (1|Type/Name), data= data)
+summary(model_LSWC)
+
+#plot 
+#can i do an anova on lmer ? what's the point of having done the model above?
+stat.test.LSWC<- aov(lm(LSWC~Type, data=data)) %>% tukey_hsd()
+
+LSWC.summary <- aggregate(LSWC ~ Type, mean, data=data)
+ggplot(data,aes(x=Type,y=LSWC, col=Name)) +
+   scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=LSWC.summary, aes(ymin = LSWC, ymax = LSWC),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(LSWC~(g.g^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stat.test.LSWC, label = "p.adj.signif",
+                       y.position = c(1.2), hide.ns = TRUE)
+```
+
+## MajVLA 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_MajVLA <- lmer(MajVLA ~ 1 + (1|Type/Name), data= data)
+summary(model_MajVLA)
+
+#plot 
+#can i do an anova on lmer ? what's the point of having done the model above?
+stat.test.MajVLA<- aov(lm(MajVLA~Type, data=data)) %>% tukey_hsd()
+
+MajVLA.summary <- aggregate(MajVLA ~ Type, mean, data=data)
+ggplot(data,aes(x=Type,y=MajVLA, col=Name)) +
+   scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=MajVLA.summary, aes(ymin = MajVLA, ymax = MajVLA),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(MajVLA~(mm.mm^-2))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stat.test.MajVLA, label = "p.adj.signif",
+                       y.position = c(2.9), hide.ns = TRUE)
+```
+
+
+## B - Trait ~ TWI 
+```{r}
+generalist <- Metradica %>% filter(Type == "Generalist")
+#only working with generalists here
+
+#with Sylvain
+#all traits
+data2 <- generalist %>% 
+  dplyr::select(Name, TWI, Gmin, TLP, LSWC, MajVLA) %>% 
+  reshape2::melt(c("Name", "TWI"), variable.name = "Trait") 
+
+ggplot(data2, aes(TWI, value)) +
+  geom_point(alpha = 0.5, color="#23ba35")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  theme(legend.text = element_text(face = "italic")) +
+  facet_wrap(~ Trait, scales = "free_y") +
+  ggpubr::stat_cor(aes(group = NA, label =  paste(..rr.label.., ..p.label.., sep = "~"))) 
+  #geom_point(data = data2 %>% 
+               #group_by(Name, Trait) %>% 
+               #summarise_all(median), size = 4)
+
+
+#just looking quickly at leaf K
+ggplot(data, aes(TWI, K)) +
+  geom_point(alpha = 0.5, color="#23ba35")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  scale_x_log10() +
+  geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab(expression(K~(g.kg^-1))) +
+  scale_color_discrete("") +
+  theme(legend.text = element_text(face = "italic")) +
+  #facet_wrap(~ Trait, scales = "free_y") +
+  ggpubr::stat_cor(aes(group = NA, label =  paste(..rr.label.., ..p.label.., sep = "~"))) 
+  #geom_point(data = data2 %>% 
+               #group_by(Name, Trait) %>% 
+               #summarise_all(median), size = 4)
+```
+
+# models
+```{r}
+lm(LSWC ~ log(TWI), generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#Fitted R2 0.022 pvalue : 0.024 or adjusted R2 generalized for measuring explained variation in linear mixed-effects models
+
+lm(Gmin ~ log(TWI), generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#Fitted R2 0.04 pvalue 0.002 or adjusted R2 generalized for measuring explained variation in linear mixed-effects models
+
+lm(TLP ~ log(TWI), generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#Fitted R2 0.007 pvalue 0.2 or adjusted R2 generalized for measuring explained variation in linear mixed-effects models
+
+lm(MajVLA ~ log(TWI), generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#Fitted R2 -0.004 pvalue 0.7 :R2 compares the fit of the chosen model with that of a horizontal straight line (the null hypothesis). If the chosen model fits worse than a horizontal line, then R2 is negative !!
+
+----------------------------------------------------------------
+
+# Better models with random effects
+
+lme4::lmer(LSWC ~ TWI + (1|Name),  generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#marginal r2 : 0.004 provides the variance explained only by fixed effect (here TWI)
+#conditional R2 : 0.0460 provides the variance explained by the entire model, i.e., both fixed effects and random effects (TWI and Species) we can see it improves the quality of model.
+
+
+Model.lswc <- lmer(LSWC ~ TWI + (1|Name), data = generalist)
+summary(Model.lswc)
+equation2=function(x){fixef(Model.lswc)[2]*x+fixef(Model.lswc)[1]}
+
+lme4::lmer(Gmin~ TWI + (1| Name),  generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+
+#marginal r2 : 0.023 provides the variance explained only by fixed effect (here TWI)
+#conditional R2 : 0.363 with a p value of 0.005 provides the variance explained by the entire model, i.e., both fixed effects and random effects (TWI and Species) we can see it improves the quality of model.
+
+Model.gmin <- lmer(Gmin ~ TWI + (1|Name), data = generalist)
+summary(Model.gmin)
+equation1=function(x){fixef(Model.gmin)[2]*x+fixef(Model.gmin)[1]}
+
+
+
+lme4::lmer(TLP ~ TWI + (1|Name) + (1|TreeDawkins),  generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#marginal r2 : 0 provides the variance explained only by fixed effect (here TWI)
+#conditional R2 : 0.430 provides the variance explained by the entire model, i.e., both fixed effects and random effects (TWI and Species) we can see it improves the quality of model.
+
+Model.TLP <- lmer(TLP ~ TWI + (1|Name), data = generalist)
+summary(Model.TLP)
+equation3=function(x){fixef(Model.TLP)[2]*x+fixef(Model.TLP)[1]}
+
+
+lme4::lmer(MajVLA ~ TWI + (1|Name),  generalist) %>% 
+  sjPlot::tab_model(show.icc = F)
+#marginal r2 : 0 provides the variance explained only by fixed effect (here TWI)
+#conditional R2 : 0.484 provides the variance explained by the entire model, i.e., both fixed effects and random effects (TWI and Species) we can see it improves the quality of model.
+Model.MajVLA <- lmer(MajVLA ~ TWI + (1|Name), data = generalist)
+summary(Model.MajVLA)
+equation4=function(x){fixef(Model.MajVLA)[2]*x+fixef(Model.MajVLA)[1]}
+
+```
+
+
+## gmin 
+```{r}
+
+#plot
+
+
+###Model.gmin1 <- lmer(Gmin ~ TWI + (1|Name), data = Metradica)
+summary(Model.gmin1)
+equation1=function(x){fixef(Model.gmin1)[2]*x+fixef(Model.gmin1)[1]}
+# generalist slope: y=-0.006104x+1.72505
+
+SpTF <- Metradica %>% filter(Type == "TF")
+Model.gmin2 <- lmer(Gmin ~ TWI + (1|Name), data = SpTF)
+summary(Model.gmin2)
+equation2=function(x){fixef(Model.gmin2)[2]*x+fixef(Model.gmin2)[1]}
+# TF specialist slope: y=0.005461x+1.134988
+
+SpBF <- Metradica %>% filter(Type == "BF")
+Model.gmin3 <- lmer(Gmin ~ TWI + (1|Name), data = SpBF)
+summary(Model.gmin3)
+equation3=function(x){fixef(Model.gmin3)[2]*x+fixef(Model.gmin3)[1]}
+# TF specialist slope: y=-0.003363x+1.117063
+
+ggplot(Metradica,aes(y=Gmin,x=TWI,color=Type))+geom_point()+
+        stat_function(fun=equation1,geom="line") +
+        stat_function(fun=equation2,geom="line")+
+        stat_function(fun=equation3,geom="line") 
+#je n'arrive pas a mettre des couleurs !!
+
+#en fait add reg.line does the same thing!
+generalist <- Metradica %>% filter(Type == "Generalist")
+
+gmin <-ggscatter(data = generalist,x = "TWI", y = "Gmin", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  #add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                 ) +
+  stat_cor( aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"),color = Type), label.x = 7, size = 6)+
+  scale_color_manual(
+    values = list(
+      Generalist = "#34e042"
+    )) +
+ labs(x = "Topographic wetness index") +
+  ylab(expression(gmin~(mmol.m^-2~.s^-1))) +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+     
+                                                        
+gmin
+
+gmin<-ggplot(generalist, aes(TWI, Gmin)) +
+  geom_point(alpha = 0.5, color="#34e042")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  #geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(gmin~(mmol.m^-2~.s^-1)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+          
+    #stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8, p.digits = 1, r.digits=1)+
+   stat_function(fun = equation1, size = 2)+ #line from model : Gmin ~ TWI + (1+Name) data = generalists
+    geom_label(
+      label="R² = 0.363; p = 0.005", 
+      x=1.90,
+      y=3
+  )
+
+#with generalist species' slopes
+gmin<-ggplot(generalist, aes(TWI, Gmin, color= Name)) +
+  geom_point(alpha = 0.5)+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  geom_smooth(aes(group = Name), se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(gmin~(mmol.m^-2~.s^-1)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+          
+    stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8, p.digits = 1, r.digits=1)+
+  theme(legend.position="none")
+
+
+```
+
+## TLP 
+```{r}
+
+#plot
+
+TLP <- ggscatter(data = generalist,x = "TWI", y = "TLP", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  #add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                 ) +
+  stat_cor( aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"),color = Type), label.x = 7, size = 6)+
+  scale_color_manual(
+    values = list(
+      Generalist = "#34e042")) +
+ labs(x = "Topographic wetness index", y = "Turgor loss point (MPa)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+TLP
+
+TLP <-ggplot(generalist, aes(TWI, TLP)) +
+  geom_point(alpha = 0.5, color="#34e042")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  #geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle("TLP (MPa)")+
+  theme(
+    plot.title = element_text(color="black", size=20),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+          
+  #ggpubr::stat_cor(aes(group = NA, label =  paste(..rr.label.., ..p.label.., sep = "~"))) 
+    stat_function(fun = equation3, size = 2) #line from model : TLP ~ TWI + (1+Name) data = generalists
+  
+TLP <- ggplot(generalist, aes(TWI, TLP, color= Name)) +
+  geom_point(alpha = 0.5)+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  geom_smooth(aes(group = Name), se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle("TLP (MPa)")+
+  theme(
+    plot.title = element_text(color="black", size=20),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+
+  theme(legend.position="none")
+    #stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8, p.digits = 1, r.digits=1)  
+  
+```
+
+## LSWC 
+```{r}
+
+#plot
+
+LSWC <- ggscatter(data = generalist,x = "TWI", y = "LSWC", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  #add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                 ) +
+  stat_cor( aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"),color = Type), label.x = 7, size = 6)+
+  scale_color_manual(
+    values = list(
+      Generalist = "#34e042"))  +
+ labs(x = "Topographic wetness index") +
+  ylab(expression(LSWC~(g.g^-1))) +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+LSWC
+
+LSWC<- ggplot(generalist, aes(TWI, LSWC)) +
+  geom_point(alpha = 0.5, color="#34e042")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  #geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(LSWC~(g.g^-1)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold")) +         
+  #stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8,p.digits = 1, r.digits=1)
+     stat_function(fun = equation2, size = 2) #line from model : LSWC ~ TWI + (1+Name) data = generalists
+    
+
+#generalist species all slopes
+LSWC<- ggplot(generalist, aes(TWI, LSWC, color= Name)) +
+  geom_point(alpha = 0.5)+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  geom_smooth(aes(group = Name), se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(LSWC~(g.g^-1)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+          
+    stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8, p.digits = 1, r.digits=1)+
+  theme(legend.position="none")
+
+LSWC
+```
+
+## MajVLA 
+```{r}
+
+#plot
+
+MajVLA <- ggscatter(data = generalist,x = "TWI", y = "MajVLA", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  #add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                 ) +
+  stat_cor( aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"),color = Type), label.x = 7, size = 6)+
+  scale_color_manual(
+    values = list(
+      Generalist = "#34e042")) +
+ labs(x = "Topographic wetness index") +
+   ylab(expression(MajVLA~(mm.mm^-2))) +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+MajVLA
+
+MajVLA <- ggplot(generalist, aes(TWI, MajVLA)) +
+  geom_point(alpha = 0.5, color="#34e042")+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  #geom_smooth(aes(group = NA), col = "black", se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(MajVLA~(mm.mm^-2)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+        
+  #ggpubr::stat_cor(aes(group = NA, label =  paste(..rr.label.., ..p.label.., sep = "~")))
+stat_function(fun = equation4, size = 2) 
+
+#generalist species all slopes
+MajVLA<- ggplot(generalist, aes(TWI, MajVLA, color= Name)) +
+  geom_point(alpha = 0.5)+
+  #scale_color_manual("#b58404")+
+  theme_classic() +
+  # scale_x_log10() +
+  # geom_smooth(method = "lm", se = F) +
+  geom_smooth(aes(group = Name), se = F, size = 2, method = "lm") +
+  xlab("Topographic Wetness Index (TWI)") + ylab("") +
+  scale_color_discrete("") +
+  ggtitle(expression(MajVLA~(mm.mm^-2)))+
+  theme(
+    plot.title = element_text(color="black", size=20, face="bold"),
+    axis.title.x = element_text(color="black", size=15, face="bold"))+
+  theme(legend.position="none")     
+    #stat_cor(aes(group = NA ,label =  paste(..rr.label.., ..p.label.., sep = "~")), size=8, p.digits = 1, r.digits=1)
+
+
+
+```
+
+```{r}
+
+# extract a legend that is laid out horizontally for the generalisst species graphs
+legend <- get_legend(
+  MajVLA + 
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom"))
+
+cowplot::plot_grid(TLP,gmin, LSWC, MajVLA, nrow= 1, ncol=4 )
+```
+
+
+# essai 
+```{r}
+Generalist <- Metradica  %>% filter(Type == "Generalist") 
+model_gmin <- lmer(Gmin ~ TWI + (1|Name), data= Generalist)
+summary(model_gmin)
+predict(model_gmin)
+head(predict(model_gmin))
+head(data)
+data$gminpred <- predict(model)
+confint(model_gmin)
+
+#plot
+sjPlot::plot_model(model_gmin)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_gmin, 
+                   axis.labels=c("Generalist"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of TWI on Gmin")
+sjPlot:: tab_model(model_gmin)
+```
+
+
+# 2 - Mixed model 
+
+```{r}
+
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Type <- as.factor(Metradica$Type)
+
+
+mixed.lmer <- lmer(Gmin ~ Habitat + Type + (1|Name), data = Metradica)
+summary(mixed.lmer)
+
+#Here, the variance for species ("Name") = 0.1965. Species is important : it does explain a third of the total variation. How do we know ? 
+
+0.1965/(0.1965+0.4242) # 31.7 %
+
+#So the differences between species explain ~30% of the variance that’s “left over” after the variance explained by our fixed effects : habitat collected and habitat preference.
+
+plot(mixed.lmer) # no visual pattern : good
+qqnorm(resid(mixed.lmer))
+qqline(resid(mixed.lmer))  # points fall nicely onto the line - good!
+
+# a more complete model
+Metradica <- within(Metradica, sample <- factor(Habitat:Forest)) #new variable for explicit nesting : we have 2 habitats in each 3 forest sites : 6 level factor. But if i use TWI I don't even need it.
+
+mixed.lmer2 <- lmer(Gmin ~ TWI * Type + Forest + (1|Name) + (1|TreeDawkins), data = Metradica) 
+summary(mixed.lmer2)
+
+gmin_pred <- 1.58 -0.01886*(seq(4,16,length.out = 50))
+Pred <- as.data.frame(seq(4,16,length.out = 50))
+
+#plot
+
+# Extract the prediction data frame
+pred.mm <- ggpredict(mixed.lmer2, terms = c("TWI"))  # this gives overall predictions for the model
+
+# Plot the predictions 
+
+(ggplot(pred.mm) + 
+   geom_line(aes(x = x, y = predicted)) +          # slope
+   geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+               fill = "lightgrey", alpha = 0.5) +  # error band
+   geom_point(data = Metradica,                     
+              aes(x = TWI, y = Gmin, colour = Type)) + 
+   labs(x = "TWI", y = "Minimal conductance (mmol.m-2.s-1)", 
+        title = "More residual water leaks observed for Terra firme tree species") + 
+   theme_minimal() + scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )))
+
+
+# same models for other traits
+mixed.lmer_tlp <- lmer(TLP ~ TWI + Type + Forest + (1|Name) + (1|TreeDawkins), data = Metradica) 
+mixed.lmer_lswc <- lmer(LSWC ~ TWI + Type + Forest + (1|Name) + (1|TreeDawkins), data = Metradica) 
+mixed.lmer_MajVLA <- lmer(MajVLA ~ TWI + Type + Forest + (1|Name) + (1|TreeDawkins), data = Metradica) 
+
+#same plot for other traits
+## tlp 
+
+pred.mm_tlp <- ggpredict(mixed.lmer_tlp, terms = c("TWI"))  
+
+(ggplot(pred.mm_tlp) + 
+   geom_line(aes(x = x, y = predicted)) +          # slope
+   geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+               fill = "lightgrey", alpha = 0.5) +  # error band
+   geom_point(data = Metradica,                    
+              aes(x = TWI, y = TLP, colour = Type)) + 
+   labs(x = "TWI", y = "Turgor loss point (MPa)", 
+        title = "Turgor loss point varies with TWI in tropical trees") + 
+   theme_minimal() + scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )))
+
+## lswc
+
+pred.mm_lswc<- ggpredict(mixed.lmer_lswc, terms = c("TWI"))  
+
+(ggplot(pred.mm_lswc) + 
+   geom_line(aes(x = x, y = predicted)) +          # slope
+   geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+               fill = "lightgrey", alpha = 0.5) +  # error band
+   geom_point(data = Metradica,                      
+              aes(x = TWI, y = LSWC, colour = Type)) + 
+   labs(x = "TWI", y = "Leaf saturated water content (g/g)", 
+        title = "xx") + 
+   theme_minimal() + scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )))
+
+## MajVLA
+
+pred.mm_MajVLA<- ggpredict(mixed.lmer_MajVLA, terms = c("TWI"))  
+
+(ggplot(pred.mm_MajVLA) + 
+   geom_line(aes(x = x, y = predicted)) +          # slope
+   geom_ribbon(aes(x = x, ymin = predicted - std.error, ymax = predicted + std.error), 
+               fill = "lightgrey", alpha = 0.5) +  # error band
+   geom_point(data = Metradica,                   
+              aes(x = TWI, y = MajVLA, colour = Type)) + 
+   labs(x = "TWI", y = "Major vein density (mm.mm-2)", 
+        title = "xx") + 
+   theme_minimal() + scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )))
+
+```
+
+# 3- ITV
+
+### CV
+```{r}
+Metradica <- Metradica %>% filter(Name != "Casearia_javitensis")
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+} 
+
+# For generalists
+Generalist <- Metradica %>% filter(Type =="Generalist")
+cv_G <- Generalist %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                ungroup(cv_G) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_G$Type <- c("Generalist")
+
+cv_long_G %>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_G, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+#generalist : gmin 56% / tlp 25% / lswc 77% / 20% majvla
+
+# For TF specialist
+TFSp <- Metradica %>% filter(Type == "TF")
+
+cv_TF <- TFSp %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA"), funs(cv))
+
+cv_TF <- bind_rows(cv_TF,
+                ungroup(cv_TF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_TF$Type <- c("TF")
+
+cv_long_TF%>% 
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_TF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+ 
+ #TF : gmin 71% / tlp 21% / lswc 935 ???% / 19% majvla
+ 
+
+# For BF specialist
+BFSp <- Metradica %>% filter(Type == "BF")
+
+cv_BF <- BFSp %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA"), funs(cv))
+
+cv_BF <- bind_rows(cv_BF,
+                ungroup(cv_BF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_BF$Type <- c("BF")
+
+ cv_long_BF%>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_BF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+#BF : gmin 56% / tlp 25% / lswc 77% / 20% majvla
+
+cv_tot <- bind_rows(cv_long_G, cv_long_BF, cv_long_TF)
+
+# plot all 
+cv_tot %>% mutate(CV =CV*100)%>%
+  filter(Name != "mean") %>% 
+  filter(CV>0)%>%
+  ggplot(aes(x = trait, y = CV, fill = Type, alpha=0.4)) +
+  #scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404", "Bocoa_prouacensis"="#34e042", "Eschweilera_coriacea"="#34e042", "Conceveiba_guianensis"="#34e042", "Virola_michelii"="#34e042", "Protium_stevensonii"="#34e042", "Hymenopus_heteromorphus"="#34e042", "Jacaranda_copaia subsp. copaia"="#34e042"))+
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  ggtitle("Coefficient of variation %")+
+  theme(axis.title.x = element_blank(), axis.text.x = element_text())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("") + xlab("")+
+    theme_minimal()
+
+# Anova on CV
+#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+
+kruskal.test(CV ~ Type, data = cv_tot2)
+
+cv_tot2<- cv_tot %>% filter(Name != "mean") %>% select(-Name) %>% filter(trait =="TLP")
+View(cv_tot2)
+
+pairwise.wilcox.test(cv_tot2$CV, cv_tot2$Type,
+                 p.adjust.method = "BH")
+
+
+#nothing is significant except for LSWC: BF and Generalists
+  
+
+
+```
+
+## CV table
+
+```{r cvsptab}
+knitr::kable(cv, caption = "Coefficients of variation ($CV_4$) across each species.", digits = 3) 
+```
+# 4- Partitionnement variance
+
+```{r}
+#variance partitionning for these traits
+data <- Metradica %>% filter(Type =="Generalist")
+
+varcomp.gmin<-varcomp(lme(Gmin~1,random=~1|Forest/Species/Habitat, data = data, na.action = na.omit),1) 
+
+varcomp.tlp<-varcomp(lme(TLP~1,random=~1|Forest/Species/Habitat, data = data, na.action = na.omit),1)
+
+varcomp.LSWC<-varcomp(lme(LSWC~1,random=~1|Forest/Species/Habitat, data = data, na.action = na.omit),1)
+
+varcomp.MajVLA<-varcomp(lme(MajVLA~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+vars <- bind_rows(varcomp.gmin, varcomp.tlp, varcomp.LA, varcomp.SLA, varcomp.LSWC, varcomp.MajVLA) %>% mutate(Trait = "")
+
+#library(rio)
+#export(vars, "vars.csv")
+
+vars <- read_delim("vars_traits.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+
+vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "variance") 
+
+```
+
+
+```{r}
+
+library(paletteer) 
+paletteer_d("RColorBrewer::GnBu")
+
+ggplot(vars, aes(fill=level, y=variance, x=Trait)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(
+    values = list(
+      Forest = "#A8DDB5FF",
+      Habitat = "#2B8CBEFF",
+      Species = "#e0b1e3",
+      Residual = "#516363"
+    )) + 
+  theme_minimal() +
+  labs(x = "", y = "Portion of total variance (%)")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# OTHER TESTS
+
+
+## gmin habitat preference
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Global test
+
+Metradica_log$HabitatType <- as.factor(Metradica_log$HabitatType)
+Metradica_log$Habitat <- as.factor(Metradica_log$Habitat)
+Metradica_log$Name <- as.factor(Metradica_log$Name)
+Model_gmin<-lm(Gmin ~ HabitatType,  data = Metradica_log)
+autoplot(Model_gmin)
+summary(Model_gmin)
+anova(Model_gmin) 
+
+tukey <- HSD.test(aov(Model_gmin), trt = 'HabitatType') 
+
+#plot
+
+stat.test.gmin<- aov(lm(Gmin~HabitatType, data=Metradica_log)) %>% tukey_hsd() 
+
+gmin <- ggboxplot(data = Metradica_log,x = "HabitatType", y = "Gmin", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+                                                                       
+gmin
+```
+
+
+
+## TLP Habitat preference
+```{r}
+
+# Global test
+
+Model_Ptlp<-lm(Ptlp ~ HabitatType,  data = Metradica_log)
+autoplot(Model_Ptlp)
+summary(Model_Ptlp)
+anova(Model_Ptlp) 
+
+tukey <- HSD.test(aov(Model_Ptlp), trt = 'HabitatType') 
+
+#plot
+
+stat.test.tlp<- aov(lm(Ptlp~HabitatType, data=Metradica_log)) %>% tukey_hsd() 
+
+TLP <- ggboxplot(data = Metradica_log,x = "HabitatType", y = "Ptlp", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.tlp, label = "p.adj.signif",
+                       y.position = c(0.2, 0), hide.ns = TRUE)
+                                                                       
+TLP
+```
+
+## Test geraldine
+
+```{r}
+data <- Metradica %>% filter(Type !="Generalist")
+model <- lmer(Gmin ~ Type + (1|Name), data= data)
+summary(model)
+
+predict(model)
+head(predict(model))
+head(data)
+data$gminpred <- predict(model)
+
+data2 <- data %>% filter(Name == "Gustavia_hexapetala") 
+
+
+confint(model, oldNames=FALSE)
+```
+

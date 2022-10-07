@@ -80,8 +80,38 @@ leaflet(data = st_transform(MySpecies, crs = crs)) %>%
              label = ~ GS, radius = ~ DBH/5) %>% 
   addLegend(pal = palSp, values = ~ GS)
 
-
+#abandon..
 
 ```
 
+# abundance de Christopher Baraloto
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(gt)
+library(glue)
+
+IndValParacou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice/Species.xlsx", 
+    sheet = "IndVal")
+
+IndValParacou_table <- gt(IndValParacou)
+
+IndValParacou_table <- 
+  IndValParacou_table %>%
+  tab_header(
+    title = "Indicator values for neotropical tree species",
+    subtitle = "Greenhouse and Paracou are composite samples n = 8; 8 different pots and 8 different locations in Paracou. For Paracou, soil was sampled in the 0-10 cm horizon.") %>%
+  cols_label(`Soil Tests` = md("**Soil Tests**"), Greenhouse = md("**Greenhouse**"), Paracou = md("**Paracou**") )%>%
+  tab_source_note(source_note = "Results expressed in relation to the soil prepared according to the NF ISO 11464 standard, Cirad, Montpellier.") %>%
+  tab_footnote(footnote = "For available phosphorous, the Olsen method was used, best method for acid soils.", locations = cells_body(columns = `Soil Tests`, rows =9 ))
+
+IndValParacou_table %>%
+  gtsave(
+    "IndValParacou_table.png", expand = 10,
+    path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/DRYER/Soil/")
+
+View(analyses_sol)
+```
 

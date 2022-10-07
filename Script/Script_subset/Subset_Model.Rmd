@@ -1,0 +1,873 @@
+---
+title: "Boxplots"
+author: "Marion Boisseaux"
+date: "13/09/2022"
+output: html_document
+---
+
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(multcomp) #for lmer model to do anovas
+library(lmerTest) #same
+library(emmeans)#same
+library(ggplotify)
+```
+
+# Data
+
+```{r Data_results, message=FALSE, warning=FALSE}
+
+# dat
+library(googleAuthR)
+library(googledrive)
+library(googlesheets4)
+gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% dplyr::select(Code, Genus, Species, Name, Habitat, Type, HabitatType, Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica <- sub_data
+
+```
+
+## Specialist data
+```{r}
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+data <- Metradica %>% filter(Type !="Generalist")
+
+```
+
+## gmin 
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+
+model_gmin1 <- lmer(Gmin ~ Type + (1|Forest/Type/Name), data=data) 
+
+summary(model_gmin1)
+
+
+#Check normality of residuals 
+
+plot(model_gmin) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+#pour lmer
+str(model_gmin)
+model_gmin #you access the lmer objects through@
+resid(model_gmin)
+hist(resid(model_gmin), main = "Residual Histogram")
+boxplot(resid(model_gmin), main="Residual Box Plot")
+qqnorm(resid(model_gmin)) 
+qqline(resid(model_gmin))
+
+#plot
+sjPlot::plot_model(model_gmin1)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_gmin1, 
+                   axis.labels=c("TF Specialists"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on Gmin")
+
+
+#anova
+#summary(glht(model_gmin, linfct = mcp(Type = "Tukey")), test = adjusted("holm"))
+
+emmeans(model_gmin1, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats_gmin<- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Subset") %>% filter(Trait == 'Gmin') 
+  
+#plot 
+
+gmin.summary <- aggregate(Gmin ~ Type, mean, data=data)
+gmin <- ggplot(data,aes(x=Type,y=Gmin, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=gmin.summary, aes(ymin = Gmin, ymax = Gmin),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(gmin~(mmol.m^-2~.s^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20)) # + 
+  #stat_pvalue_manual(stats_gmin, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+gmin
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = Gmin)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+
+```
+
+## TLP
+```{r}
+
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_tlp <- lmer(TLP ~ Type + (1|Forest/Type/Name), data=data) #so better to use it like that, simpler
+summary(model_tlp)
+
+
+#Check normality of residuals 
+
+plot(model_tlp) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_tlp)
+model_tlp #you access the lmer objects through@
+resid(model_tlp)
+hist(resid(model_tlp), main = "Residual Histogram")
+boxplot(resid(model_tlp), main="Residual Box Plot")
+qqnorm(resid(model_tlp)) 
+qqline(resid(model_tlp))
+
+#plot
+sjPlot::plot_model(model_tlp)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_tlp, 
+                   axis.labels=c("TWI"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of TWI on TLP")
+
+
+#anova
+summary(glht(model_tlp, linfct = mcp(Type = "Tukey")), test = adjusted("holm"))
+
+emmeans(model_tlp, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'TLP')
+  
+#plot 
+tlp.summary <- aggregate(TLP ~ Type, mean, data=data)
+tlp <- ggplot(data,aes(x=Type,y=TLP, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=tlp.summary, aes(ymin = TLP, ymax = TLP),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(TLP~(MPa))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))  + 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = TLP)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(TLP)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+  
+```
+
+## LSWC 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_lswc <- lmer(LSWC ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it like that, simpler
+summary(model_lswc)
+
+model_lswc2 <- lm(LSWC ~ Type, data=data) 
+#Check normality of residuals 
+
+plot(model_lswc) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_lswc)
+model_lswc #you access the lmer objects through@
+resid(model_lswc)
+hist(resid(model_lswc), main = "Residual Histogram")
+boxplot(resid(model_lswc), main="Residual Box Plot")
+qqnorm(resid(model_lswc2)) 
+qqline(resid(model_lswc2))
+
+#plot
+sjPlot::plot_model(model_lswc)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_lswc, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on LSWC")
+
+
+#tukey
+
+emmeans(model_lswc, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'LSWC')
+
+
+#plot 
+
+LSWC.summary <- aggregate(LSWC ~ Type, mean, data=data)
+LSWC <- ggplot(data,aes(x=Type,y=LSWC, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=LSWC.summary, aes(ymin = LSWC, ymax = LSWC),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(LSWC~(g.g^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(1.2), hide.ns = TRUE)
+
+LSWC
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = LSWC)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(LSWC)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+```
+
+## MajVLA 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+
+model_majvla <- lmer(MajVLA ~ Type + (1|Forest/Habitat/Name), data=data) 
+summary(model_majvla)
+
+
+#Check normality of residuals 
+
+plot(model_majvla) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_majvla)
+model_majvla #you access the lmer objects through@
+resid(model_majvla)
+hist(resid(model_majvla), main = "Residual Histogram")
+boxplot(resid(model_majvla), main="Residual Box Plot")
+qqnorm(resid(model_majvla)) 
+qqline(resid(model_majvla))
+
+#plot
+sjPlot::plot_model(model_majvla)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_majvla, 
+                   #axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on MajVLA")
+
+
+#tukey
+
+emmeans(model_majvla, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'MajVLA')
+
+MajVLA.summary <- aggregate(MajVLA ~ Type, mean, data=data)
+MajVLA <- ggplot(data,aes(x=Type,y=MajVLA, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=MajVLA.summary, aes(ymin = MajVLA, ymax = MajVLA),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(MajVLA~(mm.mm^-2))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(2.9), hide.ns = TRUE)
+MajVLA
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = MajVLA)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(MajVLA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+```
+
+## LA 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_la <- lmer(LA ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it like that, simpler
+summary(model_la)
+
+
+#Check normality of residuals 
+
+plot(model_la) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_la)
+model_la #you access the lmer objects through@
+resid(model_la)
+hist(resid(model_la), main = "Residual Histogram")
+boxplot(resid(model_la), main="Residual Box Plot")
+qqnorm(resid(model_la)) 
+qqline(resid(model_la))
+
+#plot
+sjPlot::plot_model(model_la)
+# Notes: axis labels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_la, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on LA")
+
+
+#tukey
+
+emmeans(model_la, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'LA')
+LA.summary <- aggregate(LA ~ Type, mean, data=data)
+LA <- ggplot(data,aes(x=Type,y=LA, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=LA.summary, aes(ymin = LA, ymax = LA),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(LA~(cm²))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(5.5), hide.ns = TRUE)
+LA
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = LA)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(LA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+## SLA 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_SLA <- lmer(SLA ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it like that, simpler
+summary(model_SLA)
+
+
+#Check normality of residuals 
+
+plot(model_SLA) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_SLA)
+model_SLA #you access the lmer objects through@
+resid(model_SLA)
+hist(resid(model_SLA), main = "Residual Histogram")
+boxplot(resid(model_SLA), main="Residual Box Plot")
+qqnorm(resid(model_SLA)) 
+qqline(resid(model_SLA))
+
+#plot
+sjPlot::plot_model(model_SLA)
+# Notes: axis SLAbels should be in order from bottom to top. 
+# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
+
+sjPlot::plot_model(model_SLA, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on SLA")
+
+
+#tukey
+
+emmeans(model_SLA, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'SLA')
+
+SLA.summary <- aggregate(SLA ~ Type, mean, data=data)
+SLA <- ggplot(data,aes(x=Type,y=SLA, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=SLA.summary, aes(ymin = SLA, ymax = SLA),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  ylab(expression(SLA~(cm^2.g^-1))) + 
+  theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))
+
+SLA
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = SLA)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(SLA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+## K 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_K <- lmer(K ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it like that, simpler
+summary(model_K)
+
+
+#Check normality of residuals 
+
+plot(model_K) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_K)
+model_K #you access the lmer objects through@
+resid(model_K)
+hist(resid(model_K), main = "Residual Histogram")
+boxplot(resid(model_K), main="Residual Box Plot")
+qqnorm(resid(model_K)) 
+qqline(resid(model_K))
+
+#plot
+
+sjPlot::plot_model(model_K, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on K")
+
+
+#tukey
+
+emmeans(model_K, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'K')
+
+K.summary <- aggregate(K ~ Type, mean, data=data)
+K <- ggplot(data,aes(x=Type,y=K, col=Name)) + 
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE","Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE",  "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=K.summary, aes(ymin = K, ymax = K),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=12, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(K~(g.kg^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(3.2), hide.ns = TRUE)
+
+K
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = K)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(K)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+## P 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_P <- lmer(P ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it liPe that, simpler
+summary(model_P)
+
+
+#ChecP normality of residuals 
+
+plot(model_P) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_P)
+model_P #you access the lmer objects through@
+resid(model_P)
+hist(resid(model_P), main = "Residual Histogram")
+boxplot(resid(model_P), main="Residual Box Plot")
+qqnorm(resid(model_P)) 
+qqline(resid(model_P))
+
+#plot
+
+sjPlot::plot_model(model_P, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on P")
+
+
+#tuPey
+
+emmeans(model_P, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'P')
+
+P.summary <- aggregate(P ~ Type, mean, data=data)
+P <- ggplot(data,aes(x=Type,y=P, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=P.summary, aes(ymin = P, ymax = P),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=12, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(P~(g.kg^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(0.5), hide.ns = TRUE)
+P
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = P)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(P)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+## C 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_C <- lmer(C ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it liPe that, simpler
+summary(model_C)
+
+
+#ChecP normality of residuals 
+
+plot(model_C) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_C)
+model_C #you access the lmer objects through@
+resid(model_C)
+hist(resid(model_C), main = "Residual Histogram")
+boxplot(resid(model_C), main="Residual Box Plot")
+qqnorm(resid(model_C)) 
+qqline(resid(model_C))
+
+#plot
+
+sjPlot::plot_model(model_C, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on C")
+
+
+#tuPey
+
+emmeans(model_C, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'C')
+
+C.summary <- aggregate(C ~ Type, mean, data=data)
+C <- ggplot(data,aes(x=Type,y=C, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=C.summary, aes(ymin = C, ymax = C),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=12, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(C~("%"))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(4.1), hide.ns = TRUE)
+
+C
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = C)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(C)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+## N 
+
+```{r}
+# Global test
+
+data$Name <- as.factor(data$Name)
+data$Type <- as.factor(data$Type)
+model_N <- lmer(N ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it liPe that, simpler
+summary(model_N)
+
+
+#ChecP normality of residuals 
+
+plot(model_N) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#pour lmer
+str(model_N)
+model_N #you access the lmer objects through@
+resid(model_N)
+hist(resid(model_N), main = "Residual Histogram")
+boxplot(resid(model_N), main="Residual Box Plot")
+qqnorm(resid(model_N)) 
+qqline(resid(model_N))
+
+#plot
+
+sjPlot::plot_model(model_N, 
+                   axis.labels=c("Specialist TF"),
+                   show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on N")
+
+
+#tuPey
+
+emmeans(model_N, list(pairwise ~ Type), adjust = "tukey")
+
+#Adding the emmeans to a google sheet the results
+
+stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'N')
+
+N.summary <- aggregate(N ~ Type, mean, data=data)
+N <-ggplot(data,aes(x=Type,y=N, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=N.summary, aes(ymin = N, ymax = N),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=12, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(N~("%"))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))+ 
+  stat_pvalue_manual(stats, label = "p.adj.signif",
+                       y.position = c(1.2), hide.ns = TRUE)
+N
+
+#plot raw 
+
+
+ggplot(data, aes(x = Type, y = N)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(N)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+```
+
+#Summary
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("thomasp85/patchwork")
+library(patchwork)
+
+(gmin | tlp | LSWC)/(LA | SLA | MajVLA)/(K | P | C | N ) + plot_layout(guides = "collect")
+```
+
+
+# Model 1 
+
+Trait ~ Type + (1|Forest/Habitat/Name)
+
+Fixed effet of habitat preference and nested random effect of species within each habitat, and the habitats nested in the 3 forest sites.
+
+There is an error with this model : **boundary (singular) fit: see help('isSingular')** which means that there are not enough foresst sites to put it as random.
+
+```{r}
+
+name_list <- NULL
+Nbcol <- match(colnames(data)[9:18],colnames(data)) 
+count <- 0
+for ( i in data[,Nbcol]){
+  count <-  count + 1
+  name <- names(data[Nbcol[count]])
+ 
+  #write the formula
+  formu <- formula(paste(name,"~Type + (1|Forest/Habitat/Name)"))
+ 
+  # Create the graphz
+  Scale_loc <- as.ggplot(
+    plot(
+      lmer(formula=formu,data=data),
+      sqrt(abs(resid(.)))~fitted(.),
+      type=c("p","smooth"),
+      col.line=1,
+      xlab=paste0("Fitted  ",name),
+      ylab=expression(sqrt("Standardized residuals")))
+    )
+ 
+
+  QQ <- as.ggplot(
+    lattice::qqmath(
+      lmer(formula=formu,data=data))
+      )
+   
+ 
+  Res_Fit <- as.ggplot(
+    plot(
+      lmer(formula=formu,data=data),
+      type=c("p","smooth"),
+      col.line = 1),
+      xlab=paste0("Fitted  ",name),
+      ylab=expression(sqrt("Residuals"))
+    )
+ 
+  Res_lev <- as.ggplot(
+    plot(
+      lmer(formula=formu,data=data),
+      rstudent(.)~hatvalues(.),
+      xlab=paste0("Leverage  ",name),
+      ylab=expression(sqrt("Residuals"))
+     
+      )
+    )
+ 
+  # Save them
+  plot <- arrangeGrob(Res_Fit,
+                      QQ,
+                      Scale_loc,
+                      Res_lev,
+                      ncol = 2,
+                      nrow = 2)
+ 
+  ggsave(plot,
+         filename=paste0("lmer_diagnostic_",name,".jpg"),
+         device = "jpg",
+         path = "./Results/Model/Model_1/Subset/Diag",
+         width = 7,
+         height = 9,
+         units = "in")
+ 
+  name_list <- c(name_list,name)
+  
+  #plot model
+   print(sjPlot::plot_model(lmer(formula=formu,data=data), axis.labels=c("Specialist TF"), show.values=TRUE, show.p=TRUE,
+                   title="Effect of habitat preference on N",
+         file=paste0("./Results/Model/Model_1/Subset/Plot/",name,".jpeg")))
+   
+  # Create an html summary table
+  print(sjPlot::tab_model(lmer(formula=formu,data=data),file=paste0("./Results/Model/Model_1/Subset/Table/",name,".html")
+                          )
+        )
+  # # convert it to png
+  # webshot::webshot(paste0("./Results/Boxplot/Subset/Table/",name,".html"),
+  #         paste0("./Results/Boxplot/Subset/Table/",name,".png")
+  #         )
+}
+```
+
+Plot everything together
+
+```{r}
+
+model_gmin1 <- lmer(Gmin ~ TWI + (1|Name), data= data)
+
+mydata$model_gmin1_predicted <- predict(model_gmin1)
+
+ggplot(data, aes(x = Type, y = Gmin, colour = Type)) +
+      facet_wrap(~Forest, ncol=3) +   # a panel for each mountain range
+      geom_boxplot(alpha = 0.5) +
+      theme_classic() +
+      #geom_line(data = cbind(data, pred = predict(model_gmin1)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+  # geom_smooth(method = "lm", se = FALSE) thisis the predicted line comapring only the chosen variables
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+
+```
+
+
+# Model 2
+
+Every habitat belong to only one forest. = NESTED
+
+Every habitat TF (TF1, TF2, TF3) has species1, species2, species3. = CROSSED
+Every habitat BF (BF1, BF2, BF3) has species4, species5, species6.
+
+

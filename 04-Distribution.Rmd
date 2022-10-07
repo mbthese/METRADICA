@@ -1,0 +1,1394 @@
+---
+title: "Distribution"
+author: "Marion Boisseaux"
+date: "04/05/2022"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# (PART) Part three : Results {-}
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(olsrr)
+library(ggplot2)
+```
+
+# Data
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# data
+
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, TreeHeight, TreeDawkins) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight)) %>% 
+  mutate_at(c("Gmin","Ptlp" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight", "StomatalDensity"), abs) %>% 
+  mutate_at(c("Gmin","Ptlp" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=738111573", range = "Metradica") %>% 
+  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N,Ca, StomatalDensity, TreeHeight, BranchHeight, TreeDawkins, BranchDawkins) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight), BranchHeight = as.numeric(BranchHeight))  
+
+
+Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for small sample size (n=30)
+```
+
+# Hypotheses : 
+
+Species assemblages in BF are different from species assemblages of TF. (develop this with Guillaume model and IndVal) An environemental filtering exists. These habitats different in terms of water availability. We suggest to sample different water-related traits in the hope to explain the different assemblages by their differences in terms of hydrological niches. Under a stress, the trait space is constrained. We suggest to sample these water-related traits during drought. We suggest to look along the precipitation across French Guiana and hoping to observe extreme patterns between Bafog site TF and Kaw site BF. 
+
+Plan analyses:
+
+1- ACP
+2- Boxplot :
+  * Trait en fonction site "precipitation"
+  * Trait en fonction topo "BF/TF"
+  * Trait en fonction gradient precipitation Habitat TF
+  * Trait en fonction gradient precipitation Habitat BF
+3- Modele avec un indice de stress hydrique
+
+    D'apres le work package, avoir un indice plus fin pour distinguer BF/TF     et avoir le plant water availability (avec CWD+ TWI + type de sol). Ce      que je peux faire c'est inclure précipitation + evapotranspiration          (mensuel) = CWD *climatic water deficit* et aussi en incluant le TWI        *topographic wetness index*. 
+
+    Recuperer precipitation *P* + evapotranspiration *ETP* avec Chelsa ou       WorldClim. CWD = P - ETP.
+
+    Modele : Trait en fonction(TWI, CWD) avec TWI qui varie intra- + inter- site. CWD qui varie inter-site. 
+    
+    lm(Trait ~ 1 + SH) avec SH = CWD/TWI. Faire log du trait et log d' l'indice. 
+    
+
+
+# Distribution of major traits 
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
+
+*before and after log tranform*
+
+## Gmin
+
+
+```{r}
+
+ggplot(Metradica) +
+ aes(x = Gmin) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(Gmin)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#shapiro 
+shapiro.test(log(Metradica$Gmin))
+shapiro.test(Metradica$Gmin)
+shapiro.test(log(Subdata_shapiro$Gmin))
+
+
+ #produces a normal QQ plot
+qqnorm(log(Metradica$Gmin), pch = 1, frame = FALSE, main= "log(Gmin)")
+qqline(log(Metradica$Gmin), col = "steelblue", lwd = 2)
+
+
+#Holmogorov-smirnov
+ks.test(log(Metradica$Gmin), "pnorm")
+
+```
+
+## TLP
+```{r}
+ggplot(Metradica) +
+ aes(x = TLP) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(abs(TLP))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(log(abs(Metradica$TLP)), pch = 1, frame = FALSE, main= "log(abs(TLP))")
+qqline(log(abs(Metradica$TLP)), col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(log(abs(Metradica$TLP)))
+shapiro.test(log(abs(Subdata_shapiro$TLP)))
+
+
+#Kolmogorov-smirnov
+ks.test(log(abs(Metradica$TLP)), "pnorm")
+
+```
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
+
+
+## LA
+
+```{r}
+ggplot(Metradica) +
+ aes(x = LA) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(LA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(log(Metradica$LA), pch = 1, frame = FALSE, main= "log(LA)")
+qqline(log(Metradica$LA), col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(log(Metradica$LA))
+shapiro.test(log(Subdata_shapiro$LA))
+
+#Kolmogorov-smirnov
+ks.test(log(Metradica$LA), "pnorm")
+
+```
+
+## SLA
+```{r}
+
+ggplot(Metradica) +
+ aes(x = SLA) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(SLA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(log(Metradica$SLA), pch = 1, frame = FALSE, main= "log(SLA)")
+qqline(log(Metradica$SLA), col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(log(Metradica$SLA))
+
+
+shapiro.test(log(SLA_sub$SLA))
+
+#Kolmogorov-smirnov
+ks.test(log(Metradica$SLA), "pnorm")
+```
+
+## LSWC
+```{r}
+
+ggplot(Metradica) +
+ aes(x = LSWC) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(LSWC)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(log(Metradica$LSWC), pch = 1, frame = FALSE, main= "log(LSWC)")
+qqline(log(Metradica$LSWC), col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(log(Metradica$LSWC))
+shapiro.test(log(Subdata_shapiro$LSWC))
+
+#Kolmogorov-smirnov
+ks.test(log(Metradica$LSWC), "pnorm")
+```
+
+
+## MajVLA
+```{r}
+ggplot(Metradica) +
+ aes(x = MajVLA) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(MajVLA)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(log(Metradica$MajVLA), pch = 1, frame = FALSE, main= "log(MajVLA)")
+qqline(log(Metradica$MajVLA), col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(log(Metradica$MajVLA))
+shapiro.test(log(Subdata_shapiro$MajVLA))
+
+#Holmogorov-smirnov
+ks.test(log(Metradica$MajVLA), "pnorm")
+
+
+```
+
+
+## Height , Branch, Dawkins
+```{r}
+ggplot(Metradica) +
+ aes(x = TreeHeight) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = BranchHeight) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = TreeHeight) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = BranchDawkins, y = BranchHeight) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = Code) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum() +
+ facet_wrap(vars(Name))
+
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = Gmin) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = LA) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = SLA) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = TLP) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = LSWC) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+
+ggplot(Metradica) +
+ aes(x = TreeDawkins, y = MajVLA) +
+ geom_boxplot(shape = "circle", fill = "#46337E") +
+ hrbrthemes::theme_ipsum()
+```
+
+```{r DBH}
+
+library(ggplot2)
+
+ggplot(Data) +
+ aes(x = Type, y = DBH, colour = Habitat) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = DBH) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = Name, y = DBH, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ scale_color_hue(direction = 1) +
+ coord_flip() +
+ theme_minimal()
+
+```
+
+
+## Chemistry
+```{r}
+
+#Distribution chimie pour le potassium
+ggplot(Data) +
+ aes(x = K) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = log(K)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot pour le potassium
+qqnorm(log(Data$K), pch = 1, frame = FALSE, main= "log(K)")
+qqline(log(Data$K), col = "steelblue", lwd = 2)
+
+#shapiro  pour le potassium
+shapiro.test(log(Data$K))
+shapiro.test(log(Subdata_shapiro$K))
+
+----------------------------------------------------------
+#Distribution chimie pour le phosphore
+ggplot(Data) +
+ aes(x = P) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = log(P)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot pour le phosphore
+qqnorm(log(Data$P), pch = 1, frame = FALSE, main= "log(P)")
+qqline(log(Data$P), col = "steelblue", lwd = 2)
+
+#shapiro  pour le phosphore
+shapiro.test(log(Data$P))
+shapiro.test(log(Subdata_shapiro$P))
+
+--------------------------------
+
+  #Distribution chimie pour le carbon
+
+
+library(ggplot2)
+
+ggplot(Metradica) +
+  aes(x = asin(sqrt(Metradica$C/100))) +
+  geom_histogram(bins = 30L, fill = "#112446") +
+  theme_minimal()
+
+ggplot(Metradica) +
+  aes(x = log(C)) +
+  geom_histogram(bins = 30L, fill = "#112446") +
+  theme_minimal()
+
+
+#qqplot pour le carbon
+qqnorm(log(Metradica$C), pch = 1, frame = FALSE, main= "log(C)")
+qqline(log(Metradica$C), col = "steelblue", lwd = 2)
+
+qqnorm(asin(sqrt(Metradica$C/100)), pch = 1, frame = FALSE, main= "arcsin(C)")
+qqline(asin(sqrt(Metradica$C/100)), col = "steelblue", lwd = 2)
+
+#shapiro  pour le carbon
+shapiro.test(log(Metradica$C))
+shapiro.test(log(Subdata_shapiro$C))
+
+
+---------------------------
+
+  #Distribution chimie pour l'azote
+
+library(ggplot2)  
+ggplot(Metradica) +
+ aes(x = N) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(N)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot pour l'azote
+qqnorm(log(Metradica$N), pch = 1, frame = FALSE, main= "log(N)")
+qqline(log(Metradica$N), col = "steelblue", lwd = 2)
+
+#shapiro  pour l'azote
+shapiro.test(log(Metradica$N))
+shapiro.test(log(Subdata_shapiro$N))  
+  
+  
+--------------------------------------  
+  
+#rapide analyses par habitat
+
+ggplot(Data) +
+ aes(x = HabitatType, y = K) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = P) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+
+
+
+
+########### le reste des elements
+
+Data %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+ aes(x = HabitatType, y = K) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+Data %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+ aes(x = HabitatType, y = P) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = HabitatType, y = N) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = C) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = S) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Fe) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Mn) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Mg) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = HabitatType, y = Ca) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Na) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Cu) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Ni) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Rb) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Sr) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Zn) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+```
+
+## Summary of main variables
+```{r}
+ plot(Metradica_log[,8:13])
+```
+
+
+# Data exploration with descriptive statistics
+
+How to visualize the data and show the links between the variables and identify the same responses of the individuals? 
+
+
+## First PCA interpretations
+
+Avec le shiny PCA, sur les variables non transformées et en gardant les NAs. 
+
+```{r}
+library(FactoMineR)
+library(Factoshiny)
+library(factoextra)
+
+#data used ------------
+
+#Metradica <-  googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>%  dplyr::select(Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, Ptlp, LA, SLA, LSWC, MajVLA)
+
+# shiny used
+
+#resultPCA <- Factoshiny(Metradica[,c(1:13)])
+
+# dim 1 et 2 ----------------
+
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,4,6,7)],quali.sup=c(1),graph=FALSE)
+
+plot.PCA(res.PCA,choix='var',habillage = 'contrib',select='contrib  6',unselect=0,cex=1.45,cex.main=1.45,cex.axis=1.45,title="Graphe des variables de l'ACP")
+
+## Habitat collected
+
+plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+
+## Habitat preference
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,4,5,7)],quali.sup=c(1),graph=FALSE)
+
+plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+
+## Forest 
+
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,5,6,7)],quali.sup=c(1),graph=FALSE)
+
+plotellipses(res.PCA, keepvar=1,invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+
+
+# dim 3 et 4 -------------------
+
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,4,6,7)],quali.sup=c(1),graph=FALSE)
+
+plot.PCA(res.PCA,axes=c(4,3),choix='var',habillage = 'contrib',title="Graphe des variables de l'ACP")
+
+## Habitat collected
+plotellipses(res.PCA, keepvar=1,axes=c(4,3),invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+
+## Habitat preference
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,4,5,7)],quali.sup=c(1),graph=FALSE)
+
+plotellipses(res.PCA, keepvar=1,axes=c(4,3),invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+
+# Forest 
+res.PCA<-PCA(Metradica[, c(1:13)][,-c(1,2,3,5,6,7)],quali.sup=c(1),graph=FALSE)
+
+plotellipses(res.PCA, keepvar=1,axes=c(4,3),invisible=c('ind','ind.sup'),title="Graphe des individus de l'ACP",label =c('quali'))
+```
+
+Interprétation avec Ghislain 01/06/2022 - AMAP
+
+* The first axis is driven by LA/SLA and MajVLA, representing the leaves' dimensions. 
+* The second axis is driven by the TLP and LSWC, representing turgor loss and maximum capacity of water retention, therefore the water reservoir/supply. 
+* The thirst axis is driven by gmin, the minimal conductance, representating passive water leaks when stomata are supposedly closed. It represents le fait d'etre hermétique/sealed. 
+
+* hypotheses for drought resistance:
+  - do not lose water
+  - the search to have more water supply/reserve 
+
+BF leaves have a less negative TLP, more water storage and less leaks compared to TF leaves. TF leaves tend to be bigger *(opposite to what expected).* 
+
+BF and TF species communities are different but water does not seem to be the limiting factor here, and is not responsible for the environmental filtering of the species, according to my data. This environmental filtering is not based on drought resistance. It could be due to :
+
+* resistance to hypoxia in BF (O2)
+* fertility gradient (Phosphorous is limiting)
+
+
+For the 3 sites :
+
+* put precipitation gradient
+* we observe the opposite trend and paracou is not always in the middle for the response traits. 
+
+Il n'y a pas forcément de trade-offs en 2-dimensions. On est sur des trade-offs en multidimensions. Plus le stress est fort, plus l'espace du trait sera contraint. On en conclu d'après les données que l'eau n'est pas le facteur limitant ici. 
+
+## PCA with factoextra
+
+Avec la fonction PCA, sur les variables transformées, et en enlevant les Nas. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(FactoMineR)
+library(Factoshiny)
+library(factoextra)
+
+
+res.PCA<-PCA(Metradica_log[, c(1:18)][,-c(1,2,3,4,5,7,8,18)],quali.sup=c(1),graph=FALSE)
+
+# Visualize eigenvalues/variances
+fviz_screeplot(res.PCA, addlabels = TRUE, ylim = c(0, 50))
+
+# dim 1-2 
+
+## variables
+fviz_pca_var(res.PCA, axes = c(1,2), col.var='contrib')+
+ theme_classic() + scale_color_gradient2(low="white", mid="blue",
+      high="red")
+
+## Biplot 
+fviz_pca_biplot(res.PCA, label="var",  repel = TRUE # Avoid text overlapping
+                ) + scale_color_brewer(palette="Paired")  + ylim(-4,4) + theme_classic()
+
+## dim 3,4
+fviz_pca_var(res.PCA, axes = c(3,4), col.var='contrib')+
+ theme_classic() + scale_color_gradient2(low="white", mid="blue",
+      high="red")
+
+## Habitat collected
+
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.5) + scale_color_brewer(palette="Set2")  + ylim(-0.2,0.2)+ xlim(-0.2,0.2) + theme_classic() 
+
+fviz_pca_biplot(res.PCA, axes = c(3,4), label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + ylim(-0.2,0.2)+ xlim(-0.2,0.2) + theme_classic() 
+
+##Habitat type
+
+res.PCA<-PCA(Metradica_log[, c(1:18)][,-c(1,2,3,4,5,6,7,18)],quali.sup=c(1),graph=FALSE)
+
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + ylim(-0.2,0.2)+ xlim(-0.2,0.2) + theme_classic() 
+
+##Forest
+
+res.PCA<-PCA(Metradica_log[, c(1:18)][,-c(1,2,3,4,8,6,7,18)],quali.sup=c(1),graph=FALSE)
+
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + ylim(-4,3)+ theme_classic()
+
+fviz_pca_biplot(res.PCA, axes = c(3,4), label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + ylim(-4,3)+ theme_classic() 
+
+##tree dawkins dim 1,2
+res.PCA<-PCA(Metradica_log[, c(1:18)][,-c(1,2,3,4,5,6,7,8)],quali.sup=c(10),graph=FALSE)
+
+
+fviz_pca_biplot(res.PCA, label="var", habillage = c(10)) + theme_minimal() + scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#56B4E9", "#56B4E9" ))+ geom_point(size = 0.1)
+
+
+
+```
+
+Interpretation: Normal que les habitats soient inversés par rapport à précédemment, car -Ptlp et log-transform variables. 
+
+
+
+# Gmin - exploration
+
+The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
+
+ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat collect. Tukey post-hoc test shows groups a Bafog and b for Paracou and Kaw. It also shows groups TF a and BF b.  
+
+Model_gmin <- lm(log10(Gmin) ~ Forest + Habitat,  data = Metradica)
+
+The data
+
+```{r Data import for traits, echo=FALSE, message=FALSE, warning=FALSE}
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")
+```
+
+```{r gmin-anova, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Forest) %>% summarise_at(vars(Gmin), funs(mean(Gmin, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_gmin<-lm(log10(Gmin) ~ Forest+Habitat,  data = Metradica)
+#autoplot(Model_gmin)
+summary(Model_gmin)
+anova(Model_gmin) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+#tukey_gmin <- TukeyHSD(aov(Model_gmin))
+library(agricolae)
+tukey2 <- HSD.test(aov(Model_gmin), trt = 'Forest') #show groups a Bafog and b for Paracou and Kaw
+tukey3 <- HSD.test(aov(Model_gmin), trt = 'Habitat') #show groups TF a and BF b 
+```
+
+### Plots 
+```{r Gmin pref habitat}
+
+stat.test.gmin<- aov(lm(log10(Gmin)~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+gmin <- ggboxplot(data = Metradica,x = "HabitatType", y = "Gmin", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(30), hide.ns = TRUE)
+#gmin <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+  aes(
+    x = HabitatType,
+    y = log10(Gmin),
+    fill = Type,
+    colour = Habitat
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat preference", colour = "Habitat collected") +
+  theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 2, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 1.5, size = 7)
+                                                                       
+
+
+```
+
+
+```{r gmin-plot, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#gmin with all species- interactive graph
+plot_ly(Metradica, x=~Name, y = ~Gmin, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='Minimal conductance (mmol.m-2.s-1)'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(Gmin ~Forest, Metradica, mean)
+
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log10(Gmin), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "Minimal conductance (mmol.m-2.s-1)"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+
+B <- ggplot(Metradica) +
+ aes(x = Forest, y = Gmin, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
+
+
+```
+
+
+The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances. 
+
+```{r gmin-ajustmeans, echo=FALSE, message=FALSE, warning=FALSE}
+#moyenne ajustée pour reequilibre mon design : meme nbr d'espece dans chque site
+Model_gmin<-lm(log10(Gmin) ~ Forest+Habitat,  data = Metradica)
+
+library(emmeans)
+m_ajust_forest_gmin <- emmeans(object = Model_gmin, specs = "Forest")
+#pairs(m_ajust_forest_gmin) 
+a <- plot(m_ajust_forest_gmin)
+
+m_ajust_habitat_gmin <- emmeans(object = Model_gmin, specs = "Habitat")
+#pairs(m_ajust_habitat_gmin) 
+b <- plot(m_ajust_habitat_gmin)
+
+library(ggplot2)
+library(cowplot)
+
+plot_grid(a,b, labels = c('A', 'B'), label_size = 12)
+```
+
+## Gmin and other variables? 
+
+Yes : MajVLA and SLA.
+$quanti
+          correlation       p.value
+MajVLA  0.09328913682 0.01618976310
+FvFm    0.06178897606 0.10874004687
+LSWC   -0.04404830581 0.25416539130
+Ptlp   -0.05363521589 0.17134527454
+LA     -0.08838865629 0.02213220611
+SLA    -0.09932187546 0.01009827694
+
+
+```{r gmin-MajVLA and SLA}
+M_gmin <- lm(Gmin ~ MajVLA + SLA, data = Metradica)
+library(ggplot2)
+
+
+library(ggpubr)
+ggplot(Metradica,aes(x = Gmin, y = MajVLA)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se=FALSE) +
+  stat_regline_equation(label.y = 30, aes(label = ..eq.label..)) +
+  stat_regline_equation(label.y = 25, aes(label = ..rr.label..))
+
+
+ggplot(Metradica,aes(x = SLA, y = Gmin)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se=FALSE) +
+  stat_regline_equation(label.y = 30, aes(label = ..eq.label..)) +
+  stat_regline_equation(label.y = 25, aes(label = ..rr.label..))
+
+
+```
+
+
+*interpretation* Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326,  p-value: < 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m–2 s–1 in Paracou to 3.60 mmol m–2 s–1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic:  50.0139,  p-value: < 2.2204e-16). 
+
+It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
+
+*literature* Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m–2 s–1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
+
+* **Test the phylogenetic signal.**
+* **compare with stomatal density** 
+* **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
+
+
+
+# LSWC - exploration 
+
+One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
+
+```{r lswc-anova calcul, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Type) %>% summarise_at(vars(LSWC), funs(mean(LSWC, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_LSWC<-lm(log10(LSWC) ~ Type,  data = Metradica)
+#autoplot(Model_LSWC)
+summary(Model_LSWC)
+anova(Model_LSWC) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+tukey_LSWC <- TukeyHSD(aov(Model_LSWC))
+library(agricolae)
+tukey2 <- HSD.test(aov(Model_LSWC), trt = 'Type') 
+#tukey3 <- HSD.test(aov(Model_LSWC), trt = 'Habitat')  
+```
+
+## Plots 
+
+```{r HabitatPref_LSWC plot1, warning=FALSE}
+
+stat.test.lswc<- aov(lm(log10(LSWC)~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+Metradica <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType))
+
+lswc <- ggboxplot(data = Metradica,x = "HabitatType", y = "LSWC", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Leaf saturated water content (g.g)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.lswc, label = "p.adj.signif",
+                       y.position = c(3,3.2,3.4), hide.ns = TRUE)
+
+
+
+
+lswc <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+  aes(
+    x = HabitatType,
+    y = log10(LSWC),
+    fill = Type,
+    colour = Habitat
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Leaf saturated water content (g.g)", 
+ fill = "Habitat preference", colour = "Habitat collected") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 0.75, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 0.5, size = 7)
+lswc
+``` 
+
+# Ptlp - exploration
+
+Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought. 
+
+```{r Ptlp-plot}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#ptlp with all species- interactive graph
+plot_ly(Metradica, y = ~Ptlp, color = ~Name, type = "box")
+```
+
+### Paracou data set
+
+
+Several outliers are either marked as "herbivory", are "young", or have Run = 4 and trace of fungi (659).
+
+```{r Ptlp-Paracou, message=FALSE, warning=FALSE}
+library(plotly)
+library(ggplot2)
+
+ParacouPtlp <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=922870345", range = "ptlp")
+
+plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Code)
+plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Comment)
+plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Run)
+plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafPhenoStatus)
+plot_ly(ParacouPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
+
+```
+
+ 
+
+### Bafog data set
+
+```{r Ptlp-Bafog, message=FALSE, warning=FALSE}
+library(plotly)
+library(ggplot2)
+
+BafogPtlp <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/14E9RjSB4dq8epcDBqMtRi1HOGddbhLOWA8g6TF1bDWM/edit#gid=1237961205", range = "ptlp")
+
+plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Code)
+plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Comment)
+plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Run)
+plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafPhenoStatus)
+plot_ly(BafogPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
+
+```
+
+Several outliers are either marked as "Erreur bota", "pas de stabilisation", and two leaves are Run 4 and 3.
+
+### Kaw data set
+
+```{r Ptlp-Kaw, message=FALSE, warning=FALSE}
+library(plotly)
+library(ggplot2)
+
+KawPtlp <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=922870345", range = "ptlp")
+
+plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Code)
+plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Comment)
+plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~Run)
+plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafPhenoStatus)
+plot_ly(KawPtlp, x=~SpCode, y=~Ptlp, type = "box",text=~LeafHealthStatus)
+
+```
+
+Several outliers are either marked as "Epiphytes", "herbivory", One run is 4. 
+
+
+
+* The variability in πtlp among species indicates the potential for a 
+range of species responses to drought within Amazonian forest communities. 
+
+* For *Symphonia globulifera* we couldn't exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta & Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative. 
+
+* We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):
+  - *Dicorynia guianensis* (as Maréchaux et al 2015)
+  - *Eschweleira coriacea *  (as Maréchaux et al 2015)
+  - *Hymenopus heteromorphus*
+  - *Iryanthera sagotiana*
+  - *Iryanthera hostmannii*
+  - *Jacaranda copaia subsp. copaia*
+  - *Pterocarpus officinalis*
+
+* We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including *Voucapoua americana* and both *Protium* species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006). 
+
+Correlation with other variable : LSWC and SLA 
+
+```{r Ptlp-LSWC and SLA, echo=FALSE, message=FALSE, warning=FALSE}
+M_ptlp <- lm(Ptlp ~ LSWC + SLA, data = Metradica)
+
+
+library(ggpubr)
+ggplot(Metradica,aes(x = LSWC, y = Ptlp)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se=FALSE) +
+  stat_regline_equation(label.y = 0.5, aes(label = ..eq.label..)) +
+  stat_regline_equation(label.y = 0.3, aes(label = ..rr.label..))
+
+
+ggplot(Metradica,aes(x = SLA, y = Ptlp)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se=FALSE) +
+  stat_regline_equation(label.y = 0.5, aes(label = ..eq.label..)) +
+  stat_regline_equation(label.y = 0.3, aes(label = ..rr.label..))
+```
+
+###  Anova and plots
+```{r Ptlp-anova, message=FALSE, warning=FALSE}
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_Ptlp<-lm(Ptlp ~ Forest+Habitat,  data = Metradica)
+#autoplot(Model_Ptlp)
+summary(Model_Ptlp)
+anova(Model_Ptlp) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+#tukey_Ptlp <- TukeyHSD(aov(Model_Ptlp))
+library(agricolae)
+#tukey2 <- HSD.test(aov(Model_Ptlp), trt = 'Forest') #show groups a Bafog and b for Paracou and c for Kaw
+#tukey3 <- HSD.test(aov(Model_Ptlp), trt = 'Habitat') #show groups TF a and BF b
+
+library(rstatix)
+stat.test <- aov(Ptlp ~ Forest,  data = Metradica) %>%
+  tukey_hsd()
+
+ggboxplot(Metradica, x = "Forest", y = "Ptlp") +
+  stat_pvalue_manual(
+    stat.test, label = "p.adj", 
+    y.position = c(0, 0.7, -0.5)
+      )
+
+
+library(dplyr)
+library(ggplot2)
+# BF vs TF per site
+
+Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ ggplot() +
+ aes(x = Habitat, y = Ptlp, fill = Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ BF = "#4097F2", TF = "#EEC810")) +
+ labs(x = "Habitat", y = "Turgor loss point (MPa)", fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 18L), plot.caption = element_text(size = 17L), 
+ axis.title.y = element_text(size = 16L), axis.title.x = element_text(size = 13L)) +
+ facet_wrap(vars(Forest)) + stat_compare_means()
+
+# BF vs TF all sites blended
+Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ ggplot() +
+ aes(x = Habitat, y = Ptlp, fill = Habitat) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(
+ BF = "#4097F2", TF = "#EEC810")) +
+ labs(x = "Habitat", y = "Turgor loss point (MPa)", fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 18L), plot.caption = element_text(size = 17L), 
+ axis.title.y = element_text(size = 16L), axis.title.x = element_text(size = 13L)) + stat_compare_means()
+
+#habitat preference and collected 
+
+stat.test.tlp <- aov(lm(log10(abs(Ptlp))~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+tlp <- ggboxplot(data = Metradica,x = "HabitatType", y = "Ptlp", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.tlp, label = "p.adj.signif",
+                       y.position = c(-0.8), hide.ns = TRUE)
+
+
+
+
+#tlp <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+  aes(
+    x = HabitatType,
+    y = log10(abs(Ptlp)),
+    fill = Type,
+    colour = Habitat
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference", colour = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10)) 
+
+#habitat preference
+Metradica %>%
+ filter(!is.na(Type)) %>%
+ ggplot() +
+ aes(x = Type, y = log10(abs(Ptlp)), fill = Type) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361")) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + stat_compare_means(method = "anova", label.y = 0.6, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 0.5, size = 7)
+
+### 3 sites
+
+stat.test.tlp <- aov(lm(TLP~Forest, data=Metradica)) %>% tukey_hsd() 
+
+tlp <- ggboxplot(data = Metradica, x = "Forest", y = "TLP", fill = "Forest") +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#F4C71C",
+      Paracou = "#66FF61", 
+      Kaw = "#0051C1"
+    )
+  ) + labs(
+    x = "",
+    y = "Turgor loss point (MPa)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(size = 16L),
+    axis.title.x = element_blank(), 
+    axis.text.x=element_blank(),
+    axis.title.y = element_text(size = 15)) + 
+  stat_pvalue_manual(stat.test.tlp, label = "p.adj.signif",
+                       y.position = c(-0.8,-1,-1.2))
+ 
+    
+tlp
+```
+
+
+*Litterature* 
+* The paper by Zhu et al. (2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China. 
+
+*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al. 2008) and altered nutrient concentrations (Villagra et al. 2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
+
+*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree & Dainty 1975; Abrams, Kubiske & Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni & Sack 2012b; Guyot, Scoffoni & Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance. 
+
+
+
+# MajVLA - exploration 
+
+```{r majVLA -anova, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+Metradica %>% group_by(Type) %>% summarise_at(vars(MajVLA), funs(mean(MajVLA, na.rm=TRUE))) 
+
+# Global test
+library(ggpubr)
+library(ggfortify)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_MajVLA<-lm(log10(MajVLA) ~ Type,  data = Metradica)
+#autoplot(Model_MajVLA)
+summary(Model_MajVLA)
+anova(Model_MajVLA) # ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat and varies across species.
+tukey_MajVLA <- TukeyHSD(aov(Model_MajVLA))
+library(agricolae)
+tukey2 <- HSD.test(aov(Model_MajVLA), trt = 'Type') 
+#tukey3 <- HSD.test(aov(Model_MajVLA), trt = 'Habitat')  
+```
+
+### Plots
+
+```{r MajVLA plot1}
+library(rstatix)
+stat.test.veins<- aov(lm(log10(MajVLA)~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+Metradica <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType))
+
+veins <- ggboxplot(data = Metradica,x = "HabitatType", y = "MajVLA", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Major vein density (mm.mm-2)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.veins, label = "p.adj.signif",
+                       y.position = c(14,15,16), hide.ns = TRUE)
+
+vein <- Metradica %>%
+ filter(!is.na(Habitat)) %>%
+ filter(!is.na(Type)) %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+  aes(
+    x = HabitatType,
+    y = log10(MajVLA),
+    fill = Type,
+    colour = Habitat
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#FFD361"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )) +
+ labs(x = " ", y = "Major vein density (mm.mm-2)", 
+ fill = "Habitat preference", colour = "Habitat collected") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label.y = 1.5, size = 3)+ theme(axis.title = element_text(size = 10)) +  stat_compare_means(aes(label = ..p.signif..),
+                  method = "anova", label.y = 1.25, size = 7)
+plot(vein)
+``` 
+
+# Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
+
+```{r Summary tlp, gmin, vein, lswc}
+library(ggpubr)
+
+ggarrange(tlp, gmin, lswc, veins, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+
+

@@ -1,0 +1,161 @@
+---
+title: "Annexes_Paper_Metradica"
+author: "Marion Boisseaux"
+date: "13/09/2022"
+output: html_document
+---
+
+#libraries
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+```
+
+# Species phylo
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+species <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
+    sheet = "subset")
+
+kable(species)
+
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Virola_michelii",
+  "Laetia_procera",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+)) %>% 
+  separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+kable(select(species, Genus, Species), caption = "Studied species.")
+
+```
+
+
+```{r eval=FALSE, fig.cap="phylogeny", include=FALSE}
+
+species <- select(species, taxon , Genus, Species)
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+save(tree, file = "./Results/phylogeny_subset.Rdata")
+load("./Results/phylogeny_subset.Rdata")
+fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='right', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+#Table sampling
+
+```{r Tab. S1. Individuals per species collected in the three sampling sites. }
+
+Totaux <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
+    sheet = "Feuil3")
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux  %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(26, background = "#666;", color = "white") %>% save_kable(file = "Sampling.png", zoom = 10)
+
+
+
+```
+
+## Subset - Table sampling
+
+```{r Tab. S1. Individuals per species collected in the three sampling sites. }
+
+Totaux <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
+    sheet = "subset")
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux  %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(16, background = "#666;", color = "white") %>% save_kable(file = "Sampling.png", zoom = 10)
+
+
+
+```
+
+
+
+#Table indvals
+
+```{r Table S2: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
+Table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=1159265517", range = "Abundance") %>% select(Genus, Species, Type, Abund, SF, TF, `P-value`) %>% 
+  mutate(Abund = as.numeric(Abund))%>% mutate(SF = as.numeric(SF)) %>% mutate(TF = as.numeric(TF)) %>% mutate(`P-value` = as.numeric(`P-value`)) %>% rename(`p-value` = `P-value`, Abundance = Abund, `SF Habitat` = SF,  `TF Habitat` = TF)
+
+
+Table %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1:2, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_.png", zoom = 10)
+
+```
+
+## Indval Subset 
+
+```{r Indval_subset}
+```{r Table S2: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
+Table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=1159265517", range = "AbundanceSUBSET") %>% select(Genus, Species, Type, Abund, SF, TF, `P-value`) %>% 
+  mutate(Abund = as.numeric(Abund))%>% mutate(SF = as.numeric(SF)) %>% mutate(TF = as.numeric(TF)) %>% mutate(`P-value` = as.numeric(`P-value`)) %>% rename(`p-value` = `P-value`, Abundance = Abund, `SF Habitat` = SF,  `TF Habitat` = TF)
+
+
+Table %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1:2, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_subset.png")
+
+```
+
+

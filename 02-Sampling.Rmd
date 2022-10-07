@@ -97,7 +97,7 @@ Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra fir
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(readxl)
 species <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
-    sheet = "Feuil2")
+    sheet = "Feuil3")
 library(kableExtra)
 kable(species)
 
@@ -119,8 +119,9 @@ species <- data.frame(taxon = c(
   "Protium_stevensonii",
   "Virola_michelii",
   "Carapa_surinamensis",
+  "Carapa_guianensis",
   "Laetia_procera",
-  "Protium_opacum",
+  "Protium_opacum subsp. rabelianum",
   "Casearia_javitensis",
   "Dicorynia_guianensis",
   "Gustavia_hexapetala",
@@ -161,15 +162,15 @@ species <- select(species, taxon , Genus, Species)
   mutate(taxon = as.character(taxon))
 #tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
 #save(tree, file = "./document/phylogeny/phylogeny.Rdata")
-#load("Greenhouse_document/phylogeny/phylogeny.Rdata")
-#fortify(tree$scenario.3) %>% 
+load("./document/phylogeny/phylogeny.Rdata")
+fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
   left_join(paracou) %>% 
   ggtree(aes(col = taxon), layout="circular") + 
   geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
   theme_tree(legend.position='right', legend.text = element_text(face = "italic")) +
-  scale_alpha_manual("taxon", values = c(0.2, 1)) +
-  scale_size_manual("taxon", values = c(1, 2))
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
 ```
 
 
@@ -213,10 +214,15 @@ ggplot(df) +
   )
 
 Totaux <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
-    sheet = "Feuil2")
+    sheet = "Feuil3")
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
 
 Totaux  %>%
-  kbl(caption = "Individuals per species collected on the 3 sites") %>%
-  kable_classic(full_width = F, html_font = "Cambria")
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(25, background = "#666;", color = "white")
 
 ```

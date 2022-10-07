@@ -1,0 +1,67 @@
+---
+title: "Functional diversity metrics"
+author: "Marion Boisseaux"
+date: "11/05/2022"
+output: html_document
+---
+
+We used a combination of univariate and multivariate analyses to evaluate trait response to habitat characteristics. 
+
+*Hypothesis:* (adapted from Fichaux et al 2019)
+
+How does the functional diversity of tree assemblages vary across habitats and along a precipitation gradient ? 
+
+If habitats are filtering species based on their tolerance to abiotic conditions, then ecological strategies of tree assemblages should differ across contrasted habitats. We predicted that contrasted habitats would differ in terms of niches for tree species. 
+
+1- log transform data 
+2- Calculate indices based on a convex hull
+
+*All functional indices were computed using the “MultidimFD” function (Mouillot et al. 2013, <http://www.ecolag.univ-montp2.fr/software>).* NOT AVAILABLE.
+
+## Convex hull
+
+Methods that estimate the niche of a species by calculating a convex hull or an elliptical envelope have become popular due to their simplicity and interpretation, given Hutchinson’s conception of the niche as an n-dimensional hypervolume
+
+## Functional diversity
+
+Functional diversity was measured using the multidimensional framework proposed by Mouillot et al. (2013) which includes:
+
+* **functional richness** : represents the volume of the minimum convex hull occupied by all species of the assemblage (Cornwell et al. 2006), expressed here as the proportion of functional space filled by species present in the assemblage.It is not weighted by species abundance.
+
+
+* **functional evenness** :  represents the regularity of species distribution in the functional trait space, weighted by their occurrences.
+
+* **functional divergence** : measures the occurrence-weighted deviation of species from the non-weighted center of gravity of the convex hull.
+
+* **functional dispersion** : quantifies the occurrence-weighted mean dispersion of species from the occurrence-weighted center of gravity of all the species.
+
+* **functional specialization** : measures the global weighted mean distance to the centroid of the functional space of the community. 
+
+* **functional originality** : measures the weighted mean distance to the nearest species in the functional space of the community; this index reveals the functional redundancy between species.
+
+
+
+```{r}
+
+#FD is a package to compute different multidimensional functional diversity (FD) indices
+
+#install.packages("devtools")
+#require(devtools)
+#install_github("ibartomeus/fundiv")
+#require(fundiv)
+
+```
+
+
+To return the functional composition of a set of communities, as measured by the communitylevel weighted means of trait values, I need 2 matrixes:
+
+* data containing traits (x)
+* matrix containing the abundances of the species in x (or presence-absence, i.e. 0 or 1). Rows are sites and species are columns. The number of species (columns) must match the number of species (rows) in x. In addition, the species labels in a and x must be identical and in the same order. NAs will be replaced by 0.
+
+## Community weighted mean (CWM)
+
+It represents the average trait values in a community weighted by the relative abundance of species and is an indicator of functional composition. 
+
+## Null model
+
+A null model approach to investigate whether env't filtering drives the observed patterns. It compares the observed functional diversity metrics to the metrics generated with the null model at the assemblage level.

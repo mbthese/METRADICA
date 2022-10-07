@@ -1,0 +1,471 @@
+---
+title: "Climatic data in Guyane"
+output:
+ bookdown::html_document2:
+  #base_format: rmarkdown::html_vignette
+  #highlight: tango
+  number_sections: true
+  toc: true
+  toc_float: true
+  fig_caption: yes
+link-citations: yes
+date: '2022-06-13'
+---
+
+# Load librairies 
+
+```{r librairies }
+# Libraries
+library(glue)
+library(sf)
+library(stars)
+library(rgdal)
+library(rgrass7)
+## Define the working directory as the folder where is saved this .Rmd file
+setwd(paste0(dirname(rstudioapi::getSourceEditorContext()$path)))
+```
+
+# French Guiana's border and extent  
+
+```{r borders-extent, eval=FALSE}
+## folder for the country's borders and extent 
+dir.create(paste0(getwd(),"/borders"))
+
+# Function to get the area's extent from GADM version 3.6 (https://gadm.org/download_country36.html)
+get_extent <- function(ISO_country_code, EPSG,
+                       area_borders=NULL,
+                       verbose=TRUE, write=TRUE){
+  
+  if(is.null(area_borders)){
+    URL <- paste0("https://geodata.ucdavis.edu/gadm/gadm3.6/gpkg/gadm36_", ISO_country_code, "_gpkg.zip")
+    # Download file
+    # The coordinate reference system is longitude/latitude and the WGS84 datum.
+    download.file(URL, quiet = !verbose, method="auto",
+                  paste0(getwd(), "/borders/gpkg_gadm36_", ISO_country_code, ".zip"))
+  # Unzip 
+  unzip(paste0(getwd(), "/borders/gpkg_gadm36_", ISO_country_code, ".zip"),
+        exdir=paste0(getwd(), "/borders"), overwrite=TRUE)
+  # Remove zip file
+  file.remove(paste0(getwd(), "/borders/gpkg_gadm36_", ISO_country_code, ".zip"))
+  # Read vector (level 0 for country borders)
+  borders <- sf::st_read(paste0(getwd(), "/borders/gadm36_", ISO_country_code, ".gpkg"),
+                         layer=paste0("gadm36_", ISO_country_code, "_0"), quiet=!verbose)
+  } else{
+  borders <- area_borders  
+  }
+  crs_borders <- st_crs(borders)
+  bb_ll <- st_bbox(borders, crs=crs_borders)
+  bb_utm <- bb_ll %>%
+    st_as_sfc() %>%
+    st_transform(crs=EPSG) %>%
+    st_bbox()
+  
+  # Bounding box for French Guiana
+  xmin <- as.integer((floor(bb_utm$xmin/1000)-5)*1000)
+  xmax <- as.integer((ceiling(bb_utm$xmax/1000)+5)*1000)
+  ymin <- as.integer((floor(bb_utm$ymin/1000)-5)*1000)
+  ymax <- as.integer((ceiling(bb_utm$ymax/1000)+5)*1000)
+  
+  # Print extent with description (xmin, ymin, xmax, ymax)
+  msg <- paste0("Extent of ", ISO_country_code," in EPSG:", EPSG)
+  extent <- glue("xmin: {xmin}, ymin: {ymin}, xmax: {xmax}, ymax: {ymax}")
+  if(write){writeLines(c(msg, extent), paste0(getwd(), "/borders/extent.txt"))}
+  
+  # Print extent (xmin, ymin, xmax, ymax)
+  extent <- glue("{xmin} {ymin} {xmax} {ymax}")
+  if(write){writeLines(extent, paste0(getwd(), "/borders/extent_short.txt"))}
+  
+return(c(xmin, ymin, xmax, ymax))
+}
+
+# Get extent of French Guiana 
+# with a projection: unit=m, EPSG=32622
+ISO_country_code <- "GUF"
+EPSG <- 32622
+Extent <- get_extent(ISO_country_code, EPSG,
+                     write=TRUE, verbose=TRUE)
+nodat <- -32767
+```
+
+# Topographic water index (TWI)
+
+## Elevation 
+
+### Download elevation data 
+
+```{r download-elevation, eval=FALSE}
+## folder for elevation data with 90m resolution
+dir.create(paste0(getwd(),"/srtm_v1_4_90m"))
+## folder for elevation data with 30m resolution
+dir.create(paste0(getwd(),"/srtm_v1_4_30m"))
+
+#====== Elevation #======
+# SRTM at 90m resolution from https://dwtkns.com/srtm/ version 4.1
+## Download and unzip CGIAR-CSI 90m DEM data
+# Function to get tiles number of srtm to download
+tiles_srtm <- function(extent_latlong){
+  # Compute lat/long tiles for SRTM data from an extent.
+  # This function computes lat/long tiles for SRTM data from an extent
+  # in lat/long. See `<http://dwtkns.com/srtm/>`_. SRTM tiles are 5x5
+  # degrees. x: -180/+180, y: +60/-60.
+  # :param extent_latlong: Extent in lat/long: (xmin, ymin, xmax, ymax).
+  # :return: A tuple of two strings indicating tile numbers for lat and long.
+  
+  # Tiles for SRTM data
+  xmin_latlong = floor(extent_latlong[1])
+  ymin_latlong = floor(extent_latlong[2])
+  xmax_latlong = ceiling(extent_latlong[3])
+  ymax_latlong = ceiling(extent_latlong[4])
+  # Compute SRTM tile numbers
+  tile_left = as.integer(ceiling((xmin_latlong + 180.0) / 5.0))
+  tile_right = as.integer(ceiling((xmax_latlong + 180.0) / 5.0))
+  if (tile_right == tile_left){
+    # Trick to make curl globbing work in data_country.sh
+    tile_right = tile_left + 1
+  }
+  tile_top = as.integer(ceiling((-ymax_latlong + 60.0) / 5.0))
+  tile_bottom = as.integer(ceiling((-ymin_latlong + 60.0) / 5.0))
+  if (tile_bottom == tile_top){
+    tile_bottom = tile_top + 1
+  }
+  tiles_long = c(tile_left, tile_right)
+  tiles_lat = c(tile_top, tile_bottom)
+  return(list(long = tiles_long, lat=tiles_lat))
+}
+
+# French Guiana borders in latlong
+ISO_country_code <- "GUF"
+borders <- sf::st_read(paste0(getwd(), "/borders/gadm36_", ISO_country_code, ".gpkg"),
+                       layer=paste0("gadm36_", ISO_country_code, "_0"))
+plot(borders$geom, axes=TRUE)
+extent_latlong <- st_bbox(borders, crs=4326)
+# Get tiles number to download given the French Guiana extent
+tiles <- tiles_srtm(extent_latlong)
+# Format tiles, str_pad is for having 01 and not 1 values
+tiles <- paste(stringr::str_pad(rep(tiles$long[1]:tiles$long[2],
+                                    each=length(tiles$lat[1]:tiles$lat[2])),
+                                width=2, pad="0"), 
+               stringr::str_pad(tiles$lat[1]:tiles$lat[2], width=2, pad="0"), sep="_")
+#tiles <- c("26_11","26_12")
+
+# Download SRTM from https://dwtkns.com/srtm/ version 4.1
+for (i in 1:length(tiles)) {
+  dst <- paste0(paste0(getwd(), "/srtm_v1_4_90m/srtm_"), tiles[i],".zip")
+  url.tile <- paste0("https://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/TIFF/srtm_",
+                     tiles[i],".zip")
+  download.file(url=url.tile, destfile=dst, method="auto", quiet=TRUE)
+  unzip(dst, exdir=paste0(getwd(),"/srtm_v1_4_90m"), overwrite=TRUE)
+}
+# remove zip files 
+srtm.zip <- list.files(paste0(getwd(),"/srtm_v1_4_90m"), pattern=".zip", full.names=TRUE)
+file.remove(srtm.zip)
+
+## Combine the srtm_tiles.tif files downloaded in one map of elevation
+destfile <- paste0(getwd(), "/srtm_v1_4_90m/elevation.vrt")
+sourcefiles <- paste0(getwd(), "/srtm_v1_4_90m/srtm_", tiles, ".tif")
+files.txt <- paste0(getwd(), "/srtm_v1_4_90m/files.txt")
+# write in files.txt the sourcefiles path for srtm_tiles.tif 
+writeLines(sourcefiles, files.txt)
+# Mosaic with gdalbuildvrt 
+system(glue("gdalbuildvrt {destfile} -input_file_list {files.txt}"))
+
+# SRTM at 30m resolution from https://dwtkns.com/srtm30m/ version 4.1
+## Create a free account and login to EOSDIS Earthdata 
+## click to download all tiles of French Guiana
+## Unzip CGIAR-CSI 30m DEM data
+srtm.zip <- list.files(path=paste0(getwd(), "/srtm_v1_4_30m"),
+                        pattern=".zip", full.names = TRUE)
+for (i in 1:length(srtm.zip)) {
+  unzip(srtm.zip[i], exdir=paste0(getwd(),"/srtm_v1_4_30m"), overwrite=TRUE)
+}
+# remove zip files 
+file.remove(srtm.zip)
+
+## Combine the srtm_tiles.hgt files downloaded in one map of elevation
+sourcefiles <- list.files(path=paste0(getwd(), "/srtm_v1_4_30m"),
+                          pattern=".hgt", full.names = TRUE)
+# write in files.txt the sourcefiles path for srtm_tiles.hgt
+files.txt <- paste0(getwd(), "/srtm_v1_4_30m/files.txt")
+writeLines(sourcefiles, files.txt)
+destfile <- paste0(getwd(), "/srtm_v1_4_30m/elevation.vrt")
+# Mosaic with gdalbuildvrt 
+system(glue("gdalbuildvrt {destfile} -input_file_list {files.txt} -srcnodata 0 -vrtnodata -32768"))
+```
+
+### Reproject elevation map from lat-long to meters (EPSG:32622)
+
+```{r reproject-elevation, eval=FALSE}
+## gdalwrap options
+Extent <- readLines(paste0(getwd(), "/borders/extent_short.txt"))
+# projection of source file (latlong)
+proj.s <- "EPSG:4326"
+# projection of output file
+proj.t <- "EPSG:32622" 
+# "EPSG:32622" not legal projection,
+# "EPSG:2972" more conventional
+## Reproject from lat long to UTM32N (epsg: 32622) and reframe on French Guyana
+# (dstnodata need to be set to 32767 as we pass from Int16 (nodata=-32768) to INT2S (nodata=-32767) in R)
+
+# SRTM resolution in m (cells of res x res)
+for(res in c("30","90", "1000")){
+  if(res==1000){
+    sourcefile <- paste0(getwd(), "/srtm_v1_4_90m/elevation.vrt")
+    destfile <- paste0(getwd(), "/srtm_v1_4_90m/elevation_1km.tif")
+  } else{
+    sourcefile <- paste0(getwd(), "/srtm_v1_4_", res, "m/elevation.vrt")
+    destfile <- paste0(getwd(), "/srtm_v1_4_", res, "m/elevation.tif")
+  }
+  system(glue("gdalwarp -overwrite -s_srs {proj.s} -t_srs {proj.t} \\
+            -srcnodata -32768 -dstnodata -32767 \\
+            -r bilinear -tr {res} {res} -te {Extent} -ot Float64 -of GTiff \\
+            {sourcefile} \\
+            {destfile}"))
+}
+```
+
+```{r elev-visualization}
+# Elevation visualization and check with border  
+ISO_country_code ="GUF"
+for(res in c("30","90")){
+  elev <- read_stars(paste0(getwd(), "/srtm_v1_4_", res, "m/elevation.tif"))
+  border <- sf::st_read(paste0(getwd(), "/borders/gadm36_", ISO_country_code, ".gpkg"),
+                        layer=paste0("gadm36_", ISO_country_code, "_0"))
+  border <- st_transform(border, crs=st_crs(elev))
+  plot(elev, axes=TRUE, reset = FALSE, main=paste0("SRTM ",res, "m"))
+  plot(border$geom, add=TRUE, reset=FALSE)
+}
+```
+
+## Compute TWI from elevation 
+
+To do so we use the function [r.topixd](https://grass.osgeo.org/grass78/manuals/r.topidx.html) from the GRASS GIS software.
+
+```{r compute-TWI, eval=FALSE}
+## Initialize GRASS
+# Path to grass library and version of grass in your computer
+Sys.setenv(LD_LIBRARY_PATH=paste("/usr/lib/grass78/lib", Sys.getenv("LD_LIBRARY_PATH"), sep=":"))
+# Use a georeferenced raster
+# to define projection and resolution of maps produced
+for(res in c("30","90")){
+elevation <- paste0(getwd(), "/srtm_v1_4_", res, "m/elevation.tif")
+system(glue('grass -c {elevation} grassdata/environ'))
+# connect to grass database
+initGRASS(gisBase="/usr/lib/grass78", 
+          gisDbase="grassdata", home=tempdir(), 
+          location="environ", mapset="PERMANENT",
+          override=TRUE)
+## Import raster in grass
+system(glue("r.in.gdal --o input={elevation} output=elevation"))
+# Compute radiation
+cmd <- glue("r.topidx --o --verbose --overwrite input=elevation output=TWI")
+system(cmd)
+# Export
+system(glue("r.out.gdal -f --overwrite input=TWI \\
+  			 output={paste0(getwd(), '/output/TWI_', res, 'm.tif')} type=Float64 format=GTiff \\
+  			 createopt='compress=lzw, predictor=2'"))
+}
+```
+
+```{r TWI-visualization}
+# TWI visualization and check with border  
+ISO_country_code ="GUF"
+for(res in c("30","90")){
+TWI<- read_stars(paste0(getwd(), "/output/TWI_", res, "m.tif"))
+border <- sf::st_read(paste0(getwd(), "/borders/gadm36_", ISO_country_code, ".gpkg"),
+                      layer=paste0("gadm36_", ISO_country_code, "_0"))
+border <- st_transform(border, crs=st_crs(TWI))
+plot(TWI, axes=TRUE,reset = FALSE)
+plot(border$geom, add=TRUE, reset=FALSE)
+}
+```
+
+
+# Climatic water deficit (CWD)
+
+##  Download climatic data from Chelsa 
+Chelsa v2.1 Website : <https://chelsa-climate.org/>  
+
+References:   
+
+Scientific publication:  Karger, D.N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W., Zimmermann, N.E., Linder, H.P. & Kessler, M. (2017) Climatologies at high resolution for the earth’s land surface areas. Scientific Data 4, 170122. <https://doi.org/10.1038/sdata.2017.122>.
+
+Data citation: Karger, D.N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W., Zimmermann, N.E., Linder, H.P. & Kessler, M. (2021) Climatologies at high resolution for the earth’s land surface areas. EnviDat. <https://doi.org/10.16904/envidat.228.v2.1>
+
+We download the means monthly precipitation($kg/m^2$ equivalent to $mm$ or $L/m^2$) and potential evapotranspiration ($kg/m^2$), calculated with the Penman-Monteith equation, for the period 1981-2010. 
+
+```{r Download-data-from-Chelsa, eval=FALSE}
+## Create some directories
+dir.create(paste0(getwd(),"/chelsa_v2_1")) ## folder for climatic data
+
+# for(m in stringr::str_pad(1:12, 2, pad = "0")){
+for(m in c(paste0('0',1:9),10:12)){
+  ## Monthly precipitation (mm ~ kg/m2).
+  download.file(paste0('https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/pr/CHELSA_pr_',
+                       m, '_1981-2010_V.2.1.tif'),
+                destfile=paste0(getwd(),"/chelsa_v2_1/", "pr_", m,".tif"), method = 'auto')
+  
+ ## Monthly potential evapotranspiration (mm ~ kg/m2) 
+ ## calculated with the Penman-Monteith equation.
+  download.file(paste0('https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/pet/CHELSA_pet_penman_',
+                       m,'_1981-2010_V.2.1.tif'),
+                destfile=paste0(getwd(), "/chelsa_v2_1/", "pet_", m, ".tif"), method = 'auto')
+}
+```
+
+## Reproject and reframe climatic data on French Guyana 
+
+```{r reproject-prec-pet, eval=FALSE}
+## gdalwrap options
+Extent <- readLines(paste0(getwd(), "/borders/extent_short.txt"))
+# projection of source file (latlong)
+proj.s <- "EPSG:4326"
+# projection of output file
+proj.t <- "EPSG:32622" 
+# Resolution of output file (m)
+Res <- 1000
+# No data of output file
+nodat <- -9999
+# Reproject from lat long to UTM32N (epsg: 32622), set resolution to 1km
+# Reframe on French Guyana and set no data values in sea
+# according to elevation map
+elev <- read_stars(paste0(getwd(), "/srtm_v1_4_90m/elevation_1km.tif"))
+for(var in c("pr", "pet")){
+  files.tif <- list.files(paste0(getwd(), "/chelsa_v2_1"),
+                          pattern=var, full.names = TRUE)
+  for(i in 1:length(files.tif)){
+    sourcefile <- files.tif[i]
+    destfile <- gsub(".tif", "_1km.tif", files.tif[i])
+    system(glue("gdalwarp -overwrite -s_srs {proj.s} -t_srs {proj.t} \\
+        -r bilinear -tr {Res} {Res} -te {Extent} -ot Int16 -of GTiff -srcnodata 0 -dstnodata {nodat} \\
+        {sourcefile} \\
+        {destfile}"))
+  file.remove(sourcefile)
+  }
+  files.tif <- list.files(paste0(getwd(), "/chelsa_v2_1"), pattern=var, full.names = TRUE)
+  r <- read_stars(gtools::mixedsort(files.tif), along="band") 
+  # Define no data values out of French Guyana border 
+  #borders <- sf::st_read(here("data_raw", "fao_gaul", paste0("gadm36_", ISO_country_code, ".gpkg")),
+  #                       layer=paste0("gadm36_", ISO_country_code, "_0"), quiet=!verbose)
+  #st_transform(borders, crs=EPSG)
+  # st_crop(r, borders)
+  # Define no data values in sea according to elevation map 
+  r[[1]][is.na(elev[[1]])] <- nodat
+  write_stars(obj=r, options = c("COMPRESS=LZW","PREDICTOR=2"), NA_value=nodat,
+              dsn=paste0(getwd(), "/chelsa_v2_1/", var,"_1km.tif"))
+ file.remove(files.tif)
+}
+```
+
+## Compute CWD from monthly precipitation and evapotranspiration in French Guiana
+
+The annual climatic water deficit (CWD) in mm, is based on monthly precipitation ($prec$) and potential evapotranspiration ($pet$) which is defined as the amount of evaporation that would occur in a month if a sufficient water source were available: $\mathrm{cwd}= \sum_{m=1}^{12}\min(0, \ \mathrm{prec}_m-\ \mathrm{pet}_m)$.
+
+```{r compute-CWD}
+# Function to compute cwd and ndm 
+cwd.ndm.f <- function(Prec, Pet){
+  nrow <- dim(Prec[,,,1])[1]
+  ncol <- dim(Prec[,,,1])[2]
+  # initialize
+  cwd <- matrix(0, nrow, ncol)
+  ndm <- matrix(0,  nrow, ncol)
+  # loop on months
+  for (i in 1:12){
+    cat(paste("Month: ",i,"\n",sep=""))
+    pe.diff <- Prec[,,,i]-Pet[,,,i]
+    cwd <- cwd + pmin(pe.diff[[1]][,,1], 0.0) # climatic water deficit
+    dm <- matrix(0,  nrow, ncol) # dry month
+    dm[c(pe.diff[[1]][,,1]<0)] <- 1
+    ndm <- ndm+dm
+  }
+  # make stars object
+  CWD <- NDM <- Prec[,,,1]
+  CWD[[1]][,,1] <- -cwd
+  NDM[[1]][,,1] <- ndm
+  NDM[is.na(Pet[,,,1])] <- NA # to account for NA values
+  return (list(CWD=CWD,NDM=NDM))
+}
+
+# Prec and Pet
+Prec <- read_stars(paste0(getwd(), "/chelsa_v2_1/pr_1km.tif"))
+Pet <- read_stars(paste0(getwd(), "/chelsa_v2_1/pet_1km.tif"))
+
+# Compute CWD 
+results <- cwd.ndm.f(Prec, Pet)
+CWD <- results$CWD
+write_stars(CWD, paste0(getwd(), "/output/CWD_1km.tif"), options =c("COMPRESS=LZW","PREDICTOR=2"))
+# CWD visualization and check with border  
+ISO_country_code ="GUF"
+CWD <- read_stars(paste0(getwd(), "/output/CWD_1km.tif"))
+border <- sf::st_read(paste0(getwd(), "/borders/gadm36_", ISO_country_code, ".gpkg"),
+                      layer=paste0("gadm36_", ISO_country_code, "_0"))
+border <- st_transform(border, crs=st_crs(CWD))
+plot(CWD, axes=TRUE,reset = FALSE)
+plot(border$geom, add=TRUE, reset=FALSE)
+```
+
+# Extract data at selected coordinates
+
+```{r extract-data}
+METRADICA_dataset <- read.csv2(paste0(getwd(),"/Metradica - Metradica.csv"), sep=",", header=TRUE)
+# remove NA
+rows_na <- which(METRADICA_dataset[,c("Xutm", "Yutm")]=="",
+                 arr.ind = TRUE)[,"row"]
+dataset <- METRADICA_dataset[-rows_na,]
+# Coordinates
+xy <- as.matrix(dataset[,c("Xutm", "Yutm")])
+# remove comma in numbers 
+xy <- matrix(as.numeric(gsub(",", "", xy)), ncol=2)
+colnames(xy) <- c("Xutm","Yutm")
+# Extract data at selected coordinates 
+## CWD resolution 1km 
+CWD <- read_stars(paste0(getwd(), "/output/CWD_1km.tif"))
+dataset$CWD_1km <- st_extract(x=CWD, at=xy)
+METRADICA_dataset[-rows_na, "CWD_1km"] <- dataset$CWD_1km 
+
+## TWI resolution 30m 
+TWI <- read_stars(paste0(getwd(), "/output/TWI_30m.tif"))
+dataset$TWI_30m <- st_extract(x=TWI, at=xy)
+METRADICA_dataset[-rows_na, "TWI_30m"] <- dataset$TWI_30m 
+
+# Visualization of coordinates 
+xy <- sf::st_as_sf(data.frame(xy), coords=c("Xutm","Yutm"), crs=32622)
+plot(CWD, reset=FALSE, axes=TRUE)
+plot(xy, add=TRUE, reset=FALSE, col='red')
+
+# Save csv 
+write.csv2(METRADICA_dataset, file=paste0(getwd(), "/METRADICA.csv"))
+head(METRADICA_dataset)
+
+# Check with latlong coordinates 
+# Xutm	         Yutm	      Latitude	  Longitude
+# 286,315.69	583,636.63	5.277200222	-52.92810059
+# 286,347.38	583,537.88	5.276299953	-52.92779922
+# 286,328.34	583,621.81	5.277100086	-52.9280014
+print(xy[1:3,])
+print(st_transform(xy[1:3,], crs=4326))
+# Check TWI with existing values
+par(mfrow=c(1,1))
+plot(METRADICA_dataset[657:691,"TWI"],
+     METRADICA_dataset[657:691,"TWI_30m"])
+# don't match but not same computation method and resolution 
+
+```
+
+# Fitting model 
+
+```{r model}
+data <- read.csv2(paste0(getwd(),"/METRADICA.csv"), sep=";", header=TRUE)
+data[,c("Gmin", "TLP")] <- lapply(data[,c("Gmin", "TLP")], as.numeric)
+# remove NA
+data <- data[-is.na(data[,c("Gmin", "TLP")]),]
+mod1 <- lm(log(Gmin) ~ CWD_1km, data)
+mod2 <- lm(log(Gmin) ~ TWI_30m, data)
+# log(TLP) produce NaN (negative values)
+mod3 <- lm(TLP ~ CWD_1km, data)
+mod4 <- lm(TLP ~ TWI_30m, data)
+# summary(mod)
+# plot(mod)
+```
+
+
+
