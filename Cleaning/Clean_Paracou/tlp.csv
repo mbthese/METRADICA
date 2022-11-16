@@ -1,0 +1,244 @@
+Code RWC,idTree,idLeaf,NrRunLeaf,spName,statusLeaf,phenoLeaf,DenseSecVeins,idVapro,NrRunVapro,C_0,comment storag/disc/run/health/pheno,P_osmo,P_tlp
+1,NA,1,1,Iry.hos,healthy,mature,ok,1,8,452,NA,-1.1300000000000001,-1.56787
+2,NA,1,1,Gus.hex,healthy,mature,ok,1,5,624,NA,-1.56,-1.9114400000000002
+3,NA,1,1,Iry.hos,healthy,mature,ok,1,4,411,2 petits trous : herbivory?,-1.0275,-1.4859725000000001
+4,NA,1,1,Tac.mel,herbivory,mature,ok,1,4,604,NA,-1.51,-1.87149
+5,NA,2,1,Chr.pri,healthy,mature,ok,1,7,961,NA,-2.4025,-2.5845975
+6,NA,1,1,Con.gui,healthy,mature,ok,1,5,531,NA,-1.3275000000000001,-1.7256725000000002
+7,NA,1,1,Lic.mem,healthy,mature,ok,1,4,642,un peu herbivorie (-),-1.605,-1.947395
+8,NA,1,1,Iry.hos,healthy,mature,ok,1,6,488,NA,-1.22,-1.63978
+9,NA,1,1,Hym.het,herbivory,mature,ok,1,5,467,Clean avant le suivant,-1.1675,-1.5978325
+10,NA,1,1,Con.gui,healthy,mature,ok,1,4,606,NA,-1.5150000000000001,-1.8754850000000003
+11,NA,1,1,Hym.het,healthy,mature,ok,1,4,423,NA,-1.0575,-1.5099425000000002
+12,NA,5,1,Jac.cop,healthy,mature,ok,1,10,NA,"refait plusieurs fois, pas de stabilisation",NA,NA
+13,NA,1,1,Dic.gui,healthy,mature,ok,1,8,329,NA,-0.8225,-1.3221775
+14,NA,1,1,Dic.gui,healthy,mature,ok,1,8,339,NA,-0.8475,-1.3421525
+15,NA,1,2,Cas.jav,healthy,mature,ok,1,5,681,NA,-1.7025000000000001,-2.0252975
+16,NA,1,1,Hym.het,healthy,mature,ok,1,5,436,qq point d'herbivorie,-1.09,-1.53591
+17,NA,1,1,Boc.pro,healthy,mature,ok,1,8,635,feuille sale (vieille)?,-1.5875000000000001,-1.9334125000000002
+18,NA,1,1,Chr.pri,healthy,mature,ok,1,8,984,NA,-2.46,-2.63054
+19,NA,1,1,Hym.het,herbivory,mature,ok,1,5,434,feuille sale (vieille)?,-1.085,-1.5319150000000001
+20,NA,1,1,Boc.pro,healthy,mature,ok,1,6,503,NA,-1.2575,-1.6697425000000001
+21,NA,1,2,Iry.hos,herbivory,mature,ok,1,4,510,NA,-1.2750000000000001,-1.6837250000000001
+22,NA,1,1,Car.sur,herbivory,mature,ok,1,5,533,NA,-1.3325,-1.7296675000000001
+23,NA,1,1,Epe.fal,healthy,mature,ok,1,4,503,un point d'herbivorie,-1.2575,-1.6697425000000001
+24,NA,1,1,Hym.het,herbivory,mature,ok,1,5,376,NA,-0.9400000000000001,-1.41606
+25,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,pas d'individus,NA,NA
+26,NA,1,1,Hym.het,herbivory,mature,ok,1,5,379,NA,-0.9475,-1.4220525
+27,NA,1,1,Boc.pro,healthy,mature,ok,1,6,558,qq points marrons,-1.395,-1.779605
+28,NA,1,1,Epe.fal,herbivory,mature,ok,1,8,611,NA,-1.5275,-1.8854725
+29,NA,1,1,Por.gui,herbivory,mature,ok,1,5,663,NA,-1.6575,-1.9893425
+30,NA,1,1,Por.gui,healthy,mature,ok,1,6,644,NA,-1.61,-1.9513900000000002
+31,NA,1,1,Esc.cor,healthy,mature,ok,1,7,507,NA,-1.2675,-1.6777325
+32,NA,1,1,Tac.mel,healthy,mature,ok,1,6,472,NA,-1.18,-1.60782
+33,NA,1,1,Gus.hex,healthy,mature,ok,1,5,626,NA,-1.565,-1.915435
+34,NA,1,1,Pro.opa,healthy,mature,ok,1,5,694,qq points marrons,-1.735,-2.051265
+35,NA,1,1,Pro.opa,herbivory,mature,ok,1,5,635,NA,-1.5875000000000001,-1.9334125000000002
+36,NA,1,1,Car.sur,herbivory,mature,ok,1,4,544,NA,-1.36,-1.75164
+37,NA,1,1,Pte.off,herbivory,mature,ok,1,5,451,NA,-1.1275,-1.5658725
+38,NA,1,1,Pte.off,herbivory,mature,ok,1,8,587,NA,-1.4675,-1.8375325
+39,NA,1,1,Pte.off,healthy,mature,ok,1,7,669,NA,-1.6725,-2.0013275000000004
+40,NA,1,1,Boc.pro,herbivory,mature,ok,1,7,635,NA,-1.5875000000000001,-1.9334125000000002
+41,NA,1,1,Pro.opa,healthy,mature,ok,1,6,670,qq points marrons,-1.675,-2.0033250000000002
+42,NA,1,1,Pro.opa,healthy,mature,ok,1,8,765,NA,-1.9125,-2.1930875000000003
+43,NA,1,1,Car.sur,healthy,mature,ok,1,4,485,NA,-1.2125000000000001,-1.6337875000000002
+44,NA,1,1,Pro.opa,healthy,mature,ok,1,5,723,NA,-1.8075,-2.1091925000000002
+45,NA,1,1,Con.gui,healthy,mature,ok,1,5,565,NA,-1.4125,-1.7935875000000001
+46,NA,1,1,Sym.glo,healthy,mature,no,1,4,541,NA,-1.3525,-1.7456475
+47,NA,1,1,Sym.glo,healthy,mature,no,1,4,537,NA,-1.3425,-1.7376575
+48,NA,1,1,Jac.cop,herbivory,mature,ok,1,9,342,NA,-0.855,-1.3481450000000001
+49,NA,1,1,Car.sur,healthy,mature,ok,1,4,556,NA,-1.3900000000000001,-1.7756100000000001
+50,NA,1,1,Gus.hex,herbivory,mature,ok,1,6,734,NA,-1.835,-2.131165
+51,NA,1,1,Dic.gui,herbivory,mature,ok,1,6,470,qq points marrons,-1.175,-1.603825
+52,NA,1,1,Hym.het,herbivory,mature,ok,1,4,424,NA,-1.06,-1.51194
+53,NA,1,1,Boc.pro,herbivory,mature,ok,1,6,573,qq points marrons,-1.4325,-1.8095675000000002
+54,NA,1,1,Pro.opa,healthy,mature,ok,1,8,686,un point d'herbivorie,-1.715,-2.035285
+55,NA,2,1,Jac.cop,healthy,mature,ok,1,10,NA,abandon,NA,NA
+56,NA,1,1,Chr.pri,healthy,mature,ok,1,6,690,NA,-1.725,-2.0432750000000004
+57,NA,1,1,Con.gui,healthy,mature,ok,1,8,514,NA,-1.285,-1.691715
+58,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,pas d'individus,NA,NA
+59,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,pas d'individus,NA,NA
+60,NA,1,1,Con.gui,healthy,mature,ok,1,5,626,NA,-1.565,-1.915435
+61,NA,1,1,Jac.cop,healthy,mature,ok,1,7,369,NA,-0.9225,-1.4020775
+62,NA,1,1,Chr.pri,healthy,mature,ok,1,8,848,NA,-2.12,-2.35888
+63,NA,1,1,Boc.pro,herbivory,mature,ok,1,6,514,NA,-1.285,-1.691715
+64,NA,1,1,Sym.glo,healthy,mature,no,1,4,415,NA,-1.0375,-1.4939625000000003
+65,NA,1,1,Tac.mel,herbivory,mature,ok,1,4,556,NA,-1.3900000000000001,-1.7756100000000001
+66,NA,1,1,Pro.ste,healthy,mature,ok,1,5,747,qq points marrons,-1.8675,-2.1571325000000003
+67,NA,1,1,Esc.cor,herbivory,mature,ok,1,4,445,NA,-1.1125,-1.5538875
+68,NA,1,1,Boc.pro,healthy,mature,ok,1,7,580,qq points marrons,-1.45,-1.82355
+69,NA,1,1,Tac.mel,healthy,mature,ok,1,6,723,NA,-1.8075,-2.1091925000000002
+70,NA,1,1,Con.gui,healthy,mature,ok,1,4,445,NA,-1.1125,-1.5538875
+71,NA,2,1,Jac.cop,healthy,mature,ok,1,10,NA,abandon,NA,NA
+72,NA,1,1,Con.gui,healthy,mature,ok,1,5,512,NA,-1.28,-1.68772
+73,NA,1,1,Car.sur,epiphyte,mature,ok,1,5,535,NA,-1.3375000000000001,-1.7336625
+74,NA,1,1,Lic.mem,herbivory,mature,ok,1,4,638,NA,-1.595,-1.939405
+75,NA,1,1,Boc.pro,herbivory,mature,ok,1,4,501,qq points marrons,-1.2525,-1.6657475
+76,NA,1,1,Esc.cor,healthy,mature,ok,1,7,569,qq points marrons,-1.4225,-1.8015775000000003
+77,NA,1,1,Lae.pro,healthy,mature,ok,1,8,609,NA,-1.5225,-1.8814775000000001
+78,NA,1,1,Car.sur,healthy,mature,ok,1,4,540,NA,-1.35,-1.7436500000000001
+79,NA,1,1,Jac.cop,healthy,mature,ok,1,8,343,NA,-0.8575,-1.3501425
+80,NA,1,1,Esc.cor,herbivory,mature,ok,1,5,511,NA,-1.2775,-1.6857225000000002
+81,NA,1,1,Esc.cor,herbivory,mature,ok,1,9,499,NA,-1.2475,-1.6617525000000002
+82,NA,1,1,Con.gui,healthy,mature,ok,1,7,626,NA,-1.565,-1.915435
+83,NA,1,1,Esc.cor,herbivory,mature,ok,1,5,395,"confusion entre sac Ptlp (belles feuilles) et sac ""rab"" (feuilles abimées) -> ptlp fait avec une feuille sans pétiole",-0.9875,-1.4540125000000002
+84,NA,1,1,Con.gui,healthy,mature,ok,1,5,578,NA,-1.445,-1.8195550000000003
+85,NA,1,1,Epe.fal,herbivory,mature,1,1,6,516,leaf mines,-1.29,-1.69571
+86,NA,1,1,Chr.pri,herbivory,mature,ok,1,6,622,leaf mines,-1.555,-1.907445
+87,NA,1,1,Pro.ste,healthy,mature,ok,1,7,708,NA,-1.77,-2.07923
+88,NA,1,1,Vir.mic,healthy,mature,ok,1,6,530,NA,-1.325,-1.723675
+89,NA,1,1,Esc.cor,healthy,mature,ok,1,5,463,NA,-1.1575,-1.5898425
+90,NA,1,1,Con.gui,herbivory,mature,ok,1,5,479,NA,-1.1975,-1.6218025000000003
+91,NA,1,1,Con.gui,healthy,mature,ok,2,5,554,NA,-1.385,-1.7716150000000002
+92,NA,1,1,Chr.pri,healthy,mature,ok,2,5,890,NA,-2.225,-2.442775
+93,NA,1,1,Chr.pri,healthy,mature,ok,2,5,826,NA,-2.065,-2.314935
+94,NA,1,1,Lic.mem,healthy,mature,ok,2,5,620,NA,-1.55,-1.90345
+95,NA,1,1,Tac.mel,healthy,mature,ok,2,5,565,NA,-1.4125,-1.7935875000000001
+96,NA,1,1,Iry.sag,healthy,mature,ok,2,6,463,NA,-1.1575,-1.5898425
+97,NA,1,1,Lae.pro,healthy,mature,ok,2,10,658,NA,-1.645,-1.9793550000000002
+98,NA,1,1,Iry.sag,healthy,young,ok,1,9,468,NA,-1.17,-1.5998299999999999
+99,NA,1,1,Vou.ame,healthy,mature,ok,1,7,719,NA,-1.7975,-2.1012025000000003
+100,NA,1,1,Esc.cor,healthy,mature,ok,1,6,455,NA,-1.1375,-1.5738625000000002
+101,NA,1,1,Por.gui,healthy,mature,ok,1,4,667,NA,-1.6675,-1.9973325000000002
+102,NA,1,1,Hym.het,herbivory,mature,ok,1,5,424,NA,-1.06,-1.51194
+103,NA,1,1,Esc.cor,epiphyte,mature,ok,1,6,467,NA,-1.1675,-1.5978325
+105,NA,2,2,Cas.jav,healthy,mature,ok,2,4,516,NA,-1.29,-1.69571
+106,NA,1,1,Dic.gui,healthy,mature,ok,2,5,398,NA,-0.995,-1.4600050000000002
+107,NA,1,1,Por.gui,herbivory,mature,ok,2,5,588,NA,-1.47,-1.83953
+108,NA,1,1,Vou.ame,healthy,mature,ok,2,9,719,NA,-1.7975,-2.1012025000000003
+109,NA,1,1,Vou.ame,healthy,mature,ok,2,8,729,NA,-1.8225,-2.1211775
+110,NA,1,1,Pro.ste,healthy,mature,ok,2,4,751,NA,-1.8775,-2.1651225
+111,NA,1,1,Esc.cor,healthy,mature,ok,2,6,432,NA,-1.08,-1.5279200000000002
+112,NA,1,1,Vou.ame,healthy,mature,ok,2,4,641,NA,-1.6025,-1.9453975000000001
+113,NA,1,1,Gus.hex,healthy,mature,ok,2,8,555,NA,-1.3875,-1.7736125
+114,NA,1,1,Lic.mem,healthy,mature,ok,2,6,741,NA,-1.8525,-2.1451475
+115,NA,1,1,Tac.mel,healthy,mature,ok,2,6,554,NA,-1.385,-1.7716150000000002
+116,NA,1,1,Iry.hos,healthy,mature,ok,2,4,544,NA,-1.36,-1.75164
+117,NA,1,1,Esc.cor,herbivory,mature,ok,2,7,387,NA,-0.9675,-1.4380325
+118,NA,1,1,Esc.cor,healthy,mature,ok,2,7,462,NA,-1.155,-1.5878450000000002
+119,NA,1,1,Car.sur,herbivory,mature,ok,2,7,517,NA,-1.2925,-1.6977075000000001
+120,NA,1,1,Iry.hos,herbivory,mature,ok,2,6,448,NA,-1.12,-1.5598800000000002
+121,NA,1,1,Iry.sag,herbivory,mature,ok,2,4,409,NA,-1.0225,-1.4819775000000002
+122,NA,1,1,Esc.cor,herbivory,mature,ok,2,5,528,NA,-1.32,-1.71968
+123,NA,1,1,Iry.hos,herbivory,mature,ok,2,5,478,NA,-1.195,-1.6198050000000002
+124,NA,1,1,Esc.cor,herbivory,mature,ok,2,5,485,NA,-1.2125000000000001,-1.6337875000000002
+125,NA,1,1,Epe.fal,healthy,mature,no,2,10,587,impossible de ne pas prendre une veine en faisant le disque,-1.4675,-1.8375325
+126,NA,1,1,Vou.ame,herbivory,mature,ok,2,9,816,NA,-2.04,-2.29496
+127,NA,1,1,Esc.cor,epiphyte,mature,ok,2,5,452,NA,-1.1300000000000001,-1.56787
+128,NA,1,1,Pro.opa,healthy,mature,ok,2,5,706,NA,-1.7650000000000001,-2.075235
+129,NA,1,1,Vir.mic,healthy,mature,ok,2,5,544,NA,-1.36,-1.75164
+130,NA,1,1,Cas.jav,healthy,young,ok,2,6,734,NA,-1.835,-2.131165
+131,NA,1,1,Lae.pro,healthy,mature,ok,2,9,650,NA,-1.625,-1.963375
+132,NA,1,1,Epe.fal,healthy,mature,no,2,6,529,impossible de ne pas prendre une veine en faisant le disque,-1.3225,-1.7216775000000002
+133,NA,1,1,Vir.sur,healthy,mature,ok,2,9,528,NA,-1.32,-1.71968
+134,NA,1,1,Boc.pro,healthy,mature,ok,2,6,584,NA,-1.46,-1.8315400000000002
+135,NA,3,1,Jac.cop,healthy,mature,ok,1,NA,NA,pas de stabilisation,NA,NA
+136,NA,1,1,Sym.glo,healthy,mature,ok,2,9,497,NA,-1.2425,-1.6577575
+137,NA,1,1,Boc.pro,healthy,young,ok,1,5,400,NA,-1,-1.464
+138,NA,1,1,Lae.pro,healthy,mature,ok,1,9,541,NA,-1.3525,-1.7456475
+139,NA,1,1,Sym.glo,healthy,mature,no,1,6,537,NA,-1.3425,-1.7376575
+140,NA,1,1,Por.gui,healthy,mature,ok,2,6,637,NA,-1.5925,-1.9374075000000002
+141,NA,1,1,Tac.mel,healthy,mature,ok,2,5,597,NA,-1.4925,-1.8575075
+142,NA,1,1,Chr.pri,healthy,mature,ok,1,4,317,NA,-0.7925,-1.2982075000000002
+143,NA,1,1,Pro.opa,healthy,mature,ok,1,4,630,NA,-1.575,-1.9234250000000002
+144,NA,1,1,Car.sur,healthy,mature,ok,2,5,550,NA,-1.375,-1.763625
+145,NA,1,1,Pro.ste,healthy,mature,ok,1,8,714,NA,-1.7850000000000001,-2.091215
+146,NA,1,1,Lic.mem,healthy,mature,ok,2,5,609,NA,-1.5225,-1.8814775000000001
+147,NA,1,1,Epe.fal,healthy,mature,ok,1,6,438,NA,-1.095,-1.539905
+148,NA,1,1,Lae.pro,healthy,mature,ok,2,4,499,NA,-1.2475,-1.6617525000000002
+149,NA,1,1,Pte.off,healthy,mature,ok,2,5,476,NA,-1.19,-1.6158100000000002
+150,NA,1,1,Boc.pro,herbivory,mature,ok,2,4,744,NA,-1.86,-2.1511400000000003
+151,NA,1,1,Por.gui,healthy,mature,ok,2,4,697,NA,-1.7425,-2.0572575
+152,NA,1,1,Cas.jav,healthy,mature,ok,2,7,729,NA,-1.8225,-2.1211775
+153,NA,1,1,Dic.gui,healthy,mature,ok,2,6,516,NA,-1.29,-1.69571
+154,NA,1,1,Iry.sag,healthy,mature,ok,2,4,477,NA,-1.1925000000000001,-1.6178075
+155,NA,1,1,Boc.pro,healthy,mature,ok,1,4,390,NA,-0.975,-1.4440250000000001
+156,NA,1,1,Por.gui,healthy,mature,ok,1,7,706,NA,-1.7650000000000001,-2.075235
+157,NA,1,1,Pro.opa,healthy,mature,ok,1,7,809,NA,-2.0225,-2.2809775
+158,NA,1,1,Iry.hos,healthy,mature,ok,1,5,500,NA,-1.25,-1.66375
+159,NA,1,1,Esc.cor,healthy,mature,ok,1,8,511,NA,-1.2775,-1.6857225000000002
+160,NA,1,1,Por.gui,healthy,mature,ok,1,10,677,pas bon !!,-1.6925000000000001,-2.0173075000000003
+161,NA,1,1,Chr.pri,healthy,mature,ok,1,10,772,NA,-1.93,-2.20707
+162,NA,1,1,Jac.cop,healthy,mature,ok,1,10,445,NA,-1.1125,-1.5538875
+163,NA,1,1,Tac.mel,healthy,mature,ok,1,8,632,NA,-1.58,-1.9274200000000001
+164,NA,1,1,Boc.pro,herbivory,mature,ok,1,6,606,"tachee, spots",-1.5150000000000001,-1.8754850000000003
+165,NA,1,1,Lae.pro,healthy,mature,ok,1,9,696,avec fleurs,-1.74,-2.05526
+166,NA,1,1,Por.gui,healthy,mature,ok,1,8,577,NA,-1.4425000000000001,-1.8175575000000002
+167,NA,1,1,Esc.cor,healthy,mature,ok,1,10,484,NA,-1.21,-1.63179
+168,NA,1,1,Jac.cop,healthy,mature,ok,1,9,428,NA,-1.07,-1.51993
+169,NA,1,1,Tac.mel,healthy,mature,ok,1,10,551,NA,-1.3775,-1.7656225
+170,NA,1,1,Iry.sag,healthy,mature,ok,1,6,465,NA,-1.1625,-1.5938375000000002
+171,NA,1,1,Hym.het,healthy,mature,ok,2,4,368,NA,-0.92,-1.40008
+172,NA,1,1,Con.gui,healthy,mature,ok,2,7,593,NA,-1.4825,-1.8495175000000001
+173,NA,1,1,Hym.het,healthy,mature,ok,2,4,413,NA,-1.0325,-1.4899675000000001
+174,NA,1,1,Jac.cop,healthy,mature,ok,2,NA,NA,fait deux fois sans succes,NA,NA
+175,NA,1,1,Dic.gui,healthy,mature,ok,1,7,396,NA,-0.99,-1.45601
+176,NA,1,1,Con.gui,healthy,mature,ok,2,4,624,NA,-1.56,-1.9114400000000002
+177,NA,1,1,Jac.cop,healthy,mature,ok,2,7,581,NA,-1.4525000000000001,-1.8255475
+178,NA,2,1,Pte.off,healthy,mature,ok,2,4,372,arbre de la vieille refait JYG,-0.93,-1.4080700000000002
+179,NA,1,1,Hym.het,healthy,mature,ok,2,5,348,NA,-0.87,-1.36013
+180,NA,NA,NA,Jac.cop,NA,NA,ok,NA,NA,NA,missing,NA,NA
+181,NA,1,1,Hym.het,healthy,mature,ok,2,4,431,NA,-1.0775000000000001,-1.5259225
+182,NA,1,1,Pte.off,healthy,mature,ok,2,10,476,NA,-1.19,-1.6158100000000002
+183,NA,1,1,Con.gui,healthy,mature,ok,2,10,488,NA,-1.22,-1.63978
+184,NA,1,1,Por.gui,healthy,mature,ok,2,4,601,NA,-1.5025,-1.8654975
+185,NA,1,1,Hym.het,healthy,mature,ok,2,4,431,NA,-1.0775000000000001,-1.5259225
+186,NA,1,2,Jac.cop,healthy,mature,ok,2,9,356,NA,-0.89,-1.3761100000000002
+187,NA,1,1,Jac.cop,healthy,mature,ok,2,10,402,completement noire,-1.0050000000000001,-1.4679950000000002
+188,NA,1,1,Jac.cop,healthy,mature,ok,2,4,430,completement noire,-1.075,-1.5239250000000002
+189,NA,1,1,Vir.mic,healthy,mature,ok,2,7,686,NA,-1.715,-2.035285
+190,NA,1,1,Vir.mic,healthy,mature,ok,2,9,681,NA,-1.7025000000000001,-2.0252975
+191,NA,1,1,Por.gui,healthy,mature,ok,2,6,594,NA,-1.485,-1.8515150000000002
+192,NA,1,1,Jac.cop,healthy,mature,ok,2,10,291,completement noire,-0.7275,-1.2462725000000001
+193,NA,1,1,Vir.mic,healthy,mature,ok,2,6,530,NA,-1.325,-1.723675
+194,NA,1,1,Tac.mel,healthy,mature,ok,2,10,788,NA,-1.97,-2.23903
+195,NA,1,1,Con.gui,healthy,mature,ok,2,4,498,NA,-1.245,-1.659755
+196,NA,1,1,Hym.het,healthy,mature,ok,2,5,399,NA,-0.9975,-1.4620025
+197,938,1,1,Pro.opa,healthy,mature,ok,2,6,803,NA,-2.0075,-2.2689925
+198,NA,1,1,Hym.het,healthy,mature,ok,1,NA,452,manque les 1ere valeurs /oubli ouverture logiciel/ 1pt herbi,-1.1300000000000001,-1.56787
+199,NA,1,1,Boc.pro,healthy,mature,ok,1,5,502,manque la 1re valeur (voir cahier)/1 pt herbi,-1.2550000000000001,-1.6677450000000003
+200,NA,1,1,Hym.het,healthy,mature,ok,1,5,399,NA,-0.9975,-1.4620025
+201,NA,1,1,Epe.fal,healthy,mature,no,1,10,661,ok,-1.6525,-1.9853475000000003
+202,NA,1,1,Epe.fal,healthy,mature,no,1,8,538,NA,-1.345,-1.7396550000000002
+203,NA,1,1,Esc.cor,herbivory,mature,ok,1,5,536,NA,-1.34,-1.7356600000000002
+204,NA,1,1,Lae.pro,healthy,mature,ok,1,10,586,NA,-1.465,-1.8355350000000001
+205,NA,1,1,Iry.hos,herbivory,mature,ok,1,7,489,feuille noire,-1.2225,-1.6417775
+206,NA,1,1,Car.sur,herbivory,mature,ok,1,8,582,NA,-1.455,-1.8275450000000002
+207,NA,1,1,Sym.glo,healthy,mature,no,2,4,523,NA,-1.3075,-1.7096925000000003
+208,926,1,1,Car.sur,healthy,mature,ok,2,6,529,NA,-1.3225,-1.7216775000000002
+209,NA,1,1,Sym.glo,healthy,mature,no,2,9,590,NA,-1.475,-1.843525
+210,NA,1,1,Chr.pri,healthy,mature,ok,2,6,789,NA,-1.9725000000000001,-2.2410275000000004
+211,NA,1,1,Con.gui,healthy,mature,ok,2,4,582,NA,-1.455,-1.8275450000000002
+212,NA,1,1,Hym.het,healthy,mature,ok,2,4,441,NA,-1.1025,-1.5458975000000001
+213,927,1,1,Epe.fal,healthy,mature,ok,2,8,610,NA,-1.5250000000000001,-1.8834750000000002
+214,NA,1,1,Hym.het,herbivory,mature,ok,2,3,428,NA,-1.07,-1.51993
+215,NA,1,1,Hym.het,herbivory,mature,ok,2,6,433,NA,-1.0825,-1.5299175000000003
+216,NA,1,1,Esc.cor,herbivory,mature,ok,2,6,429,NA,-1.0725,-1.5219275
+217,NA,1,1,Tac.mel,healthy,mature,ok,1,4,491,NA,-1.2275,-1.6457725
+218,NA,1,2,Cas.jav,healthy,mature,ok,1,8,578,NA,-1.445,-1.8195550000000003
+219,NA,1,1,Tac.mel,healthy,mature,ok,1,8,694,NA,-1.735,-2.051265
+220,NA,1,1,Tac.mel,healthy,mature,ok,1,6,608,NA,-1.52,-1.87948
+221,720,1,1,Pte.off,healthy,mature,ok,2,8,600,NA,-1.5,-1.8635000000000002
+222,499,1,1,Esc.cor,healthy,mature,ok,2,6,644,NA,-1.61,-1.9513900000000002
+223,928,1,1,Sym.glo,healthy,mature,no,2,5,510,NA,-1.2750000000000001,-1.6837250000000001
+224,782,1,1,Hym.het,healthy,mature,ok,2,4,400,NA,-1,-1.464
+225,912,1,1,Epe.fal,healthy,mature,ok,2,8,558,NA,-1.395,-1.779605
+226,797,1,1,Pte.off,herbivory,mature,ok,2,6,546,NA,-1.365,-1.755635
+227,634,1,1,Pte.off,healthy,young,ok,2,8,449,NA,-1.1225,-1.5618775
+228,629,1,1,Sym.glo,healthy,mature,no,2,3,591,NA,-1.4775,-1.8455225000000002
+229,737,1,1,Pte.off,healthy,young,ok,2,8,417,NA,-1.0425,-1.4979575
+230,NA,1,1,Tac.mel,herbivory,mature,ok,1,6,615,NA,-1.5375,-1.8934625000000003
+231,NA,1,1,Chr.pri,healthy,mature,ok,1,7,653,NA,-1.6325,-1.9693675000000002
+232,NA,1,1,Sym.glo,healthy,mature,no,2,4,479,NA,-1.1975,-1.6218025000000003
+233,NA,1,1,Lae.pro,healthy,young,ok,2,5,552,NA,-1.3800000000000001,-1.7676200000000002
+234,NA,1,1,Con.gui,healthy,mature,ok,2,6,626,NA,-1.565,-1.915435
+235,NA,1,1,Vir.mic,healthy,mature,ok,2,4,814,NA,-2.035,-2.290965
+236,NA,1,1,Jac.cop,healthy,mature,ok,2,8,344,NA,-0.86,-1.35214
+237,NA,1,1,Chr.pri,healthy,mature,ok,2,8,848,NA,-2.12,-2.35888
+238,NA,2,1,Hym.het,herbivory,young,ok,2,9,566,NA,-1.415,-1.7955850000000002
+239,NA,1,1,Hym.het,healthy,mature,ok,2,8,458,NA,-1.145,-1.5798550000000002
+240,NA,1,1,Epe.fal,healthy,mature,ok,1,4,454,NA,-1.135,-1.571865
+241,NA,1,2,Jac.cop,healthy,mature,ok,2,10,373,NA,-0.9325,-1.4100675
+242,NA,1,1,Boc.pro,healthy,mature,ok,2,5,587,NA,-1.4675,-1.8375325
+243,NA,1,1,Con.gui,healthy,mature,ok,2,6,577,NA,-1.4425000000000001,-1.8175575000000002
+244,NA,1,1,Tac.mel,herbivory,mature,ok,1,5,582,NA,-1.455,-1.8275450000000002

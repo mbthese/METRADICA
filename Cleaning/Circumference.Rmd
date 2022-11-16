@@ -1,0 +1,64 @@
+---
+title: "DBH"
+author: "Marion Boisseaux"
+date: "24/08/2022"
+output: html_document
+---
+# Libraries
+```{r}
+library(readxl)
+library(rio)
+library(dplyr)
+library(tidyverse)
+```
+
+
+
+# Paracou Data
+Adding DBH info
+
+```{r}
+Paracou <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=0", range = "individuals") %>% 
+  select(Code, idTree, Plot, SubPlot, FieldNbr, Genus, Species) %>% rename(TreeFieldNum = FieldNbr)
+
+Paracou_database <- read_delim("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/SIG/Qgis_Paracou/Txt/Paracou_database20210830_bis.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+Paracou_database <- Paracou_database %>% select(idTree, Plot, SubPlot, TreeFieldNum, Genus, Species, Circ, CircCorr)
+
+A <- left_join(Paracou, Paracou_database)
+
+#export(A, "A.csv")
+
+
+Circumpherence <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Circumpherence.xlsx")
+
+A <-  left_join(Paracou, Circumpherence)
+
+export(A, "A.csv")
+```
+
+#bafog
+
+```{r}
+
+Bafog_Gaelle <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Document/202012_SelectionIndividus_V6.1Bafog (1).xlsx", 
+    sheet = "IndAMesurer", col_types = c("skip", 
+        "numeric", "text", "numeric", "numeric", 
+        "skip", "skip", "text", "skip", "skip", 
+        "skip", "skip", "skip", "numeric", 
+        "numeric", "numeric", "text", "text", 
+        "numeric", "text"))
+
+Bafog_Gaelle <- Bafog_Gaelle %>% select(idTree, Plot, SubPlot, TreeFieldNum, TaxonActu,Circ)
+
+Bafog_Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/14E9RjSB4dq8epcDBqMtRi1HOGddbhLOWA8g6TF1bDWM/edit#gid=0", range = "individuals") %>% 
+  select(Code, idTree, Plot, SubPlot, FieldNbr, Genus, Species) %>% rename(TreeFieldNum = FieldNbr)
+
+Bafog_Gaelle$Plot <- as.numeric(Bafog_Gaelle$Plot)
+Bafog_Metradica$idTree <- as.numeric(Bafog_Metradica$idTree)
+
+A <-  left_join(Bafog_Metradica,Bafog_Gaelle, by= "idTree")
+
+export(A, "A.csv")
+```
+

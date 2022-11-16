@@ -31,7 +31,7 @@ Data cleaning of Metradica files from the four campaigns :
 3- Kaw
 4- Paracou FTH
 
-# I - Paracou campaign
+# I - Paracou first campaign
 
 **Paracou **: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually).
 
@@ -582,6 +582,8 @@ After all annotated images, I will generate the excel to calculte the stomatal d
 stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_stomates/MetradicaParacou - stomata.csv") 
 
 stomata_tidy <- stomata %>% select(Code, SpCode, StomatalDensity_Stomate_mm2)
+
+stomata_tidy <- stomata_tidy %>% filter(Code < 245)
 
 write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv")
 
@@ -1363,3 +1365,305 @@ Kaw <- Kaw[!(Kaw$Code=="569"),]
 
 write_csv(Kaw, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw.csv")
 ```
+
+
+#IV - FTH : Paracou - Second campaign
+
+For this second campaign, the purpose was to complete the sampling of the first field campaign at Paracou's site. This was done through the HydroITV project (*sylvainschmitt.github.io/hydroITV/*) carried out in September 2021.
+
+
+##individuals
+
+Only 35 individuals from the 100 sampled for the HydroITV project were common to the Metradica project.
+
+```{r}
+FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/individuals_FTH2021.csv")
+
+FTH_individuals <- FTH_individuals %>%
+          mutate(Name = paste0(Genus, " ", Species)) %>%
+          relocate(Name, .after = Species)
+
+write_csv(FTH_individuals, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_individuals.csv")
+```
+
+##gmin
+
+gmin realised by hand by the students
+```{r FTH manual student}
+gmin_students <- read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/hydroITV_FTH_20220114.xlsx", sheet = "ind_gmin")
+
+gmin_students <- gmin_students %>% rename(CodeFTH = FieldCode, gmin_manual_student = gmin) %>% select(CodeFTH, gmin_manual_student)
+
+gmin_students_suite <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/gmin/Calculgmin/Gmin_FTHwithLA94.csv", sep = ";") %>% select(Code, gmin_manuel) %>% rename(CodeFTH = Code, gmin_manual_student = gmin_manuel)
+
+gmin_students_all <- rbind(gmin_students, gmin_students_suite)
+```
+
+
+gmin function developped by Daniela Krebber. 
+
+```{r FTH function DK}
+gmin_DK <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Gmin/input/Metradica/Paracou/output/Metradica_FTH_Gmin_Clean_OUT.csv")
+
+```
+
+Comparaison of the gmin calculation done by the students and gmin measurement calculated by D. Krebber function.
+
+```{r FTH gmin compare}
+A <- gmin_students_all %>% select(CodeFTH, gmin_manual_student)
+
+B <- gmin_DK %>% select(CodeFTH, gmin.slope) 
+  
+C <- left_join(B,A, by = "CodeFTH") %>% mutate(Diff = abs(gmin_manual_student - gmin.slope))
+
+C$CodeFTH <- as.character(C$CodeFTH)
+
+Diff_graph <- ggplot(C) +
+  aes(
+    x = gmin.slope,
+    y = gmin_manual_student,
+    colour = CodeFTH
+  ) +
+  geom_point(shape = "circle", size = 1.5) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() + 
+  geom_abline()
+
+library(plotly)
+library(ggplot2)
+ggplotly(Diff_graph)
+
+#Stong difference are found for CodeFTH 4 et 30 which are no on the 1:1 line.
+
+```
+
+
+*CodeFTH 4 was noted: Code_Meas_Quality = 3* 
+*CodeFTH 30 was noted: Code_Meas_Quality = 2* **potential_measurement_error**
+
+For these values a different - less conservative R2 selection critera was used.
+We keep track of this in the Measurement_quality_Code.
+
+- Code 1: Good original criteria - at least 4 points, & 1.4 h of consecutive measurements
+- CODE 2: Instead of minimum measurement time of 1.4 h from which the slope is calculated only 1 h could be chosen 
+- CODE 3: Instead of minimum measurements 4 from which the slope is calculated only 3 could be chosen 
+- CODE 4: Even after being more liberal with the R2 selection criteria R2 is still not good 
+
+
+
+
+
+###final gmin FTH data
+```{r final gmin FTH data for metradica}
+final_FTH_gmin <- gmin_DK #I conserved the gmin calculated by D.K. function. 
+
+#These 2 measurements for CodeFTH4 and 30 are really not optimal: I decided to remove them from my gmin FTH analysis.
+
+final_FTH_gmin <- final_FTH_gmin[!(final_FTH_gmin$CodeFTH=="4"),]
+final_FTH_gmin <- final_FTH_gmin[!(final_FTH_gmin$CodeFTH=="30"),]
+
+write_csv(final_FTH_gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_gmin.csv")
+```
+
+
+#lswc
+```{r}
+RWCMetradica_FTH<- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/rwc/RWC_20211001.xlsx")
+
+ 
+
+RWCMetradica_FTH <- RWCMetradica_FTH[!is.na(RWCMetradica_FTH$DW),]
+
+```
+
+
+## rename column names 
+```{r}
+names(RWCMetradica_FTH)
+```
+
+Check DataStructure of the columns
+```{r}
+str(RWCMetradica_FTH) #columns are ok in structure
+```
+
+
+## get rid of unnecessary rows where there is no corresponding sample 
+
+```{r}
+
+RWCMetradica_FTH <- RWCMetradica_FTH %>% mutate(Code_skipped = ifelse(is.na(`FW+BW`) &
+                                            is.na(FW) &                                 
+                                           is.na(SW) & 
+                                           is.na(DW), 1, 0))
+
+# only keep rows that are samples
+RWCMetradica_FTH <- RWCMetradica_FTH %>% filter(Code_skipped != 1)
+
+#checks
+
+RWC  <- RWCMetradica_FTH  %>% 
+  select(Code, FW, SW, DW, Comment_Lab, Comment_Weight_Bag, Comment_Field) %>% 
+  mutate(C = SW - FW) %>% 
+  mutate(C2 = SW - DW)
+
+RWC$Code[which(RWC$C < 0 )] #juste pour regarder quand SW- FW < 0 ce qui ne devrait pas arriver.
+
+# [1]  3  7 14 26 27 28 51 66 74 82 83 85 90 94
+
+#but no special comments
+
+RWC$Code[which(RWC$C2 < 0 )] #juste pour regarder quand SW- DW < 0 , ok nothing
+
+```
+
+
+##calculate LSWC
+
+```{r}
+RWCMetradica_FTH <-RWCMetradica_FTH %>%
+  mutate(LSWC = (SW - DW)/ SW) 
+
+```
+
+##final fth lswc
+
+```{r}
+final_FTH_lswc <- RWCMetradica_FTH %>% 
+  select(Code, FW, SW, DW, LSWC) %>%
+  rename(CodeFTH = Code)
+
+#recoupe avec les individus de metradica seulement
+FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_individuals.csv")
+
+lswc <- left_join(FTH_individuals, final_FTH_lswc)
+
+write_csv(lswc, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_lswc.csv")
+```
+
+
+#stomata
+
+```{r stomata FTH}
+stomata_fth <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_stomates/MetradicaParacou - stomata.csv") 
+
+stomata_tidy <- stomata %>% select(Code, SpCode, StomatalDensity_Stomate_mm2)
+
+stomata_tidy <- stomata_tidy %>% filter(Code > 244)
+
+write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_stomata.csv")
+```
+
+#fvfm
+```{r}
+fvfm <- read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/hydroITV_FTH.xlsx", sheet = "ind_soft") %>%
+  select(Sample, FvFm) %>%
+  na.omit() %>%
+  rename(CodeFTH =Sample)
+
+#recoupe avec les individus de metradica seulement
+FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_individuals.csv")
+
+fvfm_tidy <- left_join(FTH_individuals, fvfm)
+
+A <- fvfm_tidy$CodeFTH[which(fvfm_tidy$FvFm > 1 )]
+
+# 13 15 16 21 24 30 31 38 41 43 44 47 49 58 60 63 65 67 69 70 75 77
+
+#pour des raisons d'efficacité pour rentrer les valeurs brutes, seulement les 3 chiffres après la virgule étaient rentrés.
+
+#correction
+fvfm_tidy <- fvfm_tidy %>% 
+  mutate(FvFm_corr = case_when(FvFm < 1 ~ FvFm,
+                        FvFm > 1  ~ FvFm *0.001))
+
+fvfm_tidy <- fvfm_tidy %>% select(Code, FvFm_corr) %>% rename(fvfm = FvFm_corr)
+
+write_csv(fvfm_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_fvfm.csv")
+```
+
+#tlp
+
+```{r}
+tlp <- read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/hydroITV_FTH.xlsx", sheet = "ind_ptlp") %>% rename(CodeFTH = Sample, tlp =Ptlp)
+
+#recoupe avec les individus de metradica seulement
+FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_individuals.csv")
+
+tlp <- left_join(FTH_individuals, tlp)
+
+write_csv(tlp, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_tlp.csv")
+```
+
+
+#chemistry
+```{r chem fth}
+library(readr)
+#chemistry from all sites
+Chemistry <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/Chemistry.csv") 
+
+#only fth
+Chemistry_FTH <- Chemistry %>% 
+  filter(Code > 656) %>%
+  filter(Code < 692)
+
+write_csv(Chemistry_FTH, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_chemistry.csv")
+```
+
+#majvla
+
+```{r majvla FTH}
+
+Veindata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/Scoffoni_FTHdata.csv") %>% select(Code, spName, midribVLA_S1,	SecondaryVLA_S1,	TertiaryVLA_S1,	MajVLA_S1,	midribVLA_S2,	SecondaryVLA_S2,	TertiaryVLA_S2,	MajVLA_S2) 
+
+
+#averaging the two students' measurements
+Veindata_tidy <- Veindata %>% mutate(MajVLA = (MajVLA_S1 + MajVLA_S2)/2, midribVLA = (midribVLA_S1+ midribVLA_S2)/2, SecondaryVLA = (SecondaryVLA_S1 + SecondaryVLA_S2) / 2, 	TertiaryVLA = (	TertiaryVLA_S1+ 	TertiaryVLA_S2)/2) %>% select(Code, spName, midribVLA , SecondaryVLA, TertiaryVLA ,  MajVLA) %>% na.omit()
+
+
+write_csv(Veindata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_majvla.csv")
+```
+
+
+#join all fth traits
+```{r}
+FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_individuals.csv")
+
+
+Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_gmin.csv") %>% 
+  select(Code, gmin.slope) %>% rename(gmin = gmin.slope) 
+
+TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_tlp.csv") %>%
+  select(Code, tlp) 
+
+Vein <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_majvla.csv") %>% select(-spName)
+
+Vein$Code <- as.numeric(Vein$Code)
+
+Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_chemistry.csv")  %>% select(Code, X.N, X.C, `P..g.kg.`, `Ca..g.kg.`, `Na..g.kg.`, `K..g.kg.`) %>% rename(N = X.N, C = X.C, P =`P..g.kg.`, Ca= `Ca..g.kg.`, Na= `Na..g.kg.`, K= `K..g.kg.`)
+
+
+LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_lswc.csv") %>% select(Code, LSWC)
+
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_stomata.csv") %>% select(Code, StomatalDensity_Stomate_mm2
+) %>% rename(SD = StomatalDensity_Stomate_mm2
+)
+
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv") %>% select(Code, fvfm)
+
+FTH <- left_join(FTH_individuals, Gmin, by="Code")
+FTH <- left_join(FTH, TLP, by="Code")
+FTH <- left_join(FTH, Vein, by="Code")
+FTH <- left_join(FTH, Chem, by="Code")
+FTH <- left_join(FTH, LSWC, by="Code")
+FTH <- left_join(FTH, Stomata, by="Code")
+FTH <- left_join(FTH, fvfm, by="Code")
+
+##final fth trait data for metradica
+
+write_csv(FTH, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH.csv")
+```
+
+
+```
+

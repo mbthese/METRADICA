@@ -1,0 +1,184 @@
+Code,idTree,Genus,Species,Name,Forest,Habitat,Type,TreeHeight,TreeDawkins,BranchHeight,BranchDawkins,CrownPosition,DBH,Xutm,Yutm,TWI
+474,252041,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,32,5,25,4,Mid,31.5,369234,505012.3,6.166006
+475,252055,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,25,4,20,4,Inf,39,369242.4,505016.3,6.166006
+476,252075,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,25,3,23,3,Mid,35.3,369255.1,504995.2,6.166006
+477,252028,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,15,2,14,2,Mid,13.7,369265.9,504988.2,6.166006
+478,252488,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,33,5,26,5,Mid,55,369318.9,505019,6.350865
+479,252192,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,18,2,15,2,Mid,32.1,369288.9,504971.9,6.350865
+480,252197,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,18,3,16,2,Mid,16.2,369295.7,504967.3,6.350865
+481,252485,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,TF,Generalist,15,4,12,3,Mid,12.8,369321.1,505017.4,6.350865
+482,252326,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,14,3,12,2,Sup,24.2,369316.1,504974.9,6.350865
+483,252541,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,13,3,8,3,Mid,15.7,369329.5,505030.7,6.143994
+484,252542,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,TF,Generalist,20,4,17,4,Mid,19.5,369329.9,505029,6.143994
+485,,Licania,membranacea,Licania_membranacea,Kaw,TF,TF,28,3,26,2,Mid,43.7,369288.92,504948.61,6.350865
+486,252501,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,23,4,21,4,Sup,22.9,369311.7,505034.9,6.143994
+487,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,34,5,24,3,Inf,60,369264.27,504933.62,6.166006
+488,252099,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,20,3,15,2,Inf,31,369275.5,504960.2,6.166006
+489,252025,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,17,2,15,2,Mid,20.4,369253.5,504974.3,6.166006
+490,252475,Chrysophyllum,prieurii,Chrysophyllum_prieurii,Kaw,TF,Generalist,12,2,8,2,Inf,12.7,369337.5,504999.5,6.350865
+491,252565,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,10,2,8,2,Inf,10.3,369343.6,504996.9,6.350865
+492,252128,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,13,3,12,2,Mid,16.2,369272.5,504977.8,6.166006
+493,,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,25,5,18,5,Sup,40,369255.55,505026.38,6.961741
+494,252179,Bocoa,prouacensis,Bocoa_prouacensis,Kaw,TF,Generalist,18,2,16,2,Mid,27.4,369276.1,504993.3,6.166006
+495,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,TF,Generalist,30,4,22,2,Inf,45,369179.66,505028.39,6.756272
+496,252169,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,17,3,15,3,Sup,19.4,369271.5,505015,6.166006
+497,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,26,4,18,4,Inf,,355585.47,521648.05,8.813516
+498,252658,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,24,3,20,3,Mid,44.6,369228,505034.5,6.961741
+499,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,33,5,31,5,Sup,,369255.5,505074.3,6.961741
+500,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,TF,Generalist,21,3,16,3,Mid,22.9,369415.07,504946.41,6.908254
+501,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,25,4,18,3,Inf,46,369377.06,504973.33,6.908254
+502,252513,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,8,2,8,2,Sup,15.6,369302.2,505052.5,6.143994
+503,252397,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,20,4,16,3,Mid,14.4,369290.5,505046.8,6.143994
+504,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,10,4,9,4,Sup,14.7,357840.84,521575.51,9.898855
+505,,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,25,4,16,4,Mid,55,369100.11,505026.53,6.756272
+506,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,32,5,28,5,Sup,33,369013.73,504986.1,8.694102
+507,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,25,3,18,3,Mid,38.2,369020.52,504998.91,8.694102
+508,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,32,5,30,5,Sup,45,368845.79,505007.93,8.020427
+509,,,,_,Kaw,,,,,,,,,,,
+510,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,17,5,17,5,Sup,19,368863.54,505006.91,8.020427
+511,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,23,4,21,2,Mid,49.5,368843.25,505013.8,8.020427
+512,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,25,3,21,3,Inf,49.8,368711.86,504929.87,6.550724
+513,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,24,4,22,4,Sup,35.2,368714.3,504933.41,7.879825
+514,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,21,4,21,4,Sup,26.5,368711.64,504931.53,7.879825
+515,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,24,3,20,3,Sup,33.9,369018.87,504940.32,8.694102
+516,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,22,4,10,3,Mid,70,369017.62,504928.49,6.198997
+517,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,26,4,22,4,Sup,33.1,369024.61,504925.6,6.198997
+518,,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,22,3,18,3,Mid,38.2,369446.12,505006.07,6.908254
+519,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,TF,Generalist,28,3,20,3,Inf,60,369451.65,504994.33,6.908254
+520,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,18,2,15,3,Mid,22.3,368687.3,504906.36,6.550724
+521,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,24,5,15,4,Inf,24.5,368699.27,504895.29,6.550724
+522,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,23,3,15,2,Inf,33.6,369253.5,504974.3,6.166006
+523,,Vouacapoua,americana,Vouacapoua_americana,Kaw,TF,TF,25,2,12,2,Inf,29.5,368645.25,504839.65,8.916615
+524,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,35,5,33,5,Sup,50,368644.62,504862.99,6.905595
+525,,Licania,membranacea,Licania_membranacea,Kaw,TF,TF,32,4,28,3,Mid,46,368834.68,504259.23,7.686897
+526,,Gustavia,hexapetala,Gustavia_hexapetala,Kaw,TF,TF,14,3,13,2,Sup,20,368906.23,504114.17,8.654542
+527,,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,13,4,12,3,Sup,13,368924.51,504094.02,7.841443
+528,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,37,5,35,5,Sup,,368927.41,504109.16,7.841443
+529,,Bocoa,prouacensis,Bocoa_prouacensis,Kaw,TF,Generalist,35,5,31,4,Mid,45,368925.62,504032.98,7.841443
+530,,Licania,membranacea,Licania_membranacea,Kaw,TF,TF,18,2,15,2,Inf,11,368925.22,504129.62,8.127021
+531,,Licania,membranacea,Licania_membranacea,Kaw,TF,TF,16,3,14,2,Mid,10.5,368911.52,504022.17,6.924703
+532,,,,_,Kaw,,,,,,,,,,,
+533,,,,_,Kaw,,,,,,,,,,,
+534,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,24,4,21,4,Sup,38.2,357834.42,521519.91,9.898855
+535,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,26,5,24,5,Sup,57.3,357843.33,521539.57,9.898855
+536,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,13,5,13,5,Sup,25.5,357828.88,521523.9,9.898855
+537,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,13,5,12,5,Sup,26.4,357829.76,521521.13,9.898855
+538,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,26,5,20,4,Inf,55,355555,521671.52,8.174161
+539,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,18,2,16,3,Mid,22.7,355555.45,521671.96,8.174161
+540,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,22,3,18,3,Mid,25.8,355559.54,521665.77,8.813516
+541,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,15,3,15,3,Sup,22.4,355575.06,521662.42,8.813516
+542,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,14,3,14,3,Sup,19.2,355576,521687.29,8.174161
+543,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,14,3,12,3,Mid,14,355570.65,521677.68,8.174161
+544,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,26,5,16,4,Mid,60,355581.87,521685.96,8.174161
+545,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,25,5,24,5,Sup,40.5,355567.96,521659.44,8.813516
+546,,Laetia,procera,Laetia_procera,Kaw,BF,BF,28,5,26,5,Sup,42.4,355568.87,521674.7,8.174161
+547,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,16,4,10,3,Inf,34,355584.34,521700.55,8.174161
+548,,Laetia,procera,Laetia_procera,Kaw,BF,BF,19,4,17,4,Sup,40.8,355583.44,521691.59,8.174161
+549,,Laetia,procera,Laetia_procera,Kaw,BF,BF,15,4,13,4,Mid,27,355587.23,521704.74,8.174161
+550,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,26,5,20,4,Mid,43,355580.47,521645.05,8.813516
+551,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,37,5,34,5,Mid,50,355553.49,521632.71,8.813516
+552,,Laetia,procera,Laetia_procera,Kaw,BF,BF,17,3,13,3,Inf,26,355573.68,521636.1,8.813516
+553,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,14,3,10,3,Mid,14.2,355598.52,521628.76,8.813516
+554,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,20,4,17,3,Mid,23.6,355595.17,521619.15,8.813516
+555,,Laetia,procera,Laetia_procera,Kaw,BF,BF,27,5,27,5,Sup,26.4,355594.19,521628.66,8.813516
+556,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,38,5,38,5,Sup,50,355562.32,521614.68,8.813516
+557,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,12,4,8,3,Inf,21,355577.48,521589.99,8.813516
+558,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,17,5,16,4,Sup,36.5,357372.06,521330.47,7.071829
+559,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,15,2,15,2,Sup,20.2,357372.37,521325.72,7.071829
+560,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,16,4,16,4,Sup,25,357376.71,521326.6,7.071829
+561,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,19,5,18,5,Sup,29,357364.5,521325.19,7.071829
+562,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,18,4,16,4,Sup,31.5,357368.73,521332.81,7.071829
+563,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,24,5,23,4,Mid,75.2,357348.12,521343.45,7.071829
+564,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,18,3,16,4,Sup,26.5,357350.78,521341.68,7.071829
+565,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,12,2,12,2,Sup,19.7,357349.11,521342.57,7.071829
+566,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,16,4,14,2,Mid,45.4,357341.24,521346.12,7.071829
+567,,Virola,surinamensis,Virola_surinamensis,Kaw,BF,BF,19,5,17,4,Mid,42,357980.2,509509.3,6.345963
+568,,,,_,Kaw,,,,,,,,,,,
+569,,,,_,Kaw,,,,,,,,,,,
+570,,Laetia,procera,Laetia_procera,Kaw,BF,BF,14,4,14,4,Sup,15.2,357324.84,521352.45,7.071829
+571,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,23,5,20,4,Mid,50.4,357421.49,521311.14,6.819372
+572,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,28,5,20,3,Inf,50,358212.22,509274.35,5.707512
+573,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,23,4,19,4,Inf,32,357991.63,509260.59,6.816395
+574,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,19,4,15,3,Mid,47,358211.98,509263.19,5.707512
+575,,Tachigali,melinonii,Tachigali_melinonii,Kaw,TF,Generalist,35,5,28,4,Mid,60,358119.6,509226.53,7.479839
+576,,Protium,stevensonii,Protium_stevensonii,Kaw,TF,Generalist,20,4,17,3,Inf,60,358141.47,509226.38,6.754034
+577,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,TF,Generalist,32,5,32,5,Sup,40.7,358257.83,509276.03,5.707512
+578,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,25,4,16,4,Inf,35.9,358273.25,509280.44,5.707512
+579,,Licania,membranacea,Licania_membranacea,Kaw,TF,TF,18,4,16,4,Mid,18.6,358245.23,509367.94,6.703697
+580,,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,24,5,18,4,Inf,36.5,358258.38,509341.16,6.703697
+581,,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,29,5,25,4,Inf,,358247.64,509412.28,6.703697
+582,228348,Iryanthera,sagotiana,Iryanthera_sagotiana,Kaw,TF,TF,23,3,21,3,Mid,27.1,358016,509470.9,6.345963
+583,228463,Poraqueiba,guianensis,Poraqueiba_guianensis,Kaw,TF,TF,14,2,12,2,Inf,14.3,357992.1,509456.7,6.345963
+584,228208,Gustavia,hexapetala,Gustavia_hexapetala,Kaw,TF,TF,14,3,11,3,Inf,21.6,358035.3,509486,6.690291
+585,228431,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,20,2,17,2,Mid,35.3,357997.2,509467.8,6.345963
+586,228391,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,19,2,16,2,Inf,23.4,358001.3,509465.8,6.345963
+587,228447,Bocoa,prouacensis,Bocoa_prouacensis,Kaw,TF,Generalist,12,3,11,2,Mid,19.4,357967.8,509483.2,6.345963
+588,228227,Gustavia,hexapetala,Gustavia_hexapetala,Kaw,TF,TF,14,3,12,2,Mid,18.5,357992.4,509507.9,6.345963
+589,228279,Gustavia,hexapetala,Gustavia_hexapetala,Kaw,TF,TF,15,2,13,2,Mid,19.7,357980.2,509509.3,6.345963
+590,228529,Gustavia,hexapetala,Gustavia_hexapetala,Kaw,TF,TF,18,4,13,2,Inf,25.9,357945.1,509476.3,6.345963
+591,228580,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,14,4,12,3,Inf,18.8,357929.5,509475.8,5.748245
+592,228337,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,12,2,7,2,Inf,12.6,357972.2,509506.6,6.345963
+593,228578,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,18,4,8,3,Inf,22.1,357933.7,509473.3,5.748245
+594,228374,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,8,2,6,2,Inf,21.7,357963.6,509503.3,6.345963
+595,228344,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,13,4,8,3,Inf,15.3,357956.4,509515,6.345963
+596,228576,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,23,4,16,3,Inf,34.9,357941.3,509470.7,6.345963
+597,228575,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,14,3,11,3,Mid,13.8,357941.6,509468.3,6.345963
+598,228574,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,14,2,8,2,Inf,10.3,357944.7,509465.2,6.345963
+599,228608,Eschweilera,coriacea,Eschweilera_coriacea,Kaw,TF,Generalist,24,2,10,3,Inf,20.4,357938.4,509465.3,5.748245
+600,228495,Virola,michelii,Virola_michelii,Kaw,TF,Generalist,13,3,8,3,Mid,18.1,357937.2,509487.1,5.748245
+601,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,BF,Generalist,13,4,10,3,Inf,25,355580.47,521587.88,8.813516
+602,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,BF,Generalist,18,4,15,3,Mid,25,355554.52,521593.91,8.813516
+603,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,19,4,16,2,Inf,36,355569.09,521615.32,8.813516
+604,,Hymenopus,heteromorphus,Hymenopus_heteromorphus,Kaw,BF,Generalist,17,4,15,3,Mid,20,355559.39,521587.48,8.813516
+605,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,20,5,18,5,Sup,25,355557.72,521585.6,8.813516
+606,,Protium,opacum subsp. rabelianum,Protium_opacum subsp. rabelianum,Kaw,BF,BF,12,4,8,4,Mid,15.5,355606.79,521605.41,9.580924
+607,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,12,5,12,5,Sup,17.5,355615.43,521595.45,9.580924
+608,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,34,5,15,3,Inf,53,355599.91,521598.91,8.813516
+609,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,25,5,20,5,Inf,48,355612.2,521592.14,9.580924
+610,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,35,5,30,5,Sup,40,355632.96,521599.17,9.580924
+611,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,24,5,20,5,Inf,49,357834.42,521518.91,9.898855
+612,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,27,5,20,5,Mid,59,357835.42,521518.91,9.898855
+613,,Symphonia,globulifera,Symphonia_globulifera,Kaw,BF,BF,23,5,21,4,Inf,50,357836.42,521518.91,9.898855
+614,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,9,4,9,4,Sup,23.9,353580.68,524240.17,11.116259
+615,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,12,4,9,3,Mid,11.6,353575.71,524251.13,11.116259
+616,,Carapa,guianensis,Carapa_guianensis,Kaw,BF,BF,20,5,20,4,Sup,37.4,353576.24,524242.06,11.116259
+617,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,13,5,13,4,Sup,13.1,353578.36,524248.36,11.116259
+618,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,18,5,18,4,Sup,22.9,353571.7,524243.73,11.116259
+619,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,14,2,14,2,Mid,17.2,353565.04,524242.63,11.116259
+620,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,,,,,,11.5,353571.69,524238.31,11.116259
+621,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,10,2,8,3,Mid,15.3,353561.49,524242.32,11.116259
+622,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,12,3,10,3,Sup,12.4,353564.6,524244.18,11.116259
+623,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,10,4,8,3,Mid,17,353558.71,524239.77,11.116259
+624,,Pterocarpus,officinalis,Pterocarpus_officinalis,Kaw,BF,BF,12,3,12,3,Sup,13.1,353591.02,524253.09,11.116259
+625,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,BF,Generalist,16,5,16,5,Sup,31.5,348611.92,518241.8,8.638255
+626,,Laetia,procera,Laetia_procera,Kaw,BF,BF,18,4,18,4,Sup,53,349086.24,517761.78,9.967717
+627,,Laetia,procera,Laetia_procera,Kaw,BF,BF,19,4,19,4,Sup,27,349054.06,517758.54,9.967717
+628,,Laetia,procera,Laetia_procera,Kaw,BF,BF,18,4,18,3,Sup,20.2,369316.1,504974.9,6.350865
+629,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,15,4,15,4,Sup,18.9,349061.94,517758.74,9.967717
+630,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,22,5,20,4,Sup,64.7,349024.99,517758.59,7.249273
+631,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,16,3,14,4,Mid,33,349083.57,517757.15,9.967717
+632,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,14,4,14,4,Sup,13.7,349028.66,517759.58,7.249273
+633,,Laetia,procera,Laetia_procera,Kaw,BF,BF,22,5,22,5,Sup,45,357991.63,509260.59,6.816395
+634,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,16,4,15,3,Mid,28,348991.49,517756,7.249273
+635,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,24,5,20,4,Sup,53,349001.36,517756.98,7.249273
+636,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,18,4,18,4,Sup,25.5,349350.07,517371.41,9.064654
+637,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,12,3,11,2,Mid,18,348996.05,517757.98,7.249273
+638,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,18,4,11,3,Inf,40,348996.16,517761.19,7.249273
+639,,Eperua,falcata,Eperua_falcata,Kaw,BF,BF,23,2,20,3,Inf,47,348975.51,517756.7,7.249273
+640,,Tachigali,melinonii,Tachigali_melinonii,Kaw,BF,Generalist,28,5,26,4,Mid,63.5,348537.04,517902.28,16.003884
+641,,Tachigali,melinonii,Tachigali_melinonii,Kaw,BF,Generalist,13,4,12,4,Sup,15.5,348513.72,518001.95,9.564647
+642,,Tachigali,melinonii,Tachigali_melinonii,Kaw,BF,Generalist,40,5,36,4,Mid,55,348500.67,518027.74,9.564647
+643,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,BF,Generalist,33,5,31,3,Mid,48,348458.31,518033.79,14.969712
+644,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,BF,Generalist,23,5,23,5,Sup,25,348611.92,518241.8,8.638255
+645,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,15,3,13,3,Mid,17,349350.07,517371.41,9.064654
+646,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,14,2,11,2,Mid,13.3,349362.42,517387.97,9.064654
+647,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,7,1,6,2,Mid,10.8,349350.9,517451.46,7.597216
+648,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,11,2,9,3,Mid,11.6,349365.22,517456.96,7.597216
+649,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,9,2,8,2,Mid,12.1,349377.39,517445.22,7.597216
+650,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,8,2,8,2,Sup,11.5,349377.28,517443.34,7.597216
+651,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,BF,Generalist,15,5,15,5,Sup,21,348115.57,518289.88,11.688863
+652,,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,Kaw,BF,Generalist,18,5,18,5,Sup,22,348346.13,517680.19,10.442858
+653,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,10,2,8,2,Mid,20,348562.06,518101.26,8.069429
+654,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,11,4,9,2,Mid,24,348546.12,518061.15,9.564647
+655,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,12,2,8,3,Mid,23,369334.3,504965.5,6.350865
+656,,Iryanthera,hostmannii,Iryanthera_hostmannii,Kaw,BF,BF,12,2,8,2,Mid,18,348525.23,518102.55,8.069429
