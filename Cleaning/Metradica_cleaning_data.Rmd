@@ -1,0 +1,1365 @@
+---
+title: "Cleaning"
+author: "Marion Boisseaux"
+date: "2022-10-15"
+output: html_document
+---
+
+# R environement for this code
+
+
+*R version used 4.2.1*
+*Packages are managed by an renv.lock for this project.*
+
+##librairies
+```{r eval=FALSE, include=FALSE}
+library(googlesheets4)
+gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(readr)
+```
+
+
+# Introduction
+
+Data cleaning of Metradica files from the four campaigns :
+
+1- Paracou
+2- Bafog
+3- Kaw
+4- Paracou FTH
+
+# I - Paracou campaign
+
+**Paracou **: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually).
+
+## gmin
+
+Using a combination of gmin function developped by D. Krebber and rectifying some individuals manually.
+
+Minimum point chosen : 3
+Minimum time lapse : 1.4 hours
+
+Leaf area including petiole was calculated using imageJ.
+
+After calculations with the gmin R project from the raw data, last steps are:
+
+```{r}
+Gmin_Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/  gmin_Paracou.csv", 
+    col_types = cols(Code = col_integer()))
+Gmin_Paracou <- rename(Gmin_Paracou, Code = rwcNr)
+
+library(readxl)
+Leaf_area <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/input/LAgminParacou.xlsx")
+Leaf_area <- rename(Leaf_area, Leaf_area = LA_gmin)
+Leaf_area<- select(Leaf_area, Code, Leaf_area)
+
+Leaf_area$Code <- as.integer(Leaf_area$Code)
+
+
+Gmin <- left_join(Gmin_Paracou, Leaf_area, by= "Code")
+
+
+#Check NA values for Leaf area
+
+Gmin %>% filter(is.na(Leaf_area))
+Gmin <- Gmin %>% filter(!is.na(Leaf_area))
+Gmin <- Gmin %>%
+  mutate(gmin.slope_function =-(beta/60/VPD_mean*1000/18/(Leaf_area*2/10000)))
+
+```
+
+### checking errors for gmin
+
+ -Individual 10 : OK, but Daniela 9.621 
+ -Individual 26 : NON : 17.67 calculated manually (but Daniela 17.86)
+ -Individual 66: NON 9.01 calculated manually (But Daniela 19.08)
+ -Individual 96: OK
+ -Individual 108: OK
+ -Individual 145: OK
+ -Individual 157 : NON 3.07 calculated manually (But Daniela 3.33)
+ -Individual 184 : OK
+ -Individual 212 : NON 10.05 calculated manually (but Daniela 12.38)
+ -Individual 214 : NON 8.12 calculated manually (But Daniela 8.83)
+
+```{r}
+Gmin$gmin[Gmin$Code == 26] <- 17.67
+Gmin$gmin[Gmin$Code == 66] <- 9.01
+Gmin$gmin[Gmin$Code == 157] <- 3.07
+Gmin$gmin[Gmin$Code == 212] <- 10.05
+Gmin$gmin[Gmin$Code == 214] <- 8.12
+
+
+Gmin$Code[which(Gmin$gmin >10)]
+#[1] 212  26  96
+
+Gmin$Gmin[which(Gmin$gmin >10)]
+#[1] 10.05000 17.67000 13.52127 
+
+#Yes, these were re-checked. 
+
+```
+
+
+```{r}
+#save gmin file
+
+write.csv(Gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv", row.names = FALSE)
+```
+
+
+## tlp
+
+We assessed the leaf turgor loss point, $\pi_{tlp}$ in MPa, from a previously established relationship with the osmotic potential at full hydration, $\pi_{osm}$ in MPa. $\pi_{osm}$ is linked to the equilibrium solute concentration value $C_0$ (in mmol.kg^{-1}) directly measured with a vapor pressure osmometer (Vapro 5600, Wescor, Logan, UT). This is referred as the *osmometer method* (Bartlett et al. 2012a; Maréchaux et al. 2016).
+
+### Uploading Ptlp data
+ 
+Uploading Ptlp data from vapro excel files for all the 16 field days of METRADICA- Paracou 2020.
+```{r setup, include=FALSE}
+#####DO NOT MODIFY THIS CODE
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(ggplot2)
+library(forcats)
+library(questionr)
+#####DO NOT MODIFY THIS CODE - This will import the raw data
+
+## Chargement des donnees Ptlp--------------------
+
+#for i (1:10) trouver fonction de concatenation fichiers
+#read_excel(concaténer "fichier"fonction concatenation pour le i"suite du fichier")
+
+
+Jour_1_5 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_1_5_Ptlp_31_11_2020.xlsx", 
+                                       sheet = "LAB_PiTlp", col_types = c("skip", 
+                                                                          "skip", "skip", "numeric", "numeric", 
+                                                                          "numeric", "numeric", "text", "skip", 
+                                                                          "text", "text", "text", "skip", "skip", 
+                                                                          "skip", "numeric", "skip", "skip", 
+                                                                         "skip", "numeric", "numeric", "text"))
+
+Jour_6 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_6_Ptlp_4_11_2020.xlsx", 
+                                    col_types = c("skip", "skip", "skip", 
+                                                  "numeric", "numeric", "numeric", 
+                                                  "numeric", "text", "skip", "text", 
+                                                  "text", "text", "skip", "skip", "skip", 
+                                                  "numeric", "skip", "skip", "skip", 
+                                                  "numeric", "numeric", "text"))
+
+
+Jour_7 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_7_Ptlp_05_11_2020-1.xlsx", 
+                     col_types = c("skip", "skip", "skip", 
+                                   "numeric", "numeric", "numeric", 
+                                   "numeric", "text", "skip", "text", 
+                                   "text", "text", "skip", "skip", "skip", 
+                                   "numeric", "skip", "skip", "skip", 
+                                   "numeric", "numeric", "text"))
+
+Jour_8 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_8_Ptlp_06_11_2020.xlsx", 
+                     col_types = c("skip", "skip", "skip", 
+                                   "numeric", "numeric", "numeric", 
+                                   "numeric", "text", "skip", "text", 
+                                   "text", "text", "skip", "skip", "skip", 
+                                   "numeric", "skip", "skip", "skip", 
+                                   "numeric", "numeric", "text"))
+
+Jour_9 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_9_Ptlp_07_11_2020.xlsx", 
+                     col_types = c("skip", "skip", "skip", 
+                                   "numeric", "numeric", "numeric", 
+                                   "numeric", "text", "skip", "text", 
+                                   "text", "text", "skip", "skip", "skip", 
+                                   "numeric", "skip", "skip", "skip", 
+                                   "numeric", "numeric", "text"))
+
+Jour_10 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_10_Ptlp_10_11_2020.xlsx", 
+                     col_types = c("skip", "skip", "skip", 
+                                   "numeric", "numeric", "numeric", 
+                                   "numeric", "text", "skip", "text", 
+                                   "text", "text", "skip", "skip", "skip", 
+                                   "numeric", "skip", "skip", "skip", 
+                                   "numeric", "numeric", "text"))
+Jour_11 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_11_Ptlp_12_11_2020.xlsx", col_types = c("skip", "skip", "skip", 
+                                                                                                                    "numeric", "numeric", "numeric", 
+                                                                                                                    "numeric", "text", "skip", "text", 
+                                                                                                                    "text", "text", "skip", "skip", "skip", 
+                                                                                                                    "numeric", "skip", "skip", "skip", 
+                                                                                                                    "numeric", "numeric", "text"))
+
+
+Jour_12_1 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_12_Ptlp_14_11_2020_1.xlsx", 
+                     col_types = c("skip", "skip", "skip", 
+                                   "numeric", "numeric", "numeric", 
+                                   "numeric", "text", "skip", "text", 
+                                   "text", "text", "skip", "skip", "skip", 
+                                   "numeric", "skip", "skip", "skip", 
+                                   "numeric", "numeric", "text"))
+
+
+Jour_12_2 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_12_Ptlp_14_11_2020-2.xlsx", 
+                        col_types = c("skip", "skip", "skip", 
+                                      "numeric", "numeric", "numeric", 
+                                      "numeric", "text", "skip", "text", 
+                                      "text", "text", "skip", "skip", "skip", 
+                                      "numeric", "skip", "skip", "skip", 
+                                      "numeric", "numeric", "text"))
+
+
+Jour_13 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_13_Ptlp_17_11_2020.xlsx", 
+                        col_types = c("skip", "skip", "skip", 
+                                      "numeric", "numeric", "numeric", 
+                                      "numeric", "text", "skip", "text", 
+                                      "text", "text", "skip", "skip", "skip", 
+                                      "numeric", "skip", "skip", "skip", 
+                                      "numeric", "numeric", "text"))
+
+Jour_14 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_14_Ptlp_20_11_2020.xlsx", 
+                      col_types = c("skip", "skip", "skip", 
+                                    "numeric", "numeric", "numeric", 
+                                    "numeric", "text", "skip", "text", 
+                                    "text", "text", "skip", "skip", "skip", 
+                                    "numeric", "skip", "skip", "skip", 
+                                    "numeric", "numeric", "text"))
+
+Jour_15 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_15_Ptlp_1_12_2020.xlsx", 
+                      col_types = c("skip", "skip", "skip", 
+                                    "numeric", "numeric", "numeric", 
+                                    "numeric", "text", "skip", "text", 
+                                    "text", "text", "skip", "skip", "skip", 
+                                    "numeric", "skip", "skip", "skip", 
+                                    "numeric", "numeric", "text"))
+
+Jour_16 <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_Ptlp/Excel_Ptlp/Jour_16_Ptlp_08_12_2020.xlsx", 
+                      col_types = c("skip", "skip", "skip", 
+                                    "numeric", "numeric", "numeric", 
+                                    "numeric", "text", "skip", "text", 
+                                    "text", "text", "skip", "skip", "skip", 
+                                    "numeric", "skip", "skip", "skip", 
+                                    "numeric", "numeric", "text"))
+
+
+
+
+# Uniting excel Ptlp files  
+
+Ptlp_tidy <- bind_rows(Jour_1_5,Jour_6,Jour_7,Jour_8,Jour_8,Jour_9,Jour_10,Jour_11,Jour_12_1,Jour_12_2,Jour_13,Jour_14,Jour_15,Jour_16)
+
+
+```
+
+
+### Tidying Ptlp data
+
+### Renaming variables
+
+```{r}
+Ptlp_tidy <- rename(Ptlp_tidy, 'NrRunLeaf' = 'nrRun...4', 'NrRunVapro' =  'nrRun...10' )
+
+Ptlp_tidy <- rename(Ptlp_tidy,'C_0' = Posm) # le vapro mesure une concentration
+```
+
+### Arranging the tibble
+```{r}
+Ptlp_tidy <- Ptlp_tidy %>% arrange(`Code RWC`) #sort ascending
+
+View(Ptlp_tidy)
+```
+
+### Identify duplicates
+
+```{r}
+
+#1 (seul vrai doublon avec deux bonnes valeurs), 55, 98, 107, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 160 (nvarpo==10 donc on garde le 160bis)
+Doublons <-  filter(Ptlp_tidy, duplicated(`Code RWC`))
+
+# enlever les vrais doublons
+Ptlp_tidy <-  unique(Ptlp_tidy)
+
+
+#Doublons restants: 1;55;98;107;160 
+Doublons_2 <-  filter(Ptlp_tidy, duplicated(`Code RWC`))
+View(Doublons_2)
+
+Ptlp_tidy <- Ptlp_tidy[-2,] #choix pour le RWC Code 1 : stabilisation + longue.
+Ptlp_tidy <- Ptlp_tidy[-56,] #RWC Code 55, les deux étaient 'abandon'
+Ptlp_tidy <- Ptlp_tidy[-99,] #RWC Code 98 vrai doublon mais non detecté avant car NA en spName
+Ptlp_tidy <- Ptlp_tidy[-104,] #RWC code 104 not the good species, not Cas. jav from RWC raw data comment 
+Ptlp_tidy <- Ptlp_tidy[-107,] #RWC Code 107 vrai doublon mais non detecté avant car NA en spName
+Ptlp_tidy <- Ptlp_tidy[-160,] #On garde le 160bis
+
+```
+
+#### recoding certain values 
+##### species name mistakes
+Some species names had mistakes like *Symp.glo* instead of *Sym.glo*.
+```{r}
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Car sur'='Car.sur')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Car.pro'='Car.sur')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Chr pri'='Chr.pri')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Con gui'='Con.gui')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Dir.cor'='Dic.gui')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Epe fal'='Epe.fal')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Esc cor'='Esc.cor')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Hym het'='Hym.het')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Iry.has'='Iry.hos')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Jac.cap'='Jac.cop')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Jac cap'='Jac.cop')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Lae pro'='Lae.pro')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Pro Opa'='Pro.opa')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Symp.glo'='Sym.glo')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Sym glo'='Sym.glo')
+Ptlp_tidy$spName <- recode(Ptlp_tidy$spName, 'Vir mic'='Vir.mic')
+```
+
+
+
+##### handling missing data
+Three individuals are missing from the sampling: RWC Code 58,59,25.
+Some individuals have no values for the $C_0$ because the osmometer could not stabilize and get a value. 
+
+```{r echo=FALSE}
+kable(colSums(is.na(Ptlp_tidy)))
+```
+
+
+#### from $C_0$ to $\pi_{osm}$ to $\pi_{tlp}$
+
+The equilibrium solute concentration value $C_0$ (in mmol.kg^{-1}) was recorded from the osmometer when the difference between two consecutive measurements fell below 5 mmol.kg^{-1}. This value was converted to $\pi_{osm}$ values using the van't Hoff equation:  
+ 
+ $\pi_{osm}$ = $(-2.5/1000)$x$C_0$
+ 
+  where the numerator of the first term represents RxT = 2.5 L.MPa.mol^{-1}^ at 25°C, with R the ideal gas constant and T the temperature in Kelvin degrees.
+  
+The value $\pi_{osm}$ was then converted to $\pi_{tlp}$ using the following equation:  
+ 
+$\pi_{tlp}$= ( 0.799x $\pi_{osm}$ ) -0.665
+ 
+```{r}
+# Calculate new numeric variables with math formulas
+
+Ptlp_tidy<- mutate(Ptlp_tidy, P_osmo=(-2.5/1000)*C_0)
+Ptlp_tidy <- mutate(Ptlp_tidy, P_tlp=(0.799*P_osmo)-0.665) #Maréchaux formula adapted from bartlett but for tropical species.
+
+view(Ptlp_tidy)
+
+```
+
+#### checking for errors
+
+- Code 142 : nothing to report
+- Code 238 : young + herbivory
+- Code 177 : nothing to report, but jacaranda is known to have blackened leaves.
+- Code 39 : nothing to report
+- Code 221 : nothing to report
+- Code 194 : nothing to report
+- Code 126 : herbivory 
+
+
+#### printing the tidy data 
+```{r echo=TRUE, message=TRUE, warning=TRUE}
+
+Ptlp_tidy
+write_csv(Ptlp_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/tlp.csv")
+```
+
+
+## majvla
+
+The leaf is a critical component in the plant water transport system, accounting for 30% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011).
+
+
+Leaf area (LA, mm2 ) 
+Major vein density (Major VLA, mm/mm2) : vein length per unit area 
+Sum of vein densities for 1°, 2° and 3° veins (mm mm-2)
+Double sided lamp flatbed scanner
+ImageJ
+
+Measurements from Scoffoni's Lab. These measures were calculated by a student group project from January - March 2022.
+
+```{r Vein Paracou, eval=FALSE, include=FALSE}
+library(readxl)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+Veindata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/Scoffoni_Paracoudata.csv") %>% select(Code, spName, midribVLA_S1,	SecondaryVLA_S1,	TertiaryVLA_S1,	MajVLA_S1,	midribVLA_S2,	SecondaryVLA_S2,	TertiaryVLA_S2,	MajVLA_S2) 
+
+
+#averaging the two students' measurements
+Veindata_tidy <- Veindata %>% mutate(MajVLA = (MajVLA_S1 + MajVLA_S2)/2, midribVLA = (midribVLA_S1+ midribVLA_S2)/2, SecondaryVLA = (SecondaryVLA_S1 + SecondaryVLA_S2) / 2, 	TertiaryVLA = (	TertiaryVLA_S1+ 	TertiaryVLA_S2)/2) %>% select(Code, spName, midribVLA , SecondaryVLA, TertiaryVLA ,  MajVLA) %>% na.omit()
+
+
+write_csv(Veindata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/majvla.csv")
+```
+
+
+## chemistry
+
+```{r Chemistry Paracou}
+library(readr)
+#chemistry from all sites
+Chemistry <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/Chemistry.csv") 
+
+#only paracou
+Chemistry_Paracou <- Chemistry %>% filter(Code < 245)
+
+write_csv(Chemistry_Paracou, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/chemistry.csv")
+```
+
+
+## lswc
+
+The relative water content (RWC; %) was calculated as (fresh weight - dry weight) / (turgid weight - dry weight) * 100. 
+
+#### setting up the R environment
+```{r setup, include=FALSE}
+#####DO NOT MODIFY THIS CODE
+knitr::opts_chunk$set(echo = TRUE)
+
+## packages---------------------------
+#install.packages("tidyverse")
+#install.packages("readxl")
+#install.packages("devtools")
+
+## libraries------------------------
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(ggplot2)
+library(forcats)
+library(questionr)
+```
+
+#### uploading RWC data
+
+Uploading RWC data from excel file for all the 16 field days of METRADICA- Paracou 2020.
+
+
+```{r setup, include=FALSE}
+RWC_Paracou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_RWC/METRADICA_RWC.xlsx")
+
+View(RWC_Paracou)
+```
+
+#### tidy
+
+```{r setup, include=FALSE}
+d<- select(RWC_Paracou, -DateMeasBag, -NameBagWeight, -DateField, -NameFW, -DateFW, -TimeFW, -idSample,
+           -NameSW, -DateSW, -timeSW, -NameDW, -DateDW, -timeDW, -CommentField)
+
+d<- rename(d, Code = BagNr., `Fresh_Weight(g)` = `FW(g)`,
+           `Saturated_Weight(g)` = `SW(g)`,
+           `Dry_Weight(g)` = `DW(g)`,
+           `Bag_Weight(g)` = `WeightWhirlPak(g)`,
+           `Delta_Weight_SW-FW(g)` = `DeltaWeightSW-FW`)
+
+
+# <- d %>% separate(spName, c("Genus", "Species"))
+
+#d$Genus <- str_replace(d$Genus, "Boc", "Bocoa") 
+#d$Genus <- str_replace(d$Genus, "Car", "Carapa")
+#d$Genus <- str_replace(d$Genus, "Cas", "Casearia")
+#d$Genus <- str_replace(d$Genus, "Chr", "Chrysophyllum")
+#d$Genus <- str_replace(d$Genus, "Con", "Conceveiba")
+#d$Genus <- str_replace(d$Genus, "Dic", "Dicorynia")
+#d$Genus <- str_replace(d$Genus, "Epe", "Eperua")
+#d$Genus <- str_replace(d$Genus, "Esc", "Eschweilera")
+#d$Genus <- str_replace(d$Genus, "Gus", "Gustavia")
+#d$Genus <- str_replace(d$Genus, "Hym", "Hymenopus")
+#d$Genus <- str_replace(d$Genus, "Iry", "Iryanthera")
+#d$Genus <- str_replace(d$Genus, "Jac", "Jacaranda")
+#d$Genus <- str_replace(d$Genus, "Lae", "Laetia")
+#d$Genus <- str_replace(d$Genus, "Lic", "Licania")
+#d$Genus <- str_replace(d$Genus, "Por", "Poraqueiba")
+#d$Genus <- str_replace(d$Genus, "Pro", "Protium")
+#d$Genus <- str_replace(d$Genus, "Pte", "Pterocarpus")
+#d$Genus <- str_replace(d$Genus, "Sym", "Symphonia")
+#d$Genus <- str_replace(d$Genus, "Tac", "Tachigali")
+#d$Genus <- str_replace(d$Genus, "Vir", "Virola")
+#d$Genus <- str_replace(d$Genus, "Vou", "Vouacapoua")
+
+
+
+
+d <- d %>% relocate(starts_with('Bag_Weight(g)'), `FW+BW(g)` , `Balance` , .after = `Dry_Weight(g)`)
+
+
+## R Bags Table ----------------------------
+#Delete Weights of R Bags used for the big leaves from the main dataset 
+
+R_Bag_Weight<- d %>% filter(str_detect(d$Code, pattern = "R")) #extraire une autre table pour les R-bags à partir de Code commençant par "R" 
+
+R_Bag_Weight<- rename(R_Bag_Weight, R_Bag_Code = Code, Comment = CommentWeightBag)
+
+R_Bag_Weight <- R_Bag_Weight %>% relocate(starts_with('Bag_Weight(g)') , `Balance` , .after = `R_Bag_Code`)
+
+R_Bag_Weight<- select(R_Bag_Weight, -`Fresh_Weight(g)`, -`Saturated_Weight(g)`, - `Delta_Weight_SW-FW(g)`, -`Dry_Weight(g)`, -CommentLab,
+                                     -`FW+BW(g)`)
+
+
+R_Bag_Weight<- distinct(R_Bag_Weight, R_Bag_Weight$R_Bag_Code, .keep_all = TRUE) # enleve les doublons
+
+
+
+R_Bag_Weight<- mutate(R_Bag_Weight, RCode = R_Bag_Code) #creer une colonne pour ordonner les Rbags basée sur la colonne des R_Bag_Code. Mais penible pour ordonner en ayant la lettre R. Sinon, le tri s'effectue R1 / R10 / R11 / R2 etc.
+
+
+R_Bag_Weight$RCode<- str_replace(R_Bag_Weight$RCode, "R", "") 
+
+
+R_Bag_Weight$RCode <- as.numeric(R_Bag_Weight$RCode)
+
+R_Bag_Weight <- arrange(R_Bag_Weight,  R_Bag_Weight$RCode) # pour ordonner par numeros croissants
+
+R_Bag_Weight<- select(R_Bag_Weight, -`R_Bag_Weight$R_Bag_Code`) # en enlevant les doublons, cette colonne s'est rajoutée toute seule, elle sert à rien à présent
+
+View(R_Bag_Weight)
+
+
+
+## Continue tidy data RWC----------------
+
+d<- d[-c(60:69, 91:100, 165, 230, 257),]
+
+d$Code <- str_replace(d$Code, "M", "")
+
+d$`Saturated_Weight(g)`<- as.numeric(d$`Saturated_Weight(g)`)
+d$`FW+BW(g)` <- as.numeric(d$`FW+BW(g)`)
+d$`Delta_Weight_SW-FW(g)` <- as.numeric(d$`Delta_Weight_SW-FW(g)`)
+
+lswc <- d %>% select(Code, `Fresh_Weight(g)`, `Saturated_Weight(g)`, `Dry_Weight(g)`) %>% rename(FW = `Fresh_Weight(g)`, SW = `Saturated_Weight(g)`, DW = `Dry_Weight(g)`) %>% mutate(LSWC = (SW-DW)/DW)
+
+
+
+
+```
+
+
+#### checking lswc data with outliers
+
+-Code 137 : FW > SW
+-Code 68 : *eliminate indvidual because in raw data there is a comment : "valeur prise trop tard, pb de synchronisation"*
+-Code 40: FW > SW
+-Code 153 : FW > SW
+-Code 148 : OK
+-Code 39 : OK
+-Code 182 : OK
+-Code 130 : DW > SW : problem de mesure: take it out
+
+```{r}
+lswc$LSWC[lswc$Code == 68] <- NA
+lswc$LSWC[lswc$Code == 130] <- NA
+```
+
+
+
+
+#### saving lswc data
+```{r}
+
+write_csv(lswc, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/lswc.csv")
+```
+
+
+## stomata
+
+From the labelStoma app developped by Angela Casado. LabelStoma is a graphical image tool for automatically detecting stomata in images. All info are referenced in her Github : https://github.com/ancasag/labelStoma
+
+After counting all stomata from paracou campaign and FTH, she adapted the weights of labelStoma for me to recognize the same species of the bafog and kaw campaign. 
+
+Once all stomata are counted, labelStoma generates excel files where it tells how many stomata are in each image. 
+
+I am using *labelStoma* for the annotation.
+After all annotated images, I will generate the excel to calculte the stomatal density using *labelStomaMarion*, as it has the scale option I want.
+
+
+```{r Stomata Paracou}
+
+
+stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_stomates/MetradicaParacou - stomata.csv") 
+
+stomata_tidy <- stomata %>% select(Code, SpCode, StomatalDensity_Stomate_mm2)
+
+write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv")
+
+```
+
+
+
+## fvfm
+
+Eliminate individual 147 
+
+```{r}
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_FvFm/FvFm_tidy_Paracou.csv") %>% rename(Code = BagNr., FVFM = Fv.Fm)
+
+fvfm_tidy <- fvfm
+
+fvfm_tidy$FVFM[fvfm_tidy$Code == 198] <- 0.815 #correct value read from the lab notebook.
+
+#indv 147 has a very low value to consider robust measurements for the other traits on healthy leaves.  --> eliminate
+
+fvfm_tidy$FVFM[fvfm_tidy$Code == 147] <- NA
+
+write_csv(fvfm_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/fvfm.csv")
+```
+
+
+## joining traits - Paracou campaign
+
+```{r Summary Paracou}
+Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv") %>% 
+  select(Code, gmin.slope_function) %>% rename(gmin = gmin.slope_function) 
+
+TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/tlp.csv") %>%
+  select(`Code.RWC`, P_tlp) %>% rename(Code =`Code.RWC`,TLP = P_tlp)
+
+
+Paracou <- left_join(Gmin, TLP)
+
+Vein <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/majvla.csv") %>% select(-spName)
+
+Vein$Code <- as.numeric(Vein$Code) 
+
+Paracou <- left_join(Paracou, Vein)
+
+Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/chemistry.csv")  %>% select(Code, Genus, Species, X.N, X.C, `P..g.kg.`, `Ca..g.kg.`, `Na..g.kg.`, `K..g.kg.`) %>% rename(N = X.N, C = X.C, P =`P..g.kg.`, Ca= `Ca..g.kg.`, Na= `Na..g.kg.`, K= `K..g.kg.`)
+
+Paracou <- left_join(Paracou, Chem) 
+
+LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/lswc.csv") %>% select(Code, FW, SW, DW , LSWC)
+
+
+Paracou <- left_join(Paracou, LSWC) 
+
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv") %>% select(Code, StomatalDensity_Stomate_mm2) %>% rename(SD = StomatalDensity_Stomate_mm2)
+
+Paracou <- left_join(Paracou, Stomata) 
+
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/fvfm.csv") %>% select(Code, FVFM)
+#beware we eliminated individual 147 because leaves were not healthy
+
+Paracou <- left_join(Paracou, fvfm) 
+
+Paracou <- Paracou[!(Paracou$Code=="147"),]
+```
+
+### field information 
+
+D. Krebber cleaned the IDTREE with an R function. Using those to match my individuals.
+```{r}
+IDTREE <- read_csv("Cleaning/Clean_Paracou/Metradica_Paracou_2020_Individual_based_Trait_Data_Version_DK - Metradica_Paracou_2020_Individual_based_Trait_Data_Version_DK.csv") %>% select(Code, idTree, spName_CorrBota)
+
+Paracou_Indv <- left_join(Paracou, IDTREE) %>% relocate(idTree, .after = Code) %>% relocate( spName_CorrBota, .after = Species)
+
+
+#checks on the bota names of individuals
+library(stringr)
+Paracou_Indv$Name <- str_c(Paracou_Indv$Genus, '_', Paracou_Indv$Species)
+Paracou_Indv$Code[which(Paracou_Indv$Name != Paracou_Indv$spName_CorrBota)]
+#yes most of it is ok, because its the jacaranda and protium but let's correct them
+
+
+Paracou_Indv$Genus[Paracou_Indv$Code == 18] <- 'Chrysophyllum'
+Paracou_Indv$Species[Paracou_Indv$Code == 18] <- 'prieurii'
+
+
+Paracou_Indv <- Paracou_Indv %>% select(-Genus, -Species, -Name) %>% rename(Name = spName_CorrBota) %>% relocate(Name, .after = idTree)
+
+Paracou_Indv <- Paracou_Indv %>% separate(Name, into = c("Genus", "Species"), sep = "_")
+
+
+
+#find duplicates
+Paracou_Indv$Code[duplicated(Paracou_Indv$Code)]
+
+Paracou_Indv <- Paracou_Indv %>% distinct() #don't know why code 238 was there 3 times 
+
+# adding dawkins, crown position, date field, forest, plot, subplot, filedNB, habitat, type
+
+Field_info <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/MetradicaParacou - individuals_withIDTREE.csv") %>% select(-CodeFTH, -Genus, -Species)
+
+Paracou <- left_join(Paracou_Indv, Field_info)
+
+#Having IdTree problems 
+
+Paracou$Code[which(is.na(Paracou$CrownPosition))]
+#[1] 156  90 105
+#156: idTree correct 144042 referred after looking at https://paracoudata.cirad.fr/
+#90 : normal car valeur non renseigné du terrain
+#105 : idTree correct 144423 refered after looking at the paracou data: https://paracoudata.cirad.fr/
+
+Field_info$idTree[Field_info$Code == 156] <- 144042
+Field_info$idTree[Field_info$Code == 105] <- 144423
+
+Paracou <- left_join(Paracou_Indv, Field_info)
+
+```
+
+## final data for the first paracou campaign
+```{r}
+write_csv(Paracou, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Paracou.csv")
+```
+
+
+
+# II - Bafog
+
+**Bafog**: 5 permanent plots monitored of the ONF institute. Samplings were done in plots 2, 3, 4, and 5 and off plots from the 1<sup>st</sup> to  16<sup>th</sup> of March 2021.  
+
+# Cleaning individual information
+
+```{r Individuals_Bafog, eval=FALSE, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(rio)
+
+Bafog_individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Bafog_individuals.xlsx", 
+    sheet = "Bafog_individuals") %>% 
+  select(-CrownPosition)
+
+Bafog_individuals$Species[Bafog_individuals$Genus == 'Jacaranda'] <- 'copaia subsp. copaia'
+
+Bafog_individuals$Name <- str_c(Bafog_individuals$Genus, '_', Bafog_individuals$Species) 
+
+Bafog_individuals <- Bafog_individuals %>% 
+  select(-Species_Name, -Site) %>%
+  relocate(Genus, .after = FieldNbr) %>%
+  relocate(Species, .after = Genus) %>%
+  relocate(Name, .after = Species) %>%
+  relocate(Habitat, .after = Name) %>%
+  relocate(Forest, .after= DateField)
+
+#get the habitat and type
+Bafog_habitat <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/habitattype.csv")
+
+Bafog_fieldsheet <- left_join(Bafog_habitat,Bafog_individuals ,  by = c("Code", "Genus", "Species", "Name", "Habitat", "Forest", "TreeHeight", "TreeDawkins", "BranchHeight", "BranchDawkins"))
+
+Bafog_fieldsheet <- Bafog_fieldsheet %>%
+  relocate(DateField, .after= Code) %>%
+  relocate(Forest, .after= DateField) %>%
+  relocate( c("Plot", "Subplot", "FieldNbr"), .after= Forest ) %>%
+  relocate(idTree, .after = Forest)
+
+export(Bafog_fieldsheet, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog_individuals.csv")
+
+```
+
+
+## lswc
+
+Leaf-saturated water content (LSWC; g.g−1) was calculated as the mass of leaf water (SW – DW) divided by leaf dry mass (DW).
+
+```{r eval=FALSE, include=FALSE}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+
+RWC_raw <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/RWC/RWC_METRADICA_BAFOG_25_03_21.xlsx",  sheet = "RWC")
+
+RWC <- RWC_raw %>% select(Unique_Code, FW, SW, DW, Comment_Lab) %>% rename(Code =Unique_Code) %>% mutate(C = SW - FW) %>% mutate(C2 = SW- DW)
+
+#RWC$Code[which(RWC$C < 0 )] juste pour regarder quand SW- FW < 0 ce qui ne devrait pas arriver.
+
+#RWC$Code[which(RWC$C2 < 0 )] #juste pour regarder quand SW- DW < 0 ce qui ne devrait pas arriver.
+
+
+RWC <- RWC %>% select(Code, FW, SW, DW) %>% mutate(LSWC = (SW-DW)/SW) %>% select(-FW, -SW, -DW)
+
+write_csv(RWC, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/lswc.csv")
+
+```
+
+## FvFm
+
+```{r fvfm bafog, eval=FALSE, include=FALSE}
+library(readxl)
+FvFm <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/FvFm - cahier/Bafog_FvFm.xlsx")
+FvFm <- FvFm %>% 
+  select(-Comment_FvFm) %>% 
+  mutate(FvFm= `Fv/Fm`/1000)
+
+FvFm$Code[which(FvFm$FvFm < 0.6 )] # le Code 415 3 belles feuilles mais peut etre en lien avec le chablis récent, mesures refaites 3 fois, tjs meme valeurs.
+
+#elimination de l'individu 415 car pas un fvfm qui nous renseigne sur un bon etat de sante de la feuille.
+
+FvFm$FvFm[FvFm$Code == 415] <- NA
+
+write_csv(FvFm, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/fvfm.csv")
+```
+
+## gmin
+
+LA calculated with ImageJ (Marion Boisseaux) script and manual detour (Alice Bordes) for 8 species.
+
+Check resolution of images.
+```{r}
+path <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/0_Scan_bafog")
+resolution <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/0_Scan_bafog/",path),tags = "XResolution")
+ResolutionProblems <- resolution %>% filter(XResolution!=1328)
+
+```
+
+All images 1328 ppp qui correspond à 1600 dpi. 
+* Except 3 scans 1325 ppp. Code : 261, 264, 266. 
+* Except 8 scans 1200 ppp. Code : 249, 276, 295, 317, 374, 383, 401, 410. These leaves were too big for the double sided scans, so we scaned with a lesser resolution (800 dpi) one side. 
+
+Note: PPI describes the resolution in pixels of a digital image whereas DPI describes the amount of ink dots on a printed image. Though PPI largely refers to screen display, it also affects the print size of your design and thus the quality of the output.
+
+
+```{r}
+library(readxl)
+library(dplyr)
+LA_gmin <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/Species_LeafAreaGmin_Alice.xlsx")
+
+LA_gmin %>%
+  mutate(Resolution_dpi = if_else(Resolution_ppp == 1328, 1600, 0))
+
+
+LA_gmin <- LA_gmin %>%
+  mutate(Resolution_dpi = 
+           case_when(
+    Resolution_ppp == 1328 ~ "1600", 
+    Resolution_ppp == 1325 ~ "1600",
+    Resolution_ppp == 1200 ~ "1200"))
+
+LA_gmin$Resolution_dpi <- as.numeric(LA_gmin$Resolution_dpi)
+
+LA_gmin <- LA_gmin %>%mutate(PixelArea = coalesce(TotalArea, ManualArea))
+
+```
+
+Calculate pixel² in cm²
+
+Formula: PixelArea/(resolution_dpi^2)*(2.54^2)
+```{r}
+library(rio)
+LA_gmin <- LA_gmin %>% 
+  mutate(LA = 
+  PixelArea/(Resolution_dpi^2)*(2.54^2) )
+
+LA_gmin <- LA_gmin %>% relocate(Resolution_dpi, .after = Resolution_ppp)
+
+write_csv(LA_gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/LA_gmin.csv")
+```
+
+With Daniela's function, calculte gmin for all bafog individuals. 
+```{r}
+gmin <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/Bafog/Gmin_withLA.csv")
+gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
+
+#check gmin
+
+gmin$gmin[gmin$Code == 377] <- 8.7116
+gmin$gmin[gmin$Code == 429] <- 12.28
+gmin$gmin[gmin$Code == 416] <- 14.5253
+gmin$gmin[gmin$Code == 374] <- 3.7775
+gmin$gmin[gmin$Code == 317] <- 11.43
+gmin$gmin[gmin$Code == 395] <- 9.73
+gmin$gmin[gmin$Code == 376] <- 10.9998
+gmin$gmin[gmin$Code == 430] <- NA #individu eliminé car cf comment raw gmin bafog
+gmin$gmin[gmin$Code == 355] <- 10.8779
+gmin$gmin[gmin$Code == 465] <- 9.95
+gmin$gmin[gmin$Code == 396] <- 13.03
+gmin$gmin[gmin$Code == 407] <- 10.75
+gmin$gmin[gmin$Code == 281] <- 6.72
+gmin$gmin[gmin$Code == 421] <- 14.22
+gmin$gmin[gmin$Code == 422] <- 9.6
+gmin$gmin[gmin$Code == 392] <- 9.25
+gmin$gmin[gmin$Code == 389] <- 8.16
+gmin$gmin[gmin$Code == 404] <- 5.92
+gmin$gmin[gmin$Code == 386] <- 6.45
+gmin$gmin[gmin$Code == 375] <- 9.3353
+gmin$gmin[gmin$Code == 436] <- 26.65
+gmin$gmin[gmin$Code == 435] <- 11.83
+gmin$gmin[gmin$Code == 339] <- 8.71
+gmin$gmin[gmin$Code == 351] <- 7.30
+gmin$gmin[gmin$Code == 366] <- 4.85
+  
+gmin$Code[which(gmin$gmin >10)]
+ #[1] 256 269 271 289 306 317 325 355 369 376 396 407 416 421 429 435 436 450 466 #and these were checked
+
+gmin$gmin[which(gmin$gmin <1)]
+#none
+
+
+
+write_csv(gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/gmin.csv")
+```
+
+
+## tlp
+
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library("purrr")
+
+Ptlp <- list.files(path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/Ptlp/", pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_delim, delim = ";", escape_double = FALSE, trim_ws = TRUE) %>%                              
+  reduce(full_join)
+
+Ptlp <- Ptlp %>% mutate(Posmo=(-2.5/1000)*C0) %>% mutate(Ptlp=(0.799*Posmo)-0.665) %>% rename(Code = Unique_Code)
+
+Ptlp <- Ptlp %>% drop_na(Ptlp)
+
+#Code 321 species is Tacmel, erreur de saisi. Eliminer le Code 321 *ou il y a ecrit espece jaccop. checker aussi avec le vapro file, c'etait enfait un 320 bis.
+
+Ptlp <- Ptlp[-73,]
+
+#mesure faites deux fois, la premiere n'est pas bonne car le vapro a fini de mesurer au bout du 10e cycle sans ecart de 5 (cf protocole)
+
+Ptlp <- Ptlp[-69,]
+
+
+write_csv(Ptlp, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/tlp.csv")
+
+```
+
+
+##majvla
+```{r Vein Bafog, eval=FALSE, include=FALSE}
+library(readxl)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+Veindata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/Scoffoni_Bafog.csv") %>% select(Code, Genus, Species, midribVLA_S1,	SecondaryVLA_S1,	TertiaryVLA_S1,	MajVLA_S1,	midribVLA_S2,	SecondaryVLA_S2,	TertiaryVLA_S2,	MajVLA_S2) 
+
+
+#averaging the two students' measurements
+Veindata_tidy <- Veindata %>% mutate(MajVLA = (MajVLA_S1 + MajVLA_S2)/2, midribVLA = (midribVLA_S1+ midribVLA_S2)/2, SecondaryVLA = (SecondaryVLA_S1 + SecondaryVLA_S2) / 2, 	TertiaryVLA = (	TertiaryVLA_S1+ 	TertiaryVLA_S2)/2) %>% select(Code, Genus, Species, midribVLA , SecondaryVLA, TertiaryVLA ,  MajVLA) %>% na.omit()
+
+# Code number 430 is not the good species. it was detected by Christine Scoffoni. Elimination de l'individu 430 
+
+
+write_csv(Veindata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/majvla.csv")
+```
+
+
+## chemistry
+
+```{r Chemistry Bafog}
+library(readr)
+#chemistry from all sites
+Chemistry <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/Chemistry.csv") 
+
+#only bafog
+Chemistry_Bafog <- Chemistry %>% 
+  filter(Code < 474) %>%
+  filter(Code > 244)
+
+write_csv(Chemistry_Bafog, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/chemistry.csv")
+```
+
+
+##stomata
+
+```{r Stomata Paracou}
+
+
+stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/stomata_done/MetradicaBafog - stomata.csv")
+                    
+
+stomata_tidy <- stomata %>% select(Code, Genus, Species, StomataDensity, Comment)
+
+stomata_tidy <- stomata_tidy %>% 
+  mutate(Name = paste0(Genus," ", Species)) %>%
+  relocate(Name, .after = Species)
+  
+
+write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/stomata.csv")
+
+```
+
+
+## join with individuals
+```{r}
+Bafog_individuals <- read_csv("Cleaning/Clean_Bafog/Bafog_individuals.csv")
+
+
+Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/gmin.csv") %>% 
+  select(Code, gmin) 
+
+TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/tlp.csv") %>%
+  select(Code, Ptlp) %>% rename(TLP = Ptlp)
+
+Vein <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/majvla.csv")%>% select(-Genus, -Species)
+#beware we eliminated individual 430 because leaves were not from the species we thought.
+
+Vein$Code <- as.numeric(Vein$Code)
+
+Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/chemistry.csv")  %>% select(Code, X.N, X.C, `P..g.kg.`, `Ca..g.kg.`, `Na..g.kg.`, `K..g.kg.`) %>% rename(N = X.N, C = X.C, P =`P..g.kg.`, Ca= `Ca..g.kg.`, Na= `Na..g.kg.`, K= `K..g.kg.`)
+
+
+LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/lswc.csv") %>% select(Code, LSWC)
+
+
+
+
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/stomata.csv") %>% select(Code, StomataDensity) %>% rename(SD = StomataDensity)
+
+ 
+
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/fvfm.csv") %>% select(Code, FvFm)
+#beware we eliminated individual 415 because leaves were not healthy
+
+
+
+
+Bafog <- left_join(Bafog_individuals, Gmin, by="Code")
+Bafog <- left_join(Bafog, TLP, by="Code")
+Bafog <- left_join(Bafog, Vein, by="Code")
+Bafog <- left_join(Bafog, Chem, by="Code")
+Bafog <- left_join(Bafog, LSWC, by="Code")
+Bafog <- left_join(Bafog, Stomata, by="Code")
+Bafog <- left_join(Bafog, fvfm, by="Code")
+
+
+#elimination definitive de ces individus pour les raisons commentées
+Bafog <- Bafog[!(Bafog$Code=="415"),] #fvfm too low to consider healthy leaves and therefore right measurements
+Bafog <- Bafog[!(Bafog$Code=="430"),] #while looking at vein data, not the right species detected
+Bafog <- Bafog[!(Bafog$Code=="261"),] #erreur bota
+
+#doute bota for Code 416 and 425. Verified in the lab and validated to be measured.
+
+Bafog$CommentLab[Bafog$Code == 416] <- "plus de doute bota"
+Bafog$CommentLab[Bafog$Code == 425] <- "plus de doute bota"
+```
+
+
+##duplicate checks
+```{r}
+Bafog$Code[duplicated(Bafog$Code)] #no duplicated code.
+
+```
+
+##final bafog trait data
+```{r}
+
+write_csv(Bafog, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog.csv")
+```
+
+
+#III - Kaw 
+
+**Est**: Samplings were done in plots KawGuyafor (1 ha) and Trésor from the 4<sup>th</sup> to  23<sup>rd</sup> of October 2021. Some trees were also sampled outside the plots. 
+
+##indivuals
+
+```{r Individuals_Kaw, eval=FALSE, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(rio)
+
+#input
+Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Kaw_individuals.csv") %>%
+  select(Code, idTree, Genus, Species, Name, Forest, Habitat, Type, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins, CrownPosition, DBH, Xutm, Yutm, TWI )
+
+#looks already clean
+#don't worry, 620 is an individual but no field information was recorded unfortunately.
+#output
+export(Kaw_individuals, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
+
+```
+
+##gmin
+
+gmin parameters used:
+
+-min of points: 5
+-min time measurement: 1.4
+
+to do: 
+recheck 490, 638, 625, 627
+```{r}
+library(readr)
+gmin <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/Kaw/ALLGminwithLA.csv")
+gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
+
+#check gmin
+
+gmin$gmin[gmin$Code == 635] <- 4.23
+gmin$gmin[gmin$Code == 481] <- 19.16
+gmin$gmin[gmin$Code == 514] <- 11.47
+gmin$gmin[gmin$Code == 554] <- 11.53
+gmin$gmin[gmin$Code == 541] <- 13.99
+gmin$gmin[gmin$Code == 594] <- 5.6987
+gmin$gmin[gmin$Code == 536] <- 8.16
+gmin$gmin[gmin$Code == 581] <- NA #erreur rawdata
+
+
+gmin$Code[which(gmin$gmin >10)]
+ #[1] 481 514 541 547 554 565 : ok thoses were rechecked
+
+gmin$Code[which(gmin$gmin <1)]
+#  [1] 490 : chryso : recheck this one
+#520 522 578 582 586 588 593 595 597 614 624 646 647 649 these are ok
+
+#missing codes are
+#638
+#625
+#627
+
+
+write_csv(gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/gmin.csv")
+```
+
+
+### LA
+
+All images 1328 ppp corresponding to 1600 dpi. 
+Except : 564 et 565 resolution 1201 ppp corresponding to 1200 dpi.
+
+Check resolution of images.
+```{r resolution check kaw}
+library(dplyr)
+library(tidyverse)
+
+path1 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/05102021")
+
+path2 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/06102021")
+
+path3 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/07102021")
+
+path4 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/08102021")
+
+path5 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/11102021")
+
+path6 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/12102021")
+
+path7 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/13102021")
+
+path8 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/14102021")
+
+path9<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/18102021")
+
+path10<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/19102021")
+
+path11<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/20102021")
+
+
+###
+
+resolution1 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/05102021/",path1),tags = "XResolution")
+ResolutionProblems1 <- resolution1 %>% filter(XResolution!=1328)
+
+resolution2 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/06102021/",path2),tags = "XResolution")
+ResolutionProblems2 <- resolution2 %>% filter(XResolution!=1328)
+
+resolution3 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/07102021/",path3),tags = "XResolution")
+ResolutionProblems3 <- resolution3 %>% filter(XResolution!=1328)
+
+
+resolution4 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/08102021/",path4),tags = "XResolution")
+ResolutionProblems4 <- resolution4 %>% filter(XResolution!=1328)
+
+resolution5 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/11102021/",path5),tags = "XResolution")
+ResolutionProblems5 <- resolution5 %>% filter(XResolution!=1328)
+
+resolution6 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/12102021/",path6),tags = "XResolution")
+ResolutionProblems6 <- resolution6 %>% filter(XResolution!=1328)
+
+resolution7 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/13102021/",path7),tags = "XResolution")
+ResolutionProblems7 <- resolution7 %>% filter(XResolution!=1328)
+
+resolution8 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/14102021/",path8),tags = "XResolution")
+ResolutionProblems8 <- resolution8 %>% filter(XResolution!=1328)
+
+resolution9 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/18102021/",path9),tags = "XResolution")
+ResolutionProblems9 <- resolution9 %>% filter(XResolution!=1328)
+
+resolution10 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/19102021/",path10),tags = "XResolution")
+ResolutionProblems10 <- resolution10 %>% filter(XResolution!=1328)
+
+resolution11 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Scan_gmin/20102021/",path11),tags = "XResolution")
+ResolutionProblems11 <- resolution11 %>% filter(XResolution!=1328)
+
+```
+
+##lswc
+
+```{r lswc kaw}
+
+LSWC <- read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/RWC/20211108_RWC_dry.xlsx")
+
+LSWC <- LSWC %>% select(Unique_Code,FW, SW, DW) %>% rename(Code=Unique_Code)
+
+LSWC$DW[LSWC$Code == 552] <- NA #problem measure DW
+
+LSWC$DW <- as.numeric(LSWC$DW)
+
+LSWC <- LSWC %>% mutate(LSWC = (SW-DW)/DW)
+
+LSWC <- LSWC %>% select(Code, LSWC) %>% drop_na()
+
+write_csv(LSWC, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/lswc.csv")
+
+```
+
+
+##tlp
+
+```{r tlp kaw}
+
+Ptlp <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=733041492", range = "ptlp")
+
+Ptlp <- Ptlp %>% select(-Ptlp, -Posm)
+
+Ptlp_extra <- Ptlp %>% slice(185:192) #646 , 655, 654
+
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "646", "505")
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "655", "484")
+Ptlp$C0 <- replace(Ptlp$C0, Ptlp$Code == "654", "536")
+
+Ptlp$C0 <- as.numeric(Ptlp$C0)
+  
+Ptlp <- Ptlp %>% mutate(Posmo=(-2.5/1000)*C0) %>% mutate(Ptlp=(0.799*Posmo)-0.665)
+
+Ptlp <- Ptlp %>% select(-DateCalibration, -Contamination, -DateField, -DateMesure)
+
+library(stringr)
+
+Ptlp <- Ptlp %>% 
+  filter(!str_detect(Code, 'bis')) %>% filter(!str_detect(Code, 'ter'))
+
+Ptlp$Code <- as.numeric(Ptlp$Code)
+
+Ptlp_for_join <- Ptlp %>% select(Code, Ptlp)
+
+sum(is.na(Ptlp_for_join$Ptlp)) #7 NA
+
+Ptlp_for_join <- na.omit(Ptlp_for_join)
+
+write_csv(Ptlp_for_join, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/tlp.csv")
+```
+
+## fvfm
+```{r fvfm kaw}
+library(readxl)
+FvFm <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=733041492", range = "fvfm")
+
+
+FvFm$Code[which(FvFm$fvfm < 0.62 )]
+
+#elimination de l'individu 537 car pas un fvfm qui nous renseigne sur un bon etat de sante de la feuille.
+
+FvFm$fvfm[FvFm$Code == 537] <- NA
+
+FvFm_clean <- FvFm %>% drop_na(fvfm) 
+
+write_csv(FvFm_clean, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv")
+```
+
+##stomata
+
+```{r stomata kaw}
+stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/stomates/MetradicaKaw - stomata.csv") 
+                    
+
+stomata_tidy <- stomata %>% select(Code, Genus, Species, StomataDensity, Comment)
+
+stomata_tidy <- stomata_tidy %>% 
+  mutate(Name = paste0(Genus," ", Species)) %>%
+  relocate(Name, .after = Species)
+  
+
+write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/stomata.csv")
+```
+
+##majvla
+```{r Vein Kaw, eval=FALSE, include=FALSE}
+library(readxl)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+Veindata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/results/Scoffoni_Kaw.csv") %>% select(Code, Genus, Species, midribVLA_S1,	SecondaryVLA_S1,	TertiaryVLA_S1,	MajVLA_S1,	midribVLA_S2,	SecondaryVLA_S2,	TertiaryVLA_S2,	MajVLA_S2) 
+
+
+#averaging the two students' measurements
+Veindata_tidy <- Veindata %>% mutate(MajVLA = (MajVLA_S1 + MajVLA_S2)/2, midribVLA = (midribVLA_S1+ midribVLA_S2)/2, SecondaryVLA = (SecondaryVLA_S1 + SecondaryVLA_S2) / 2, 	TertiaryVLA = (	TertiaryVLA_S1+ 	TertiaryVLA_S2)/2) %>% select(Code, Genus, Species, midribVLA , SecondaryVLA, TertiaryVLA ,  MajVLA) %>% na.omit()
+
+
+write_csv(Veindata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/majvla.csv")
+```
+
+##chemistry
+
+```{r Chemistry Kaw}
+library(readr)
+#chemistry from all sites
+Chemistry <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/Chemistry.csv") 
+
+#only kaw
+Chemistry_Kaw <- Chemistry %>% 
+  filter(Code < 657) %>%
+  filter(Code > 473)
+
+write_csv(Chemistry_Kaw, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/chemistry.csv")
+```
+
+## join with individuals
+```{r}
+Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
+
+Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/gmin.csv") %>% 
+  select(Code, gmin) 
+
+TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/tlp.csv") %>%
+  select(Code, Ptlp) %>% rename(TLP = Ptlp)
+
+Vein <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/majvla.csv")%>% select(-Genus, -Species)
+
+Vein$Code <- as.numeric(Vein$Code)
+
+Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/chemistry.csv")  %>% select(Code, X.N, X.C, `P..g.kg.`, `Ca..g.kg.`, `Na..g.kg.`, `K..g.kg.`) %>% rename(N = X.N, C = X.C, P =`P..g.kg.`, Ca= `Ca..g.kg.`, Na= `Na..g.kg.`, K= `K..g.kg.`)
+
+
+LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/lswc.csv") %>% select(Code, LSWC)
+
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/stomata.csv") %>% select(Code, StomataDensity) %>% rename(SD = StomataDensity)
+
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv") %>% select(Code, fvfm)
+#beware we eliminated individual 537 because leaves were not healthy
+
+
+Kaw <- left_join(Kaw_individuals, Gmin, by="Code")
+Kaw <- left_join(Kaw, TLP, by="Code")
+Kaw <- left_join(Kaw, Vein, by="Code")
+Kaw <- left_join(Kaw, Chem, by="Code")
+Kaw <- left_join(Kaw, LSWC, by="Code")
+Kaw <- left_join(Kaw, Stomata, by="Code")
+Kaw <- left_join(Kaw, fvfm, by="Code")
+
+
+#elimination definitive de ces individus pour les raisons commentées
+Kaw <- Kaw[!(Kaw$Code=="537"),] #fvfm too low to consider healthy leaves and therefore right measurements
+
+#skipped code numbers without any individual measurements
+
+#509; 532 ; 533; 568 ; 569
+
+Kaw <- Kaw[!(Kaw$Code=="509"),]
+Kaw <- Kaw[!(Kaw$Code=="532"),]
+Kaw <- Kaw[!(Kaw$Code=="533"),]
+Kaw <- Kaw[!(Kaw$Code=="568"),]
+Kaw <- Kaw[!(Kaw$Code=="569"),]
+
+
+#don't worry, 620 is an individual but no field information was recorded unfortunately.
+```
+
+
+##final kaw trait data
+```{r}
+
+write_csv(Kaw, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw.csv")
+```
