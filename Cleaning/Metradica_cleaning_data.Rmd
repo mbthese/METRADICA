@@ -1711,7 +1711,7 @@ Bafog <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents
 Paracou_Kaw_Bafog <- rbind(Paracou_Kaw, Bafog)
 High/Low/Middle
 
-
+#homogenization des terminaison
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "top"] <- 'High'
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Sup"] <- 'High'
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "high"] <- 'High'
@@ -1719,6 +1719,7 @@ Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Inf"] <- 'Lo
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "low"] <- 'Low'
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "mid"] <- 'Middle'
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Mid"] <- 'Middle'
+Paracou_Kaw_Bafog$Type[Paracou_Kaw_Bafog$Type == "Generalists"] <- 'Generalist'
 ```
 
 
