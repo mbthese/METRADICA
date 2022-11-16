@@ -3,6 +3,8 @@ title: "Boxplots"
 author: "Marion Boisseaux"
 date: "13/09/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
@@ -12,19 +14,11 @@ output: html_document
 library(tidyverse)
 library(dplyr)
 library(ggfortify)
-library(dplyr)
-library(factoextra)
-library(FactoMineR)
-library(Factoshiny)
 library(corrplot) 
 library(ggpubr)
 library(ggfortify)
 library(agricolae)
 library(rstatix)
-library(kableExtra)
-library(V.PhyloMaker)
-library(ggfortify)
-library(ggtree)
 library(readxl)
 library(lme4)
 library(ggeffects) #draw plots of models
@@ -36,21 +30,20 @@ library(multcomp) #for lmer model to do anovas
 library(lmerTest) #same
 library(emmeans)#same
 library(ggplotify)
+library(car)
 ```
 
 # Data
 
 ```{r Data_results, message=FALSE, warning=FALSE}
 
-# dat
-library(googleAuthR)
-library(googledrive)
+# data
 library(googlesheets4)
 gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
 
-Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% dplyr::select(Code, Genus, Species, Name, Habitat, Type, HabitatType, Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% dplyr::select(Code, Genus, Species, Name, Habitat, Type, HabitatType, Forest, Gmin, TLP, LA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
   mutate(TLP = -TLP) %>% 
   na.omit() 
 
@@ -58,10 +51,10 @@ sub_data_TF <- Metradica_log %>%
   filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
 
 sub_data_SF <- Metradica_log %>%
-  filter(Name %in% c("Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+  filter(Name %in% c("Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Eschweilera_coriacea"))
 
 sub_data_G <-  Metradica_log %>%
-  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia"))
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Tachigali_melinonii", "Protium_stevensonii"))
 
 sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
 
@@ -69,31 +62,98 @@ Metradica <- sub_data
 
 ```
 
+# Question 1
+**Question (H1) Specialist species of contrasting habitats differ in trait values.**
+
+
+$$ M0 : Y_{ik} = \mu + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+$$ M1 : Y_{ik} = \mu + \alpha_i +  E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+Mais je veux prendre en compte que l'echantillonage a ete réalisé dans 3 forets qui chacune a les 2 habitats. je veux accepter les variations de mon site mais pas les etudier forcement.
+
+
+
+$$ M2 : Y_{ijk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} + E_{ijk}, \quad E_{ijk}\sim \mathcal{N} (0,\sigma^2) $$
+
+
+Et prendre en compte que j'ai plein d'espèces differentes. 
+
+Ces espèces ne sont pas très equilibrée. 
+
+
+$$ M_{comp} : Y_{ijsk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} +  A_{is} +  E_{ijsk}, \quad E_{ijsk}\sim \mathcal{N} (0,\sigma^2), \quad A_{is}\sim \mathcal{N} (0,\sigma^2_S),  $$
+
 ## Specialist data
-```{r}
+```{r data specialist}
 Metradica$Type <- as.character(Metradica$Type)
 Metradica$Name <- as.character(Metradica$Name)
 Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
 
-data <- Metradica %>% filter(Type !="Generalist")
+data_specialist <- Metradica %>% filter(Type !="Generalist")
+
 
 ```
 
+## graphs
+```{r graph specialist}
+
+#basic plot 
+ggplot(data_specialist, aes(x = Type, y = Gmin)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist")) + theme_classic()
+
+#plot2
+
+gmin.summary <- aggregate(Gmin ~ Type, mean, data=data_specialist)
+gmin <- ggplot(data_specialist,aes(x=Type,y=Gmin, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=gmin.summary, aes(ymin = Gmin, ymax = Gmin),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(gmin~(mmol.m^-2~.s^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20)) 
+
+gmin
+
+#plot across forests
+
+ggplot(data, aes(x = Type, y = Gmin, colour = Type)) +
+      facet_wrap(~Forest, ncol=3) +   # a panel for each mountain range
+      geom_boxplot(alpha = 0.5) +
+      theme_classic() +
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+
+```
+
+
+
 ## gmin 
-```{r}
+```{r H1 gmin}
 # Global test
 
-data$Name <- as.factor(data$Name)
-data$Type <- as.factor(data$Type)
+data_specialist$Name <- as.factor(data_specialist$Name)
+data_specialist$Type <- as.factor(data_specialist$Type)
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "TF")) #changer la reference
+gmin_habitat <- lm(Gmin ~Type, data= data_specialist)
+summary(gmin_habitat)
+anova(gmin_habitat)
 
-model_gmin1 <- lmer(Gmin ~ Type + (1|Forest/Type/Name), data=data) 
+gmin_forest <- lm(Gmin ~Type + Forest, data =  data_specialist)
+anova(gmin_habitat, gmin_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(gmin_forest) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
 
-summary(model_gmin1)
+gmin_comp <- lmer(Gmin ~ Type + Forest + (1|Name), data=data_specialist) 
 
+
+
+summary(gmin_comp)
 
 #Check normality of residuals 
 
-plot(model_gmin) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+plot(model_gmin1) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
 
 #pour lmer
 str(model_gmin)
@@ -105,48 +165,19 @@ qqnorm(resid(model_gmin))
 qqline(resid(model_gmin))
 
 #plot
-sjPlot::plot_model(model_gmin1)
+sjPlot::plot_model(gmin_comp)
 # Notes: axis labels should be in order from bottom to top. 
 # To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
 
-sjPlot::plot_model(model_gmin1, 
+sjPlot::plot_model(gmin_habitat, 
                    axis.labels=c("TF Specialists"),
                    show.values=TRUE, show.p=TRUE,
                    title="Effect of habitat preference on Gmin")
 
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
 
-#anova
-#summary(glht(model_gmin, linfct = mcp(Type = "Tukey")), test = adjusted("holm"))
+emmeans(gmin_comp, list(pairwise ~  Type), adjust = "tukey")
 
-emmeans(model_gmin1, list(pairwise ~ Type), adjust = "tukey")
-
-#Adding the emmeans to a google sheet the results
-
-stats_gmin<- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Subset") %>% filter(Trait == 'Gmin') 
-  
-#plot 
-
-gmin.summary <- aggregate(Gmin ~ Type, mean, data=data)
-gmin <- ggplot(data,aes(x=Type,y=Gmin, col=Name)) +
-   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
-  #geom_jitter() + 
-  geom_boxplot(alpha=0.2) + 
-  geom_crossbar(data=gmin.summary, aes(ymin = Gmin, ymax = Gmin),
-                  size=1,col="red", width = .5)+
-  theme(axis.text.x = element_text(face="bold", 
-                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(gmin~(mmol.m^-2~.s^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20)) # + 
-  #stat_pvalue_manual(stats_gmin, label = "p.adj.signif",
-                       y.position = c(5), hide.ns = TRUE)
-gmin
-
-#plot raw 
-
-
-ggplot(data, aes(x = Type, y = Gmin)) +
-geom_boxplot() +
-geom_jitter(aes(colour= Name)) +
-labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
-  
 
 ```
 
@@ -421,72 +452,6 @@ geom_jitter(aes(colour= Name)) +
 labs(x = "Habitat Preference", y = "Log(LA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
 ```
 
-## SLA 
-
-```{r}
-# Global test
-
-data$Name <- as.factor(data$Name)
-data$Type <- as.factor(data$Type)
-model_SLA <- lmer(SLA ~ Type + (1|Forest/Habitat/Name), data=data) #so better to use it like that, simpler
-summary(model_SLA)
-
-
-#Check normality of residuals 
-
-plot(model_SLA) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately fSLAt and close to zero, then one can assume that the residuals are normally distributed.
-
-
-#pour lmer
-str(model_SLA)
-model_SLA #you access the lmer objects through@
-resid(model_SLA)
-hist(resid(model_SLA), main = "Residual Histogram")
-boxplot(resid(model_SLA), main="Residual Box Plot")
-qqnorm(resid(model_SLA)) 
-qqline(resid(model_SLA))
-
-#plot
-sjPlot::plot_model(model_SLA)
-# Notes: axis SLAbels should be in order from bottom to top. 
-# To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
-
-sjPlot::plot_model(model_SLA, 
-                   axis.labels=c("Specialist TF"),
-                   show.values=TRUE, show.p=TRUE,
-                   title="Effect of habitat preference on SLA")
-
-
-#tukey
-
-emmeans(model_SLA, list(pairwise ~ Type), adjust = "tukey")
-
-#Adding the emmeans to a google sheet the results
-
-stats <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19VX7hTNn64D6G-HSF1b2L9JTMrf2UIfvL5jEhWyf6Ko/edit#gid=0", range = "Sheet1") %>% filter(Trait == 'SLA')
-
-SLA.summary <- aggregate(SLA ~ Type, mean, data=data)
-SLA <- ggplot(data,aes(x=Type,y=SLA, col=Name)) +
-   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
-  #geom_jitter() + 
-  geom_boxplot(alpha=0.2) + 
-  geom_crossbar(data=SLA.summary, aes(ymin = SLA, ymax = SLA),
-                  size=1,col="red", width = .5)+
-  theme(axis.text.x = element_text(face="bold", size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  
-  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
-  ylab(expression(SLA~(cm^2.g^-1))) + 
-  theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20))
-
-SLA
-
-#plot raw 
-
-
-ggplot(data, aes(x = Type, y = SLA)) +
-geom_boxplot() +
-geom_jitter(aes(colour= Name)) +
-labs(x = "Habitat Preference", y = "Log(SLA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
-```
 
 ## K 
 
@@ -741,26 +706,21 @@ geom_jitter(aes(colour= Name)) +
 labs(x = "Habitat Preference", y = "Log(N)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
 ```
 
-#Summary
-
-```{r}
-# install.packages("devtools")
-devtools::install_github("thomasp85/patchwork")
-library(patchwork)
-
-(gmin | tlp | LSWC)/(LA | SLA | MajVLA)/(K | P | C | N ) + plot_layout(guides = "collect")
-```
 
 
-# Model 1 
 
-Trait ~ Type + (1|Forest/Habitat/Name)
+# boucle
 
-Fixed effet of habitat preference and nested random effect of species within each habitat, and the habitats nested in the 3 forest sites.
 
-There is an error with this model : **boundary (singular) fit: see help('isSingular')** which means that there are not enough foresst sites to put it as random.
+Trait ~ Type + Forest + (1/Name)
 
-```{r}
+Fixed effet of habitat preference and forest and nested random effect of species.
+
+
+```{r boucle}
+
+#data from the clean data from Checks per trait per species script
+data <- clean
 
 name_list <- NULL
 Nbcol <- match(colnames(data)[9:18],colnames(data)) 
@@ -770,7 +730,7 @@ for ( i in data[,Nbcol]){
   name <- names(data[Nbcol[count]])
  
   #write the formula
-  formu <- formula(paste(name,"~Type + (1|Forest/Habitat/Name)"))
+  formu <- formula(paste(name,"~Type + Forest + (1|Name)"))
  
   # Create the graphz
   Scale_loc <- as.ggplot(
@@ -820,7 +780,7 @@ for ( i in data[,Nbcol]){
   ggsave(plot,
          filename=paste0("lmer_diagnostic_",name,".jpg"),
          device = "jpg",
-         path = "./Results/Model/Model_1/Subset/Diag",
+         path = "./Results/Model/Model_2/Subset/Diag",
          width = 7,
          height = 9,
          units = "in")
@@ -829,11 +789,11 @@ for ( i in data[,Nbcol]){
   
   #plot model
    print(sjPlot::plot_model(lmer(formula=formu,data=data), axis.labels=c("Specialist TF"), show.values=TRUE, show.p=TRUE,
-                   title="Effect of habitat preference on N",
-         file=paste0("./Results/Model/Model_1/Subset/Plot/",name,".jpeg")))
+                   title="Effect of habitat preference on",
+         file=paste0("./Results/Model/Model_2/Subset/Plot/",name,".jpeg")))
    
   # Create an html summary table
-  print(sjPlot::tab_model(lmer(formula=formu,data=data),file=paste0("./Results/Model/Model_1/Subset/Table/",name,".html")
+  print(sjPlot::tab_model(lmer(formula=formu,data=data),file=paste0("./Results/Model/Model_2/Subset/Table/",name,".html")
                           )
         )
   # # convert it to png
@@ -862,12 +822,251 @@ ggplot(data, aes(x = Type, y = Gmin, colour = Type)) +
 
 ```
 
+# Question 2
 
-# Model 2
+**(H2) Functional divergence among individuals of generalists between habitats in terms of water usage during the dry season.**
 
-Every habitat belong to only one forest. = NESTED
+IL y aurait un effet du TWI sur les traits fonctionnels et cela serait propre à chaque espèce.
 
-Every habitat TF (TF1, TF2, TF3) has species1, species2, species3. = CROSSED
-Every habitat BF (BF1, BF2, BF3) has species4, species5, species6.
+$$ MComp : Y_{ik} = \mu + \alpha_i + (\beta+ \gamma_{i}) x_{ik} + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+la pente $$\mu$$ commune a tout le monde 
+$$\alpha_i$$ effet diff de l'espèce sur l'ordonnée à l'origine
+$$\beta$$ pente commune a tout le monde
+$$\gamma$$ effet diff sur la pente liée au TWI
+
+H0 : "pas d'effet ni de l'espèce ni du TWI
+
+
+$$ M0 : Y_{ik} = \mu + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+
+##generalist data
+```{r data generalist}
+
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+data_generalist <- Metradica %>% filter(Type =="Generalist")
+```
+
+## graph
+```{r graph generalist, echo=FALSE}
+library(ggplot2)
+ggplot(data_generalist) +
+  aes(x = TWI, y = Gmin, colour = Name) +
+  geom_point(shape = "circle", size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+```
+
+
+## gmin
+```{r}
+MO_generalist <- lm(Gmin ~ 1, data = data_generalist)
+M1_generalist <- lm(Gmin ~Species + TWI, data = data_generalist) #meme pente pour tout le monde
+
+anova(MO_generalist, M1_generalist)
+
+#on peut rejetter l'hypothèse H0, il y a au moins un effet du TWI ou de l'espece sur Gmin.
+
+M_complet <- lm(Gmin ~Species + TWI + Species:TWI, data = data_generalist)
+
+anova(M1_generalist, M_complet)
+
+autoplot(M_complet) #tout parait ok, pas trop de structure, pas trop d'effet levier: 58 ?
+
+
+#plot results
+
+```
+
+
+
+
+# Question 3
+**(H3) Generalist species express a higher intraspecific trait variability than specialist species.**
+
+CV : pour quantifier l’ITV : absolute variation of the intraspecific trait with respect to the interspecific mean. 
+
+CV is defined as the ratio of the standard deviation \sigma to the mean , expressed as a percentage. CV is convenient to compare variation of traits among species as it requires no ad hoc assumptions and is unitless. 
+
+# CV
+```{r}
+
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(list(cv= re, eff = N))
+} 
+
+
+# For generalists
+
+
+
+  
+cv_G <- sub_data_G %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "K", "C", "N", "P"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                ungroup(cv_G) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G$Type <- c("Generalist")
+
+cv_long_G %>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_G, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+
+# For TF specialist
+
+
+cv_TF <- sub_data_TF %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "K", "C", "N", "P"), funs(cv))
+
+cv_TF <- bind_rows(cv_TF,
+                ungroup(cv_TF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_TF$Type <- c("TF")
+
+cv_long_TF%>% 
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_TF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+ 
+
+# For BF specialist
+
+cv_BF <- sub_data_SF %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA","K", "C", "N", "P"), funs(cv))
+
+cv_BF <- bind_rows(cv_BF,
+                ungroup(cv_BF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") 
+
+cv_long_BF$Type <- c("BF")
+
+ cv_long_BF%>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_BF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+
+cv_tot <- bind_rows(cv_long_G, cv_long_BF, cv_long_TF)
+
+
+```
+
+
+## graphs all
+```{r}
+# plot all 
+cv_tot %>% mutate(CV =CV*100)%>%
+  filter(Name != "mean") %>% 
+  filter(CV>0)%>%
+  ggplot(aes(x = trait, y = CV, fill = Type, alpha=0.4)) +
+  #scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404", "Bocoa_prouacensis"="#34e042", "Eschweilera_coriacea"="#34e042", "Conceveiba_guianensis"="#34e042", "Virola_michelii"="#34e042", "Protium_stevensonii"="#34e042", "Hymenopus_heteromorphus"="#34e042", "Jacaranda_copaia subsp. copaia"="#34e042"))+
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  ggtitle("Coefficient of variation %")+
+  theme(axis.title.x = element_blank(), axis.text.x = element_text())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("") + xlab("")+
+    theme_minimal()
+
+# Anova on CV
+#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+
+kruskal.test(CV ~ Type, data = cv_tot)
+
+cv_tot2<- cv_tot %>% filter(Name != "mean") %>% select(-Name) %>% filter(trait =="TLP")
+View(cv_tot2)
+
+pairwise.wilcox.test(cv_tot2$CV, cv_tot2$Type,
+                 p.adjust.method = "BH")
+
+
+#nothing is significant except for LSWC: BF and Generalists
+```
+
+
+## gmin graph
+
+```{r}
+cv_tot %>% mutate(CV =CV*100)%>%
+  filter(Name != "mean") %>% 
+  filter(trait == "Gmin") %>% 
+  ggplot(aes(x = trait, y = CV, fill = Type))+
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  ggtitle("Coefficient of variation %")+
+  theme(axis.title.x = element_blank(), axis.text.x = element_text())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("") + xlab("")+
+    theme_minimal()
+
+cv_tot_gmin <- cv_tot %>% filter(trait == "Gmin")
+
+M_CV <- lm(CV ~ Type, data = cv_tot_gmin, weights = nbre_esp) # mettre un poids car cv n'a pas ete calculer pour meme individu par espece par trait.
+summary(M_CV)
+
+M_CV_0 <- lm(CV ~1, data=cv_tot_gmin)
+anova(M_CV_0, M_CV)
+
+```
 
 

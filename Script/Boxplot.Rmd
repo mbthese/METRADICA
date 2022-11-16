@@ -47,6 +47,8 @@ Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets
   mutate(TLP = -TLP) %>% 
   na.omit() 
 
+#if probelms use: gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
 ```
 
 
