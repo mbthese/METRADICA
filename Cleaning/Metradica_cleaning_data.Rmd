@@ -940,6 +940,16 @@ Veindata_tidy <- Veindata %>% mutate(MajVLA = (MajVLA_S1 + MajVLA_S2)/2, midribV
 
 # Code number 430 is not the good species. it was detected by Christine Scoffoni. Elimination de l'individu 430 
 
+#444 value very high!!! outlier? D'après sack & scoffoni 2013 there are no MajVLA > 20
+#Elimination 444 for MajVLA measurement only. The second student did an error, so we take the measurement of the first student
+
+Veindata_tidy$midribVLA[Veindata_tidy$Code == 444] <- 0.164125881
+Veindata_tidy$SecondaryVLA[Veindata_tidy$Code == 444] <- 0.82094895
+Veindata_tidy$TertiaryVLA[Veindata_tidy$Code == 444] <- 2.286334552
+Veindata_tidy$MajVLA[Veindata_tidy$Code == 444] <- 3.271409383
+
+
+
 
 write_csv(Veindata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/majvla.csv")
 ```
@@ -1063,12 +1073,16 @@ library(rio)
 
 #input
 Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Kaw_individuals.csv") %>%
-  select(Code, idTree, Genus, Species, Name, Forest, Habitat, Type, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins, CrownPosition, DBH, Xutm, Yutm, TWI )
+  select(Code, idTree, DateField, Genus, Species, Forest, Plot, SubPlot, FieldNbr, Habitat, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins, CrownPosition, DBH, Xutm, Yutm)
+
+Kaw_individuals_completment_info <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/MetradicaKaw - traits.csv") %>% select(Code, Name, Type)
+
+Kaw_individuals_all <- left_join(Kaw_individuals, Kaw_individuals_completment_info) %>% relocate(Name, .after = Species) %>% relocate(Type, .after = Habitat)
 
 #looks already clean
 #don't worry, 620 is an individual but no field information was recorded unfortunately.
 #output
-export(Kaw_individuals, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
+write.csv(Kaw_individuals_all, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
 
 ```
 
@@ -1310,13 +1324,13 @@ write_csv(Chemistry_Kaw, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Do
 
 ## join with individuals
 ```{r}
-Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
+Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv") %>% select(-`...1`)
 
 Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/gmin.csv") %>% 
   select(Code, gmin) 
 
 TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/tlp.csv") %>%
-  select(Code, Ptlp) %>% rename(TLP = Ptlp)
+  select(Code, Ptlp) %>% rename(tlp = Ptlp)
 
 Vein <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/majvla.csv")%>% select(-Genus, -Species)
 
@@ -1665,5 +1679,46 @@ write_csv(FTH, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/ME
 ```
 
 
+#V -  Combine trait data for Metradica 
+
+##combine paracou data
+```{r}
+Paracou_first_campaign <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Paracou.csv") %>% select(-FW, -SW, -DW) %>% mutate(Name = paste0(Genus, " ", Species)) %>% relocate(Name, .after = Species) %>% rename(fvfm =FVFM, tlp =TLP) %>% relocate(c(DateField,Forest, Plot, SubPlot, FieldNbr, Habitat, Type), .after = idTree)
+
+Paracou_FTH <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH.csv") %>% select(-CodeFTH)
+
+Paracou <- rbind(Paracou_first_campaign, Paracou_FTH)
+
+write_csv(Paracou, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Paracou_both_campaigns.csv")
+
+
 ```
+
+##merge with kaw and bafog
+
+```{r}
+
+Paracou <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Paracou_both_campaigns.csv")
+
+names(Paracou)
+
+Kaw <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw.csv") %>% select(-DBH, -Xutm, -Yutm)
+
+Paracou_Kaw <- rbind(Paracou, Kaw)
+
+Bafog <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog.csv") %>% rename(SubPlot = Subplot, tlp= TLP, fvfm = FvFm) %>% select(-DBH, -Circ, -CommentField, -CommentLab)
+
+Paracou_Kaw_Bafog <- rbind(Paracou_Kaw, Bafog)
+High/Low/Middle
+
+
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "top"] <- 'High'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Sup"] <- 'High'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "high"] <- 'High'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Inf"] <- 'Low'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "low"] <- 'Low'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "mid"] <- 'Middle'
+Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Mid"] <- 'Middle'
+```
+
 
