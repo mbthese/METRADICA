@@ -1,0 +1,262 @@
+---
+title: "Indval"
+author: "Marion Boisseaux"
+date: "2022-11-18"
+output: html_document
+---
+## Species
+
+Specialist species are species that have a habitat preference, either for *terra firme* soils or for seasonally flooded soils in French Guiana. Generalist species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species. 
+
+We **hypothesize** that they should display large ITV since they inhabit a large ecological spectrum. We are interested to see how ITV of functional traits is structured for these generalist species. 
+
+### Indicator Species Analysis
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+**FAUX**
+*Generalist:  IndVal ≠ 0 in the habitats (pVal>0.08 )*
+*Specialists:  IndVal > 0.24 in one habitat (pVal<0.08)*
+
+**Now**
+*Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists (X species) and IndVal ≥  0.268 for TF specialists (X species). Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists.*
+
+```{r indval to consider}
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+```
+
+
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word **preference**), but are also a high probability of being sampled in the given habitat.
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r paracou species with indval threshold}
+identified_species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia", #en vrai subsp. copaia
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", #devient un spe TF
+  #"Carapa_surinamensis", #on enleve
+  #"Carapa_guianensis",#on enleve
+  "Laetia_procera",
+  "Protium_opacum", #en vrai  subsp. rabelianum
+  "Casearia_javitensis", #ne passe pas le threshold TF
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis", 
+  "Vouacapoua_americana" #ne passe pas le threshold TF
+  ))
+  
+
+Specialist_SF <- left_join(identified_species, Data_SF) %>% na.omit()
+#carapa surinamensis on enleve car on a un melange de deux espèce dans notre echantillonage avec guianensis
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+
+Generalist_fort_indval_deux_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui in both, removed it
+   mutate(Type = "SF specialist")
+
+
+
+#indval graphs
+
+library(forcats)
+library(ggplot2)
+
+
+Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+
+ 
+
+Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+
+#now for generalists
+
+
+Generalist <- left_join(identified_species, indval_FG) 
+
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#casearia trop fort dans un habitat pour le considérer un generalist!
+
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+
+
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+#même ordre de grandeur entre les indval TF et BF sauf pour le tachigali plutot plus SF. mais en meme temps abondance faible.
+
+```
+
+
+### Final taxa choice
+```{r final taxa}
+Metradica_species <-full_join(Generalist_all, Specialist_SF)
+
+Metradica_species <- full_join(Metradica_species, Specialist_TF)
+
+#mise en forme
+Metradica_species <- Metradica_species %>%
+    separate(Species, c("Genus", "Species"), "_")
+
+
+Metradica_species$Species[Metradica_species$Species == "opacum"] <- "opacum subsp. rabelianum"
+
+Metradica_species$Species[Metradica_species$Species == "copaia"] <- "copaia subsp. copaia"
+
+write.csv(Metradica_species,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species.csv")
+```
+
+
+### Chosen species 
+
+Our analysis identified 6 generalist taxa, 8 SFF specialist taxa and 6 terra firme specialist taxa.
+
+### More details about IndVal
+
+IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies. 
+
+Other indicators: 
+
+* Contrary to **TWINSPAN**, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies
+* Species richness (sensitive to several factors)
+* Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots. 
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(readxl)
+species <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
+    sheet = "Feuil3")
+library(kableExtra)
+kable(species)
+
+	
+species$Species[species$Species == "copaia subs. copaia"] <- "copaia subsp. copaia"
+species <- species %>% select(-Type)
+  
+  
+Metradica_species <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species.csv")
+
+Metradica_species <- Metradica_species %>% select(-X, -Abund, -Diff_Indval)
+
+species2 <- right_join(species, Metradica_species, by = c("Genus", "Species"))
+
+
+table <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+#  "Carapa_surinamensis",
+#  "Carapa_guianensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  #"Vouacapoua_americana"
+)) %>% 
+  separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+kable(select(table, Genus, Species), caption = "Studied species.")
+
+write.csv(species2, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv")
+
+```
+
+
+Un espèce : bc mortlité chez les jeunes donc parti pris de les considerer dans le choix des habitats. (percentile 10-90). 
+For *Eperua falcata*: BF?? see Laurens porter 2007 (are species adapted ...)
+

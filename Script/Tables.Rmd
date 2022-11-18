@@ -10,7 +10,7 @@ output: html_document
 library(tidyverse)
 library(ggfortify)
 library(dplyr)
-library(factoextra)
+library(factoextra) 
 library(FactoMineR)
 library(Factoshiny)
 library(corrplot) 
@@ -29,6 +29,8 @@ library(nlme)
 library(sjPlot) #for plotting lmer and glmer mods
 library(gridExtra)
 library(rio)
+library(dplyr)
+library(tidyr)
 ```
 
 # Species phylo
@@ -46,17 +48,27 @@ species <- data.frame(taxon = c(
   "Jacaranda_copaia subsp. copaia",
   "Pterocarpus_officinalis",
   "Symphonia_globulifera",
+  "Tachigali_melinonii",
   "Virola_surinamensis", 
   "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
   "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
   "Virola_michelii",
+#  "Carapa_surinamensis",
+#  "Carapa_guianensis",
   "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
   "Dicorynia_guianensis",
   "Gustavia_hexapetala",
   "Iryanthera_sagotiana",
   "Licania_membranacea",
   "Poraqueiba_guianensis"
-)) %>% 
+  #"Vouacapoua_americana"
+))%>% 
   separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
 kable(select(species, Genus, Species), caption = "Studied species.")
 
@@ -65,7 +77,7 @@ kable(select(species, Genus, Species), caption = "Studied species.")
 
 ```{r eval=FALSE, fig.cap="phylogeny", include=FALSE}
 
-species <- select(species, taxon , Genus, Species)
+species <- dplyr::select(species, taxon , Genus, Species)
 paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
   dplyr::select(Family, Genus, Species) %>% 
   unique() %>% 
@@ -73,17 +85,20 @@ paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xl
   mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
   dplyr::select(species, genus, family, taxon) %>% 
   mutate(taxon = as.character(taxon))
-tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
-save(tree, file = "./Results/phylogeny_subset.Rdata")
+#tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
 load("./Results/phylogeny_subset.Rdata")
 fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
   left_join(paracou) %>% 
   ggtree(aes(col = taxon), layout="circular") + 
   geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
-  theme_tree(legend.position='right', legend.text = element_text(face = "italic")) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
   scale_alpha_manual("taxon", values = c(0.2, 4)) +
   scale_size_manual("taxon", values = c(1, 4))
+
+```
+
 
 #Table sampling
 
@@ -109,17 +124,26 @@ Totaux  %>%
 
 ```{r Tab. S1. Individuals per species collected in the three sampling sites. }
 
-Totaux <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
-    sheet = "subset")
+Totaux <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv") %>%
+  select(-X, -Indval_SF, -Indval_TF, - P.value, -Type)
 
 options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+
+
+library(janitor)
+
+Totaux <- Totaux %>%
+  adorn_totals("col") 
 
 Totaux  %>%
   kbl(caption = "Individuals per species collected on the 3 sites") %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
   column_spec(2:3, italic = T) %>%
   row_spec(0, bold= T) %>%
-  row_spec(16, background = "#666;", color = "white") %>% save_kable(file = "Sampling.png", zoom = 10)
+  row_spec(21, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) %>%
+save_kable(file = "Sampling.png", zoom = 10)
 
 
 
