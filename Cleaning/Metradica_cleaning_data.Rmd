@@ -47,56 +47,30 @@ Leaf area including petiole was calculated using imageJ.
 After calculations with the gmin R project from the raw data, last steps are:
 
 ```{r}
-Gmin_Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/  gmin_Paracou.csv", 
+Gmin_Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Gmin/input/Metradica/Paracou/output/Metradica_Campaing_2020_Gmin_Clean_OUT.csv", 
     col_types = cols(Code = col_integer()))
-Gmin_Paracou <- rename(Gmin_Paracou, Code = rwcNr)
-
-library(readxl)
-Leaf_area <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/input/LAgminParacou.xlsx")
-Leaf_area <- rename(Leaf_area, Leaf_area = LA_gmin)
-Leaf_area<- select(Leaf_area, Code, Leaf_area)
-
-Leaf_area$Code <- as.integer(Leaf_area$Code)
-
-
-Gmin <- left_join(Gmin_Paracou, Leaf_area, by= "Code")
-
-
-#Check NA values for Leaf area
-
-Gmin %>% filter(is.na(Leaf_area))
-Gmin <- Gmin %>% filter(!is.na(Leaf_area))
-Gmin <- Gmin %>%
-  mutate(gmin.slope_function =-(beta/60/VPD_mean*1000/18/(Leaf_area*2/10000)))
 
 ```
 
 ### checking errors for gmin
 
- -Individual 10 : OK, but Daniela 9.621 
- -Individual 26 : NON : 17.67 calculated manually (but Daniela 17.86)
- -Individual 66: NON 9.01 calculated manually (But Daniela 19.08)
- -Individual 96: OK
- -Individual 108: OK
- -Individual 145: OK
+ 
+ -Individual 96: NON, 3.257 manual.
  -Individual 157 : NON 3.07 calculated manually (But Daniela 3.33)
- -Individual 184 : OK
- -Individual 212 : NON 10.05 calculated manually (but Daniela 12.38)
- -Individual 214 : NON 8.12 calculated manually (But Daniela 8.83)
+
 
 ```{r}
-Gmin$gmin[Gmin$Code == 26] <- 17.67
-Gmin$gmin[Gmin$Code == 66] <- 9.01
-Gmin$gmin[Gmin$Code == 157] <- 3.07
-Gmin$gmin[Gmin$Code == 212] <- 10.05
-Gmin$gmin[Gmin$Code == 214] <- 8.12
+
+Gmin_Paracou$gmin.slope[Gmin_Paracou$Code == 157] <- 3.07 #rapid weight loss info but manual calculation
+Gmin_Paracou$gmin.slope[Gmin_Paracou$Code == 96] <- 3.257 #adj part of curve info manual 
 
 
-Gmin$Code[which(Gmin$gmin >10)]
-#[1] 212  26  96
 
-Gmin$Gmin[which(Gmin$gmin >10)]
-#[1] 10.05000 17.67000 13.52127 
+Gmin_Paracou$Code[which(Gmin_Paracou$gmin.slope >10)]
+#[1] 212 235  26
+
+Gmin_Paracou$gmin.slope[which(Gmin_Paracou$gmin.slope >10)]
+#[1] 10.06892 12.60245 16.01937
 
 #Yes, these were re-checked. 
 
@@ -106,7 +80,7 @@ Gmin$Gmin[which(Gmin$gmin >10)]
 ```{r}
 #save gmin file
 
-write.csv(Gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv", row.names = FALSE)
+write.csv(Gmin_Paracou, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv", row.names = FALSE)
 ```
 
 
@@ -614,7 +588,7 @@ write_csv(fvfm_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Docume
 
 ```{r Summary Paracou}
 Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv") %>% 
-  select(Code, gmin.slope_function) %>% rename(gmin = gmin.slope_function) 
+  select(Code, gmin.slope) %>% rename(gmin = gmin.slope) 
 
 TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/tlp.csv") %>%
   select(`Code.RWC`, P_tlp) %>% rename(Code =`Code.RWC`,TLP = P_tlp)
@@ -674,7 +648,6 @@ Paracou_Indv <- Paracou_Indv %>% select(-Genus, -Species, -Name) %>% rename(Name
 Paracou_Indv <- Paracou_Indv %>% separate(Name, into = c("Genus", "Species"), sep = "_")
 
 
-
 #find duplicates
 Paracou_Indv$Code[duplicated(Paracou_Indv$Code)]
 
@@ -698,6 +671,9 @@ Field_info$idTree[Field_info$Code == 156] <- 144042
 Field_info$idTree[Field_info$Code == 105] <- 144423
 
 Paracou <- left_join(Paracou_Indv, Field_info)
+
+#last jacaranda copaia correct
+Paracou$Species[Paracou$Genus == 'Jacaranda'] <- 'copaia subsp. copaia'
 
 ```
 
@@ -726,7 +702,9 @@ Bafog_individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jabot
 
 Bafog_individuals$Species[Bafog_individuals$Genus == 'Jacaranda'] <- 'copaia subsp. copaia'
 
-Bafog_individuals$Name <- str_c(Bafog_individuals$Genus, '_', Bafog_individuals$Species) 
+Bafog_individuals <- Bafog_individuals %>%
+  mutate(Name = paste0(Genus, " ", Species))
+
 
 Bafog_individuals <- Bafog_individuals %>% 
   select(-Species_Name, -Site) %>%
@@ -737,9 +715,9 @@ Bafog_individuals <- Bafog_individuals %>%
   relocate(Forest, .after= DateField)
 
 #get the habitat and type
-Bafog_habitat <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/habitattype.csv")
+Bafog_habitat <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/habitattype.csv") %>% select(-Name)
 
-Bafog_fieldsheet <- left_join(Bafog_habitat,Bafog_individuals ,  by = c("Code", "Genus", "Species", "Name", "Habitat", "Forest", "TreeHeight", "TreeDawkins", "BranchHeight", "BranchDawkins"))
+Bafog_fieldsheet <- left_join(Bafog_habitat,Bafog_individuals ,  by = c("Code", "Genus", "Species", "Habitat", "Forest", "TreeHeight", "TreeDawkins", "BranchHeight", "BranchDawkins"))
 
 Bafog_fieldsheet <- Bafog_fieldsheet %>%
   relocate(DateField, .after= Code) %>%
@@ -747,7 +725,7 @@ Bafog_fieldsheet <- Bafog_fieldsheet %>%
   relocate( c("Plot", "Subplot", "FieldNbr"), .after= Forest ) %>%
   relocate(idTree, .after = Forest)
 
-export(Bafog_fieldsheet, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog_individuals.csv")
+write.csv(Bafog_fieldsheet, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog_individuals.csv")
 
 ```
 
@@ -850,36 +828,36 @@ write_csv(LA_gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Document
 ```
 
 With Daniela's function, calculte gmin for all bafog individuals. 
-```{r}
+```{r old script gmin, eval=FALSE, include=FALSE}
 gmin <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/Bafog/Gmin_withLA.csv")
 gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
 
 #check gmin
 
 gmin$gmin[gmin$Code == 377] <- 8.7116
-gmin$gmin[gmin$Code == 429] <- 12.28
+gmin$gmin[gmin$Code == 429] <- 12.28 *
 gmin$gmin[gmin$Code == 416] <- 14.5253
 gmin$gmin[gmin$Code == 374] <- 3.7775
-gmin$gmin[gmin$Code == 317] <- 11.43
-gmin$gmin[gmin$Code == 395] <- 9.73
+gmin$gmin[gmin$Code == 317] <- 11.43 *
+gmin$gmin[gmin$Code == 395] <- 9.73 *
 gmin$gmin[gmin$Code == 376] <- 10.9998
 gmin$gmin[gmin$Code == 430] <- NA #individu eliminé car cf comment raw gmin bafog
 gmin$gmin[gmin$Code == 355] <- 10.8779
-gmin$gmin[gmin$Code == 465] <- 9.95
+gmin$gmin[gmin$Code == 465] <- 9.95 *
 gmin$gmin[gmin$Code == 396] <- 13.03
-gmin$gmin[gmin$Code == 407] <- 10.75
-gmin$gmin[gmin$Code == 281] <- 6.72
-gmin$gmin[gmin$Code == 421] <- 14.22
-gmin$gmin[gmin$Code == 422] <- 9.6
-gmin$gmin[gmin$Code == 392] <- 9.25
+gmin$gmin[gmin$Code == 407] <- 10.75 
+gmin$gmin[gmin$Code == 281] <- 6.72 *
+gmin$gmin[gmin$Code == 421] <- 14.22 *
+gmin$gmin[gmin$Code == 422] <- 9.6 *
+gmin$gmin[gmin$Code == 392] <- 9.25 *
 gmin$gmin[gmin$Code == 389] <- 8.16
 gmin$gmin[gmin$Code == 404] <- 5.92
 gmin$gmin[gmin$Code == 386] <- 6.45
-gmin$gmin[gmin$Code == 375] <- 9.3353
+gmin$gmin[gmin$Code == 375] <- 9.3353 *
 gmin$gmin[gmin$Code == 436] <- 26.65
 gmin$gmin[gmin$Code == 435] <- 11.83
-gmin$gmin[gmin$Code == 339] <- 8.71
-gmin$gmin[gmin$Code == 351] <- 7.30
+gmin$gmin[gmin$Code == 339] <- 8.71 *
+gmin$gmin[gmin$Code == 351] <- 7.30 *
 gmin$gmin[gmin$Code == 366] <- 4.85
   
 gmin$Code[which(gmin$gmin >10)]
@@ -888,8 +866,16 @@ gmin$Code[which(gmin$gmin >10)]
 gmin$gmin[which(gmin$gmin <1)]
 #none
 
+```
+
+```{r after data cleaning with daniela script}
+gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Gmin/input/Metradica/Bafog/output/Metradica_Bafog_Gmin_Clean_OUT.csv")
+
+#info 430  NA car individu eliminé car cf comment raw gmin bafog and not good species detected also while doing majvla.
+```
 
 
+```{r}
 write_csv(gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/gmin.csv")
 ```
 
@@ -997,7 +983,7 @@ Bafog_individuals <- read_csv("Cleaning/Clean_Bafog/Bafog_individuals.csv")
 
 
 Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/gmin.csv") %>% 
-  select(Code, gmin) 
+  select(Code, gmin.slope) %>% rename(gmin = gmin.slope) 
 
 TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/tlp.csv") %>%
   select(Code, Ptlp) %>% rename(TLP = Ptlp)
@@ -1075,12 +1061,20 @@ library(rio)
 Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/Kaw_individuals.csv") %>%
   select(Code, idTree, DateField, Genus, Species, Forest, Plot, SubPlot, FieldNbr, Habitat, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins, CrownPosition, DBH, Xutm, Yutm)
 
-Kaw_individuals_completment_info <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/MetradicaKaw - traits.csv") %>% select(Code, Name, Type)
+Kaw_individuals_completment_info <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/MetradicaKaw - traits.csv") %>% select(Code, Type)
 
-Kaw_individuals_all <- left_join(Kaw_individuals, Kaw_individuals_completment_info) %>% relocate(Name, .after = Species) %>% relocate(Type, .after = Habitat)
+Kaw_individuals_all <- left_join(Kaw_individuals, Kaw_individuals_completment_info)  %>% relocate(Type, .after = Habitat)
 
+Kaw_individuals_all$Species[Kaw_individuals_all$Genus == 'Jacaranda'] <- 'copaia subsp. copaia'
+Kaw_individuals_all$Species[Kaw_individuals_all$Species == 'opacum'] <- 'opacum subsp. rabelianum'
+
+
+Kaw_individuals_all <- Kaw_individuals_all %>% mutate(Name= paste0(Genus, " ", Species)) %>% relocate(Name, .after = Species)
 #looks already clean
 #don't worry, 620 is an individual but no field information was recorded unfortunately.
+
+
+
 #output
 write.csv(Kaw_individuals_all, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv")
 
@@ -1095,7 +1089,7 @@ gmin parameters used:
 
 to do: 
 recheck 490, 638, 625, 627
-```{r}
+```{r old gmin script, eval=FALSE, include=FALSE}
 library(readr)
 gmin <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/Kaw/ALLGminwithLA.csv")
 gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
@@ -1105,11 +1099,11 @@ gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Co
 gmin$gmin[gmin$Code == 635] <- 4.23
 gmin$gmin[gmin$Code == 481] <- 19.16
 gmin$gmin[gmin$Code == 514] <- 11.47
-gmin$gmin[gmin$Code == 554] <- 11.53
-gmin$gmin[gmin$Code == 541] <- 13.99
-gmin$gmin[gmin$Code == 594] <- 5.6987
+gmin$gmin[gmin$Code == 554] <- 11.53 *
+gmin$gmin[gmin$Code == 541] <- 13.99 *
+gmin$gmin[gmin$Code == 594] <- 5.6987 *
 gmin$gmin[gmin$Code == 536] <- 8.16
-gmin$gmin[gmin$Code == 581] <- NA #erreur rawdata
+gmin$gmin[gmin$Code == 581] <- NA #erreur rawdata *
 
 
 gmin$Code[which(gmin$gmin >10)]
@@ -1124,6 +1118,20 @@ gmin$Code[which(gmin$gmin <1)]
 #625
 #627
 
+
+```
+
+```{r new kaw gmin script post data cleaning with daniela}
+gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Gmin/input/Metradica/Kaw/output/Metradica_Kaw_Gmin_Clean_OUT.csv")
+
+gmin$gmin.slope[gmin$Code == 554] <- 11.53 
+gmin$gmin.slope[gmin$Code == 541] <- 13.99 
+gmin$gmin.slope[gmin$Code == 594] <- 5.6987 
+gmin$gmin.slope[gmin$Code == 581] <- NA #erreur rawdata *
+```
+
+
+```{r}
 
 write_csv(gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/gmin.csv")
 ```
@@ -1327,7 +1335,7 @@ write_csv(Chemistry_Kaw, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Do
 Kaw_individuals <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw_individuals.csv") %>% select(-`...1`)
 
 Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/gmin.csv") %>% 
-  select(Code, gmin) 
+  select(Code, gmin.slope) %>% rename(gmin = gmin.slope) 
 
 TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/tlp.csv") %>%
   select(Code, Ptlp) %>% rename(tlp = Ptlp)
@@ -1392,6 +1400,8 @@ Only 35 individuals from the 100 sampled for the HydroITV project were common to
 
 ```{r}
 FTH_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/individuals_FTH2021.csv")
+
+FTH_individuals$Species[FTH_individuals$Genus == 'Jacaranda'] <- 'copaia subsp. copaia'
 
 FTH_individuals <- FTH_individuals %>%
           mutate(Name = paste0(Genus, " ", Species)) %>%
@@ -1663,7 +1673,7 @@ Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documen
 ) %>% rename(SD = StomatalDensity_Stomate_mm2
 )
 
-fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv") %>% select(Code, fvfm)
+fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_fvfm.csv") %>% select(Code, fvfm)
 
 FTH <- left_join(FTH_individuals, Gmin, by="Code")
 FTH <- left_join(FTH, TLP, by="Code")
@@ -1706,10 +1716,10 @@ Kaw <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/M
 
 Paracou_Kaw <- rbind(Paracou, Kaw)
 
-Bafog <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog.csv") %>% rename(SubPlot = Subplot, tlp= TLP, fvfm = FvFm) %>% select(-DBH, -Circ, -CommentField, -CommentLab)
+Bafog <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog.csv") %>% rename(SubPlot = Subplot, tlp= TLP, fvfm = FvFm) %>% select(-DBH, -Circ, -CommentField, -CommentLab, -`...1`)
 
 Paracou_Kaw_Bafog <- rbind(Paracou_Kaw, Bafog)
-High/Low/Middle
+#High/Low/Middle
 
 #homogenization des terminaison
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "top"] <- 'High'
@@ -1720,6 +1730,12 @@ Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "low"] <- 'Lo
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "mid"] <- 'Middle'
 Paracou_Kaw_Bafog$CrownPosition[Paracou_Kaw_Bafog$CrownPosition == "Mid"] <- 'Middle'
 Paracou_Kaw_Bafog$Type[Paracou_Kaw_Bafog$Type == "Generalists"] <- 'Generalist'
+
+
+#final Metradica data, finally
+
+write_csv(Paracou_Kaw_Bafog, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv")
+
 ```
 
 

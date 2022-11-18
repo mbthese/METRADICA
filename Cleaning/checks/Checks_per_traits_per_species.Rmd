@@ -7,8 +7,13 @@ output: html_document
 
 #data
 ```{r setup, include=FALSE}
-Metradica_notLOG <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
-  select(Code, Name,Forest, Gmin, FvFm, TLP, LA, LSWC, MajVLA, MidribWidth, SecundaryWidth, N, C, P, Ca, Na, K, DBH, TWI) %>% na.omit() 
+#Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+ # select(Code, Name,Forest, Gmin, FvFm, TLP, LA, LSWC, MajVLA, MidribWidth, SecundaryWidth, N, C, P, Ca, Na, K, DBH, TWI) %>% na.omit()
+
+
+#paracou post marion cleaning see Metradica_cleaning_data.Rmd
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv")
+
 ```
 
 
@@ -17,20 +22,20 @@ Trait values per species
 #gmin
 ```{r}
 
-long_species <- Metradica_notLOG %>% 
-  dplyr::select(-Code, -Forest, -TWI) %>%
+long_species <- Metradica %>% 
+  dplyr::select(-Code, -Forest) %>%
   gather(Trait, Value, -Name) %>% 
   group_by(Name, Trait) %>% 
   summarise(Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE)) 
 
 
-gmin_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, Gmin) 
+gmin_species_data <- Metradica %>% dplyr::select(Code, Name, gmin) 
 
 
 library(ggplot2)
 
 gmin_species <- ggplot(gmin_species_data) +
- aes(x = Name, y = Gmin, fill = Code) +
+ aes(x = Name, y = gmin, fill = Code) +
  geom_boxplot() +
  geom_jitter() +
  theme_minimal()+
@@ -43,21 +48,21 @@ ggplotly(gmin_species)
 #After correcting and indicating on googlesheet the corrected manually gmin: sheet:https://docs.google.com/document/d/1cylTKbyByoqeHczvqt6Ftrf_Tx6xYGJpk7L0a5opozQ/edit?usp=sharing 
 
 
-Paracou_gmin <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=1159265517", range = "traits") %>% 
-  select(Code, Name,Forest, Habitat, Gmin) %>% na.omit()
+Paracou_gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Paracou_both_campaigns.csv") %>% 
+  select(Code, Name,Forest, Habitat, gmin) %>% na.omit()
 
-Bafog_gmin<- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/14E9RjSB4dq8epcDBqMtRi1HOGddbhLOWA8g6TF1bDWM/edit#gid=21187810", range = "traits") %>% 
-  select(Code, Name,Forest, Habitat, Gmin) %>% na.omit()
+Bafog_gmin<-read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Bafog.csv")  %>% 
+  select(Code, Name,Forest, Habitat, gmin) %>% na.omit()
 
 
-Kaw_gmin <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=794535871", range = "traits") %>% 
-  select(Code, Name,Forest, Habitat, Gmin) %>% na.omit()
+Kaw_gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Kaw.csv")  %>% 
+  select(Code, Name,Forest, Habitat, gmin) %>% na.omit()
 
 
 gmin<- bind_rows(Paracou_gmin, Bafog_gmin, Kaw_gmin)
 
 gmin_species2 <- ggplot(gmin) +
- aes(x = Name, y = Gmin, fill = Code) +
+ aes(x = Name, y = gmin, fill = Code) +
  geom_boxplot() +
  geom_jitter() +
  theme_minimal()+
@@ -67,15 +72,47 @@ gmin_species2 <- ggplot(gmin) +
 ggplotly(gmin_species2)
 
 gmin_species <- gmin %>% 
-  dplyr::select(-Code, -Forest) %>%
+  dplyr::select(-Code, -Forest, -Habitat) %>%
   gather(Trait, Value, -Name) %>% 
   group_by(Name, Trait) %>% 
   summarise(Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE)) %>%
   kbl() %>%
   row_spec(0, bold = TRUE) %>% 
   column_spec(1, italic = TRUE) %>%
-  kable_classic_2(full_width = F) #%>% save_kable(file = "Summary_gmin_species.png")
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/gmin_check/Summary_gmin_species.png")
 
+gmin_forest <- gmin %>% 
+  dplyr::select(-Code, -Name) %>%
+  gather(Trait, Value, -Forest, -Habitat) %>% 
+  group_by(Forest, Trait) %>% 
+  summarise(Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE)) %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/gmin_check/Summary_gmin_forest.png", zoom = 10)
+
+
+
+gmin_habitat_forest <- gmin  %>% 
+  dplyr::select(-Code, -Name) %>%
+  gather(Trait, Value, -Habitat, -Forest) %>% 
+  group_by(Forest, Habitat, Trait) %>% 
+  summarise(Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE))  %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/gmin_check/Summary_gmin_Habitat_Forest.png", zoom = 10)
+
+
+gmin_habitat <- gmin  %>% 
+  dplyr::select(-Code, -Name) %>%
+  gather(Trait, Value, -Habitat, -Forest) %>% 
+  group_by(Habitat, Trait) %>% 
+  summarise(Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE))  %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/gmin_check/Summary_gmin_Habitat.png", zoom = 10)
 ```
 
 
@@ -83,7 +120,7 @@ gmin_species <- gmin %>%
 #fvfm
 
 ```{r}
-fvfm_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, FvFm, Forest, Habitat) 
+fvfm_species_data <- Metradica %>% dplyr::select(Code, Name, FvFm, Forest, Habitat) 
 
 
 library(ggplot2)
@@ -152,7 +189,7 @@ fvfm_habitat <- FvFm  %>%
 #TLP
 
 ```{r}
-TLP_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, TLP, Forest) 
+TLP_species_data <- Metradica %>% dplyr::select(Code, Name, TLP, Forest) 
 
 
 library(ggplot2)
@@ -224,7 +261,7 @@ TLP_habitat <- TLP  %>%
 #LA
 
 ```{r}
-LA_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, LA, Forest) 
+LA_species_data <- Metradica %>% dplyr::select(Code, Name, LA, Forest) 
 
 
 library(ggplot2)
@@ -292,7 +329,7 @@ LA_habitat <- LA  %>%
 #LSWC
 
 ```{r}
-LSWC_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, LSWC, Forest) 
+LSWC_species_data <- Metradica %>% dplyr::select(Code, Name, LSWC, Forest) 
 
 
 library(ggplot2)
@@ -361,7 +398,7 @@ LSWC_habitat <- LSWC  %>%
 #MajVLA
 
 ```{r}
-MajVLA_species_data <- Metradica_notLOG %>% dplyr::select(Code, Name, MajVLA, Forest) 
+MajVLA_species_data <- Metradica %>% dplyr::select(Code, Name, MajVLA, Forest) 
 
 
 library(ggplot2)
@@ -436,6 +473,104 @@ MajVLA_habitat <- MajVLA  %>%
 
 ```
 
+
+#NA
+
+```{r}
+
+#mettre en format long
+long_metradica <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species, -Name, -Forest) %>%
+  gather(Trait, Value) %>% 
+  group_by(Trait) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  mutate_if(is.numeric, format, digits=4,nsmall = 0) %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits.png")
+
+#per forest
+long_metradica <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species, -Name) %>%
+  gather(Trait, Value, -Forest) %>% 
+  group_by(Trait, Forest) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_forest.png")
+#per species SD
+long_metradica_species <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species, -Forest) %>%
+  gather(Trait, Value, -Name) %>% 
+  group_by(Trait, Name) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  filter(Trait == "SD") %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>%
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_species_SD.png") 
+#per forest SD
+long_metradica_species <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species) %>%
+  gather(Trait, Value, -Name, -Forest) %>% 
+  group_by(Trait, Name, Forest) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  filter(Trait == "SD") %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>%
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_species_SD_forest.png") 
+
+#per species tlp
+long_metradica_species <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species, -Forest) %>%
+  gather(Trait, Value, -Name) %>% 
+  group_by(Trait, Name) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  filter(Trait == "tlp") %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>%
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_species_tlp.png")
+#per forest tlp
+long_metradica_species <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species) %>%
+  gather(Trait, Value, -Name, -Forest) %>% 
+  group_by(Trait, Name, Forest) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`) %>%
+  select(-n) %>%
+  filter(Trait == "tlp") %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>%
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_species_tlp_forest.png") 
+
+#all
+#mettre en format long
+long_metradica <- Metradica %>% 
+  dplyr::select(-Code, -idTree, -DateField, -Plot, -SubPlot, -FieldNbr, -Habitat, -Type, -Genus, -Species, -Name, -Forest, -CrownPosition) %>%
+  gather(Trait, Value) %>% 
+  group_by(Trait) %>% 
+  summarise(n= n(),  `number of na`=sum(is.na(Value)), `number of values`= n-`number of na`, Mean = mean(Value, na.rm=TRUE), n= n(), SD = sd(Value, na.rm = TRUE), SE = SD/sqrt(n), MIN = min(Value, na.rm = TRUE), MAX = max(Value, na.rm = TRUE)) %>%
+  select(-n) %>%
+  mutate_if(is.numeric, format, digits=2,nsmall = 0) %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/Summary_traits_all.png")
+
+
+```
+
+
+
 #Summary
 
 ```{r}
@@ -447,12 +582,12 @@ clean <- left_join(clean, gmin)
 
 clean <- left_join(clean, TLP)
 
-Metradica_notLOG <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
   select(Code, Name,Forest, Type, TWI)
 
 clean$Code <- as.numeric(clean$Code)
 
-clean2 <- left_join(clean, Metradica_notLOG)
+clean2 <- left_join(clean, Metradica)
 ```
 
 

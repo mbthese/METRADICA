@@ -1,184 +1,184 @@
 "","Code","idTree","DateField","Genus","Species","Name","Forest","Plot","SubPlot","FieldNbr","Habitat","Type","TreeHeight","TreeDawkins","BranchHeight","BranchDawkins","CrownPosition","DBH","Xutm","Yutm"
-"1",474,252041,"10/05/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","1","38","TF","Generalists",32,5,25,4,"Middle",31.49681529,369234,505012.3
-"2",475,252055,"10/05/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","1","53","TF","Generalists",25,4,20,4,"Low",39.01978137,369242.4,505016.3
-"3",476,252075,"10/05/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","1","73","TF","Generalists",25,3,23,3,"Middle",35.25477707,369255.1,504995.2
-"4",477,252028,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","25","TF","TF",15,2,14,2,"Middle",13.66242038,369265.9,504988.2
-"5",478,252488,"10/05/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","1","484","TF","TF",33,5,26,5,"Middle",55.02789678,369318.9,505019
-"6",479,252192,"10/05/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","1","190","TF","TF",18,2,15,2,"Middle",32.07006369,369288.9,504971.9
-"7",480,252197,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","195","TF","TF",18,3,16,2,"Middle",16.24203822,369295.7,504967.3
-"8",481,252485,"10/05/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Kaw","1","481","TF","Generalists",15,4,12,3,"Middle",12.80254777,369321.1,505017.4
-"9",482,252326,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","324","TF","TF",14,3,12,2,"High",24.20382166,369316.1,504974.9
-"10",483,252541,"10/05/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","1","537","TF","TF",13,3,8,3,"Middle",15.66878981,369329.5,505030.7
-"11",484,252542,"10/05/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Kaw","1","538","TF","Generalists",20,4,17,4,"Middle",19.49044586,369329.9,505029
-"12",485,NA,"10/05/2021","Licania","membranacea","Licania_membranacea","Kaw","Kaw","1","Lmx","TF","TF",28,3,26,2,"Middle",43.7,369288.92,504948.61
-"13",486,252501,"10/05/2021","Virola","michelii","Virola_michelii","Kaw","Kaw","1","497","TF","Generalists",23,4,21,4,"High",22.89808917,369311.7,505034.9
-"14",487,NA,"10/05/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","1","Vax","TF","TF",34,5,24,3,"Low",60,369264.27,504933.62
-"15",488,252099,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","97","TF","TF",20,3,15,2,"Low",31.01910828,369275.5,504960.2
-"16",489,252025,"10/05/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","1","22","TF","TF",17,2,15,2,"Middle",20.41401274,369253.5,504974.3
-"17",490,252475,"10/05/2021","Chrysophyllum","prieurii","Chrysophyllum_prieurii","Kaw","Kaw","1","471","TF","Generalists",12,2,8,2,"Low",12.7,369337.5,504999.5
-"18",491,252565,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","561","TF","TF",10,2,8,2,"Low",10.3,NA,NA
-"19",492,252128,"10/05/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","126","TF","TF",13,3,12,2,"Middle",16.24203822,369272.5,504977.8
-"20",493,NA,"10/05/2021","Virola","michelii","Virola_michelii","Kaw","Kaw","1","Vmx","TF","Generalists",25,5,18,5,"High",40,369255.54,505026.38
-"21",494,252179,"10/05/2021","Bocoa","prouacensis","Bocoa_prouacensis","Kaw","Kaw","1","177","TF","Generalists",18,2,16,2,"Middle",27.38853503,369276.1,504993.3
-"22",495,NA,"06/10/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Kaw","H","142","TF","Generalists",30,4,22,2,"Low",45,369179.66,505028.39
-"23",496,252169,"06/10/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","1","167","TF","TF",17,3,15,3,"High",19.42675159,369271.5,505015
-"24",497,NA,"06/10/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","2","Tmx","TF","Generalists",26,4,18,4,"Low",NA,NA,NA
-"25",498,252658,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","2","85","TF","TF",24,3,20,3,"Middle",44.58598726,369228,505034.5
-"26",499,NA,"06/10/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","H","Tmx","TF","Generalists",33,5,31,5,"High",NA,NA,NA
-"27",500,NA,"06/10/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Kaw","H","136","TF","Generalists",21,3,16,3,"Middle",22.9,369415.07,504946.41
-"28",501,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","Va1x","TF","TF",25,4,18,3,"Low",46,369377.06,504973.33
-"29",502,252513,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","1","509","TF","Generalists",8,2,8,2,"High",15.57324841,369302.2,505052.5
-"30",503,252397,"06/10/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","1","395","TF","Generalists",20,4,16,3,"Middle",14.36305732,369290.5,505046.8
-"31",504,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","1","Jcx","TF","Generalists",10,4,9,4,"High",14.7,NA,NA
-"32",505,NA,"06/10/2021","Virola","michelii","Virola_michelii","Kaw","Kaw","H","143","TF","Generalists",25,4,16,4,"Middle",55,369100.11,505026.53
-"33",506,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","33","TF","Generalists",32,5,28,5,"High",33,369013.73,504986.1
-"34",507,NA,"06/10/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","H","34","TF","TF",25,3,18,3,"Middle",38.2,369020.52,504998.91
-"35",508,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","30","TF","Generalists",32,5,30,5,"High",45,368845.79,505007.93
-"36",509,NA,NA,NA,NA,"_",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
-"37",510,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","32","TF","Generalists",17,5,17,5,"High",19,368863.54,505006.91
-"38",511,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","31","TF","TF",23,4,21,2,"Middle",49.5,368843.25,505013.8
-"39",512,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","26","TF","TF",25,3,21,3,"Low",49.8,368711.86,504929.87
-"40",513,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","29","TF","TF",24,4,22,4,"High",35.2,368714.3,504933.41
-"41",514,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","27","TF","Generalists",21,4,21,4,"High",26.5,368711.64,504931.53
-"42",515,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","37","TF","TF",24,3,20,3,"High",33.9,369018.87,504940.32
-"43",516,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","39","TF","TF",22,4,10,3,"Middle",70,369017.62,504928.49
-"44",517,NA,"06/10/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","38","TF","Generalists",26,4,22,4,"High",33.1,369024.61,504925.6
-"45",518,NA,"10/07/2021","Virola","michelii","Virola_michelii","Kaw","Kaw","H","133","TF","Generalists",22,3,18,3,"Middle",38.2,NA,NA
-"46",519,NA,"10/07/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Kaw","H","134","TF","Generalists",28,3,20,3,"Low",60,NA,NA
-"47",520,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","H","25","TF","TF",18,2,15,3,"Middle",22.3,NA,NA
-"48",521,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","H","24","TF","TF",24,5,15,4,"Low",24.5,NA,NA
-"49",522,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Kaw","H","22","TF","TF",23,3,15,2,"Low",33.6,NA,NA
-"50",523,NA,"10/07/2021","Vouacapoua","americana","Vouacapoua_americana","Kaw","Kaw","H","21","TF","TF",25,2,12,2,"Low",29.5,NA,NA
-"51",524,NA,"10/07/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Kaw","H","23","TF","Generalists",35,5,33,5,"High",50,NA,NA
-"52",525,NA,"10/07/2021","Licania","membranacea","Licania_membranacea","Kaw","Kaw","H","158","TF","TF",32,4,28,3,"Middle",46,NA,NA
-"53",526,NA,"10/07/2021","Gustavia","hexapetala","Gustavia_hexapetala","Kaw","Kaw","H","152","TF","TF",14,3,13,2,"High",20,NA,NA
-"54",527,NA,"10/07/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Kaw","H","150","TF","TF",13,4,12,3,"High",13,NA,NA
-"55",528,NA,"10/07/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Kaw","H","Tmx3","TF","Generalists",37,5,35,5,"High",NA,NA,NA
-"56",529,NA,"10/07/2021","Bocoa","prouacensis","Bocoa_prouacensis","Kaw","Kaw","H","148","TF","Generalists",35,5,31,4,"Middle",45,NA,NA
-"57",530,NA,"10/07/2021","Licania","membranacea","Licania_membranacea","Kaw","Kaw","H","154","TF","TF",18,2,15,2,"Low",11,NA,NA
-"58",531,NA,"10/07/2021","Licania","membranacea","Licania_membranacea","Kaw","Kaw","H","147","TF","TF",16,3,14,2,"Middle",10.5,NA,NA
-"59",532,NA,NA,NA,NA,"_",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
-"60",533,NA,NA,NA,NA,"_",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
-"61",534,NA,"10/07/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Crique Gabrielle","H","SGx1","BF","BF",24,4,21,4,"High",38.21656051,NA,NA
-"62",535,NA,"10/07/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Crique Gabrielle","H","81","BF","BF",26,5,24,5,"High",57.32484076,NA,NA
-"63",536,NA,"10/07/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","Vsx2","BF","BF",13,5,13,5,"High",25.47770701,NA,NA
-"64",537,NA,"10/07/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","Vsx1","BF","BF",13,5,12,5,"High",26.43312102,NA,NA
-"65",538,NA,"08/10/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Malou","H","97","BF","BF",26,5,20,4,"Low",55,NA,NA
-"66",539,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","42","BF","BF",18,2,16,3,"Middle",22.7,NA,NA
-"67",540,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","41","BF","BF",22,3,18,3,"Middle",25.8,NA,NA
-"68",541,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","44","BF","BF",15,3,15,3,"High",22.4,NA,NA
-"69",542,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","46","BF","BF",14,3,14,3,"High",19.2,NA,NA
-"70",543,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","45","BF","BF",14,3,12,3,"Middle",14,NA,NA
-"71",544,NA,"08/10/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","47","BF","BF",26,5,16,4,"Middle",60,NA,NA
-"72",545,NA,"08/10/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Malou","H","43","BF","BF",25,5,24,5,"High",40.5,NA,NA
-"73",546,NA,"08/10/2021","Laetia","procera","Laetia_procera","Kaw","Malou","H","51","BF","BF",28,5,26,5,"High",42.4,NA,NA
-"74",547,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","49","BF","BF",16,4,10,3,"Low",34,NA,NA
-"75",548,NA,"08/10/2021","Laetia","procera","Laetia_procera","Kaw","Malou","H","48","BF","BF",19,4,17,4,"High",40.8,NA,NA
-"76",549,NA,"08/10/2021","Laetia","procera","Laetia_procera","Kaw","Malou","H","50","BF","BF",15,4,13,4,"Middle",27,NA,NA
-"77",550,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","53","BF","BF",26,5,20,4,"Middle",43,NA,NA
-"78",551,NA,"08/10/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Malou","H","88","BF","BF",37,5,34,5,"Middle",50,NA,NA
-"79",552,NA,"08/10/2021","Laetia","procera","Laetia_procera","Kaw","Malou","H","96","BF","BF",17,3,13,3,"Low",26,NA,NA
-"80",553,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","55","BF","BF",14,3,10,3,"Middle",14.2,NA,NA
-"81",554,NA,"08/10/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","56","BF","BF",20,4,17,3,"Middle",23.6,NA,NA
-"82",555,NA,"08/10/2021","Laetia","procera","Laetia_procera","Kaw","Malou","H","54","BF","BF",27,5,27,5,"High",26.4,NA,NA
-"83",556,NA,"08/10/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","89","BF","BF",38,5,38,5,"High",50,NA,NA
-"84",557,NA,"08/10/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Malou","H","93","BF","BF",12,4,8,3,"Low",21,NA,NA
-"85",558,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","66","BF","BF",17,5,16,4,"High",36.5,NA,NA
-"86",559,NA,"10/11/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Crique Gabrielle","H","67","BF","BF",15,2,15,2,"High",20.2,NA,NA
-"87",560,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","65","BF","BF",16,4,16,4,"High",25,NA,NA
-"88",561,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","68","BF","BF",19,5,18,5,"High",29,NA,NA
-"89",562,NA,"10/11/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Crique Gabrielle","H","69","BF","BF",18,4,16,4,"High",31.5,NA,NA
-"90",563,NA,"10/11/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Crique Gabrielle","H","70","BF","BF",24,5,23,4,"Middle",75.2,NA,NA
-"91",564,NA,"10/11/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Crique Gabrielle","H","72","BF","BF",18,3,16,4,"High",26.5,NA,NA
-"92",565,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","71","BF","BF",12,2,12,2,"High",19.7,NA,NA
-"93",566,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","74","BF","BF",16,4,14,2,"Middle",45.4,NA,NA
-"94",567,NA,"10/11/2021","Virola","surinamensis","Virola_surinamensis","Kaw","Crique Gabrielle","H","73","BF","BF",19,5,17,4,"Middle",42,NA,NA
-"95",568,NA,"10/11/2021",NA,NA,"_","Kaw","Crique Gabrielle","H",NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
-"96",569,NA,"10/11/2021",NA,NA,"_","Kaw","Crique Gabrielle","H",NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
-"97",570,NA,"10/11/2021","Laetia","procera","Laetia_procera","Kaw","Crique Gabrielle","H","76","BF","BF",14,4,14,4,"High",15.2,NA,NA
-"98",571,NA,"10/11/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Crique Gabrielle","H","80","BF","BF",23,5,20,4,"Middle",50.4,NA,NA
-"99",572,NA,"10/12/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Tresor","H","14","TF","Generalists",28,5,20,3,"Low",50,NA,NA
-"100",573,NA,"10/12/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Tresor","H","18","TF","Generalists",23,4,19,4,"Low",32,NA,NA
-"101",574,NA,"10/12/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Tresor","H","13","TF","Generalists",19,4,15,3,"Middle",47,NA,NA
-"102",575,NA,"10/12/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Tresor","H","17","TF","Generalists",35,5,28,4,"Middle",60,NA,NA
-"103",576,NA,"10/12/2021","Protium","stevensonii","Protium_stevensonii","Kaw","Tresor","H","16","TF","Generalists",20,4,17,3,"Low",60,NA,NA
-"104",577,NA,"10/12/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Tresor","H","9","TF","Generalists",32,5,32,5,"High",40.7,NA,NA
-"105",578,NA,"10/12/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Tresor","H","10","TF","TF",25,4,16,4,"Low",35.9,NA,NA
-"106",579,NA,"10/12/2021","Licania","membranacea","Licania_membranacea","Kaw","Tresor","H","6","TF","TF",18,4,16,4,"Middle",18.6,NA,NA
-"107",580,NA,"10/12/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Tresor","H","Pgx1","TF","TF",24,5,18,4,"Low",36.5,NA,NA
-"108",581,NA,"10/12/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Tresor","H","Isx1","TF","TF",29,5,25,4,"Low",NA,NA,NA
-"109",582,228348,"10/13/2021","Iryanthera","sagotiana","Iryanthera_sagotiana","Kaw","Tresor","1","142","TF","TF",23,3,21,3,"Middle",27.1,NA,NA
-"110",583,228463,"10/13/2021","Poraqueiba","guianensis","Poraqueiba_guianensis","Kaw","Tresor","1","259","TF","TF",14,2,12,2,"Low",14.3,NA,NA
-"111",584,228208,"10/13/2021","Gustavia","hexapetala","Gustavia_hexapetala","Kaw","Tresor","1","1","TF","TF",14,3,11,3,"Low",21.6,NA,NA
-"112",585,228431,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","227","TF","Generalists",20,2,17,2,"Middle",35.3,NA,NA
-"113",586,228391,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","185","TF","Generalists",19,2,16,2,"Low",23.4,NA,NA
-"114",587,228447,"10/13/2021","Bocoa","prouacensis","Bocoa_prouacensis","Kaw","Tresor","1","243","TF","Generalists",12,3,11,2,"Middle",19.4,NA,NA
-"115",588,228227,"10/13/2021","Gustavia","hexapetala","Gustavia_hexapetala","Kaw","Tresor","1","20","TF","TF",14,3,12,2,"Middle",18.5,NA,NA
-"116",589,228279,"10/13/2021","Gustavia","hexapetala","Gustavia_hexapetala","Kaw","Tresor","1","73","TF","TF",15,2,13,2,"Middle",19.7,NA,NA
-"117",590,228529,"10/13/2021","Gustavia","hexapetala","Gustavia_hexapetala","Kaw","Tresor","1","325","TF","TF",18,4,13,2,"Low",25.9,NA,NA
-"118",591,228580,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","377","TF","Generalists",14,4,12,3,"Low",18.8,NA,NA
-"119",592,228337,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","131","TF","Generalists",12,2,7,2,"Low",12.6,NA,NA
-"120",593,228578,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","375","TF","Generalists",18,4,8,3,"Low",22.1,NA,NA
-"121",594,228374,"10/13/2021","Virola","michelii","Virola_michelii","Kaw","Tresor","1","168","TF","Generalists",8,2,6,2,"Low",21.7,NA,NA
-"122",595,228344,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","138","TF","Generalists",13,4,8,3,"Low",15.3,NA,NA
-"123",596,228576,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","373","TF","Generalists",23,4,16,3,"Low",34.9,NA,NA
-"124",597,228575,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","372","TF","Generalists",14,3,11,3,"Middle",13.8,NA,NA
-"125",598,228574,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","371","TF","Generalists",14,2,8,2,"Low",10.3,NA,NA
-"126",599,228608,"10/13/2021","Eschweilera","coriacea","Eschweilera_coriacea","Kaw","Tresor","1","405","TF","Generalists",24,2,10,3,"Low",20.4,NA,NA
-"127",600,228495,"10/13/2021","Virola","michelii","Virola_michelii","Kaw","Tresor","1","291","TF","Generalists",13,3,8,3,"Middle",18.1,NA,NA
-"128",601,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Malou","H","95","BF","Generalists",13,4,10,3,"Low",25,NA,NA
-"129",602,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Malou","H","90","BF","Generalists",18,4,15,3,"Middle",25,NA,NA
-"130",603,NA,"10/14/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","94","BF","BF",19,4,16,2,"Low",36,NA,NA
-"131",604,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus_heteromorphus","Kaw","Malou","H","92","BF","Generalists",17,4,15,3,"Middle",20,NA,NA
-"132",605,NA,"10/14/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","91","BF","BF",20,5,18,5,"High",25,NA,NA
-"133",606,NA,"10/14/2021","Protium","opacum","Protium_opacum subsp. rabelianum","Kaw","Malou","H","58","BF","BF",12,4,8,4,"Middle",15.5,NA,NA
-"134",607,NA,"10/14/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Malou","H","61","BF","BF",12,5,12,5,"High",17.5,NA,NA
-"135",608,NA,"10/14/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Malou","H","57","BF","BF",34,5,15,3,"Low",53,NA,NA
-"136",609,NA,"10/14/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Malou","H","60","BF","BF",25,5,20,5,"Low",48,NA,NA
-"137",610,NA,"10/14/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","64","BF","BF",35,5,30,5,"High",40,NA,NA
-"138",611,NA,"10/14/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","Sgx1","BF","BF",24,5,20,5,"Low",49,NA,NA
-"139",612,NA,"10/14/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","Sgx2","BF","BF",27,5,20,5,"Middle",59,NA,NA
-"140",613,NA,"10/14/2021","Symphonia","globulifera","Symphonia_globulifera","Kaw","Malou","H","Sgx3","BF","BF",23,5,21,4,"Low",50,NA,NA
-"141",614,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","99","BF","BF",9,4,9,4,"top",23.9,NA,NA
-"142",615,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","101","BF","BF",12,4,9,3,"mid",11.62,NA,NA
-"143",616,NA,"10/18/2021","Carapa","guianensis","Carapa_guianensis","Kaw","Waiki Village","H","102","BF","BF",20,5,20,4,"top",37.4,NA,NA
-"144",617,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","100","BF","BF",13,5,13,4,"top",13.05,NA,NA
-"145",618,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","103","BF","BF",18,5,18,4,"top",22.9,NA,NA
-"146",619,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","107","BF","BF",14,2,14,2,"mid",17.2,NA,NA
-"147",620,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","105","BF","BF",NA,NA,NA,NA,NA,11.46,NA,NA
-"148",621,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","108","BF","BF",10,2,8,3,"mid",15.3,NA,NA
-"149",622,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","106","BF","BF",12,3,10,3,"top",12.42,NA,NA
-"150",623,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","109","BF","BF",10,4,8,3,"mid",17,NA,NA
-"151",624,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus_officinalis","Kaw","Waiki Village","H","98","BF","BF",12,3,12,3,"top",13.05,NA,NA
-"152",625,NA,"10/19/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Val","H","326","BF","Generalists",16,5,16,5,"top",31.5,NA,NA
-"153",626,NA,"10/19/2021","Laetia","procera","Laetia_procera","Kaw","Val","H","323","BF","BF",18,4,18,4,"top",53,NA,NA
-"154",627,NA,"10/19/2021","Laetia","procera","Laetia_procera","Kaw","Val","H","319","BF","BF",19,4,19,4,"top",27,NA,NA
-"155",628,NA,"10/19/2021","Laetia","procera","Laetia_procera","Kaw","Val","H","324","BF","BF",18,4,18,3,"top",20.2,NA,NA
-"156",629,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","321","BF","BF",15,4,15,4,"top",18.9,NA,NA
-"157",630,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","315","BF","BF",22,5,20,4,"top",64.7,NA,NA
-"158",631,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","322","BF","BF",16,3,14,4,"mid",33,NA,NA
-"159",632,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","316","BF","BF",14,4,14,4,"top",13.7,NA,NA
-"160",633,NA,"10/19/2021","Laetia","procera","Laetia_procera","Kaw","Val","H","18","BF","BF",22,5,22,5,"top",45,NA,NA
-"161",634,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","311","BF","BF",16,4,15,3,"mid",28,NA,NA
-"162",635,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","314","BF","BF",24,5,20,4,"top",53,NA,NA
-"163",636,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","327","BF","BF",18,4,18,4,"top",25.5,NA,NA
-"164",637,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","312","BF","BF",12,3,11,2,"mid",18,NA,NA
-"165",638,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","313","BF","BF",18,4,11,3,"low",40,NA,NA
-"166",639,NA,"10/19/2021","Eperua","falcata","Eperua_falcata","Kaw","Val","H","310","BF","BF",23,2,20,3,"low",47,NA,NA
-"167",640,NA,"10/19/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Val","H","306","BF","Generalists",28,5,26,4,"mid",63.5,NA,NA
-"168",641,NA,"10/19/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Val","H","304","BF","Generalists",13,4,12,4,"top",15.5,NA,NA
-"169",642,NA,"10/19/2021","Tachigali","melinonii","Tachigali_melinonii","Kaw","Val","H","303","BF","Generalists",40,5,36,4,"mid",55,NA,NA
-"170",643,NA,"10/19/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Val","H","302","BF","Generalists",33,5,31,3,"mid",48,NA,NA
-"171",644,NA,"10/20/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Tonton","H","326","BF","Generalists",23,5,23,5,"top",25,NA,NA
-"172",645,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","327","BF","BF",15,3,13,3,"mid",17,NA,NA
-"173",646,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","330","BF","BF",14,2,11,2,"mid",13.3,NA,NA
-"174",647,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","331","BF","BF",7,1,6,2,"mid",10.8,NA,NA
-"175",648,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","332","BF","BF",11,2,9,3,"mid",11.6,NA,NA
-"176",649,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","333","BF","BF",9,2,8,2,"mid",12.1,NA,NA
-"177",650,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Tonton","H","334","BF","BF",8,2,8,2,"top",11.5,NA,NA
-"178",651,NA,"10/20/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Val","H","335","BF","Generalists",15,5,15,5,"top",21,NA,NA
-"179",652,NA,"10/20/2021","Jacaranda","copaia","Jacaranda_copaia subsp. copaia","Kaw","Val","H","336","BF","Generalists",18,5,18,5,"top",22,NA,NA
-"180",653,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Val","H","337","BF","BF",10,2,8,2,"mid",20,NA,NA
-"181",654,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Val","H","338","BF","BF",11,4,9,2,"mid",24,NA,NA
-"182",655,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Val","H","339","BF","BF",12,2,8,3,"mid",23,NA,NA
-"183",656,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera_hostmannii","Kaw","Val","H","340","BF","BF",12,2,8,2,"mid",18,NA,NA
+"1",474,252041,"10/05/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","1","38","TF","Generalists",32,5,25,4,"Middle",31.49681529,369234,505012.3
+"2",475,252055,"10/05/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","1","53","TF","Generalists",25,4,20,4,"Low",39.01978137,369242.4,505016.3
+"3",476,252075,"10/05/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","1","73","TF","Generalists",25,3,23,3,"Middle",35.25477707,369255.1,504995.2
+"4",477,252028,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","25","TF","TF",15,2,14,2,"Middle",13.66242038,369265.9,504988.2
+"5",478,252488,"10/05/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","1","484","TF","TF",33,5,26,5,"Middle",55.02789678,369318.9,505019
+"6",479,252192,"10/05/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","1","190","TF","TF",18,2,15,2,"Middle",32.07006369,369288.9,504971.9
+"7",480,252197,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","195","TF","TF",18,3,16,2,"Middle",16.24203822,369295.7,504967.3
+"8",481,252485,"10/05/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Kaw","1","481","TF","Generalists",15,4,12,3,"Middle",12.80254777,369321.1,505017.4
+"9",482,252326,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","324","TF","TF",14,3,12,2,"High",24.20382166,369316.1,504974.9
+"10",483,252541,"10/05/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","1","537","TF","TF",13,3,8,3,"Middle",15.66878981,369329.5,505030.7
+"11",484,252542,"10/05/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Kaw","1","538","TF","Generalists",20,4,17,4,"Middle",19.49044586,369329.9,505029
+"12",485,NA,"10/05/2021","Licania","membranacea","Licania membranacea","Kaw","Kaw","1","Lmx","TF","TF",28,3,26,2,"Middle",43.7,369288.92,504948.61
+"13",486,252501,"10/05/2021","Virola","michelii","Virola michelii","Kaw","Kaw","1","497","TF","Generalists",23,4,21,4,"High",22.89808917,369311.7,505034.9
+"14",487,NA,"10/05/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","1","Vax","TF","TF",34,5,24,3,"Low",60,369264.27,504933.62
+"15",488,252099,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","97","TF","TF",20,3,15,2,"Low",31.01910828,369275.5,504960.2
+"16",489,252025,"10/05/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","1","22","TF","TF",17,2,15,2,"Middle",20.41401274,369253.5,504974.3
+"17",490,252475,"10/05/2021","Chrysophyllum","prieurii","Chrysophyllum prieurii","Kaw","Kaw","1","471","TF","Generalists",12,2,8,2,"Low",12.7,369337.5,504999.5
+"18",491,252565,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","561","TF","TF",10,2,8,2,"Low",10.3,NA,NA
+"19",492,252128,"10/05/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","126","TF","TF",13,3,12,2,"Middle",16.24203822,369272.5,504977.8
+"20",493,NA,"10/05/2021","Virola","michelii","Virola michelii","Kaw","Kaw","1","Vmx","TF","Generalists",25,5,18,5,"High",40,369255.54,505026.38
+"21",494,252179,"10/05/2021","Bocoa","prouacensis","Bocoa prouacensis","Kaw","Kaw","1","177","TF","Generalists",18,2,16,2,"Middle",27.38853503,369276.1,504993.3
+"22",495,NA,"06/10/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Kaw","H","142","TF","Generalists",30,4,22,2,"Low",45,369179.66,505028.39
+"23",496,252169,"06/10/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","1","167","TF","TF",17,3,15,3,"High",19.42675159,369271.5,505015
+"24",497,NA,"06/10/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","2","Tmx","TF","Generalists",26,4,18,4,"Low",NA,NA,NA
+"25",498,252658,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","2","85","TF","TF",24,3,20,3,"Middle",44.58598726,369228,505034.5
+"26",499,NA,"06/10/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","H","Tmx","TF","Generalists",33,5,31,5,"High",NA,NA,NA
+"27",500,NA,"06/10/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Kaw","H","136","TF","Generalists",21,3,16,3,"Middle",22.9,369415.07,504946.41
+"28",501,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","Va1x","TF","TF",25,4,18,3,"Low",46,369377.06,504973.33
+"29",502,252513,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","1","509","TF","Generalists",8,2,8,2,"High",15.57324841,369302.2,505052.5
+"30",503,252397,"06/10/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","1","395","TF","Generalists",20,4,16,3,"Middle",14.36305732,369290.5,505046.8
+"31",504,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","1","Jcx","TF","Generalists",10,4,9,4,"High",14.7,NA,NA
+"32",505,NA,"06/10/2021","Virola","michelii","Virola michelii","Kaw","Kaw","H","143","TF","Generalists",25,4,16,4,"Middle",55,369100.11,505026.53
+"33",506,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","33","TF","Generalists",32,5,28,5,"High",33,369013.73,504986.1
+"34",507,NA,"06/10/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","H","34","TF","TF",25,3,18,3,"Middle",38.2,369020.52,504998.91
+"35",508,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","30","TF","Generalists",32,5,30,5,"High",45,368845.79,505007.93
+"36",509,NA,NA,NA,NA,"NA NA",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
+"37",510,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","32","TF","Generalists",17,5,17,5,"High",19,368863.54,505006.91
+"38",511,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","31","TF","TF",23,4,21,2,"Middle",49.5,368843.25,505013.8
+"39",512,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","26","TF","TF",25,3,21,3,"Low",49.8,368711.86,504929.87
+"40",513,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","29","TF","TF",24,4,22,4,"High",35.2,368714.3,504933.41
+"41",514,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","27","TF","Generalists",21,4,21,4,"High",26.5,368711.64,504931.53
+"42",515,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","37","TF","TF",24,3,20,3,"High",33.9,369018.87,504940.32
+"43",516,NA,"06/10/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","39","TF","TF",22,4,10,3,"Middle",70,369017.62,504928.49
+"44",517,NA,"06/10/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","38","TF","Generalists",26,4,22,4,"High",33.1,369024.61,504925.6
+"45",518,NA,"10/07/2021","Virola","michelii","Virola michelii","Kaw","Kaw","H","133","TF","Generalists",22,3,18,3,"Middle",38.2,NA,NA
+"46",519,NA,"10/07/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Kaw","H","134","TF","Generalists",28,3,20,3,"Low",60,NA,NA
+"47",520,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","H","25","TF","TF",18,2,15,3,"Middle",22.3,NA,NA
+"48",521,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","H","24","TF","TF",24,5,15,4,"Low",24.5,NA,NA
+"49",522,NA,"10/07/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Kaw","H","22","TF","TF",23,3,15,2,"Low",33.6,NA,NA
+"50",523,NA,"10/07/2021","Vouacapoua","americana","Vouacapoua americana","Kaw","Kaw","H","21","TF","TF",25,2,12,2,"Low",29.5,NA,NA
+"51",524,NA,"10/07/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Kaw","H","23","TF","Generalists",35,5,33,5,"High",50,NA,NA
+"52",525,NA,"10/07/2021","Licania","membranacea","Licania membranacea","Kaw","Kaw","H","158","TF","TF",32,4,28,3,"Middle",46,NA,NA
+"53",526,NA,"10/07/2021","Gustavia","hexapetala","Gustavia hexapetala","Kaw","Kaw","H","152","TF","TF",14,3,13,2,"High",20,NA,NA
+"54",527,NA,"10/07/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Kaw","H","150","TF","TF",13,4,12,3,"High",13,NA,NA
+"55",528,NA,"10/07/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Kaw","H","Tmx3","TF","Generalists",37,5,35,5,"High",NA,NA,NA
+"56",529,NA,"10/07/2021","Bocoa","prouacensis","Bocoa prouacensis","Kaw","Kaw","H","148","TF","Generalists",35,5,31,4,"Middle",45,NA,NA
+"57",530,NA,"10/07/2021","Licania","membranacea","Licania membranacea","Kaw","Kaw","H","154","TF","TF",18,2,15,2,"Low",11,NA,NA
+"58",531,NA,"10/07/2021","Licania","membranacea","Licania membranacea","Kaw","Kaw","H","147","TF","TF",16,3,14,2,"Middle",10.5,NA,NA
+"59",532,NA,NA,NA,NA,"NA NA",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
+"60",533,NA,NA,NA,NA,"NA NA",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
+"61",534,NA,"10/07/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Crique Gabrielle","H","SGx1","BF","BF",24,4,21,4,"High",38.21656051,NA,NA
+"62",535,NA,"10/07/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Crique Gabrielle","H","81","BF","BF",26,5,24,5,"High",57.32484076,NA,NA
+"63",536,NA,"10/07/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","Vsx2","BF","BF",13,5,13,5,"High",25.47770701,NA,NA
+"64",537,NA,"10/07/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","Vsx1","BF","BF",13,5,12,5,"High",26.43312102,NA,NA
+"65",538,NA,"08/10/2021","Carapa","guianensis","Carapa guianensis","Kaw","Malou","H","97","BF","BF",26,5,20,4,"Low",55,NA,NA
+"66",539,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","42","BF","BF",18,2,16,3,"Middle",22.7,NA,NA
+"67",540,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","41","BF","BF",22,3,18,3,"Middle",25.8,NA,NA
+"68",541,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","44","BF","BF",15,3,15,3,"High",22.4,NA,NA
+"69",542,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","46","BF","BF",14,3,14,3,"High",19.2,NA,NA
+"70",543,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","45","BF","BF",14,3,12,3,"Middle",14,NA,NA
+"71",544,NA,"08/10/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","47","BF","BF",26,5,16,4,"Middle",60,NA,NA
+"72",545,NA,"08/10/2021","Virola","surinamensis","Virola surinamensis","Kaw","Malou","H","43","BF","BF",25,5,24,5,"High",40.5,NA,NA
+"73",546,NA,"08/10/2021","Laetia","procera","Laetia procera","Kaw","Malou","H","51","BF","BF",28,5,26,5,"High",42.4,NA,NA
+"74",547,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","49","BF","BF",16,4,10,3,"Low",34,NA,NA
+"75",548,NA,"08/10/2021","Laetia","procera","Laetia procera","Kaw","Malou","H","48","BF","BF",19,4,17,4,"High",40.8,NA,NA
+"76",549,NA,"08/10/2021","Laetia","procera","Laetia procera","Kaw","Malou","H","50","BF","BF",15,4,13,4,"Middle",27,NA,NA
+"77",550,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","53","BF","BF",26,5,20,4,"Middle",43,NA,NA
+"78",551,NA,"08/10/2021","Virola","surinamensis","Virola surinamensis","Kaw","Malou","H","88","BF","BF",37,5,34,5,"Middle",50,NA,NA
+"79",552,NA,"08/10/2021","Laetia","procera","Laetia procera","Kaw","Malou","H","96","BF","BF",17,3,13,3,"Low",26,NA,NA
+"80",553,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","55","BF","BF",14,3,10,3,"Middle",14.2,NA,NA
+"81",554,NA,"08/10/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","56","BF","BF",20,4,17,3,"Middle",23.6,NA,NA
+"82",555,NA,"08/10/2021","Laetia","procera","Laetia procera","Kaw","Malou","H","54","BF","BF",27,5,27,5,"High",26.4,NA,NA
+"83",556,NA,"08/10/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","89","BF","BF",38,5,38,5,"High",50,NA,NA
+"84",557,NA,"08/10/2021","Carapa","guianensis","Carapa guianensis","Kaw","Malou","H","93","BF","BF",12,4,8,3,"Low",21,NA,NA
+"85",558,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","66","BF","BF",17,5,16,4,"High",36.5,NA,NA
+"86",559,NA,"10/11/2021","Carapa","guianensis","Carapa guianensis","Kaw","Crique Gabrielle","H","67","BF","BF",15,2,15,2,"High",20.2,NA,NA
+"87",560,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","65","BF","BF",16,4,16,4,"High",25,NA,NA
+"88",561,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","68","BF","BF",19,5,18,5,"High",29,NA,NA
+"89",562,NA,"10/11/2021","Carapa","guianensis","Carapa guianensis","Kaw","Crique Gabrielle","H","69","BF","BF",18,4,16,4,"High",31.5,NA,NA
+"90",563,NA,"10/11/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Crique Gabrielle","H","70","BF","BF",24,5,23,4,"Middle",75.2,NA,NA
+"91",564,NA,"10/11/2021","Carapa","guianensis","Carapa guianensis","Kaw","Crique Gabrielle","H","72","BF","BF",18,3,16,4,"High",26.5,NA,NA
+"92",565,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","71","BF","BF",12,2,12,2,"High",19.7,NA,NA
+"93",566,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","74","BF","BF",16,4,14,2,"Middle",45.4,NA,NA
+"94",567,NA,"10/11/2021","Virola","surinamensis","Virola surinamensis","Kaw","Crique Gabrielle","H","73","BF","BF",19,5,17,4,"Middle",42,NA,NA
+"95",568,NA,"10/11/2021",NA,NA,"NA NA","Kaw","Crique Gabrielle","H",NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
+"96",569,NA,"10/11/2021",NA,NA,"NA NA","Kaw","Crique Gabrielle","H",NA,NA,NA,NA,NA,NA,NA,NA,0,NA,NA
+"97",570,NA,"10/11/2021","Laetia","procera","Laetia procera","Kaw","Crique Gabrielle","H","76","BF","BF",14,4,14,4,"High",15.2,NA,NA
+"98",571,NA,"10/11/2021","Carapa","guianensis","Carapa guianensis","Kaw","Crique Gabrielle","H","80","BF","BF",23,5,20,4,"Middle",50.4,NA,NA
+"99",572,NA,"10/12/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Tresor","H","14","TF","Generalists",28,5,20,3,"Low",50,NA,NA
+"100",573,NA,"10/12/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Tresor","H","18","TF","Generalists",23,4,19,4,"Low",32,NA,NA
+"101",574,NA,"10/12/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Tresor","H","13","TF","Generalists",19,4,15,3,"Middle",47,NA,NA
+"102",575,NA,"10/12/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Tresor","H","17","TF","Generalists",35,5,28,4,"Middle",60,NA,NA
+"103",576,NA,"10/12/2021","Protium","stevensonii","Protium stevensonii","Kaw","Tresor","H","16","TF","Generalists",20,4,17,3,"Low",60,NA,NA
+"104",577,NA,"10/12/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Tresor","H","9","TF","Generalists",32,5,32,5,"High",40.7,NA,NA
+"105",578,NA,"10/12/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Tresor","H","10","TF","TF",25,4,16,4,"Low",35.9,NA,NA
+"106",579,NA,"10/12/2021","Licania","membranacea","Licania membranacea","Kaw","Tresor","H","6","TF","TF",18,4,16,4,"Middle",18.6,NA,NA
+"107",580,NA,"10/12/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Tresor","H","Pgx1","TF","TF",24,5,18,4,"Low",36.5,NA,NA
+"108",581,NA,"10/12/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Tresor","H","Isx1","TF","TF",29,5,25,4,"Low",NA,NA,NA
+"109",582,228348,"10/13/2021","Iryanthera","sagotiana","Iryanthera sagotiana","Kaw","Tresor","1","142","TF","TF",23,3,21,3,"Middle",27.1,NA,NA
+"110",583,228463,"10/13/2021","Poraqueiba","guianensis","Poraqueiba guianensis","Kaw","Tresor","1","259","TF","TF",14,2,12,2,"Low",14.3,NA,NA
+"111",584,228208,"10/13/2021","Gustavia","hexapetala","Gustavia hexapetala","Kaw","Tresor","1","1","TF","TF",14,3,11,3,"Low",21.6,NA,NA
+"112",585,228431,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","227","TF","Generalists",20,2,17,2,"Middle",35.3,NA,NA
+"113",586,228391,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","185","TF","Generalists",19,2,16,2,"Low",23.4,NA,NA
+"114",587,228447,"10/13/2021","Bocoa","prouacensis","Bocoa prouacensis","Kaw","Tresor","1","243","TF","Generalists",12,3,11,2,"Middle",19.4,NA,NA
+"115",588,228227,"10/13/2021","Gustavia","hexapetala","Gustavia hexapetala","Kaw","Tresor","1","20","TF","TF",14,3,12,2,"Middle",18.5,NA,NA
+"116",589,228279,"10/13/2021","Gustavia","hexapetala","Gustavia hexapetala","Kaw","Tresor","1","73","TF","TF",15,2,13,2,"Middle",19.7,NA,NA
+"117",590,228529,"10/13/2021","Gustavia","hexapetala","Gustavia hexapetala","Kaw","Tresor","1","325","TF","TF",18,4,13,2,"Low",25.9,NA,NA
+"118",591,228580,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","377","TF","Generalists",14,4,12,3,"Low",18.8,NA,NA
+"119",592,228337,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","131","TF","Generalists",12,2,7,2,"Low",12.6,NA,NA
+"120",593,228578,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","375","TF","Generalists",18,4,8,3,"Low",22.1,NA,NA
+"121",594,228374,"10/13/2021","Virola","michelii","Virola michelii","Kaw","Tresor","1","168","TF","Generalists",8,2,6,2,"Low",21.7,NA,NA
+"122",595,228344,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","138","TF","Generalists",13,4,8,3,"Low",15.3,NA,NA
+"123",596,228576,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","373","TF","Generalists",23,4,16,3,"Low",34.9,NA,NA
+"124",597,228575,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","372","TF","Generalists",14,3,11,3,"Middle",13.8,NA,NA
+"125",598,228574,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","371","TF","Generalists",14,2,8,2,"Low",10.3,NA,NA
+"126",599,228608,"10/13/2021","Eschweilera","coriacea","Eschweilera coriacea","Kaw","Tresor","1","405","TF","Generalists",24,2,10,3,"Low",20.4,NA,NA
+"127",600,228495,"10/13/2021","Virola","michelii","Virola michelii","Kaw","Tresor","1","291","TF","Generalists",13,3,8,3,"Middle",18.1,NA,NA
+"128",601,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Malou","H","95","BF","Generalists",13,4,10,3,"Low",25,NA,NA
+"129",602,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Malou","H","90","BF","Generalists",18,4,15,3,"Middle",25,NA,NA
+"130",603,NA,"10/14/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","94","BF","BF",19,4,16,2,"Low",36,NA,NA
+"131",604,NA,"10/14/2021","Hymenopus","heteromorphus","Hymenopus heteromorphus","Kaw","Malou","H","92","BF","Generalists",17,4,15,3,"Middle",20,NA,NA
+"132",605,NA,"10/14/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","91","BF","BF",20,5,18,5,"High",25,NA,NA
+"133",606,NA,"10/14/2021","Protium","opacum subsp. rabelianum","Protium opacum subsp. rabelianum","Kaw","Malou","H","58","BF","BF",12,4,8,4,"Middle",15.5,NA,NA
+"134",607,NA,"10/14/2021","Carapa","guianensis","Carapa guianensis","Kaw","Malou","H","61","BF","BF",12,5,12,5,"High",17.5,NA,NA
+"135",608,NA,"10/14/2021","Carapa","guianensis","Carapa guianensis","Kaw","Malou","H","57","BF","BF",34,5,15,3,"Low",53,NA,NA
+"136",609,NA,"10/14/2021","Carapa","guianensis","Carapa guianensis","Kaw","Malou","H","60","BF","BF",25,5,20,5,"Low",48,NA,NA
+"137",610,NA,"10/14/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","64","BF","BF",35,5,30,5,"High",40,NA,NA
+"138",611,NA,"10/14/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","Sgx1","BF","BF",24,5,20,5,"Low",49,NA,NA
+"139",612,NA,"10/14/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","Sgx2","BF","BF",27,5,20,5,"Middle",59,NA,NA
+"140",613,NA,"10/14/2021","Symphonia","globulifera","Symphonia globulifera","Kaw","Malou","H","Sgx3","BF","BF",23,5,21,4,"Low",50,NA,NA
+"141",614,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","99","BF","BF",9,4,9,4,"top",23.9,NA,NA
+"142",615,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","101","BF","BF",12,4,9,3,"mid",11.62,NA,NA
+"143",616,NA,"10/18/2021","Carapa","guianensis","Carapa guianensis","Kaw","Waiki Village","H","102","BF","BF",20,5,20,4,"top",37.4,NA,NA
+"144",617,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","100","BF","BF",13,5,13,4,"top",13.05,NA,NA
+"145",618,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","103","BF","BF",18,5,18,4,"top",22.9,NA,NA
+"146",619,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","107","BF","BF",14,2,14,2,"mid",17.2,NA,NA
+"147",620,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","105","BF","BF",NA,NA,NA,NA,NA,11.46,NA,NA
+"148",621,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","108","BF","BF",10,2,8,3,"mid",15.3,NA,NA
+"149",622,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","106","BF","BF",12,3,10,3,"top",12.42,NA,NA
+"150",623,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","109","BF","BF",10,4,8,3,"mid",17,NA,NA
+"151",624,NA,"10/18/2021","Pterocarpus","officinalis","Pterocarpus officinalis","Kaw","Waiki Village","H","98","BF","BF",12,3,12,3,"top",13.05,NA,NA
+"152",625,NA,"10/19/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Val","H","326","BF","Generalists",16,5,16,5,"top",31.5,NA,NA
+"153",626,NA,"10/19/2021","Laetia","procera","Laetia procera","Kaw","Val","H","323","BF","BF",18,4,18,4,"top",53,NA,NA
+"154",627,NA,"10/19/2021","Laetia","procera","Laetia procera","Kaw","Val","H","319","BF","BF",19,4,19,4,"top",27,NA,NA
+"155",628,NA,"10/19/2021","Laetia","procera","Laetia procera","Kaw","Val","H","324","BF","BF",18,4,18,3,"top",20.2,NA,NA
+"156",629,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","321","BF","BF",15,4,15,4,"top",18.9,NA,NA
+"157",630,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","315","BF","BF",22,5,20,4,"top",64.7,NA,NA
+"158",631,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","322","BF","BF",16,3,14,4,"mid",33,NA,NA
+"159",632,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","316","BF","BF",14,4,14,4,"top",13.7,NA,NA
+"160",633,NA,"10/19/2021","Laetia","procera","Laetia procera","Kaw","Val","H","18","BF","BF",22,5,22,5,"top",45,NA,NA
+"161",634,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","311","BF","BF",16,4,15,3,"mid",28,NA,NA
+"162",635,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","314","BF","BF",24,5,20,4,"top",53,NA,NA
+"163",636,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","327","BF","BF",18,4,18,4,"top",25.5,NA,NA
+"164",637,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","312","BF","BF",12,3,11,2,"mid",18,NA,NA
+"165",638,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","313","BF","BF",18,4,11,3,"low",40,NA,NA
+"166",639,NA,"10/19/2021","Eperua","falcata","Eperua falcata","Kaw","Val","H","310","BF","BF",23,2,20,3,"low",47,NA,NA
+"167",640,NA,"10/19/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Val","H","306","BF","Generalists",28,5,26,4,"mid",63.5,NA,NA
+"168",641,NA,"10/19/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Val","H","304","BF","Generalists",13,4,12,4,"top",15.5,NA,NA
+"169",642,NA,"10/19/2021","Tachigali","melinonii","Tachigali melinonii","Kaw","Val","H","303","BF","Generalists",40,5,36,4,"mid",55,NA,NA
+"170",643,NA,"10/19/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Val","H","302","BF","Generalists",33,5,31,3,"mid",48,NA,NA
+"171",644,NA,"10/20/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Tonton","H","326","BF","Generalists",23,5,23,5,"top",25,NA,NA
+"172",645,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","327","BF","BF",15,3,13,3,"mid",17,NA,NA
+"173",646,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","330","BF","BF",14,2,11,2,"mid",13.3,NA,NA
+"174",647,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","331","BF","BF",7,1,6,2,"mid",10.8,NA,NA
+"175",648,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","332","BF","BF",11,2,9,3,"mid",11.6,NA,NA
+"176",649,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","333","BF","BF",9,2,8,2,"mid",12.1,NA,NA
+"177",650,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Tonton","H","334","BF","BF",8,2,8,2,"top",11.5,NA,NA
+"178",651,NA,"10/20/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Val","H","335","BF","Generalists",15,5,15,5,"top",21,NA,NA
+"179",652,NA,"10/20/2021","Jacaranda","copaia subsp. copaia","Jacaranda copaia subsp. copaia","Kaw","Val","H","336","BF","Generalists",18,5,18,5,"top",22,NA,NA
+"180",653,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Val","H","337","BF","BF",10,2,8,2,"mid",20,NA,NA
+"181",654,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Val","H","338","BF","BF",11,4,9,2,"mid",24,NA,NA
+"182",655,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Val","H","339","BF","BF",12,2,8,3,"mid",23,NA,NA
+"183",656,NA,"10/20/2021","Iryanthera","hostmannii","Iryanthera hostmannii","Kaw","Val","H","340","BF","BF",12,2,8,2,"mid",18,NA,NA

@@ -1,229 +1,229 @@
-Code,DateField,Forest,idTree,Plot,Subplot,FieldNbr,Genus,Species,Name,Habitat,Type,TreeHeight,TreeDawkins,BranchHeight,BranchDawkins,CrownPosition,Circ,DBH,CommentField,CommentLab
-245,2021-03-01T00:00:00Z,Bafog,4451,3,1,22,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,26,5,24,4,Sup,90,28.66242038,,
-246,2021-03-01T00:00:00Z,Bafog,15283,3,1,32,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,13,3,14,4,Mid,80,25.47770701,,
-247,2021-03-01T00:00:00Z,Bafog,41396,3,9,63,Vouacapoua,americana,Vouacapoua_americana,TF,TF,12,2,10,3,Inf,37.5,11.94267516,,
-248,2021-03-01T00:00:00Z,Bafog,41678,3,17,70,Casearia,javitensis,Casearia_javitensis,TF,TF,16,2,14,2,Mid,52.5,16.71974522,,
-249,2021-03-01T00:00:00Z,Bafog,41670,3,17,62,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,7,3,6,3,Mid,46,14.64968153,etete,
-250,2021-03-01T00:00:00Z,Bafog,41655,3,17,47,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,13,2,11,2,Mid,39,12.42038217,,
-251,2021-03-01T00:00:00Z,Bafog,41659,3,17,51,Virola,michelii,Virola_michelii,TF,Generalists,24,4,18,3,Mid,45,14.33121019,,
-252,2021-03-01T00:00:00Z,Bafog,15399,3,18,29,Iryanthera,sagotiana,Iryanthera_sagotiana,TF,TF,20,2,16,2,Inf,75.5,24.04458599,,
-253,2021-03-01T00:00:00Z,Bafog,41699,3,18,55,Licania,membranacea,Licania_membranacea,TF,TF,23,2,19,2,Mid,55.5,17.67515924,,
-254,2021-03-01T00:00:00Z,Bafog,4543,3,18,16,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,16,3,16,3,Sup,78,24.84076433,,
-255,2021-03-01T00:00:00Z,Bafog,15406,3,18,40,Protium,stevensonii,Protium_stevensonii,TF,Generalists,18,3,16,2,Mid,64,20.38216561,,
-256,2021-03-01T00:00:00Z,Bafog,41416,3,10,53,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,20,2,18,2,Inf,52,16.56050955,,
-257,2021-03-01T00:00:00Z,Bafog,41420,3,10,57,Protium,stevensonii,Protium_stevensonii,TF,Generalists,16,2,13,2,Sup,46,14.64968153,,
-258,2021-03-01T00:00:00Z,Bafog,15353,3,10,36,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,21,3,18,3,Mid,81.5,25.95541401,,
-259,2021-03-01T00:00:00Z,Bafog,41201,3,3,44,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,18,2,16,3,Mid,56,17.8343949,,
-260,2021-03-01T00:00:00Z,Bafog,3145,3,12,8,Iryanthera,sagotiana,Iryanthera_sagotiana,TF,TF,16,3,16,3,Sup,68.5,21.81528662,,
-261,2021-03-01T00:00:00Z,Bafog,41508,3,12,74,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,19,3,15,3,Mid,41,13.05732484,,erreur bota
-262,2021-03-01T00:00:00Z,Bafog,15306,3,4,27,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,18,3,14,2,Inf,89.5,28.50318471,,
-263,2021-03-01T00:00:00Z,Bafog,4472,3,4,5,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,19,2,15,3,Mid,68,21.65605096,,
-264,2021-03-01T00:00:00Z,Bafog,5136,3,5,24,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,23,3,18,3,Inf,77,24.52229299,,
-265,2021-03-01T00:00:00Z,Bafog,41257,3,5,35,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,12,3,11,3,Mid,35.5,11.30573248,,
-266,2021-03-01T00:00:00Z,Bafog,41269,3,5,49,Virola,michelii,Virola_michelii,BF,Generalists,18,2,16,2,Mid,44,14.01273885,,
-267,2021-03-01T00:00:00Z,Bafog,41499,3,12,61,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,11,2,11,2,Sup,35.5,11.30573248,,
-268,2021-03-02T00:00:00Z,Bafog,15511,3,33,22,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,24,2,18,2,Inf,63.5,20.22292994,,
-269,2021-03-02T00:00:00Z,Bafog,42545,3,41,36,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,16,2,15,2,Sup,39,12.42038217,,
-270,2021-03-02T00:00:00Z,Bafog,15517,3,33,31,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,18,2,16,2,Mid,56.5,17.99363057,,
-271,2021-03-02T00:00:00Z,Bafog,3316,3,25,14,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,30,5,26,4,Mid,204.203522,65.03296879,,
-272,2021-03-02T00:00:00Z,Bafog,3320,3,26,1,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,21,3,20,3,Sup,97,30.89171975,,
-274,2021-03-02T00:00:00Z,Bafog,3433,3,34,8,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,23,3,20,3,Mid,113.5,36.14649682,,
-275,2021-03-02T00:00:00Z,Bafog,3431,3,34,5,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,20,2,20,2,Sup,83,26.43312102,,
-276,2021-03-02T00:00:00Z,Bafog,15469,3,26,42,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,20,2,16,3,Mid,62,19.74522293,,
-277,2021-03-02T00:00:00Z,Bafog,3436,3,34,12,Protium,stevensonii,Protium_stevensonii,TF,Generalists,22,3,18,3,Mid,92,29.29936306,,
-278,2021-03-02T00:00:00Z,Bafog,3443,3,34,22,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,26,3,22,2,Inf,116,36.94267516,,
-279,2021-03-02T00:00:00Z,Bafog,15420,3,34,27,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,33,5,28,3,Inf,94.2477796,30.01521643,,
-280,2021-03-02T00:00:00Z,Bafog,3445,3,35,1,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,22,2,20,2,Mid,74,23.56687898,,
-281,2021-03-02T00:00:00Z,Bafog,3438,3,34,15,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,20,3,16,3,Mid,93.5,29.77707006,,
-282,2021-03-02T00:00:00Z,Bafog,3519,3,41,2,Protium,stevensonii,Protium_stevensonii,TF,Generalists,20,3,18,2,Mid,80.5,25.63694268,,
-283,2021-03-02T00:00:00Z,Bafog,42555,3,41,46,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,18,2,16,2,Sup,39,12.42038217,,
-284,2021-03-02T00:00:00Z,Bafog,42558,3,41,41,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,18,2,15,2,Mid,49,15.60509554,,
-285,2021-03-02T00:00:00Z,Bafog,5145,3,41,16,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,18,2,15,2,Inf,77.5,24.68152866,,
-286,2021-03-02T00:00:00Z,Bafog,15563,3,41,29,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,18,3,15,3,Mid,65.5,20.85987261,,
-287,2021-03-02T00:00:00Z,Bafog,15646,3,49,20,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,20,3,9,2,Inf,95,30.25477707,,
-288,2021-03-02T00:00:00Z,Bafog,15656,3,49,35,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,18,2,16,2,Mid,58,18.47133758,,
-289,2021-03-02T00:00:00Z,Bafog,15562,3,41,27,Licania,membranacea,Licania_membranacea,TF,TF,24,5,22,4,Mid,76.5,24.36305732,,
-290,2021-03-02T00:00:00Z,Bafog,15560,3,41,24,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,17,4,14,3,Mid,69,21.97452229,,
-291,2021-03-03T00:00:00Z,Bafog,15763,3,60,21,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,17,3,16,3,Mid,71,22.61146497,,
-292,2021-03-03T00:00:00Z,Bafog,15761,3,60,14,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,15,2,11,3,Mid,52,16.56050955,,
-293,2021-03-03T00:00:00Z,Bafog,15768,3,60,30,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,18,3,15,3,Mid,53.5,17.03821656,fruit,
-294,2021-03-03T00:00:00Z,Bafog,3759,3,60,11,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,24,3,22,2,Mid,109.955743,35.01775255,,
-295,2021-03-03T00:00:00Z,Bafog,43207,3,60,36,Carapa,surinamensis,Carapa_surinamensis,BF,BF,20,4,18,3,Sup,42.5,13.53503185,,
-296,2021-03-03T00:00:00Z,Bafog,15775,3,61,23,Hymenopus,heteromorphus,Hymenopus_heteromorphus,BF,Generalists,23,3,17,2,Inf,58.5,18.63057325,,
-297,2021-03-03T00:00:00Z,Bafog,15765,3,60,26,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,20,2,19,2,Sup,78.5,25,,
-298,2021-03-03T00:00:00Z,Bafog,15776,3,61,24,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,BF,Generalists,24,2,24,3,Sup,67,21.33757962,,
-299,2021-03-03T00:00:00Z,Bafog,3659,3,53,9,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,27,4,20,3,Inf,141.371669,45.02282452,,
-300,2021-03-03T00:00:00Z,Bafog,3762,3,61,2,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,25,2,20,2,Inf,117,37.2611465,,
-301,2021-03-03T00:00:00Z,Bafog,5107,3,52,15,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,18,3,14,2,Inf,77.5,24.68152866,,
-302,2021-03-03T00:00:00Z,Bafog,42935,3,52,80,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,15,2,15,2,Sup,41.5,13.21656051,,
-303,2021-03-03T00:00:00Z,Bafog,4667,3,44,3,Hymenopus,heteromorphus,Hymenopus_heteromorphus,BF,Generalists,18,2,18,2,Sup,68,21.65605096,,
-304,2021-03-03T00:00:00Z,Bafog,42653,3,44,57,Symphonia,globulifera,Symphonia_globulifera,BF,BF,15,3,15,3,Sup,53.5,17.03821656,,
-305,2021-03-03T00:00:00Z,Bafog,15582,3,44,17,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,14,2,12,2,Inf,59,18.78980892,,
-306,2021-03-03T00:00:00Z,Bafog,15586,3,44,24,Virola,michelii,Virola_michelii,BF,Generalists,26,4,23,4,Sup,90,28.66242038,,
-307,2021-03-03T00:00:00Z,Bafog,42419,3,37,50,Virola,michelii,Virola_michelii,BF,Generalists,14,3,12,2,Inf,45.5,14.49044586,,
-308,2021-03-03T00:00:00Z,Bafog,42426,3,37,57,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,11,2,9,2,Inf,48,15.2866242,,
-309,2021-03-03T00:00:00Z,Bafog,4636,3,37,13,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,26,4,24,4,Mid,125.663706,40.02028854,,
-310,2021-03-03T00:00:00Z,Bafog,4632,3,37,3,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,20,3,18,2,Inf,119,37.89808917,,
-311,2021-03-03T00:00:00Z,Bafog,3475,3,37,17,Laetia,procera,Laetia_procera,BF,BF,28,5,26,5,Sup,108,34.39490446,,
-312,2021-03-03T00:00:00Z,Bafog,15532,3,36,27,Hymenopus,heteromorphus,Hymenopus_heteromorphus,BF,Generalists,16,3,12,2,Inf,63.5,20.22292994,,
-313,2021-03-04T00:00:00Z,Bafog,4556,3,21,1,Hymenopus,heteromorphus,Hymenopus_heteromorphus,BF,Generalists,15,2,13,2,Inf,75,23.88535032,TMS BF1,
-314,2021-03-04T00:00:00Z,Bafog,5095,3,45,10,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,17,3,15,2,Mid,65.5,20.85987261,moche,
-315,2021-03-04T00:00:00Z,Bafog,3466,3,36,17,Eschweilera,coriacea,Eschweilera_coriacea,BF,Generalists,18,3,14,3,Inf,108.5,34.55414013,D1 rare 78,
-316,2021-03-04T00:00:00Z,Bafog,41772,3,20,49,Virola,michelii,Virola_michelii,BF,Generalists,11,3,10,3,Mid,38,12.10191083,,
-317,2021-03-04T00:00:00Z,Bafog,41790,3,21,78,Chrysophyllum,prieurii,Chrysophyllum_prieurii,BF,Generalists,12,1,10,1,Sup,57,18.15286624,,
-318,2021-03-04T00:00:00Z,Bafog,3258,3,21,3,Laetia,procera,Laetia_procera,BF,BF,28,4,28,4,Sup,113,35.98726115,,
-319,2021-03-04T00:00:00Z,Bafog,15386,3,15,32,Licania,membranacea,Licania_membranacea,TF,TF,18,2,16,2,Mid,82.5,26.27388535,,
-320,2021-03-04T00:00:00Z,Bafog,4518,3,14,2,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,24,3,20,3,Inf,83,26.43312102,,
-321,2021-03-04T00:00:00Z,Bafog,41539,3,14,35,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,30,5,25,3,Inf,48,15.2866242,,
-322,2021-03-04T00:00:00Z,Bafog,3060,3,6,8,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,30,5,28,5,Sup,94.2477796,30.01521643,,
-323,2021-03-04T00:00:00Z,Bafog,,3,14,,Tachigali,melinonii,Tachigali_melinonii,TF,Generalists,29,5,22,4,Mid,,,1 tacmel supplémentaire non renseigne,
-324,2021-03-04T00:00:00Z,Bafog,15309,3,6,17,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,17,2,14,2,Mid,78.5398163,25.01268035,,
-325,2021-03-04T00:00:00Z,Bafog,15322,3,8,27,Protium,stevensonii,Protium_stevensonii,TF,Generalists,15,2,14,2,Mid,64,20.38216561,,
-326,2021-03-04T00:00:00Z,Bafog,3096,3,8,15,Protium,stevensonii,Protium_stevensonii,TF,Generalists,26,3,20,2,Mid,128,40.76433121,,
-327,2021-03-04T00:00:00Z,Bafog,15326,3,8,31,Virola,michelii,Virola_michelii,TF,Generalists,22,2,20,2,Sup,62,19.74522293,,
-328,2021-03-04T00:00:00Z,Bafog,41941,3,24,68,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,13,3,12,2,Sup,34,10.82802548,,
-329,2021-03-05T00:00:00Z,Bafog,26512,5,58,2,Virola,surinamensis,Virola_surinamensis,BF,BF,16,3,13,2,Mid,125.7,40.03184713,,
-330,2021-03-05T00:00:00Z,Bafog,265510,5,57,57,Chrysophyllum,prieurii,Chrysophyllum_prieurii,BF,Generalists,15,2,12,2,Inf,45,14.33121019,,
-331,2021-03-05T00:00:00Z,Bafog,26207,5,48,30,Virola,surinamensis,Virola_surinamensis,BF,BF,32,5,25,2,Inf,204.2,65.03184713,,
-332,2021-03-05T00:00:00Z,Bafog,25882,5,38,4,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,38,5,30,3,Mid,157.1,50.03184713,,
-333,2021-03-05T00:00:00Z,Bafog,25869,5,37,15,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,14,2,12,3,Sup,46.5,14.8089172,,
-334,2021-03-05T00:00:00Z,Bafog,25857,5,37,2,Symphonia,globulifera,Symphonia_globulifera,BF,BF,38,5,31,3,Mid,172.8,55.03184713,,
-335,2021-03-05T00:00:00Z,Bafog,26196,5,48,9,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,23,2,21,3,Mid,94.2,30,,
-336,2021-03-05T00:00:00Z,Bafog,26197,5,48,11,Symphonia,globulifera,Symphonia_globulifera,BF,BF,22,3,20,2,Inf,78.5,25,,
-337,2021-03-05T00:00:00Z,Bafog,26235,5,49,20,Symphonia,globulifera,Symphonia_globulifera,BF,BF,20,2,16,2,Inf,67.5,21.49681529,,
-338,2021-03-05T00:00:00Z,Bafog,26224,5,49,9,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,23,2,20,2,Sup,94.2,30,,
-339,2021-03-05T00:00:00Z,Bafog,26221,5,49,6,Virola,surinamensis,Virola_surinamensis,BF,BF,34,5,30,4,Sup,141.4,45.03184713,,
-340,2021-03-05T00:00:00Z,Bafog,26562,5,60,32,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,25,4,23,2,Mid,73,23.24840764,,
-341,2021-03-05T00:00:00Z,Bafog,26555,5,60,19,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,18,3,16,2,Mid,62.8,20,,
-342,2021-03-05T00:00:00Z,Bafog,26257,5,50,43,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,26,3,22,2,Inf,57.5,18.31210191,,
-343,2021-03-05T00:00:00Z,Bafog,25945,5,40,7,Laetia,procera,Laetia_procera,BF,BF,20,2,18,2,Sup,95,30.25477707,,
-344,2021-03-05T00:00:00Z,Bafog,26245,5,50,12,Laetia,procera,Laetia_procera,BF,BF,25,4,25,4,Sup,149,47.4522293,,
-345,2021-03-05T00:00:00Z,Bafog,26247,5,50,15,Virola,surinamensis,Virola_surinamensis,BF,BF,28,4,24,3,Inf,157.1,50.03184713,,
-346,2021-03-05T00:00:00Z,Bafog,26228,5,49,13,Symphonia,globulifera,Symphonia_globulifera,BF,BF,23,4,23,4,Sup,110,35.03184713,,
-347,2021-03-05T00:00:00Z,Bafog,25915,5,39,8,Symphonia,globulifera,Symphonia_globulifera,BF,BF,34,5,29,4,Inf,125.7,40.03184713,,
-348,2021-03-05T00:00:00Z,Bafog,2529,5,39,39,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,15,2,13,2,Mid,51,16.24203822,,
-349,2021-03-05T00:00:00Z,Bafog,26218,5,49,3,Symphonia,globulifera,Symphonia_globulifera,BF,BF,35,5,29,3,Mid,141.4,45.03184713,,
-350,2021-03-05T00:00:00Z,Bafog,26186,5,47,40,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,12,2,10,2,Mid,34.5,10.98726115,,
-351,2021-03-08T00:00:00Z,Bafog,33274,2,5,38,Vouacapoua,americana,Vouacapoua_americana,TF,TF,14,2,12,2,Mid,47.5,15.12738854,,
-352,2021-03-08T00:00:00Z,Bafog,840,2,5,17,Dicorynia,guianensis,Dicorynia_guianensis,TF,TF,23,3,15,3,Mid,172.787596,55.02789682,,
-353,2021-03-08T00:00:00Z,Bafog,10608,2,6,24,Vouacapoua,americana,Vouacapoua_americana,TF,TF,22,2,20,3,Mid,78.5398163,25.01268035,,
-354,2021-03-08T00:00:00Z,Bafog,848,2,6,10,Virola,michelii,Virola_michelii,TF,Generalists,22,2,20,3,Mid,70,22.29299363,,
-355,2021-03-08T00:00:00Z,Bafog,34450,2,14,41,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,15,2,14,2,Sup,40.5,12.89808917,,
-356,2021-03-08T00:00:00Z,Bafog,10660,2,14,23,Iryanthera,sagotiana,Iryanthera_sagotiana,TF,TF,15,3,13,2,Mid,64,20.38216561,,
-357,2021-03-08T00:00:00Z,Bafog,33463,2,15,36,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,13,3,12,3,Mid,39,12.42038217,,
-358,2021-03-08T00:00:00Z,Bafog,852,2,6,15,Vouacapoua,americana,Vouacapoua_americana,TF,TF,26,5,21,3,Sup,125.663706,40.02028854,,
-359,2021-03-08T00:00:00Z,Bafog,820,2,4,9,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,14,3,14,3,Mid,67,21.33757962,,
-360,2021-03-08T00:00:00Z,Bafog,783,2,2,10,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,15,2,13,2,Mid,65.5,20.85987261,,
-361,2021-03-08T00:00:00Z,Bafog,3826,2,3,9,Virola,michelii,Virola_michelii,TF,Generalists,29,5,21,3,Mid,128.5,40.92356688,,
-362,2021-03-08T00:00:00Z,Bafog,33255,2,3,48,Iryanthera,sagotiana,Iryanthera_sagotiana,TF,TF,14,2,12,2,Sup,61,19.42675159,,
-363,2021-03-08T00:00:00Z,Bafog,246162,2,3,66,Casearia,javitensis,Casearia_javitensis,TF,TF,11,2,11,2,Sup,34,10.82802548,,
-364,2021-03-08T00:00:00Z,Bafog,925,2,10,24,Vouacapoua,americana,Vouacapoua_americana,TF,TF,32,5,25,3,Mid,116.5,37.10191083,,
-365,2021-03-08T00:00:00Z,Bafog,908,2,10,1,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,12,2,12,2,Sup,56,17.8343949,,
-366,2021-03-08T00:00:00Z,Bafog,33221,2,1,45,Vouacapoua,americana,Vouacapoua_americana,TF,TF,14,2,12,2,Mid,42,13.37579618,,
-367,2021-03-09T00:00:00Z,Bafog,911,2,10,5,Virola,michelii,Virola_michelii,TF,Generalists,28,4,23,2,Inf,106,33.75796178,,
-368,2021-03-09T00:00:00Z,Bafog,10635,2,10,29,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,18,2,16,4,Sup,73.5,23.40764331,,
-369,2021-03-09T00:00:00Z,Bafog,33521,2,18,46,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,13,2,11,2,Inf,45.5,14.49044586,,
-370,2021-03-09T00:00:00Z,Bafog,33527,2,18,52,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,10,3,9,4,Mid,40,12.7388535,,
-371,2021-03-09T00:00:00Z,Bafog,1074,2,19,23,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,28,3,25,2,Inf,115,36.62420382,,
-372,2021-03-09T00:00:00Z,Bafog,1073,2,19,22,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,24,2,21,3,Mid,109.955743,35.01775255,,
-373,2021-03-09T00:00:00Z,Bafog,1082,2,20,9,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,24,3,20,4,Inf,98,31.21019108,,
-374,2021-03-09T00:00:00Z,Bafog,33661,2,27,49,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,18,2,17,3,Inf,50,15.92356688,,
-375,2021-03-09T00:00:00Z,Bafog,1061,2,19,9,Virola,michelii,Virola_michelii,TF,Generalists,23,3,20,2,Inf,103,32.80254777,,
-376,2021-03-09T00:00:00Z,Bafog,33692,2,28,51,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,14,5,12,4,Inf,46,14.64968153,,
-377,2021-03-09T00:00:00Z,Bafog,10873,2,44,37,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,12,1,11,2,Mid,59,18.78980892,,
-378,2021-03-09T00:00:00Z,Bafog,10818,2,36,24,Virola,michelii,Virola_michelii,TF,Generalists,32,5,22,4,Inf,76.5,24.36305732,,
-379,2021-03-09T00:00:00Z,Bafog,33880,2,37,50,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,14,2,13,3,Sup,33.5,10.66878981,,
-380,2021-03-09T00:00:00Z,Bafog,34229,2,52,44,Casearia,javitensis,Casearia_javitensis,TF,TF,11,2,10,2,Mid,39,12.42038217,,
-381,2021-03-09T00:00:00Z,Bafog,34016,2,43,33,Vouacapoua,americana,Vouacapoua_americana,TF,TF,12,2,10,2,Mid,36.5,11.62420382,,
-382,2021-03-09T00:00:00Z,Bafog,1681,2,51,22,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,25,2,22,2,Mid,118,37.57961783,,
-383,2021-03-09T00:00:00Z,Bafog,1787,2,57,4,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,19,4,16,3,Inf,97.5,31.05095541,,
-384,2021-03-10T00:00:00Z,Bafog,25140,5,16,1,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,38,5,16,3,Inf,157.1,50.03184713,,
-385,2021-03-10T00:00:00Z,Bafog,25118,5,15,23,Laetia,procera,Laetia_procera,BF,BF,25,4,21,4,Mid,150.5,47.92993631,,
-386,2021-03-10T00:00:00Z,Bafog,24822,5,6,23,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,35,4,25,5,Inf,204.2,65.03184713,,
-387,2021-03-10T00:00:00Z,Bafog,24775,5,4,48,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,13,2,11,2,Mid,38,12.10191083,,
-388,2021-03-10T00:00:00Z,Bafog,373422,5,4,71,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,12,2,11,2,Mid,38,12.10191083,,
-389,2021-03-10T00:00:00Z,Bafog,24790,5,5,12,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,30,5,28,4,Mid,157.1,50.03184713,,
-390,2021-03-10T00:00:00Z,Bafog,24845,5,7,30,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,13,2,13,2,Sup,49.5,15.76433121,,
-391,2021-03-10T00:00:00Z,Bafog,24842,5,7,21,Symphonia,globulifera,Symphonia_globulifera,BF,BF,30,5,25,2,Inf,94.2,30,,
-392,2021-03-10T00:00:00Z,Bafog,25187,5,17,28,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,26,4,25,2,Inf,141.4,45.03184713,,
-393,2021-03-10T00:00:00Z,Bafog,25264,5,19,34,Virola,michelii,Virola_michelii,BF,Generalists,21,3,20,3,Mid,53.5,17.03821656,,
-394,2021-03-10T00:00:00Z,Bafog,25514,5,26,29,Laetia,procera,Laetia_procera,BF,BF,28,5,28,4,Sup,91.5,29.14012739,,
-395,2021-03-10T00:00:00Z,Bafog,25526,5,26,53,Chrysophyllum,prieurii,Chrysophyllum_prieurii,BF,Generalists,13,4,11,4,Mid,63.5,20.22292994,,
-396,2021-03-10T00:00:00Z,Bafog,25510,5,26,20,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,BF,Generalists,24,4,21,3,Inf,79.5,25.31847134,,
-397,2021-03-10T00:00:00Z,Bafog,24905,5,9,33,Virola,michelii,Virola_michelii,BF,Generalists,27,3,23,3,Sup,59.5,18.94904459,,
-398,2021-03-10T00:00:00Z,Bafog,373525,5,36,76,Virola,michelii,Virola_michelii,BF,Generalists,14,2,12,2,Inf,48,15.2866242,,
-399,2021-03-10T00:00:00Z,Bafog,25823,5,36,4,Virola,surinamensis,Virola_surinamensis,BF,BF,35,5,28,2,Inf,141.4,45.03184713,,
-400,2021-03-10T00:00:00Z,Bafog,25255,5,19,22,Symphonia,globulifera,Symphonia_globulifera,BF,BF,24,4,18,4,Inf,70.5,22.4522293,,
-401,2021-03-10T00:00:00Z,Bafog,26169,5,47,8,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,24,3,20,2,Inf,71,22.61146497,,
-402,2021-03-10T00:00:00Z,Bafog,25232,5,18,49,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,18,2,17,2,Sup,49,15.60509554,,
-403,2021-03-11T00:00:00Z,Bafog,26147,5,46,21,Virola,michelii,Virola_michelii,BF,Generalists,24,3,20,2,Inf,77.5,24.68152866,,
-404,2021-03-11T00:00:00Z,Bafog,26148,5,46,28,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,22,3,18,3,Sup,42.5,13.53503185,,
-405,2021-03-11T00:00:00Z,Bafog,26127,5,45,44,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,BF,Generalists,8,2,6,2,Inf,39.5,12.57961783,,
-406,2021-03-11T00:00:00Z,Bafog,25790,5,35,7,Laetia,procera,Laetia_procera,BF,BF,32,5,27,4,Mid,128,40.76433121,lianes,
-407,2021-03-11T00:00:00Z,Bafog,26107,5,45,10,Laetia,procera,Laetia_procera,BF,BF,22,4,20,4,Mid,90,28.66242038,,
-408,2021-03-11T00:00:00Z,Bafog,27157,5,78,12,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,26,4,22,2,Inf,78.5,25,,
-409,2021-03-11T00:00:00Z,Bafog,27154,5,78,3,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,22,4,16,4,Mid,70,22.29299363,,
-410,2021-03-11T00:00:00Z,Bafog,27466,5,88,22,Virola,surinamensis,Virola_surinamensis,BF,BF,28,3,26,2,Inf,110,35.03184713,,
-411,2021-03-11T00:00:00Z,Bafog,27164,5,78,34,Pterocarpus,officinalis,Pterocarpus_officinalis,BF,BF,20,2,16,2,Inf,52,16.56050955,,
-412,2021-03-11T00:00:00Z,Bafog,27459,5,88,7,Virola,surinamensis,Virola_surinamensis,BF,BF,32,3,28,4,Mid,172.8,55.03184713,ficelle + sac,
-413,2021-03-11T00:00:00Z,Bafog,373740,5,98,43,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,27,4,20,4,Mid,52.5,16.71974522,,
-414,2021-03-11T00:00:00Z,Bafog,27776,5,98,36,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,9,2,9,2,Sup,39,12.42038217,,
-415,2021-03-11T00:00:00Z,Bafog,27754,5,97,36,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,10,3,10,3,Sup,42,13.37579618,,
-416,2021-03-12T00:00:00Z,Bafog,25976,5,41,16,Casearia,javitensis,Casearia_javitensis,TF,TF,21,2,19,2,Sup,54,17.19745223,TMS ; doute bota,
-417,2021-03-12T00:00:00Z,Bafog,25699,5,32,21,Iryanthera,sagotiana,Iryanthera_sagotiana,TF,TF,22,2,18,2,Inf,74.5,23.72611465,,
-418,2021-03-12T00:00:00Z,Bafog,25328,5,21,8,Protium,stevensonii,Protium_stevensonii,TF,Generalists,26,4,19,3,Mid,81,25.79617834,,
-419,2021-03-12T00:00:00Z,Bafog,25386,5,22,58,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,16,2,13,2,Inf,48,15.2866242,,
-420,2021-03-12T00:00:00Z,Bafog,25395,5,23,11,Protium,stevensonii,Protium_stevensonii,TF,Generalists,21,4,19,4,Mid,58,18.47133758,,
-421,2021-03-12T00:00:00Z,Bafog,25405,5,23,28,Protium,stevensonii,Protium_stevensonii,TF,Generalists,24,3,22,2,Mid,63,20.06369427,,
-422,2021-03-12T00:00:00Z,Bafog,26307,5,52,21,Protium,stevensonii,Protium_stevensonii,TF,Generalists,24,3,17,2,Inf,77.5,24.68152866,,
-423,2021-03-12T00:00:00Z,Bafog,26670,5,63,55,Casearia,javitensis,Casearia_javitensis,TF,TF,8,2,8,2,Sup,35,11.14649682,,
-424,2021-03-12T00:00:00Z,Bafog,27038,5,74,42,Casearia,javitensis,Casearia_javitensis,TF,TF,7,3,7,3,Sup,36,11.46496815,,
-425,2021-03-12T00:00:00Z,Bafog,26707,5,64,42,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,26,3,24,4,Mid,67,21.33757962,doute bota,
-426,2021-03-12T00:00:00Z,Bafog,27354,5,84,69,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,18,3,17,3,Mid,50,15.92356688,,
-427,2021-03-15T16:46:50Z,Bafog,26575,5,61,16,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,16,2,16,2,Sup,61.5,19.58598726,,
-428,2021-03-15T16:46:50Z,Bafog,27215,5,81,10,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,13,3,13,3,Sup,53,16.87898089,,
-429,2021-03-15T16:46:50Z,Bafog,27233,5,81,39,Casearia,javitensis,Casearia_javitensis,TF,TF,15,4,15,4,Sup,52.5,16.71974522,,
-430,2021-03-15T16:46:50Z,Bafog,27624,5,93,13,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,24,3,20,3,Sup,90.5,28.82165605,,
-431,2021-03-15T16:46:50Z,Bafog,27632,5,93,21,Gustavia,hexapetala,Gustavia_hexapetala,TF,TF,18,2,15,2,Inf,57,18.15286624,,
-432,2021-03-15T16:46:50Z,Bafog,26771,5,66,15,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,24,2,18,3,Inf,63,20.06369427,,
-433,2021-03-15T16:46:50Z,Bafog,26174,5,47,16,Laetia,procera,Laetia_procera,BF,BF,34,5,34,5,Sup,138,43.94904459,fruits,
-434,2021-03-15T16:46:50Z,Bafog,25856,5,37,1,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,39,5,30,4,Inf,172.8,55.03184713,,
-435,2021-03-15T16:46:50Z,Bafog,26217,5,49,2,Virola,surinamensis,Virola_surinamensis,BF,BF,35,5,30,4,Mid,172.8,55.03184713,,
-436,2021-03-15T16:46:50Z,Bafog,25880,5,38,2,Virola,surinamensis,Virola_surinamensis,BF,BF,36,5,30,4,Inf,204.2,65.03184713,,
-437,2021-03-15T16:46:50Z,Bafog,25888,5,38,10,Virola,surinamensis,Virola_surinamensis,BF,BF,28,3,24,3,Mid,94.2,30,,
-438,2021-03-16T16:30:31Z,Bafog,26559,5,60,28,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,14,2,14,2,Sup,51,16.24203822,,
-439,2021-03-16T16:30:31Z,Bafog,26915,5,70,52,Tachigali,melinonii,Tachigali_melinonii,BF,Generalists,17,3,15,2,Mid,57.5,18.31210191,,
-440,2021-03-16T16:30:31Z,Bafog,373713,5,90,42,Conceveiba,guianensis,Conceveiba_guianensis,BF,Generalists,13,1,13,2,Sup,48.5,15.44585987,,
-441,2021-03-16T16:30:31Z,Bafog,26866,5,69,29,Laetia,procera,Laetia_procera,BF,BF,24,4,24,4,Sup,121.5,38.69426752,,
-442,2021-03-16T16:30:31Z,Bafog,27788,5,99,14,Protium,stevensonii,Protium_stevensonii,BF,Generalists,23,3,23,3,Sup,110,35.03184713,,
-443,2021-03-16T16:30:31Z,Bafog,27799,5,99,27,Iryanthera,hostmannii,Iryanthera_hostmannii,BF,BF,14,2,14,3,Sup,35.5,11.30573248,,
-444,2021-03-16T16:30:31Z,Bafog,25275,5,19,50,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,17,2,15,2,Inf,50.5,16.08280255,,
-445,2021-03-16T16:30:31Z,Bafog,25207,5,18,10,Protium,stevensonii,Protium_stevensonii,BF,Generalists,24,3,18,3,Sup,172.8,55.03184713,,
-446,2021-03-16T16:30:31Z,Bafog,25442,5,24,25,Chrysophyllum,prieurii,Chrysophyllum_prieurii,TF,Generalists,16,2,14,2,Inf,64,20.38216561,,
-447,2021-03-16T16:30:31Z,Bafog,24752,5,4,8,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,28,4,24,5,Mid,109.5,34.87261146,,
-448,2021-03-16T16:30:31Z,Bafog,24733,5,3,39,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,12,2,11,2,Mid,36.5,11.62420382,,
-449,2021-03-16T16:30:31Z,Bafog,25360,5,22,10,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,22,4,20,4,Sup,98.5,31.36942675,,
-450,2021-03-16T16:30:31Z,Bafog,26697,5,64,14,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,28,5,24,4,Sup,98.5,31.36942675,,
-451,2021-03-17T00:00:00Z,Bafog,4699,3,57,12,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,24,4,15,3,Mid,98.5,31.36942675,,
-452,2021-03-17T00:00:00Z,Bafog,15745,3,58,28,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,16,2,14,2,Mid,71,22.61146497,,
-453,2021-03-17T00:00:00Z,Bafog,15746,3,58,29,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,23,3,17,3,Inf,65,20.70063694,,
-454,2021-03-17T00:00:00Z,Bafog,3709,3,57,4,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,13,3,12,3,Mid,84,26.75159236,,
-455,2021-03-17T00:00:00Z,Bafog,3736,3,58,18,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,23,4,16,3,Mid,77.5,24.68152866,,
-456,2021-03-17T00:00:00Z,Bafog,3624,3,50,4,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,24,2,22,3,Mid,98.5,31.36942675,,
-457,2021-03-17T00:00:00Z,Bafog,3744,3,59,6,Hymenopus,heteromorphus,Hymenopus_heteromorphus,TF,Generalists,23,3,19,3,Inf,70.5,22.4522293,,
-458,2021-03-17T00:00:00Z,Bafog,3751,3,59,13,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,21,3,16,3,Mid,95,30.25477707,,
-459,2021-03-17T00:00:00Z,Bafog,3630,3,50,11,Eschweilera,coriacea,Eschweilera_coriacea,TF,Generalists,13,3,13,3,Sup,62.5,19.9044586,,
-460,2021-03-17T00:00:00Z,Bafog,15759,3,59,29,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,27,4,25,4,Sup,71,22.61146497,,
-461,2021-03-17T00:00:00Z,Bafog,3636,3,51,3,Poraqueiba,guianensis,Poraqueiba_guianensis,TF,TF,14,3,12,2,Inf,70.5,22.4522293,,
-462,2021-03-17T00:00:00Z,Bafog,43001,3,54,55,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,13,2,13,2,Sup,37.5,11.94267516,,
-463,2021-03-17T00:00:00Z,Bafog,42991,3,54,45,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,18,3,12,3,Mid,41,13.05732484,,
-464,2021-03-17T00:00:00Z,Bafog,43017,3,54,72,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,21,3,20,3,Sup,39.5,12.57961783,,
-465,2021-03-17T00:00:00Z,Bafog,41503,3,12,65,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,9,3,9,3,Sup,40.5,12.89808917,pas BF,
-466,2021-03-17T00:00:00Z,Bafog,15361,3,12,24,Virola,michelii,Virola_michelii,BF,Generalists,28,3,25,2,Inf,82.5,26.27388535,en limite BF,
-467,2021-03-18T14:42:33Z,Bafog,33216,2,1,40,Casearia,javitensis,Casearia_javitensis,TF,TF,13,2,10,2,Sup,36,11.46496815,,
-468,2021-03-18T14:42:33Z,Bafog,33214,2,1,38,Conceveiba,guianensis,Conceveiba_guianensis,TF,Generalists,12,2,12,2,Sup,42,13.37579618,,
-469,2021-03-18T14:42:33Z,Bafog,10616,2,8,29,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,18,3,15,3,Mid,62,19.74522293,,
-470,2021-03-18T14:42:33Z,Bafog,3856,2,8,4,Jacaranda,copaia subsp. copaia,Jacaranda_copaia subsp. copaia,TF,Generalists,28,4,28,4,Sup,90.5,28.82165605,,
-471,2021-03-18T14:42:33Z,Bafog,33461,2,15,34,Casearia,javitensis,Casearia_javitensis,TF,TF,17,4,17,4,Sup,43,13.69426752,,
-472,2021-03-18T14:42:33Z,Bafog,1012,2,16,17,Bocoa,prouacensis,Bocoa_prouacensis,TF,Generalists,14,1,14,2,Sup,102.5,32.6433121,,
-473,2021-03-18T14:42:33Z,Bafog,4215,4,16,6,Licania,membranacea,Licania_membranacea,TF,TF,12,1,11,2,Mid,38.6746512,12.3167679,,
+"","Code","DateField","Forest","idTree","Plot","Subplot","FieldNbr","Genus","Species","Habitat","Type","TreeHeight","TreeDawkins","BranchHeight","BranchDawkins","CrownPosition","Circ","DBH","Name","CommentField","CommentLab"
+"1",245,"2021-03-01T00:00:00Z","Bafog",4451,3,1,22,"Jacaranda","copaia subsp. copaia","TF","Generalists",26,5,24,4,"Sup",90,28.66242038,"Jacaranda copaia subsp. copaia",NA,NA
+"2",246,"2021-03-01T00:00:00Z","Bafog",15283,3,1,32,"Eschweilera","coriacea","TF","Generalists",13,3,14,4,"Mid",80,25.47770701,"Eschweilera coriacea",NA,NA
+"3",247,"2021-03-01T00:00:00Z","Bafog",41396,3,9,63,"Vouacapoua","americana","TF","TF",12,2,10,3,"Inf",37.5,11.94267516,"Vouacapoua americana",NA,NA
+"4",248,"2021-03-01T00:00:00Z","Bafog",41678,3,17,70,"Casearia","javitensis","TF","TF",16,2,14,2,"Mid",52.5,16.71974522,"Casearia javitensis",NA,NA
+"5",249,"2021-03-01T00:00:00Z","Bafog",41670,3,17,62,"Conceveiba","guianensis","TF","Generalists",7,3,6,3,"Mid",46,14.64968153,"Conceveiba guianensis","etete",NA
+"6",250,"2021-03-01T00:00:00Z","Bafog",41655,3,17,47,"Gustavia","hexapetala","TF","TF",13,2,11,2,"Mid",39,12.42038217,"Gustavia hexapetala",NA,NA
+"7",251,"2021-03-01T00:00:00Z","Bafog",41659,3,17,51,"Virola","michelii","TF","Generalists",24,4,18,3,"Mid",45,14.33121019,"Virola michelii",NA,NA
+"8",252,"2021-03-01T00:00:00Z","Bafog",15399,3,18,29,"Iryanthera","sagotiana","TF","TF",20,2,16,2,"Inf",75.5,24.04458599,"Iryanthera sagotiana",NA,NA
+"9",253,"2021-03-01T00:00:00Z","Bafog",41699,3,18,55,"Licania","membranacea","TF","TF",23,2,19,2,"Mid",55.5,17.67515924,"Licania membranacea",NA,NA
+"10",254,"2021-03-01T00:00:00Z","Bafog",4543,3,18,16,"Conceveiba","guianensis","TF","Generalists",16,3,16,3,"Sup",78,24.84076433,"Conceveiba guianensis",NA,NA
+"11",255,"2021-03-01T00:00:00Z","Bafog",15406,3,18,40,"Protium","stevensonii","TF","Generalists",18,3,16,2,"Mid",64,20.38216561,"Protium stevensonii",NA,NA
+"12",256,"2021-03-01T00:00:00Z","Bafog",41416,3,10,53,"Chrysophyllum","prieurii","TF","Generalists",20,2,18,2,"Inf",52,16.56050955,"Chrysophyllum prieurii",NA,NA
+"13",257,"2021-03-01T00:00:00Z","Bafog",41420,3,10,57,"Protium","stevensonii","TF","Generalists",16,2,13,2,"Sup",46,14.64968153,"Protium stevensonii",NA,NA
+"14",258,"2021-03-01T00:00:00Z","Bafog",15353,3,10,36,"Eschweilera","coriacea","TF","Generalists",21,3,18,3,"Mid",81.5,25.95541401,"Eschweilera coriacea",NA,NA
+"15",259,"2021-03-01T00:00:00Z","Bafog",41201,3,3,44,"Dicorynia","guianensis","TF","TF",18,2,16,3,"Mid",56,17.8343949,"Dicorynia guianensis",NA,NA
+"16",260,"2021-03-01T00:00:00Z","Bafog",3145,3,12,8,"Iryanthera","sagotiana","TF","TF",16,3,16,3,"Sup",68.5,21.81528662,"Iryanthera sagotiana",NA,NA
+"17",261,"2021-03-01T00:00:00Z","Bafog",41508,3,12,74,"Tachigali","melinonii","TF","Generalists",19,3,15,3,"Mid",41,13.05732484,"Tachigali melinonii",NA,"erreur bota"
+"18",262,"2021-03-01T00:00:00Z","Bafog",15306,3,4,27,"Eschweilera","coriacea","TF","Generalists",18,3,14,2,"Inf",89.5,28.50318471,"Eschweilera coriacea",NA,NA
+"19",263,"2021-03-01T00:00:00Z","Bafog",4472,3,4,5,"Poraqueiba","guianensis","TF","TF",19,2,15,3,"Mid",68,21.65605096,"Poraqueiba guianensis",NA,NA
+"20",264,"2021-03-01T00:00:00Z","Bafog",5136,3,5,24,"Eschweilera","coriacea","BF","Generalists",23,3,18,3,"Inf",77,24.52229299,"Eschweilera coriacea",NA,NA
+"21",265,"2021-03-01T00:00:00Z","Bafog",41257,3,5,35,"Iryanthera","hostmannii","BF","BF",12,3,11,3,"Mid",35.5,11.30573248,"Iryanthera hostmannii",NA,NA
+"22",266,"2021-03-01T00:00:00Z","Bafog",41269,3,5,49,"Virola","michelii","BF","Generalists",18,2,16,2,"Mid",44,14.01273885,"Virola michelii",NA,NA
+"23",267,"2021-03-01T00:00:00Z","Bafog",41499,3,12,61,"Iryanthera","hostmannii","BF","BF",11,2,11,2,"Sup",35.5,11.30573248,"Iryanthera hostmannii",NA,NA
+"24",268,"2021-03-02T00:00:00Z","Bafog",15511,3,33,22,"Tachigali","melinonii","TF","Generalists",24,2,18,2,"Inf",63.5,20.22292994,"Tachigali melinonii",NA,NA
+"25",269,"2021-03-02T00:00:00Z","Bafog",42545,3,41,36,"Dicorynia","guianensis","TF","TF",16,2,15,2,"Sup",39,12.42038217,"Dicorynia guianensis",NA,NA
+"26",270,"2021-03-02T00:00:00Z","Bafog",15517,3,33,31,"Eschweilera","coriacea","TF","Generalists",18,2,16,2,"Mid",56.5,17.99363057,"Eschweilera coriacea",NA,NA
+"27",271,"2021-03-02T00:00:00Z","Bafog",3316,3,25,14,"Dicorynia","guianensis","TF","TF",30,5,26,4,"Mid",204.203522,65.03296879,"Dicorynia guianensis",NA,NA
+"28",272,"2021-03-02T00:00:00Z","Bafog",3320,3,26,1,"Poraqueiba","guianensis","TF","TF",21,3,20,3,"Sup",97,30.89171975,"Poraqueiba guianensis",NA,NA
+"29",274,"2021-03-02T00:00:00Z","Bafog",3433,3,34,8,"Eschweilera","coriacea","TF","Generalists",23,3,20,3,"Mid",113.5,36.14649682,"Eschweilera coriacea",NA,NA
+"30",275,"2021-03-02T00:00:00Z","Bafog",3431,3,34,5,"Poraqueiba","guianensis","TF","TF",20,2,20,2,"Sup",83,26.43312102,"Poraqueiba guianensis",NA,NA
+"31",276,"2021-03-02T00:00:00Z","Bafog",15469,3,26,42,"Conceveiba","guianensis","TF","Generalists",20,2,16,3,"Mid",62,19.74522293,"Conceveiba guianensis",NA,NA
+"32",277,"2021-03-02T00:00:00Z","Bafog",3436,3,34,12,"Protium","stevensonii","TF","Generalists",22,3,18,3,"Mid",92,29.29936306,"Protium stevensonii",NA,NA
+"33",278,"2021-03-02T00:00:00Z","Bafog",3443,3,34,22,"Hymenopus","heteromorphus","TF","Generalists",26,3,22,2,"Inf",116,36.94267516,"Hymenopus heteromorphus",NA,NA
+"34",279,"2021-03-02T00:00:00Z","Bafog",15420,3,34,27,"Tachigali","melinonii","TF","Generalists",33,5,28,3,"Inf",94.2477796,30.01521643,"Tachigali melinonii",NA,NA
+"35",280,"2021-03-02T00:00:00Z","Bafog",3445,3,35,1,"Hymenopus","heteromorphus","TF","Generalists",22,2,20,2,"Mid",74,23.56687898,"Hymenopus heteromorphus",NA,NA
+"36",281,"2021-03-02T00:00:00Z","Bafog",3438,3,34,15,"Poraqueiba","guianensis","TF","TF",20,3,16,3,"Mid",93.5,29.77707006,"Poraqueiba guianensis",NA,NA
+"37",282,"2021-03-02T00:00:00Z","Bafog",3519,3,41,2,"Protium","stevensonii","TF","Generalists",20,3,18,2,"Mid",80.5,25.63694268,"Protium stevensonii",NA,NA
+"38",283,"2021-03-02T00:00:00Z","Bafog",42555,3,41,46,"Dicorynia","guianensis","TF","TF",18,2,16,2,"Sup",39,12.42038217,"Dicorynia guianensis",NA,NA
+"39",284,"2021-03-02T00:00:00Z","Bafog",42558,3,41,41,"Dicorynia","guianensis","TF","TF",18,2,15,2,"Mid",49,15.60509554,"Dicorynia guianensis",NA,NA
+"40",285,"2021-03-02T00:00:00Z","Bafog",5145,3,41,16,"Poraqueiba","guianensis","TF","TF",18,2,15,2,"Inf",77.5,24.68152866,"Poraqueiba guianensis",NA,NA
+"41",286,"2021-03-02T00:00:00Z","Bafog",15563,3,41,29,"Hymenopus","heteromorphus","TF","Generalists",18,3,15,3,"Mid",65.5,20.85987261,"Hymenopus heteromorphus",NA,NA
+"42",287,"2021-03-02T00:00:00Z","Bafog",15646,3,49,20,"Eschweilera","coriacea","TF","Generalists",20,3,9,2,"Inf",95,30.25477707,"Eschweilera coriacea",NA,NA
+"43",288,"2021-03-02T00:00:00Z","Bafog",15656,3,49,35,"Hymenopus","heteromorphus","TF","Generalists",18,2,16,2,"Mid",58,18.47133758,"Hymenopus heteromorphus",NA,NA
+"44",289,"2021-03-02T00:00:00Z","Bafog",15562,3,41,27,"Licania","membranacea","TF","TF",24,5,22,4,"Mid",76.5,24.36305732,"Licania membranacea",NA,NA
+"45",290,"2021-03-02T00:00:00Z","Bafog",15560,3,41,24,"Hymenopus","heteromorphus","TF","Generalists",17,4,14,3,"Mid",69,21.97452229,"Hymenopus heteromorphus",NA,NA
+"46",291,"2021-03-03T00:00:00Z","Bafog",15763,3,60,21,"Eschweilera","coriacea","BF","Generalists",17,3,16,3,"Mid",71,22.61146497,"Eschweilera coriacea",NA,NA
+"47",292,"2021-03-03T00:00:00Z","Bafog",15761,3,60,14,"Iryanthera","hostmannii","BF","BF",15,2,11,3,"Mid",52,16.56050955,"Iryanthera hostmannii",NA,NA
+"48",293,"2021-03-03T00:00:00Z","Bafog",15768,3,60,30,"Iryanthera","hostmannii","BF","BF",18,3,15,3,"Mid",53.5,17.03821656,"Iryanthera hostmannii","fruit",NA
+"49",294,"2021-03-03T00:00:00Z","Bafog",3759,3,60,11,"Eschweilera","coriacea","BF","Generalists",24,3,22,2,"Mid",109.955743,35.01775255,"Eschweilera coriacea",NA,NA
+"50",295,"2021-03-03T00:00:00Z","Bafog",43207,3,60,36,"Carapa","surinamensis","BF","BF",20,4,18,3,"Sup",42.5,13.53503185,"Carapa surinamensis",NA,NA
+"51",296,"2021-03-03T00:00:00Z","Bafog",15775,3,61,23,"Hymenopus","heteromorphus","BF","Generalists",23,3,17,2,"Inf",58.5,18.63057325,"Hymenopus heteromorphus",NA,NA
+"52",297,"2021-03-03T00:00:00Z","Bafog",15765,3,60,26,"Conceveiba","guianensis","BF","Generalists",20,2,19,2,"Sup",78.5,25,"Conceveiba guianensis",NA,NA
+"53",298,"2021-03-03T00:00:00Z","Bafog",15776,3,61,24,"Jacaranda","copaia subsp. copaia","BF","Generalists",24,2,24,3,"Sup",67,21.33757962,"Jacaranda copaia subsp. copaia",NA,NA
+"54",299,"2021-03-03T00:00:00Z","Bafog",3659,3,53,9,"Tachigali","melinonii","BF","Generalists",27,4,20,3,"Inf",141.371669,45.02282452,"Tachigali melinonii",NA,NA
+"55",300,"2021-03-03T00:00:00Z","Bafog",3762,3,61,2,"Eschweilera","coriacea","BF","Generalists",25,2,20,2,"Inf",117,37.2611465,"Eschweilera coriacea",NA,NA
+"56",301,"2021-03-03T00:00:00Z","Bafog",5107,3,52,15,"Eschweilera","coriacea","BF","Generalists",18,3,14,2,"Inf",77.5,24.68152866,"Eschweilera coriacea",NA,NA
+"57",302,"2021-03-03T00:00:00Z","Bafog",42935,3,52,80,"Conceveiba","guianensis","BF","Generalists",15,2,15,2,"Sup",41.5,13.21656051,"Conceveiba guianensis",NA,NA
+"58",303,"2021-03-03T00:00:00Z","Bafog",4667,3,44,3,"Hymenopus","heteromorphus","BF","Generalists",18,2,18,2,"Sup",68,21.65605096,"Hymenopus heteromorphus",NA,NA
+"59",304,"2021-03-03T00:00:00Z","Bafog",42653,3,44,57,"Symphonia","globulifera","BF","BF",15,3,15,3,"Sup",53.5,17.03821656,"Symphonia globulifera",NA,NA
+"60",305,"2021-03-03T00:00:00Z","Bafog",15582,3,44,17,"Eschweilera","coriacea","BF","Generalists",14,2,12,2,"Inf",59,18.78980892,"Eschweilera coriacea",NA,NA
+"61",306,"2021-03-03T00:00:00Z","Bafog",15586,3,44,24,"Virola","michelii","BF","Generalists",26,4,23,4,"Sup",90,28.66242038,"Virola michelii",NA,NA
+"62",307,"2021-03-03T00:00:00Z","Bafog",42419,3,37,50,"Virola","michelii","BF","Generalists",14,3,12,2,"Inf",45.5,14.49044586,"Virola michelii",NA,NA
+"63",308,"2021-03-03T00:00:00Z","Bafog",42426,3,37,57,"Iryanthera","hostmannii","BF","BF",11,2,9,2,"Inf",48,15.2866242,"Iryanthera hostmannii",NA,NA
+"64",309,"2021-03-03T00:00:00Z","Bafog",4636,3,37,13,"Eschweilera","coriacea","BF","Generalists",26,4,24,4,"Mid",125.663706,40.02028854,"Eschweilera coriacea",NA,NA
+"65",310,"2021-03-03T00:00:00Z","Bafog",4632,3,37,3,"Eschweilera","coriacea","BF","Generalists",20,3,18,2,"Inf",119,37.89808917,"Eschweilera coriacea",NA,NA
+"66",311,"2021-03-03T00:00:00Z","Bafog",3475,3,37,17,"Laetia","procera","BF","BF",28,5,26,5,"Sup",108,34.39490446,"Laetia procera",NA,NA
+"67",312,"2021-03-03T00:00:00Z","Bafog",15532,3,36,27,"Hymenopus","heteromorphus","BF","Generalists",16,3,12,2,"Inf",63.5,20.22292994,"Hymenopus heteromorphus",NA,NA
+"68",313,"2021-03-04T00:00:00Z","Bafog",4556,3,21,1,"Hymenopus","heteromorphus","BF","Generalists",15,2,13,2,"Inf",75,23.88535032,"Hymenopus heteromorphus","TMS BF1",NA
+"69",314,"2021-03-04T00:00:00Z","Bafog",5095,3,45,10,"Eschweilera","coriacea","BF","Generalists",17,3,15,2,"Mid",65.5,20.85987261,"Eschweilera coriacea","moche",NA
+"70",315,"2021-03-04T00:00:00Z","Bafog",3466,3,36,17,"Eschweilera","coriacea","BF","Generalists",18,3,14,3,"Inf",108.5,34.55414013,"Eschweilera coriacea","D1 rare 78",NA
+"71",316,"2021-03-04T00:00:00Z","Bafog",41772,3,20,49,"Virola","michelii","BF","Generalists",11,3,10,3,"Mid",38,12.10191083,"Virola michelii",NA,NA
+"72",317,"2021-03-04T00:00:00Z","Bafog",41790,3,21,78,"Chrysophyllum","prieurii","BF","Generalists",12,1,10,1,"Sup",57,18.15286624,"Chrysophyllum prieurii",NA,NA
+"73",318,"2021-03-04T00:00:00Z","Bafog",3258,3,21,3,"Laetia","procera","BF","BF",28,4,28,4,"Sup",113,35.98726115,"Laetia procera",NA,NA
+"74",319,"2021-03-04T00:00:00Z","Bafog",15386,3,15,32,"Licania","membranacea","TF","TF",18,2,16,2,"Mid",82.5,26.27388535,"Licania membranacea",NA,NA
+"75",320,"2021-03-04T00:00:00Z","Bafog",4518,3,14,2,"Jacaranda","copaia subsp. copaia","TF","Generalists",24,3,20,3,"Inf",83,26.43312102,"Jacaranda copaia subsp. copaia",NA,NA
+"76",321,"2021-03-04T00:00:00Z","Bafog",41539,3,14,35,"Tachigali","melinonii","TF","Generalists",30,5,25,3,"Inf",48,15.2866242,"Tachigali melinonii",NA,NA
+"77",322,"2021-03-04T00:00:00Z","Bafog",3060,3,6,8,"Tachigali","melinonii","TF","Generalists",30,5,28,5,"Sup",94.2477796,30.01521643,"Tachigali melinonii",NA,NA
+"78",323,"2021-03-04T00:00:00Z","Bafog",NA,3,14,NA,"Tachigali","melinonii","TF","Generalists",29,5,22,4,"Mid",NA,NA,"Tachigali melinonii","1 tacmel supplémentaire non renseigne",NA
+"79",324,"2021-03-04T00:00:00Z","Bafog",15309,3,6,17,"Chrysophyllum","prieurii","TF","Generalists",17,2,14,2,"Mid",78.5398163,25.01268035,"Chrysophyllum prieurii",NA,NA
+"80",325,"2021-03-04T00:00:00Z","Bafog",15322,3,8,27,"Protium","stevensonii","TF","Generalists",15,2,14,2,"Mid",64,20.38216561,"Protium stevensonii",NA,NA
+"81",326,"2021-03-04T00:00:00Z","Bafog",3096,3,8,15,"Protium","stevensonii","TF","Generalists",26,3,20,2,"Mid",128,40.76433121,"Protium stevensonii",NA,NA
+"82",327,"2021-03-04T00:00:00Z","Bafog",15326,3,8,31,"Virola","michelii","TF","Generalists",22,2,20,2,"Sup",62,19.74522293,"Virola michelii",NA,NA
+"83",328,"2021-03-04T00:00:00Z","Bafog",41941,3,24,68,"Gustavia","hexapetala","TF","TF",13,3,12,2,"Sup",34,10.82802548,"Gustavia hexapetala",NA,NA
+"84",329,"2021-03-05T00:00:00Z","Bafog",26512,5,58,2,"Virola","surinamensis","BF","BF",16,3,13,2,"Mid",125.7,40.03184713,"Virola surinamensis",NA,NA
+"85",330,"2021-03-05T00:00:00Z","Bafog",265510,5,57,57,"Chrysophyllum","prieurii","BF","Generalists",15,2,12,2,"Inf",45,14.33121019,"Chrysophyllum prieurii",NA,NA
+"86",331,"2021-03-05T00:00:00Z","Bafog",26207,5,48,30,"Virola","surinamensis","BF","BF",32,5,25,2,"Inf",204.2,65.03184713,"Virola surinamensis",NA,NA
+"87",332,"2021-03-05T00:00:00Z","Bafog",25882,5,38,4,"Pterocarpus","officinalis","BF","BF",38,5,30,3,"Mid",157.1,50.03184713,"Pterocarpus officinalis",NA,NA
+"88",333,"2021-03-05T00:00:00Z","Bafog",25869,5,37,15,"Iryanthera","hostmannii","BF","BF",14,2,12,3,"Sup",46.5,14.8089172,"Iryanthera hostmannii",NA,NA
+"89",334,"2021-03-05T00:00:00Z","Bafog",25857,5,37,2,"Symphonia","globulifera","BF","BF",38,5,31,3,"Mid",172.8,55.03184713,"Symphonia globulifera",NA,NA
+"90",335,"2021-03-05T00:00:00Z","Bafog",26196,5,48,9,"Pterocarpus","officinalis","BF","BF",23,2,21,3,"Mid",94.2,30,"Pterocarpus officinalis",NA,NA
+"91",336,"2021-03-05T00:00:00Z","Bafog",26197,5,48,11,"Symphonia","globulifera","BF","BF",22,3,20,2,"Inf",78.5,25,"Symphonia globulifera",NA,NA
+"92",337,"2021-03-05T00:00:00Z","Bafog",26235,5,49,20,"Symphonia","globulifera","BF","BF",20,2,16,2,"Inf",67.5,21.49681529,"Symphonia globulifera",NA,NA
+"93",338,"2021-03-05T00:00:00Z","Bafog",26224,5,49,9,"Pterocarpus","officinalis","BF","BF",23,2,20,2,"Sup",94.2,30,"Pterocarpus officinalis",NA,NA
+"94",339,"2021-03-05T00:00:00Z","Bafog",26221,5,49,6,"Virola","surinamensis","BF","BF",34,5,30,4,"Sup",141.4,45.03184713,"Virola surinamensis",NA,NA
+"95",340,"2021-03-05T00:00:00Z","Bafog",26562,5,60,32,"Tachigali","melinonii","BF","Generalists",25,4,23,2,"Mid",73,23.24840764,"Tachigali melinonii",NA,NA
+"96",341,"2021-03-05T00:00:00Z","Bafog",26555,5,60,19,"Pterocarpus","officinalis","BF","BF",18,3,16,2,"Mid",62.8,20,"Pterocarpus officinalis",NA,NA
+"97",342,"2021-03-05T00:00:00Z","Bafog",26257,5,50,43,"Pterocarpus","officinalis","BF","BF",26,3,22,2,"Inf",57.5,18.31210191,"Pterocarpus officinalis",NA,NA
+"98",343,"2021-03-05T00:00:00Z","Bafog",25945,5,40,7,"Laetia","procera","BF","BF",20,2,18,2,"Sup",95,30.25477707,"Laetia procera",NA,NA
+"99",344,"2021-03-05T00:00:00Z","Bafog",26245,5,50,12,"Laetia","procera","BF","BF",25,4,25,4,"Sup",149,47.4522293,"Laetia procera",NA,NA
+"100",345,"2021-03-05T00:00:00Z","Bafog",26247,5,50,15,"Virola","surinamensis","BF","BF",28,4,24,3,"Inf",157.1,50.03184713,"Virola surinamensis",NA,NA
+"101",346,"2021-03-05T00:00:00Z","Bafog",26228,5,49,13,"Symphonia","globulifera","BF","BF",23,4,23,4,"Sup",110,35.03184713,"Symphonia globulifera",NA,NA
+"102",347,"2021-03-05T00:00:00Z","Bafog",25915,5,39,8,"Symphonia","globulifera","BF","BF",34,5,29,4,"Inf",125.7,40.03184713,"Symphonia globulifera",NA,NA
+"103",348,"2021-03-05T00:00:00Z","Bafog",2529,5,39,39,"Pterocarpus","officinalis","BF","BF",15,2,13,2,"Mid",51,16.24203822,"Pterocarpus officinalis",NA,NA
+"104",349,"2021-03-05T00:00:00Z","Bafog",26218,5,49,3,"Symphonia","globulifera","BF","BF",35,5,29,3,"Mid",141.4,45.03184713,"Symphonia globulifera",NA,NA
+"105",350,"2021-03-05T00:00:00Z","Bafog",26186,5,47,40,"Iryanthera","hostmannii","BF","BF",12,2,10,2,"Mid",34.5,10.98726115,"Iryanthera hostmannii",NA,NA
+"106",351,"2021-03-08T00:00:00Z","Bafog",33274,2,5,38,"Vouacapoua","americana","TF","TF",14,2,12,2,"Mid",47.5,15.12738854,"Vouacapoua americana",NA,NA
+"107",352,"2021-03-08T00:00:00Z","Bafog",840,2,5,17,"Dicorynia","guianensis","TF","TF",23,3,15,3,"Mid",172.787596,55.02789682,"Dicorynia guianensis",NA,NA
+"108",353,"2021-03-08T00:00:00Z","Bafog",10608,2,6,24,"Vouacapoua","americana","TF","TF",22,2,20,3,"Mid",78.5398163,25.01268035,"Vouacapoua americana",NA,NA
+"109",354,"2021-03-08T00:00:00Z","Bafog",848,2,6,10,"Virola","michelii","TF","Generalists",22,2,20,3,"Mid",70,22.29299363,"Virola michelii",NA,NA
+"110",355,"2021-03-08T00:00:00Z","Bafog",34450,2,14,41,"Conceveiba","guianensis","TF","Generalists",15,2,14,2,"Sup",40.5,12.89808917,"Conceveiba guianensis",NA,NA
+"111",356,"2021-03-08T00:00:00Z","Bafog",10660,2,14,23,"Iryanthera","sagotiana","TF","TF",15,3,13,2,"Mid",64,20.38216561,"Iryanthera sagotiana",NA,NA
+"112",357,"2021-03-08T00:00:00Z","Bafog",33463,2,15,36,"Gustavia","hexapetala","TF","TF",13,3,12,3,"Mid",39,12.42038217,"Gustavia hexapetala",NA,NA
+"113",358,"2021-03-08T00:00:00Z","Bafog",852,2,6,15,"Vouacapoua","americana","TF","TF",26,5,21,3,"Sup",125.663706,40.02028854,"Vouacapoua americana",NA,NA
+"114",359,"2021-03-08T00:00:00Z","Bafog",820,2,4,9,"Conceveiba","guianensis","TF","Generalists",14,3,14,3,"Mid",67,21.33757962,"Conceveiba guianensis",NA,NA
+"115",360,"2021-03-08T00:00:00Z","Bafog",783,2,2,10,"Bocoa","prouacensis","TF","Generalists",15,2,13,2,"Mid",65.5,20.85987261,"Bocoa prouacensis",NA,NA
+"116",361,"2021-03-08T00:00:00Z","Bafog",3826,2,3,9,"Virola","michelii","TF","Generalists",29,5,21,3,"Mid",128.5,40.92356688,"Virola michelii",NA,NA
+"117",362,"2021-03-08T00:00:00Z","Bafog",33255,2,3,48,"Iryanthera","sagotiana","TF","TF",14,2,12,2,"Sup",61,19.42675159,"Iryanthera sagotiana",NA,NA
+"118",363,"2021-03-08T00:00:00Z","Bafog",246162,2,3,66,"Casearia","javitensis","TF","TF",11,2,11,2,"Sup",34,10.82802548,"Casearia javitensis",NA,NA
+"119",364,"2021-03-08T00:00:00Z","Bafog",925,2,10,24,"Vouacapoua","americana","TF","TF",32,5,25,3,"Mid",116.5,37.10191083,"Vouacapoua americana",NA,NA
+"120",365,"2021-03-08T00:00:00Z","Bafog",908,2,10,1,"Bocoa","prouacensis","TF","Generalists",12,2,12,2,"Sup",56,17.8343949,"Bocoa prouacensis",NA,NA
+"121",366,"2021-03-08T00:00:00Z","Bafog",33221,2,1,45,"Vouacapoua","americana","TF","TF",14,2,12,2,"Mid",42,13.37579618,"Vouacapoua americana",NA,NA
+"122",367,"2021-03-09T00:00:00Z","Bafog",911,2,10,5,"Virola","michelii","TF","Generalists",28,4,23,2,"Inf",106,33.75796178,"Virola michelii",NA,NA
+"123",368,"2021-03-09T00:00:00Z","Bafog",10635,2,10,29,"Chrysophyllum","prieurii","TF","Generalists",18,2,16,4,"Sup",73.5,23.40764331,"Chrysophyllum prieurii",NA,NA
+"124",369,"2021-03-09T00:00:00Z","Bafog",33521,2,18,46,"Gustavia","hexapetala","TF","TF",13,2,11,2,"Inf",45.5,14.49044586,"Gustavia hexapetala",NA,NA
+"125",370,"2021-03-09T00:00:00Z","Bafog",33527,2,18,52,"Gustavia","hexapetala","TF","TF",10,3,9,4,"Mid",40,12.7388535,"Gustavia hexapetala",NA,NA
+"126",371,"2021-03-09T00:00:00Z","Bafog",1074,2,19,23,"Jacaranda","copaia subsp. copaia","TF","Generalists",28,3,25,2,"Inf",115,36.62420382,"Jacaranda copaia subsp. copaia",NA,NA
+"127",372,"2021-03-09T00:00:00Z","Bafog",1073,2,19,22,"Bocoa","prouacensis","TF","Generalists",24,2,21,3,"Mid",109.955743,35.01775255,"Bocoa prouacensis",NA,NA
+"128",373,"2021-03-09T00:00:00Z","Bafog",1082,2,20,9,"Bocoa","prouacensis","TF","Generalists",24,3,20,4,"Inf",98,31.21019108,"Bocoa prouacensis",NA,NA
+"129",374,"2021-03-09T00:00:00Z","Bafog",33661,2,27,49,"Chrysophyllum","prieurii","TF","Generalists",18,2,17,3,"Inf",50,15.92356688,"Chrysophyllum prieurii",NA,NA
+"130",375,"2021-03-09T00:00:00Z","Bafog",1061,2,19,9,"Virola","michelii","TF","Generalists",23,3,20,2,"Inf",103,32.80254777,"Virola michelii",NA,NA
+"131",376,"2021-03-09T00:00:00Z","Bafog",33692,2,28,51,"Chrysophyllum","prieurii","TF","Generalists",14,5,12,4,"Inf",46,14.64968153,"Chrysophyllum prieurii",NA,NA
+"132",377,"2021-03-09T00:00:00Z","Bafog",10873,2,44,37,"Bocoa","prouacensis","TF","Generalists",12,1,11,2,"Mid",59,18.78980892,"Bocoa prouacensis",NA,NA
+"133",378,"2021-03-09T00:00:00Z","Bafog",10818,2,36,24,"Virola","michelii","TF","Generalists",32,5,22,4,"Inf",76.5,24.36305732,"Virola michelii",NA,NA
+"134",379,"2021-03-09T00:00:00Z","Bafog",33880,2,37,50,"Gustavia","hexapetala","TF","TF",14,2,13,3,"Sup",33.5,10.66878981,"Gustavia hexapetala",NA,NA
+"135",380,"2021-03-09T00:00:00Z","Bafog",34229,2,52,44,"Casearia","javitensis","TF","TF",11,2,10,2,"Mid",39,12.42038217,"Casearia javitensis",NA,NA
+"136",381,"2021-03-09T00:00:00Z","Bafog",34016,2,43,33,"Vouacapoua","americana","TF","TF",12,2,10,2,"Mid",36.5,11.62420382,"Vouacapoua americana",NA,NA
+"137",382,"2021-03-09T00:00:00Z","Bafog",1681,2,51,22,"Bocoa","prouacensis","TF","Generalists",25,2,22,2,"Mid",118,37.57961783,"Bocoa prouacensis",NA,NA
+"138",383,"2021-03-09T00:00:00Z","Bafog",1787,2,57,4,"Chrysophyllum","prieurii","TF","Generalists",19,4,16,3,"Inf",97.5,31.05095541,"Chrysophyllum prieurii",NA,NA
+"139",384,"2021-03-10T00:00:00Z","Bafog",25140,5,16,1,"Tachigali","melinonii","BF","Generalists",38,5,16,3,"Inf",157.1,50.03184713,"Tachigali melinonii",NA,NA
+"140",385,"2021-03-10T00:00:00Z","Bafog",25118,5,15,23,"Laetia","procera","BF","BF",25,4,21,4,"Mid",150.5,47.92993631,"Laetia procera",NA,NA
+"141",386,"2021-03-10T00:00:00Z","Bafog",24822,5,6,23,"Tachigali","melinonii","BF","Generalists",35,4,25,5,"Inf",204.2,65.03184713,"Tachigali melinonii",NA,NA
+"142",387,"2021-03-10T00:00:00Z","Bafog",24775,5,4,48,"Gustavia","hexapetala","TF","TF",13,2,11,2,"Mid",38,12.10191083,"Gustavia hexapetala",NA,NA
+"143",388,"2021-03-10T00:00:00Z","Bafog",373422,5,4,71,"Gustavia","hexapetala","TF","TF",12,2,11,2,"Mid",38,12.10191083,"Gustavia hexapetala",NA,NA
+"144",389,"2021-03-10T00:00:00Z","Bafog",24790,5,5,12,"Pterocarpus","officinalis","BF","BF",30,5,28,4,"Mid",157.1,50.03184713,"Pterocarpus officinalis",NA,NA
+"145",390,"2021-03-10T00:00:00Z","Bafog",24845,5,7,30,"Conceveiba","guianensis","BF","Generalists",13,2,13,2,"Sup",49.5,15.76433121,"Conceveiba guianensis",NA,NA
+"146",391,"2021-03-10T00:00:00Z","Bafog",24842,5,7,21,"Symphonia","globulifera","BF","BF",30,5,25,2,"Inf",94.2,30,"Symphonia globulifera",NA,NA
+"147",392,"2021-03-10T00:00:00Z","Bafog",25187,5,17,28,"Pterocarpus","officinalis","BF","BF",26,4,25,2,"Inf",141.4,45.03184713,"Pterocarpus officinalis",NA,NA
+"148",393,"2021-03-10T00:00:00Z","Bafog",25264,5,19,34,"Virola","michelii","BF","Generalists",21,3,20,3,"Mid",53.5,17.03821656,"Virola michelii",NA,NA
+"149",394,"2021-03-10T00:00:00Z","Bafog",25514,5,26,29,"Laetia","procera","BF","BF",28,5,28,4,"Sup",91.5,29.14012739,"Laetia procera",NA,NA
+"150",395,"2021-03-10T00:00:00Z","Bafog",25526,5,26,53,"Chrysophyllum","prieurii","BF","Generalists",13,4,11,4,"Mid",63.5,20.22292994,"Chrysophyllum prieurii",NA,NA
+"151",396,"2021-03-10T00:00:00Z","Bafog",25510,5,26,20,"Jacaranda","copaia subsp. copaia","BF","Generalists",24,4,21,3,"Inf",79.5,25.31847134,"Jacaranda copaia subsp. copaia",NA,NA
+"152",397,"2021-03-10T00:00:00Z","Bafog",24905,5,9,33,"Virola","michelii","BF","Generalists",27,3,23,3,"Sup",59.5,18.94904459,"Virola michelii",NA,NA
+"153",398,"2021-03-10T00:00:00Z","Bafog",373525,5,36,76,"Virola","michelii","BF","Generalists",14,2,12,2,"Inf",48,15.2866242,"Virola michelii",NA,NA
+"154",399,"2021-03-10T00:00:00Z","Bafog",25823,5,36,4,"Virola","surinamensis","BF","BF",35,5,28,2,"Inf",141.4,45.03184713,"Virola surinamensis",NA,NA
+"155",400,"2021-03-10T00:00:00Z","Bafog",25255,5,19,22,"Symphonia","globulifera","BF","BF",24,4,18,4,"Inf",70.5,22.4522293,"Symphonia globulifera",NA,NA
+"156",401,"2021-03-10T00:00:00Z","Bafog",26169,5,47,8,"Conceveiba","guianensis","BF","Generalists",24,3,20,2,"Inf",71,22.61146497,"Conceveiba guianensis",NA,NA
+"157",402,"2021-03-10T00:00:00Z","Bafog",25232,5,18,49,"Conceveiba","guianensis","BF","Generalists",18,2,17,2,"Sup",49,15.60509554,"Conceveiba guianensis",NA,NA
+"158",403,"2021-03-11T00:00:00Z","Bafog",26147,5,46,21,"Virola","michelii","BF","Generalists",24,3,20,2,"Inf",77.5,24.68152866,"Virola michelii",NA,NA
+"159",404,"2021-03-11T00:00:00Z","Bafog",26148,5,46,28,"Tachigali","melinonii","BF","Generalists",22,3,18,3,"Sup",42.5,13.53503185,"Tachigali melinonii",NA,NA
+"160",405,"2021-03-11T00:00:00Z","Bafog",26127,5,45,44,"Jacaranda","copaia subsp. copaia","BF","Generalists",8,2,6,2,"Inf",39.5,12.57961783,"Jacaranda copaia subsp. copaia",NA,NA
+"161",406,"2021-03-11T00:00:00Z","Bafog",25790,5,35,7,"Laetia","procera","BF","BF",32,5,27,4,"Mid",128,40.76433121,"Laetia procera","lianes",NA
+"162",407,"2021-03-11T00:00:00Z","Bafog",26107,5,45,10,"Laetia","procera","BF","BF",22,4,20,4,"Mid",90,28.66242038,"Laetia procera",NA,NA
+"163",408,"2021-03-11T00:00:00Z","Bafog",27157,5,78,12,"Tachigali","melinonii","BF","Generalists",26,4,22,2,"Inf",78.5,25,"Tachigali melinonii",NA,NA
+"164",409,"2021-03-11T00:00:00Z","Bafog",27154,5,78,3,"Pterocarpus","officinalis","BF","BF",22,4,16,4,"Mid",70,22.29299363,"Pterocarpus officinalis",NA,NA
+"165",410,"2021-03-11T00:00:00Z","Bafog",27466,5,88,22,"Virola","surinamensis","BF","BF",28,3,26,2,"Inf",110,35.03184713,"Virola surinamensis",NA,NA
+"166",411,"2021-03-11T00:00:00Z","Bafog",27164,5,78,34,"Pterocarpus","officinalis","BF","BF",20,2,16,2,"Inf",52,16.56050955,"Pterocarpus officinalis",NA,NA
+"167",412,"2021-03-11T00:00:00Z","Bafog",27459,5,88,7,"Virola","surinamensis","BF","BF",32,3,28,4,"Mid",172.8,55.03184713,"Virola surinamensis","ficelle + sac",NA
+"168",413,"2021-03-11T00:00:00Z","Bafog",373740,5,98,43,"Tachigali","melinonii","BF","Generalists",27,4,20,4,"Mid",52.5,16.71974522,"Tachigali melinonii",NA,NA
+"169",414,"2021-03-11T00:00:00Z","Bafog",27776,5,98,36,"Iryanthera","hostmannii","BF","BF",9,2,9,2,"Sup",39,12.42038217,"Iryanthera hostmannii",NA,NA
+"170",415,"2021-03-11T00:00:00Z","Bafog",27754,5,97,36,"Iryanthera","hostmannii","BF","BF",10,3,10,3,"Sup",42,13.37579618,"Iryanthera hostmannii",NA,NA
+"171",416,"2021-03-12T00:00:00Z","Bafog",25976,5,41,16,"Casearia","javitensis","TF","TF",21,2,19,2,"Sup",54,17.19745223,"Casearia javitensis","TMS ; doute bota",NA
+"172",417,"2021-03-12T00:00:00Z","Bafog",25699,5,32,21,"Iryanthera","sagotiana","TF","TF",22,2,18,2,"Inf",74.5,23.72611465,"Iryanthera sagotiana",NA,NA
+"173",418,"2021-03-12T00:00:00Z","Bafog",25328,5,21,8,"Protium","stevensonii","TF","Generalists",26,4,19,3,"Mid",81,25.79617834,"Protium stevensonii",NA,NA
+"174",419,"2021-03-12T00:00:00Z","Bafog",25386,5,22,58,"Hymenopus","heteromorphus","TF","Generalists",16,2,13,2,"Inf",48,15.2866242,"Hymenopus heteromorphus",NA,NA
+"175",420,"2021-03-12T00:00:00Z","Bafog",25395,5,23,11,"Protium","stevensonii","TF","Generalists",21,4,19,4,"Mid",58,18.47133758,"Protium stevensonii",NA,NA
+"176",421,"2021-03-12T00:00:00Z","Bafog",25405,5,23,28,"Protium","stevensonii","TF","Generalists",24,3,22,2,"Mid",63,20.06369427,"Protium stevensonii",NA,NA
+"177",422,"2021-03-12T00:00:00Z","Bafog",26307,5,52,21,"Protium","stevensonii","TF","Generalists",24,3,17,2,"Inf",77.5,24.68152866,"Protium stevensonii",NA,NA
+"178",423,"2021-03-12T00:00:00Z","Bafog",26670,5,63,55,"Casearia","javitensis","TF","TF",8,2,8,2,"Sup",35,11.14649682,"Casearia javitensis",NA,NA
+"179",424,"2021-03-12T00:00:00Z","Bafog",27038,5,74,42,"Casearia","javitensis","TF","TF",7,3,7,3,"Sup",36,11.46496815,"Casearia javitensis",NA,NA
+"180",425,"2021-03-12T00:00:00Z","Bafog",26707,5,64,42,"Chrysophyllum","prieurii","TF","Generalists",26,3,24,4,"Mid",67,21.33757962,"Chrysophyllum prieurii","doute bota",NA
+"181",426,"2021-03-12T00:00:00Z","Bafog",27354,5,84,69,"Jacaranda","copaia subsp. copaia","TF","Generalists",18,3,17,3,"Mid",50,15.92356688,"Jacaranda copaia subsp. copaia",NA,NA
+"182",427,"2021-03-15T16:46:50Z","Bafog",26575,5,61,16,"Hymenopus","heteromorphus","TF","Generalists",16,2,16,2,"Sup",61.5,19.58598726,"Hymenopus heteromorphus",NA,NA
+"183",428,"2021-03-15T16:46:50Z","Bafog",27215,5,81,10,"Conceveiba","guianensis","TF","Generalists",13,3,13,3,"Sup",53,16.87898089,"Conceveiba guianensis",NA,NA
+"184",429,"2021-03-15T16:46:50Z","Bafog",27233,5,81,39,"Casearia","javitensis","TF","TF",15,4,15,4,"Sup",52.5,16.71974522,"Casearia javitensis",NA,NA
+"185",430,"2021-03-15T16:46:50Z","Bafog",27624,5,93,13,"Chrysophyllum","prieurii","TF","Generalists",24,3,20,3,"Sup",90.5,28.82165605,"Chrysophyllum prieurii",NA,NA
+"186",431,"2021-03-15T16:46:50Z","Bafog",27632,5,93,21,"Gustavia","hexapetala","TF","TF",18,2,15,2,"Inf",57,18.15286624,"Gustavia hexapetala",NA,NA
+"187",432,"2021-03-15T16:46:50Z","Bafog",26771,5,66,15,"Conceveiba","guianensis","TF","Generalists",24,2,18,3,"Inf",63,20.06369427,"Conceveiba guianensis",NA,NA
+"188",433,"2021-03-15T16:46:50Z","Bafog",26174,5,47,16,"Laetia","procera","BF","BF",34,5,34,5,"Sup",138,43.94904459,"Laetia procera","fruits",NA
+"189",434,"2021-03-15T16:46:50Z","Bafog",25856,5,37,1,"Tachigali","melinonii","BF","Generalists",39,5,30,4,"Inf",172.8,55.03184713,"Tachigali melinonii",NA,NA
+"190",435,"2021-03-15T16:46:50Z","Bafog",26217,5,49,2,"Virola","surinamensis","BF","BF",35,5,30,4,"Mid",172.8,55.03184713,"Virola surinamensis",NA,NA
+"191",436,"2021-03-15T16:46:50Z","Bafog",25880,5,38,2,"Virola","surinamensis","BF","BF",36,5,30,4,"Inf",204.2,65.03184713,"Virola surinamensis",NA,NA
+"192",437,"2021-03-15T16:46:50Z","Bafog",25888,5,38,10,"Virola","surinamensis","BF","BF",28,3,24,3,"Mid",94.2,30,"Virola surinamensis",NA,NA
+"193",438,"2021-03-16T16:30:31Z","Bafog",26559,5,60,28,"Tachigali","melinonii","BF","Generalists",14,2,14,2,"Sup",51,16.24203822,"Tachigali melinonii",NA,NA
+"194",439,"2021-03-16T16:30:31Z","Bafog",26915,5,70,52,"Tachigali","melinonii","BF","Generalists",17,3,15,2,"Mid",57.5,18.31210191,"Tachigali melinonii",NA,NA
+"195",440,"2021-03-16T16:30:31Z","Bafog",373713,5,90,42,"Conceveiba","guianensis","BF","Generalists",13,1,13,2,"Sup",48.5,15.44585987,"Conceveiba guianensis",NA,NA
+"196",441,"2021-03-16T16:30:31Z","Bafog",26866,5,69,29,"Laetia","procera","BF","BF",24,4,24,4,"Sup",121.5,38.69426752,"Laetia procera",NA,NA
+"197",442,"2021-03-16T16:30:31Z","Bafog",27788,5,99,14,"Protium","stevensonii","BF","Generalists",23,3,23,3,"Sup",110,35.03184713,"Protium stevensonii",NA,NA
+"198",443,"2021-03-16T16:30:31Z","Bafog",27799,5,99,27,"Iryanthera","hostmannii","BF","BF",14,2,14,3,"Sup",35.5,11.30573248,"Iryanthera hostmannii",NA,NA
+"199",444,"2021-03-16T16:30:31Z","Bafog",25275,5,19,50,"Conceveiba","guianensis","TF","Generalists",17,2,15,2,"Inf",50.5,16.08280255,"Conceveiba guianensis",NA,NA
+"200",445,"2021-03-16T16:30:31Z","Bafog",25207,5,18,10,"Protium","stevensonii","BF","Generalists",24,3,18,3,"Sup",172.8,55.03184713,"Protium stevensonii",NA,NA
+"201",446,"2021-03-16T16:30:31Z","Bafog",25442,5,24,25,"Chrysophyllum","prieurii","TF","Generalists",16,2,14,2,"Inf",64,20.38216561,"Chrysophyllum prieurii",NA,NA
+"202",447,"2021-03-16T16:30:31Z","Bafog",24752,5,4,8,"Jacaranda","copaia subsp. copaia","TF","Generalists",28,4,24,5,"Mid",109.5,34.87261146,"Jacaranda copaia subsp. copaia",NA,NA
+"203",448,"2021-03-16T16:30:31Z","Bafog",24733,5,3,39,"Hymenopus","heteromorphus","TF","Generalists",12,2,11,2,"Mid",36.5,11.62420382,"Hymenopus heteromorphus",NA,NA
+"204",449,"2021-03-16T16:30:31Z","Bafog",25360,5,22,10,"Jacaranda","copaia subsp. copaia","TF","Generalists",22,4,20,4,"Sup",98.5,31.36942675,"Jacaranda copaia subsp. copaia",NA,NA
+"205",450,"2021-03-16T16:30:31Z","Bafog",26697,5,64,14,"Jacaranda","copaia subsp. copaia","TF","Generalists",28,5,24,4,"Sup",98.5,31.36942675,"Jacaranda copaia subsp. copaia",NA,NA
+"206",451,"2021-03-17T00:00:00Z","Bafog",4699,3,57,12,"Poraqueiba","guianensis","TF","TF",24,4,15,3,"Mid",98.5,31.36942675,"Poraqueiba guianensis",NA,NA
+"207",452,"2021-03-17T00:00:00Z","Bafog",15745,3,58,28,"Hymenopus","heteromorphus","TF","Generalists",16,2,14,2,"Mid",71,22.61146497,"Hymenopus heteromorphus",NA,NA
+"208",453,"2021-03-17T00:00:00Z","Bafog",15746,3,58,29,"Bocoa","prouacensis","TF","Generalists",23,3,17,3,"Inf",65,20.70063694,"Bocoa prouacensis",NA,NA
+"209",454,"2021-03-17T00:00:00Z","Bafog",3709,3,57,4,"Eschweilera","coriacea","TF","Generalists",13,3,12,3,"Mid",84,26.75159236,"Eschweilera coriacea",NA,NA
+"210",455,"2021-03-17T00:00:00Z","Bafog",3736,3,58,18,"Poraqueiba","guianensis","TF","TF",23,4,16,3,"Mid",77.5,24.68152866,"Poraqueiba guianensis",NA,NA
+"211",456,"2021-03-17T00:00:00Z","Bafog",3624,3,50,4,"Eschweilera","coriacea","TF","Generalists",24,2,22,3,"Mid",98.5,31.36942675,"Eschweilera coriacea",NA,NA
+"212",457,"2021-03-17T00:00:00Z","Bafog",3744,3,59,6,"Hymenopus","heteromorphus","TF","Generalists",23,3,19,3,"Inf",70.5,22.4522293,"Hymenopus heteromorphus",NA,NA
+"213",458,"2021-03-17T00:00:00Z","Bafog",3751,3,59,13,"Poraqueiba","guianensis","TF","TF",21,3,16,3,"Mid",95,30.25477707,"Poraqueiba guianensis",NA,NA
+"214",459,"2021-03-17T00:00:00Z","Bafog",3630,3,50,11,"Eschweilera","coriacea","TF","Generalists",13,3,13,3,"Sup",62.5,19.9044586,"Eschweilera coriacea",NA,NA
+"215",460,"2021-03-17T00:00:00Z","Bafog",15759,3,59,29,"Poraqueiba","guianensis","TF","TF",27,4,25,4,"Sup",71,22.61146497,"Poraqueiba guianensis",NA,NA
+"216",461,"2021-03-17T00:00:00Z","Bafog",3636,3,51,3,"Poraqueiba","guianensis","TF","TF",14,3,12,2,"Inf",70.5,22.4522293,"Poraqueiba guianensis",NA,NA
+"217",462,"2021-03-17T00:00:00Z","Bafog",43001,3,54,55,"Conceveiba","guianensis","TF","Generalists",13,2,13,2,"Sup",37.5,11.94267516,"Conceveiba guianensis",NA,NA
+"218",463,"2021-03-17T00:00:00Z","Bafog",42991,3,54,45,"Bocoa","prouacensis","TF","Generalists",18,3,12,3,"Mid",41,13.05732484,"Bocoa prouacensis",NA,NA
+"219",464,"2021-03-17T00:00:00Z","Bafog",43017,3,54,72,"Jacaranda","copaia subsp. copaia","TF","Generalists",21,3,20,3,"Sup",39.5,12.57961783,"Jacaranda copaia subsp. copaia",NA,NA
+"220",465,"2021-03-17T00:00:00Z","Bafog",41503,3,12,65,"Jacaranda","copaia subsp. copaia","TF","Generalists",9,3,9,3,"Sup",40.5,12.89808917,"Jacaranda copaia subsp. copaia","pas BF",NA
+"221",466,"2021-03-17T00:00:00Z","Bafog",15361,3,12,24,"Virola","michelii","BF","Generalists",28,3,25,2,"Inf",82.5,26.27388535,"Virola michelii","en limite BF",NA
+"222",467,"2021-03-18T14:42:33Z","Bafog",33216,2,1,40,"Casearia","javitensis","TF","TF",13,2,10,2,"Sup",36,11.46496815,"Casearia javitensis",NA,NA
+"223",468,"2021-03-18T14:42:33Z","Bafog",33214,2,1,38,"Conceveiba","guianensis","TF","Generalists",12,2,12,2,"Sup",42,13.37579618,"Conceveiba guianensis",NA,NA
+"224",469,"2021-03-18T14:42:33Z","Bafog",10616,2,8,29,"Bocoa","prouacensis","TF","Generalists",18,3,15,3,"Mid",62,19.74522293,"Bocoa prouacensis",NA,NA
+"225",470,"2021-03-18T14:42:33Z","Bafog",3856,2,8,4,"Jacaranda","copaia subsp. copaia","TF","Generalists",28,4,28,4,"Sup",90.5,28.82165605,"Jacaranda copaia subsp. copaia",NA,NA
+"226",471,"2021-03-18T14:42:33Z","Bafog",33461,2,15,34,"Casearia","javitensis","TF","TF",17,4,17,4,"Sup",43,13.69426752,"Casearia javitensis",NA,NA
+"227",472,"2021-03-18T14:42:33Z","Bafog",1012,2,16,17,"Bocoa","prouacensis","TF","Generalists",14,1,14,2,"Sup",102.5,32.6433121,"Bocoa prouacensis",NA,NA
+"228",473,"2021-03-18T14:42:33Z","Bafog",4215,4,16,6,"Licania","membranacea","TF","TF",12,1,11,2,"Mid",38.6746512,12.3167679,"Licania membranacea",NA,NA

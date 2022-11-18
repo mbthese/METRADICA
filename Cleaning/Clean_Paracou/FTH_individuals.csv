@@ -1,6 +1,6 @@
 CodeFTH,Code,DateField,Forest,Plot,SubPlot,idTree,FieldNbr,Habitat,Type,Genus,Species,Name,TreeHeight,TreeDawkins,BranchHeight,BranchDawkins,CrownPosition
 1,657,13/09/2021,Paracou,16,15,158148,320,BF,BF,Virola,surinamensis,Virola surinamensis,25,5,25,5,Sup
-2,658,13/09/2021,Paracou,16,15,205438,"2,745",BF,Generalists,Jacaranda,copaia,Jacaranda copaia,20,5,20,5,Sup
+2,658,13/09/2021,Paracou,16,15,205438,"2,745",BF,Generalists,Jacaranda,copaia subsp. copaia,Jacaranda copaia subsp. copaia,20,5,20,5,Sup
 3,659,13/09/2021,Paracou,16,15,191854,"2,727",BF,BF,Virola,surinamensis,Virola surinamensis,18,4,18,4,Sup
 4,660,13/09/2021,Paracou,16,15,157940,106,TF,TF,Gustavia,hexapetala,Gustavia hexapetala,10,1,8,2,Inf
 5,661,13/09/2021,Paracou,16,14,157726,413,TF,TF,Casearia,javitensis,Casearia javitensis,8,3,5,2,Inf
@@ -13,7 +13,7 @@ CodeFTH,Code,DateField,Forest,Plot,SubPlot,idTree,FieldNbr,Habitat,Type,Genus,Sp
 21,668,13/09/2021,Paracou,16,11,156021,403,BF,Generalists,Tachigali,melinonii,Tachigali melinonii,25,5,25,5,Inf
 24,669,13/09/2021,Paracou,16,16,158903,556,BF,Generalists,Chrysophyllum,prieurii,Chrysophyllum prieurii,26,5,26,5,Sup
 30,670,13/09/2021,Paracou,16,17,159252,273,BF,Generalists,Protium,stevensonii,Protium stevensonii,25,4,19,3,Sup
-31,671,13/09/2021,Paracou,16,17,246993,"2,799",BF,Generalists,Jacaranda,copaia,Jacaranda copaia,15,5,15,5,Sup
+31,671,13/09/2021,Paracou,16,17,246993,"2,799",BF,Generalists,Jacaranda,copaia subsp. copaia,Jacaranda copaia subsp. copaia,15,5,15,5,Sup
 38,672,13/09/2021,Paracou,16,1,150153,215,TF,Generalists,Protium,stevensonii,Protium stevensonii,17,3,15,3,Inf
 41,673,13/09/2021,Paracou,16,6,153081,286,TF,TF,Casearia,javitensis,Casearia javitensis,10,3,9,4,Inf
 43,674,13/09/2021,Paracou,16,6,153135,340,TF,TF,Casearia,javitensis,Casearia javitensis,8,2,5,3,Inf
