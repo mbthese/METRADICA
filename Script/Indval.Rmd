@@ -113,30 +113,31 @@ library(forcats)
 library(ggplot2)
 
 
-Specialist_SF  %>%
+indval_SF_plot <- Specialist_SF  %>%
   mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
   ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
   geom_col() +
-  scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
   theme_minimal() +
   # theme(palette = "Tol") #color blind palette
   theme(axis.text.x=element_text(angle=50, hjust = 1))+
   theme(legend.position="none")
 
-
+ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
  
 
-Specialist_TF  %>%
+indval_TF_plot<- Specialist_TF  %>%
   mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
   ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
   geom_col() +
-  scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
   theme_minimal() +
   # theme(palette = "Tol") #color blind palette
   theme(axis.text.x=element_text(angle=50, hjust = 1))+
   theme(legend.position="none")
 
-
+ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+ 
 #now for generalists
 
 
@@ -163,6 +164,17 @@ Generalist_all <- Generalist_all %>%
   mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
   mutate(Type = "Generalist")
 
+library(ggplot2)
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal() +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
 #même ordre de grandeur entre les indval TF et BF sauf pour le tachigali plutot plus SF. mais en meme temps abondance faible.
 
 ```
