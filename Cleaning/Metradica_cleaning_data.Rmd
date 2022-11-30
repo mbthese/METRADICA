@@ -415,7 +415,6 @@ Uploading RWC data from excel file for all the 16 field days of METRADICA- Parac
 ```{r setup, include=FALSE}
 RWC_Paracou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_RWC/METRADICA_RWC.xlsx")
 
-View(RWC_Paracou)
 ```
 
 #### tidy
@@ -490,8 +489,6 @@ R_Bag_Weight <- arrange(R_Bag_Weight,  R_Bag_Weight$RCode) # pour ordonner par n
 
 R_Bag_Weight<- select(R_Bag_Weight, -`R_Bag_Weight$R_Bag_Code`) # en enlevant les doublons, cette colonne s'est rajoutée toute seule, elle sert à rien à présent
 
-View(R_Bag_Weight)
-
 
 
 ## Continue tidy data RWC----------------
@@ -549,20 +546,116 @@ Once all stomata are counted, labelStoma generates excel files where it tells ho
 I am using *labelStoma* for the annotation.
 After all annotated images, I will generate the excel to calculte the stomatal density using *labelStomaMarion*, as it has the scale option I want.
 
+All Paracou images sizes are: *1392* x *1040* in BMP format: 
+-X20 Scale conversion: 0.5 mm = 2145 pixel/mm; 0.65 mm *0.48 mm = 0.312 mm^2 image sizes
+-X40 Scale conversion: 0.2 mm = 4250 pixel/mm; 0.33 mm * 0.24 mm = 0.0792 mm^2 image sizes
+
 
 ```{r Stomata Paracou}
 
 
 stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_stomates/MetradicaParacou - stomata.csv") 
 
-stomata_tidy <- stomata %>% select(Code, SpCode, StomatalDensity_Stomate_mm2)
+stomata_tidy <- stomata %>% select(Code, SpCode, Countx10, Countx20, Countx40, ImageSizex20_mm2, ImageSizex40_mm2, StomatalDensity_Stomate_mm2, Comment_Stomata)
 
 stomata_tidy <- stomata_tidy %>% filter(Code < 245)
+
+stomata_tidy <- stomata_tidy %>% mutate(SD = ifelse(!is.na(Countx20), Countx20 / ImageSizex20_mm2 , Countx40 / ImageSizex40_mm2))
+
+```
+
+```{r outlier stomata paracou checks}
+#looking at outliers
+#from Machado et al 2021 (130 - 1708 mm^-2 for the Stomatal Density range)
+
+stomata_impossible<- stomata_tidy %>% filter(SD < 90 ) # the lowest SD are also the ones that were really hard to calculate. I went back to the raw files and clearly impossible to see or calculate correctly for those ones.
+
+stomata_tidy <- stomata_tidy %>% filter(SD > 90 ) 
+#plot to see if anymore outliers stand out
+###plot all
+
+stomata_all_plot <- ggplot(stomata_tidy) +
+  aes(
+    x = SpCode,
+    y = SD,
+    fill = SpCode
+  ) +
+  geom_boxplot() +
+  scale_fill_hue(direction = 1) +
+  theme_minimal()  +
+  ggtitle("Stomata_Paracou_all")
+
+ggsave(stomata_all_plot, file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Check_stomata/All_Paracou_Stomata.jpg", width = 35, height = 20, units = "cm")
+
+#per species loop
+options(ggrepel.max.overlaps = Inf)
+SpCode <- unique(stomata_tidy$SpCode)
+for (i in SpCode) {
+
+Stomata_Plotting <- stomata_tidy %>% filter(SpCode == i)
+############# WITHOUT LABELS
+PlotFam <- ggplot(data = Stomata_Plotting, aes(x = SpCode, y=SD)) + 
+           geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    
+ scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+   geom_point(aes(color = SpCode), size = 2.5)  +
+
+  ggtitle(paste0(i, ": Stomata"))
+print(PlotFam)
+#ggsave(PlotFam, file = paste("Outlier_analysis/images/Plots_Outliers_per_Family/gmin/", i,"gmin.jpg", sep = ""), width = 35, height = 20, units = "cm")
+ 
+################# WITH LABELS 
+
+PlotFam_label <- ggplot(data = Stomata_Plotting, aes(x = SpCode, y=SD)) + 
+  geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+  
+  geom_point(aes(color = SpCode), size = 2.5)   +
+  
+  
+ggnewscale::new_scale_fill() + 
+  
+ ggrepel::geom_label_repel(aes(label = Code, fill = as.factor(Comment_Stomata)),  data = Stomata_Plotting,
+                  
+                   nudge_y       = 0 ,
+                   nudge_x       = 0,
+                 size          = 2,
+                  box.padding   = 1,
+                  point.padding = 0.5,
+                  
+                  segment.size  = 0.3,
+                  segment.color = "black",
+                  direction     = "both") +
+#                             
+  ggtitle(paste0(i, ": Stomata"))
+
+
+#print(PlotFam)  
+print(PlotFam_label)
+
+ggsave(PlotFam_label, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Check_stomata" , i, "_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+} 
+
+#outliers detection:
+#a more complete check would be after join all sites, because some might seem outliers but let's see the rest as well
+#no removal at theis stage
+
+#M240 seems weird
+#M62
+
+```
+
+```{r Final Paracou stomata}
+stomata_tidy <- stomata_tidy %>% select(-StomatalDensity_Stomate_mm2)
 
 write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv")
 
 ```
-
 
 
 ## fvfm
@@ -588,7 +681,9 @@ write_csv(fvfm_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Docume
 
 ```{r Summary Paracou}
 Gmin <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/gmin.csv") %>% 
-  select(Code, gmin.slope) %>% rename(gmin = gmin.slope) 
+  select(sample_id, gmin.slope) %>% rename(Code = sample_id, gmin = gmin.slope) 
+
+Gmin$Code <- as.integer(Gmin$Code)
 
 TLP <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/tlp.csv") %>%
   select(`Code.RWC`, P_tlp) %>% rename(Code =`Code.RWC`,TLP = P_tlp)
@@ -611,7 +706,7 @@ LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
 
 Paracou <- left_join(Paracou, LSWC) 
 
-Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv") %>% select(Code, StomatalDensity_Stomate_mm2) %>% rename(SD = StomatalDensity_Stomate_mm2)
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/stomata.csv") %>% select(Code, SD, Comment_Stomata)
 
 Paracou <- left_join(Paracou, Stomata) 
 
@@ -748,7 +843,7 @@ RWC <- RWC_raw %>% select(Unique_Code, FW, SW, DW, Comment_Lab) %>% rename(Code 
 #RWC$Code[which(RWC$C2 < 0 )] #juste pour regarder quand SW- DW < 0 ce qui ne devrait pas arriver.
 
 
-RWC <- RWC %>% select(Code, FW, SW, DW) %>% mutate(LSWC = (SW-DW)/SW) %>% select(-FW, -SW, -DW)
+RWC <- RWC %>% select(Code, FW, SW, DW) %>% mutate(LSWC = (SW-DW)/DW) %>% select(-FW, -SW, -DW)
 
 write_csv(RWC, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/lswc.csv")
 
@@ -829,6 +924,9 @@ write_csv(LA_gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Document
 
 With Daniela's function, calculte gmin for all bafog individuals. 
 ```{r old script gmin, eval=FALSE, include=FALSE}
+
+#old gmin script
+
 gmin <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Gmin_Marion/documents/data/output/Bafog/Gmin_withLA.csv")
 gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
 
@@ -959,23 +1057,132 @@ write_csv(Chemistry_Bafog, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/
 
 ##stomata
 
-```{r Stomata Paracou}
+Some Bafog images sizes are: *1392* x *1040* in BMP format: 
+-X20 Scale conversion: 0.5 mm = 2145 pixel/mm; 0.65 mm *0.48 mm = 0.312 mm^2 image sizes
+-X40 Scale conversion: 0.2 mm = 4250 pixel/mm; 0.33 mm * 0.24 mm = 0.0792 mm^2 image sizes
+
+
+Some Bafog images sizes are also: *2560* x *1922* in BMP format: 
+-X20 Scale conversion: 4566 pixel/mm; 0.56 mm *0.42 mm = 0.2352 mm^2 image sizes
+-X40 Scale conversion: 9105 pixel/mm; 0.28 mm * 0.21 mm = 0.0588 mm^2 image sizes
+
+Two scales because there was a change of camera for the microscope in between !
+```{r Stomata Bafog}
 
 
 stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/stomata_done/MetradicaBafog - stomata.csv")
-                    
 
-stomata_tidy <- stomata %>% select(Code, Genus, Species, StomataDensity, Comment)
+stomata <- stomata %>% select(Code, Genus, Species, Count_x10, Count_x20, Count_x40, AncienneCamera, ImageResolution, Ancienne_ImageSizex20_mm2, Ancienne_ImageSizex40_mm2, Nouvelle_ImageSizex10_mm2, Nouvelle_ImageSizex20_mm2, Nouvelle_ImageSizex40_mm2, StomataDensity, Comment, Done) %>%
+  rename(Comment_bis = Done)
+
+#nouvelle Camera measurements
+NouvelleCamera <- stomata %>% filter(AncienneCamera == 'non')
+
+NouvelleCamera <- NouvelleCamera %>% 
+  mutate(SD = ifelse(!is.na(Count_x20), Count_x20 / Nouvelle_ImageSizex20_mm2 , Count_x40 / Nouvelle_ImageSizex40_mm2)) %>%
+  select(-Comment_bis, -Count_x10, -Ancienne_ImageSizex20_mm2, -Ancienne_ImageSizex40_mm2, -StomataDensity) 
+
+
+#Ancienne
+AncienneCamera <- stomata %>% filter(AncienneCamera == 'oui')
+
+AncienneCamera <- AncienneCamera %>% 
+  mutate(SD = ifelse(!is.na(Count_x20), Count_x20 / Ancienne_ImageSizex20_mm2 , Count_x40 / Ancienne_ImageSizex40_mm2)) %>%
+  select(-Comment_bis, -Count_x10, -Nouvelle_ImageSizex20_mm2, -Nouvelle_ImageSizex40_mm2, -StomataDensity) 
+
+#merge two data
+stomata_tidy <- full_join(AncienneCamera, NouvelleCamera)
 
 stomata_tidy <- stomata_tidy %>% 
   mutate(Name = paste0(Genus," ", Species)) %>%
   relocate(Name, .after = Species)
-  
+
+#330 there is a remark that it looks like a x10, but let's keep it x20
+stomata_tidy$SD[stomata_tidy$Code == "330"] <- 62/0.2352
+
+#425 there is a remark that it looks like a x10, but let's keep it x20
+stomata_tidy$SD[stomata_tidy$Code == "425"] <- 49/0.2352
+
 
 write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/stomata.csv")
 
 ```
 
+###plot to see if anymore outliers stand out
+
+
+```{r outlier stomata bafog}
+###plot all
+
+stomata_all_plot <- ggplot(stomata_tidy) +
+  aes(
+    x = Name,
+    y = SD,
+    fill = Name
+  ) +
+  geom_boxplot() +
+  scale_fill_hue(direction = 1) +
+  theme_minimal()  +
+  theme(axis.text.x = element_text(angle = 45)) +
+  ggtitle("Stomata_Bafog_all")
+
+ggsave(stomata_all_plot, file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Check_stomata/All_bafog_Stomata.jpg", width = 35, height = 20, units = "cm")
+
+#per species loop
+options(ggrepel.max.overlaps = Inf)
+Name <- unique(stomata_tidy$Name)
+for (i in SpCode) {
+
+Stomata_Plotting <- stomata_tidy %>% filter(Name == i)
+############# WITHOUT LABELS
+PlotFam <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+           geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    
+ scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+   geom_point(aes(color = Name), size = 2.5)  +
+
+  ggtitle(paste0(i, ": Stomata"))
+print(PlotFam)
+#ggsave(PlotFam, file = paste("Outlier_analysis/images/Plots_Outliers_per_Family/gmin/", i,"gmin.jpg", sep = ""), width = 35, height = 20, units = "cm")
+ 
+################# WITH LABELS 
+
+PlotFam_label <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+  geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+  
+  geom_point(aes(color = Name), size = 2.5)   +
+  
+  
+ggnewscale::new_scale_fill() + 
+  
+ ggrepel::geom_label_repel(aes(label = Code, fill = as.factor(Comment)),  data = Stomata_Plotting,
+                  
+                   nudge_y       = 0 ,
+                   nudge_x       = 0,
+                 size          = 2,
+                  box.padding   = 1,
+                  point.padding = 0.5,
+                  
+                  segment.size  = 0.3,
+                  segment.color = "black",
+                  direction     = "both") +
+#                             
+  ggtitle(paste0(i, ": Stomata"))
+
+
+#print(PlotFam)  
+print(PlotFam_label)
+
+ggsave(PlotFam_label, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/Check_stomata/" , i, "_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+} 
+
+```
 
 ## join with individuals
 ```{r}
@@ -1001,7 +1208,7 @@ LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
 
 
 
-Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/stomata.csv") %>% select(Code, StomataDensity) %>% rename(SD = StomataDensity)
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/stomata.csv") %>% select(Code, SD, Comment) %>% rename(Comment_Stomata = Comment)
 
  
 
@@ -1097,13 +1304,14 @@ gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Co
 #check gmin
 
 gmin$gmin[gmin$Code == 635] <- 4.23
-gmin$gmin[gmin$Code == 481] <- 19.16
-gmin$gmin[gmin$Code == 514] <- 11.47
-gmin$gmin[gmin$Code == 554] <- 11.53 *
-gmin$gmin[gmin$Code == 541] <- 13.99 *
-gmin$gmin[gmin$Code == 594] <- 5.6987 *
-gmin$gmin[gmin$Code == 536] <- 8.16
-gmin$gmin[gmin$Code == 581] <- NA #erreur rawdata *
+
+gmin$gmin[gmin$Code == 481] <- 19.16 
+gmin$gmin[gmin$Code == 514] <- 11.47 
+gmin$gmin[gmin$Code == 554] <- 11.53 * 
+gmin$gmin[gmin$Code == 541] <- 13.99 * 
+gmin$gmin[gmin$Code == 594] <- 5.6987 * 
+gmin$gmin[gmin$Code == 536] <- 8.16 
+gmin$gmin[gmin$Code == 581] <- NA #erreur rawdata * 
 
 
 gmin$Code[which(gmin$gmin >10)]
@@ -1284,18 +1492,128 @@ write_csv(FvFm_clean, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Docum
 
 ##stomata
 
+
+Kaw images sizes are : *1392* x *1040* in BMP format: 
+-X20 Scale conversion: 2470 pixel/mm; 0.56 mm *0.42 mm = 0.2352 mm^2 image sizes
+-X40 Scale conversion: 4940 pixel/mm; 0.28 mm * 0.21 mm = 0.0588 mm^2 image sizes
+
 ```{r stomata kaw}
 stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Est/Rawdata/stomates/MetradicaKaw - stomata.csv") 
                     
+stomata <- stomata %>% select(Code, Genus, Species, Done, Done_x40, Count, ImageResolution, X10_echelle, X20_echelle, x40_echelle, StomataDensity, Comment) %>%
+  rename(Comment_bis = Done)
 
-stomata_tidy <- stomata %>% select(Code, Genus, Species, StomataDensity, Comment)
-
-stomata_tidy <- stomata_tidy %>% 
+stomata <- stomata %>% 
   mutate(Name = paste0(Genus," ", Species)) %>%
   relocate(Name, .after = Species)
   
 
+stomata_tidy <- stomata %>% filter(!is.na(Count))
+
+stomata_tidy$Comment_bis[stomata_tidy$Code == 617] <- stomata_tidy$Done_x40[stomata_tidy$Code == 617]
+
+stomata_tidy <- stomata_tidy %>% select(-Done_x40)
+
+library(forstringr)
+stomata_tidy$Comment_bis <- str_right(stomata_tidy$Comment_bis, 3)
+
+stomata_tidy$Comment_bis <- gsub("x", "",stomata_tidy$Comment_bis)
+
+stomata_tidy$x40_echelle <- as.numeric(stomata_tidy$x40_echelle)
+
+stomata_tidy <- stomata_tidy %>% mutate(SD = ifelse(Comment_bis == "20", Count / X20_echelle , Count / x40_echelle))
+
+
+#522 there is a remark that it looks like a x10, but let's keep it x20, it's x20
+stomata_tidy$SD[stomata_tidy$Code == "522"] <- 36/0.2352
+
+#425 there is a remark that it looks like a x40. x20 is clearly an outlier
+
+stomata_tidy$SD[stomata_tidy$Code == "491"] <- 27/0.0588
+stomata_tidy$Comment[stomata_tidy$Code == "491"] <- "its x40"
+
+
 write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/stomata.csv")
+```
+
+###plot to see if anymore outliers stand out
+
+
+```{r outlier stomata kaw}
+###plot all
+
+stomata_all_plot <- ggplot(stomata_tidy) +
+  aes(
+    x = Name,
+    y = SD,
+    fill = Name
+  ) +
+  geom_boxplot() +
+  scale_fill_hue(direction = 1) +
+  theme_minimal()  +
+  theme(axis.text.x = element_text(angle = 45)) +
+  ggtitle("Stomata_Kaw_all")
+
+ggsave(stomata_all_plot, file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Check_stomata/All_Kaw_Stomata.jpg", width = 35, height = 20, units = "cm")
+
+#per species loop
+options(ggrepel.max.overlaps = Inf)
+Name <- unique(stomata_tidy$Name)
+for (i in Name) {
+
+Stomata_Plotting <- stomata_tidy %>% filter(Name == i)
+############# WITHOUT LABELS
+PlotFam <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+           geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    
+ scale_y_continuous(breaks = seq(from = 0.0, to = 1600, by = 20), limits = c(0, 1600))+
+  
+   geom_point(aes(color = Name), size = 2.5)  +
+
+  ggtitle(paste0(i, ": Stomata"))
+print(PlotFam)
+#ggsave(PlotFam, file = paste("Outlier_analysis/images/Plots_Outliers_per_Family/gmin/", i,"gmin.jpg", sep = ""), width = 35, height = 20, units = "cm")
+ 
+################# WITH LABELS 
+
+PlotFam_label <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+  geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  scale_y_continuous(breaks = seq(from = 0.0, to = 1600, by = 20), limits = c(0, 1600))+
+  
+  
+  geom_point(aes(color = Name), size = 2.5)   +
+  
+  
+ggnewscale::new_scale_fill() + 
+  
+ ggrepel::geom_label_repel(aes(label = Code, fill = as.factor(Comment)),  data = Stomata_Plotting,
+                  
+                   nudge_y       = 0 ,
+                   nudge_x       = 0,
+                 size          = 2,
+                  box.padding   = 1,
+                  point.padding = 0.5,
+                  
+                  segment.size  = 0.3,
+                  segment.color = "black",
+                  direction     = "both") +
+#                             
+  ggtitle(paste0(i, ": Stomata"))
+
+
+#print(PlotFam)  
+print(PlotFam_label)
+
+ggsave(PlotFam_label, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/Check_stomata/" , i, "_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+} 
+
+#650 take out?
+#581 not the good species?
+#laetia procera really high, 546?
+#642 tac mel trop haut?
 ```
 
 ##majvla
@@ -1349,7 +1667,7 @@ Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
 
 LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/lswc.csv") %>% select(Code, LSWC)
 
-Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/stomata.csv") %>% select(Code, StomataDensity) %>% rename(SD = StomataDensity)
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/stomata.csv") %>% select(Code, SD, Comment) %>% rename(Comment_Stomata = Comment)
 
 fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv") %>% select(Code, fvfm)
 #beware we eliminated individual 537 because leaves were not healthy
@@ -1490,7 +1808,7 @@ write_csv(final_FTH_gmin, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/D
 ```
 
 
-#lswc
+##lswc
 ```{r}
 RWCMetradica_FTH<- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/rwc/RWC_20211001.xlsx")
 
@@ -1501,7 +1819,7 @@ RWCMetradica_FTH <- RWCMetradica_FTH[!is.na(RWCMetradica_FTH$DW),]
 ```
 
 
-## rename column names 
+### rename column names 
 ```{r}
 names(RWCMetradica_FTH)
 ```
@@ -1512,7 +1830,7 @@ str(RWCMetradica_FTH) #columns are ok in structure
 ```
 
 
-## get rid of unnecessary rows where there is no corresponding sample 
+### get rid of unnecessary rows where there is no corresponding sample 
 
 ```{r}
 
@@ -1542,11 +1860,11 @@ RWC$Code[which(RWC$C2 < 0 )] #juste pour regarder quand SW- DW < 0 , ok nothing
 ```
 
 
-##calculate LSWC
+###calculate LSWC
 
 ```{r}
 RWCMetradica_FTH <-RWCMetradica_FTH %>%
-  mutate(LSWC = (SW - DW)/ SW) 
+  mutate(LSWC = (SW - DW)/ DW) 
 
 ```
 
@@ -1568,15 +1886,102 @@ write_csv(lswc, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/M
 
 #stomata
 
+All Paracou FTH images sizes are: *1392* x *1040* in BMP format: 
+-X20 Scale conversion: 2145 pixel/mm; 0.65 mm *0.48 mm = 0.312 mm^2 image sizes
+-X40 Scale conversion: 4250 pixel/mm; 0.33 mm * 0.24 mm = 0.0792 mm^2 image sizes
+
 ```{r stomata FTH}
 stomata_fth <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_stomates/MetradicaParacou - stomata.csv") 
 
-stomata_tidy <- stomata %>% select(Code, SpCode, StomatalDensity_Stomate_mm2)
+stomata_fth <- stomata_fth %>% select(Code, Name, -Countx10, Countx20, Countx40, ImageSizex20_mm2, ImageSizex40_mm2,StomatalDensity_Stomate_mm2, Comment_Stomata) 
 
-stomata_tidy <- stomata_tidy %>% filter(Code > 244)
+
+stomata_tidy <- stomata_fth %>% filter(Code > 244)
+
+stomata_tidy <- stomata_tidy %>% mutate(SD = ifelse(!is.na(Countx20), Countx20 / ImageSizex20_mm2 , Countx40 / ImageSizex40_mm2)) %>% filter(!is.na(SD))
 
 write_csv(stomata_tidy, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_stomata.csv")
 ```
+
+```{r outlier stomata FTH checks}
+#looking at outliers
+#from Machado et al 2021 (130 - 1708 mm^-2 for the Stomatal Density range)
+
+stomata_all_plot <- ggplot(stomata_tidy) +
+  aes(
+    x = Name,
+    y = SD,
+    fill = Name
+  ) +
+  geom_boxplot() +
+  scale_fill_hue(direction = 1) +
+  theme_minimal()  +
+  ggtitle("Stomata_Paracou_all_FTH")
+
+ggsave(stomata_all_plot, file = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Check_stomata/FTH/FTH_Stomata.jpg", width = 35, height = 20, units = "cm")
+
+#per species loop
+options(ggrepel.max.overlaps = Inf)
+Name <- unique(stomata_tidy$Name)
+for (i in Name) {
+
+Stomata_Plotting <- stomata_tidy %>% filter(Name == i)
+############# WITHOUT LABELS
+PlotFam <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+           geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    
+ scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+   geom_point(aes(color = Name), size = 2.5)  +
+
+  ggtitle(paste0(i, ": Stomata"))
+print(PlotFam)
+#ggsave(PlotFam, file = paste("Outlier_analysis/images/Plots_Outliers_per_Family/gmin/", i,"gmin.jpg", sep = ""), width = 35, height = 20, units = "cm")
+ 
+################# WITH LABELS 
+
+PlotFam_label <- ggplot(data = Stomata_Plotting, aes(x = Name, y=SD)) + 
+  geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  scale_y_continuous(breaks = seq(from = 0.0, to = 900, by = 20), limits = c(0, 900))+
+  
+  
+  geom_point(aes(color = Name), size = 2.5)   +
+  
+  
+ggnewscale::new_scale_fill() + 
+  
+ ggrepel::geom_label_repel(aes(label = Code, fill = as.factor(Comment_Stomata)),  data = Stomata_Plotting,
+                  
+                   nudge_y       = 0 ,
+                   nudge_x       = 0,
+                 size          = 2,
+                  box.padding   = 1,
+                  point.padding = 0.5,
+                  
+                  segment.size  = 0.3,
+                  segment.color = "black",
+                  direction     = "both") +
+#                             
+  ggtitle(paste0(i, ": Stomata"))
+
+
+#print(PlotFam)  
+print(PlotFam_label)
+
+ggsave(PlotFam_label, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/Check_stomata/FTH/" , i, "_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+} 
+
+#outliers detection:
+#a more complete check would be after join all sites, because some might seem outliers but let's see the rest as well
+#no removal at theis stage
+
+
+```
+
+
 
 #fvfm
 ```{r}
@@ -1669,9 +2074,7 @@ Chem <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
 
 LSWC <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_lswc.csv") %>% select(Code, LSWC)
 
-Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_stomata.csv") %>% select(Code, StomatalDensity_Stomate_mm2
-) %>% rename(SD = StomatalDensity_Stomate_mm2
-)
+Stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_stomata.csv") %>% select(Code, SD, Comment_Stomata)
 
 fvfm <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_fvfm.csv") %>% select(Code, fvfm)
 
@@ -1738,4 +2141,68 @@ write_csv(Paracou_Kaw_Bafog, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20
 
 ```
 
+
+VI - Additional traits
+
+************************
+RECHECK Stomatal density and the conversions!!!
+*******************
+
+## Gmax
+
+Theoretical maximum stomatal conductance in $$mol H_2O m^{-2} s^{-1}$$ 
+
+
+$$ g_{max} = \frac{SD*d_w*amax} {v * (pd + \pi/2 * sqrt(amax/ \pi))} $$
+For normalization of the values, the constants *dw* and *v* represent the values at 25°C (24.9 × 10−6 m2 s−1) and 24.4 × 10−3 m3 mol−1, respectively). *pd* or *l*. amax was calculated as π(*StomatalPoreLength*/2)^2 , according to Franks et al. (2009) for a fully opened stomata was taken as L/4 assuming guard cells inflate to circular
+cross-section (Franks et al., 2009).
+
+pd = is the depth of the stomatal pore (m, approximated as W/2 for fully inflated guard cells (Franks & Farquhar (2007)) = pore depth of fully opened stomata = W/2 => m
+
+Small stomatal size can provide a reduction in total leaf pore area and might also facilitate faster aperture response (Franks and Beerling, 2009; Drake et al., 2013; Lawson and Blatt, 2014). 
+
+```{r}
+Gmax_subset_data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Gmax/Stomates_gmax.csv",fileEncoding = "Windows-1252") %>%
+  rename(Code = Code_ind, StomatalPoreLength=lp..mm., StomatalLength=L..mm., StomatalWidth=W..mm.) %>%
+  select(Code, Stomate, -Species, StomatalPoreLength, StomatalLength, StomatalWidth)
+
+StomataDensity <-  read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv") %>%
+  select(Code, Genus, Species, Name, gmin, SD)
+
+Gmax_subset_data <- left_join(Gmax_subset_data, StomataDensity, by = "Code")
+
+#calculate SS
+
+Gmax_subset_data <- Gmax_subset_data %>%
+  mutate(SS= StomatalLength * StomatalWidth) %>%
+  mutate(amax = pi*((StomatalPoreLength/1000)/2)^2) %>% #en mètre en divisant par 1000
+  mutate(pd = (StomatalWidth/1000)/2) %>% #en mètre en divisant par 1000
+  mutate(gmax = (SD*(10^6)*24.9*10^(-6)*amax)/((24.4*10^(-3))*(pd+(pi/2)*sqrt(amax/pi))))
+
+#mean gmax per individual
+
+Gmax_subset_data <- Gmax_subset_data %>%
+  group_by(Code) %>%
+  summarise(gmax_mean_indv = mean(gmax))
+
+#merge with the data
+
+Gmax_subset_data <- left_join(Gmax_subset_data, StomataDensity) %>%
+  na.omit()
+
+Gmax <- Gmax_subset_data %>%
+  select(Code, gmax_mean_indv) %>%
+  rename(gmax= gmax_mean_indv)
+
+#there are 149 individuals for whom gmax has been calculated.
+```
+
+##merge gmax with final metradica
+```{r}
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv") 
+
+Metradica <- left_join(Metradica, Gmax)
+
+write_csv(Metradica, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv")
+```
 

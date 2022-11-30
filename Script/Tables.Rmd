@@ -88,7 +88,7 @@ paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xl
 #tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
 #save(tree, file = "./Results/phylogeny_subset.Rdata")
 load("./Results/phylogeny_subset.Rdata")
-fortify(tree$scenario.3) %>% 
+A<- fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
   left_join(paracou) %>% 
   ggtree(aes(col = taxon), layout="circular") + 
@@ -97,6 +97,9 @@ fortify(tree$scenario.3) %>%
   scale_alpha_manual("taxon", values = c(0.2, 4)) +
   scale_size_manual("taxon", values = c(1, 4))
 
+
+ggsave(file="phylo_subset.svg", plot=A, width=15, height=10)
+ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
 ```
 
 
@@ -154,31 +157,20 @@ save_kable(file = "Sampling.png", zoom = 10)
 #Table indvals
 
 ```{r Table S2: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
-Table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=1159265517", range = "Abundance") %>% select(Genus, Species, Type, Abund, SF, TF, `P-value`) %>% 
-  mutate(Abund = as.numeric(Abund))%>% mutate(SF = as.numeric(SF)) %>% mutate(TF = as.numeric(TF)) %>% mutate(`P-value` = as.numeric(`P-value`)) %>% rename(`p-value` = `P-value`, Abundance = Abund, `SF Habitat` = SF,  `TF Habitat` = TF)
+
+Indval <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv") %>%
+  select(-X, -Paracou, -Kaw, -Bafog)
+
+Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
 
 
-Table %>%
+B<- Indval %>%
   kbl() %>%
   row_spec(0, bold = TRUE) %>% 
   column_spec(1:2, italic = TRUE) %>%
-  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_.png", zoom = 10)
-
-```
-
-## Indval Subset 
-
-```{r Indval_subset}
-```{r Table S2: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
-Table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=1159265517", range = "AbundanceSUBSET") %>% select(Genus, Species, Type, Abund, SF, TF, `P-value`) %>% 
-  mutate(Abund = as.numeric(Abund))%>% mutate(SF = as.numeric(SF)) %>% mutate(TF = as.numeric(TF)) %>% mutate(`P-value` = as.numeric(`P-value`)) %>% rename(`p-value` = `P-value`, Abundance = Abund, `SF Habitat` = SF,  `TF Habitat` = TF)
-
-
-Table %>%
-  kbl() %>%
-  row_spec(0, bold = TRUE) %>% 
-  column_spec(1:2, italic = TRUE) %>%
-  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_subset.png")
+  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_subset.png", zoom = 10)
 
 ```
 

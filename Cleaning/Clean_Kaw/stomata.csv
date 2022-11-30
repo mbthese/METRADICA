@@ -1,184 +1,136 @@
-Code,Genus,Species,Name,StomataDensity,Comment
-494,Bocoa,prouacensis,Bocoa prouacensis,191.3265306,
-529,Bocoa,prouacensis,Bocoa prouacensis,212.585034,
-587,Bocoa,prouacensis,Bocoa prouacensis,144.5578231,
-538,Carapa,guianensis,Carapa guianensis,NA,
-557,Carapa,guianensis,Carapa guianensis,NA,
-559,Carapa,guianensis,Carapa guianensis,1071.428571,
-562,Carapa,guianensis,Carapa guianensis,701.5306122,
-564,Carapa,guianensis,Carapa guianensis,NA,
-571,Carapa,guianensis,Carapa guianensis,1292.517007,
-607,Carapa,guianensis,Carapa guianensis,1037.414966,
-608,Carapa,guianensis,Carapa guianensis,863.0952381,
-609,Carapa,guianensis,Carapa guianensis,948.1292517,
-616,Carapa,guianensis,Carapa guianensis,744.047619,
-490,Chrysophyllum,prieurii,Chrysophyllum prieurii,174.3197279,
-629,Eperua,falcata,Eperua falcata,884.3537415,
-630,Eperua,falcata,Eperua falcata,620.7482993,
-631,Eperua,falcata,Eperua falcata,586.7346939,
-632,Eperua,falcata,Eperua falcata,476.1904762,
-634,Eperua,falcata,Eperua falcata,693.0272109,
-635,Eperua,falcata,Eperua falcata,684.5238095,
-636,Eperua,falcata,Eperua falcata,586.7346939,
-637,Eperua,falcata,Eperua falcata,607.9931973,
-638,Eperua,falcata,Eperua falcata,646.2585034,
-639,Eperua,falcata,Eperua falcata,629.2517007,
-585,Eschweilera,coriacea,Eschweilera coriacea,646.2585034,
-586,Eschweilera,coriacea,Eschweilera coriacea,331.6326531,il y en a juste moins 
-591,Eschweilera,coriacea,Eschweilera coriacea,616.4965986,
-592,Eschweilera,coriacea,Eschweilera coriacea,522.9591837,
-593,Eschweilera,coriacea,Eschweilera coriacea,671.7687075,
-595,Eschweilera,coriacea,Eschweilera coriacea,484.6938776,
-596,Eschweilera,coriacea,Eschweilera coriacea,607.9931973,
-597,Eschweilera,coriacea,Eschweilera coriacea,671.7687075,
-598,Eschweilera,coriacea,Eschweilera coriacea,531.462585,
-599,Eschweilera,coriacea,Eschweilera coriacea,420.9183673,
-526,Gustavia,hexapetala,Gustavia hexapetala,289.1156463,
-584,Gustavia,hexapetala,Gustavia hexapetala,259.3537415,
-588,Gustavia,hexapetala,Gustavia hexapetala,331.6326531,
-589,Gustavia,hexapetala,Gustavia hexapetala,361.3945578,
-590,Gustavia,hexapetala,Gustavia hexapetala,335.8843537,
-481,Hymenopus,heteromorphus,Hymenopus heteromorphus,191.3265306,
-484,Hymenopus,heteromorphus,Hymenopus heteromorphus,323.1292517,
-495,Hymenopus,heteromorphus,Hymenopus heteromorphus,233.8435374,
-500,Hymenopus,heteromorphus,Hymenopus heteromorphus,233.8435374,
-601,Hymenopus,heteromorphus,Hymenopus heteromorphus,187.0748299,
-602,Hymenopus,heteromorphus,Hymenopus heteromorphus,488.9455782,semble echelle diff
-604,Hymenopus,heteromorphus,Hymenopus heteromorphus,501.7006803,semble echelle diff
-519,Hymenopus ,heteromorphus,Hymenopus  heteromorphus,548.4693878,semble echelle diff
-479,Iryanthera,sagotiana,Iryanthera sagotiana,NA,
-483,Iryanthera,sagotiana,Iryanthera sagotiana,NA,
-489,Iryanthera,sagotiana,Iryanthera sagotiana,161.5646259,
-507,Iryanthera,sagotiana,Iryanthera sagotiana,NA,
-520,Iryanthera,sagotiana,Iryanthera sagotiana,140.3061224,
-521,Iryanthera,sagotiana,Iryanthera sagotiana,144.5578231,
-522,Iryanthera,sagotiana,Iryanthera sagotiana,153.0612245,ce n'est pas a x20 mais x10 je pense
-578,Iryanthera,sagotiana,Iryanthera sagotiana,199.829932,
-581,Iryanthera,sagotiana,Iryanthera sagotiana,522.9591837,tres bizarre
-582,Iryanthera,sagotiana,Iryanthera sagotiana,178.5714286,
-645,Iryanthera,hostmannii,Iryanthera hostmannii,293.3673469,
-646,Iryanthera,hostmannii,Iryanthera hostmannii,267.8571429,
-647,Iryanthera,hostmannii,Iryanthera hostmannii,310.3741497,
-648,Iryanthera,hostmannii,Iryanthera hostmannii,267.8571429,
-649,Iryanthera,hostmannii,Iryanthera hostmannii,208.3333333,
-650,Iryanthera,hostmannii,Iryanthera hostmannii,140.3061224,"pas super belle, peu de stomates car flou on one side"
-653,Iryanthera,hostmannii,Iryanthera hostmannii,246.5986395,
-654,Iryanthera,hostmannii,Iryanthera hostmannii,221.0884354,
-655,Iryanthera,hostmannii,Iryanthera hostmannii,327.3809524,
-656,Iryanthera,hostmannii,Iryanthera hostmannii,293.3673469,
-573,Jacaranda,copaia,Jacaranda copaia,242.3469388,
-577,Jacaranda,copaia,Jacaranda copaia,480.4421769,
-625,Jacaranda,copaia,Jacaranda copaia,429.4217687,
-643,Jacaranda,copaia,Jacaranda copaia,331.6326531,
-644,Jacaranda,copaia,Jacaranda copaia,408.1632653,
-651,Jacaranda,copaia,Jacaranda copaia,382.6530612,
-652,Jacaranda,copaia,Jacaranda copaia,369.8979592,
-502,Jacaranda ,copaia,Jacaranda  copaia,340.1360544,
-504,Jacaranda ,copaia,Jacaranda  copaia,361.3945578,
-506,Jacaranda ,copaia,Jacaranda  copaia,493.1972789,
-508,Jacaranda ,copaia,Jacaranda  copaia,395.4081633,
-510,Jacaranda ,copaia,Jacaranda  copaia,386.9047619,
-514,Jacaranda ,copaia,Jacaranda  copaia,416.6666667,
-517,Jacaranda ,copaia,Jacaranda  copaia,659.0136054,
-524,Jacaranda ,copaia,Jacaranda  copaia,352.8911565,
-546,Laetia,procera,Laetia procera,1513.605442,
-548,Laetia,procera,Laetia procera,1190.47619,
-549,Laetia,procera,Laetia procera,1241.496599,
-552,Laetia,procera,Laetia procera,NA,
-555,Laetia,procera,Laetia procera,1118.197279,
-570,Laetia,procera,Laetia procera,1054.421769,
-626,Laetia,procera,Laetia procera,986.3945578,
-627,Laetia,procera,Laetia procera,1139.455782,
-628,Laetia,procera,Laetia procera,NA,
-633,Laetia,procera,Laetia procera,NA,
-485,Licania,membranacea,Licania membranacea,NA,
-525,Licania,membranacea,Licania membranacea,NA,
-530,Licania,membranacea,Licania membranacea,NA,
-531,Licania,membranacea,Licania membranacea,NA,
-579,Licania,membranacea,Licania membranacea,NA,
-477,Poraqueiba,guianensis,Poraqueiba guianensis,476.1904762,
-480,Poraqueiba,guianensis,Poraqueiba guianensis,386.9047619,
-482,Poraqueiba,guianensis,Poraqueiba guianensis,416.6666667,
-488,Poraqueiba,guianensis,Poraqueiba guianensis,386.9047619,
-491,Poraqueiba,guianensis,Poraqueiba guianensis,459.1836735,appears to be x40
-492,Poraqueiba,guianensis,Poraqueiba guianensis,323.1292517,
-496,Poraqueiba,guianensis,Poraqueiba guianensis,378.4013605,
-527,Poraqueiba,guianensis,Poraqueiba guianensis,561.2244898,marche tres bien la reco sur cette epsèce
-580,Poraqueiba,guianensis,Poraqueiba guianensis,425.170068,joli
-583,Poraqueiba,guianensis,Poraqueiba guianensis,310.3741497,
-539,Protium,opacum,Protium opacum,NA,
-540,Protium,opacum,Protium opacum,NA,
-541,Protium,opacum,Protium opacum,NA,
-542,Protium,opacum,Protium opacum,735.5442177,
-543,Protium,opacum,Protium opacum,544.2176871,
-547,Protium,opacum,Protium opacum,718.537415,
-550,Protium,opacum,Protium opacum,1037.414966,
-553,Protium,opacum,Protium opacum,697.2789116,
-554,Protium,opacum,Protium opacum,969.3877551,
-576,Protium,stevensonii,Protium stevensonii,684.5238095,
-603,Protium,opacum,Protium opacum,646.2585034,
-606,Protium,opacum,Protium opacum,646.2585034,
-614,Pterocarpus,officinalis,Pterocarpus officinalis,272.1088435,
-615,Pterocarpus,officinalis,Pterocarpus officinalis,365.6462585,
-617,Pterocarpus,officinalis,Pterocarpus officinalis,476.1904762,
-618,Pterocarpus,officinalis,Pterocarpus officinalis,352.8911565,
-619,Pterocarpus,officinalis,Pterocarpus officinalis,352.8911565,
-620,Pterocarpus,officinalis,Pterocarpus officinalis,335.8843537,
-621,Pterocarpus,officinalis,Pterocarpus officinalis,612.244898,
-622,Pterocarpus,officinalis,Pterocarpus officinalis,331.6326531,
-623,Pterocarpus,officinalis,Pterocarpus officinalis,442.1768707,
-624,Pterocarpus,officinalis,Pterocarpus officinalis,408.1632653,
-534,Symphonia,globulifera,Symphonia globulifera,276.3605442,
-535,Symphonia,globulifera,Symphonia globulifera,263.6054422,
-544,Symphonia,globulifera,Symphonia globulifera,255.1020408,
-556,Symphonia,globulifera,Symphonia globulifera,238.0952381,
-563,Symphonia,globulifera,Symphonia globulifera,293.3673469,
-605,Symphonia,globulifera,Symphonia globulifera,289.1156463,
-610,Symphonia,globulifera,Symphonia globulifera,276.3605442,
-611,Symphonia,globulifera,Symphonia globulifera,250.8503401,
-612,Symphonia,globulifera,Symphonia globulifera,250.8503401,
-613,Symphonia,globulifera,Symphonia globulifera,284.8639456,
-474,Tachigali,melinonii,Tachigali melinonii,352.8911565,joli
-475,Tachigali,melinonii,Tachigali melinonii,433.6734694,
-476,Tachigali,melinonii,Tachigali melinonii,416.6666667,
-497,Tachigali,melinonii,Tachigali melinonii,476.1904762,
-499,Tachigali,melinonii,Tachigali melinonii,450.6802721,
-503,Tachigali,melinonii,Tachigali melinonii,289.1156463,written proopa
-528,Tachigali,melinonii,Tachigali melinonii,539.9659864,
-572,Tachigali,melinonii,Tachigali melinonii,514.4557823,
-574,Tachigali,melinonii,Tachigali melinonii,569.7278912,
-575,Tachigali,melinonii,Tachigali melinonii,446.4285714,
-640,Tachigali,melinonii,Tachigali melinonii,437.9251701,
-641,Tachigali,melinonii,Tachigali melinonii,497.4489796,
-642,Tachigali,melinonii,Tachigali melinonii,748.2993197,
-486,Virola,michelii,Virola michelii,NA,
-493,Virola,michelii,Virola michelii,NA,
-505,Virola,michelii,Virola michelii,NA,
-518,Virola,michelii,Virola michelii,NA,
-536,Virola,surinamensis,Virola surinamensis,NA,
-537,Virola,surinamensis,Virola surinamensis,NA,
-545,Virola,surinamensis,Virola surinamensis,NA,
-551,Virola,surinamensis,Virola surinamensis,NA,
-558,Virola,surinamensis,Virola surinamensis,NA,
-560,Virola,surinamensis,Virola surinamensis,NA,
-561,Virola,surinamensis,Virola surinamensis,NA,
-565,Virola,surinamensis,Virola surinamensis,NA,
-566,Virola,surinamensis,Virola surinamensis,NA,
-567,Virola,surinamensis,Virola surinamensis,NA,
-594,Virola,michelii,Virola michelii,NA,
-600,Virola,michelii,Virola michelii,NA,
-478,Vouacapoua,americana,Vouacapoua americana,NA,difficile a voir
-487,Vouacapoua,americana,Vouacapoua americana,NA,
-498,Vouacapoua,americana,Vouacapoua americana,NA,
-501,Vouacapoua,americana,Vouacapoua americana,NA,
-511,Vouacapoua,americana,Vouacapoua americana,NA,
-512,Vouacapoua,americana,Vouacapoua americana,NA,
-513,Vouacapoua,americana,Vouacapoua americana,NA,
-515,Vouacapoua,americana,Vouacapoua americana,NA,
-516,Vouacapoua,americana,Vouacapoua americana,NA,
-523,Vouacapoua,americana,Vouacapoua americana,NA,
-509,,, ,NA,
-532,,, ,NA,
-533,,, ,NA,
-568,,, ,NA,
-569,,, ,NA,
+Code,Genus,Species,Name,Comment_bis,Count,ImageResolution,X10_echelle,X20_echelle,x40_echelle,StomataDensity,Comment,SD
+494,Bocoa,prouacensis,Bocoa prouacensis,20,45,1392x1040,0.9408,0.2352,0.0588,191.3265306,,191.3265306122449
+529,Bocoa,prouacensis,Bocoa prouacensis,20,50,1392x1040,NA,0.2352,NA,212.585034,,212.58503401360545
+587,Bocoa,prouacensis,Bocoa prouacensis,20,34,1392x1040,NA,0.2352,NA,144.5578231,,144.55782312925172
+559,Carapa,guianensis,Carapa guianensis,40,63,1392x1040,NA,NA,0.0588,1071.428571,,1071.4285714285716
+562,Carapa,guianensis,Carapa guianensis,20,165,1392x1040,NA,0.2352,NA,701.5306122,,701.530612244898
+571,Carapa,guianensis,Carapa guianensis,40,76,1392x1040,NA,NA,0.0588,1292.517007,,1292.5170068027212
+607,Carapa,guianensis,Carapa guianensis,40,61,1392x1040,NA,NA,0.0588,1037.414966,,1037.4149659863947
+608,Carapa,guianensis,Carapa guianensis,20,203,1392x1040,NA,0.2352,NA,863.0952381,,863.0952380952381
+609,Carapa,guianensis,Carapa guianensis,20,223,1392x1040,NA,0.2352,NA,948.1292517,,948.1292517006804
+616,Carapa,guianensis,Carapa guianensis,20,175,1392x1040,NA,0.2352,NA,744.047619,,744.047619047619
+490,Chrysophyllum,prieurii,Chrysophyllum prieurii,20,41,1392x1040,NA,0.2352,NA,174.3197279,,174.31972789115648
+629,Eperua,falcata,Eperua falcata,20,208,1392x1040,NA,0.2352,NA,884.3537415,,884.3537414965987
+630,Eperua,falcata,Eperua falcata,20,146,1392x1040,NA,0.2352,NA,620.7482993,,620.748299319728
+631,Eperua,falcata,Eperua falcata,20,138,1392x1040,NA,0.2352,NA,586.7346939,,586.7346938775511
+632,Eperua,falcata,Eperua falcata,20,112,1392x1040,NA,0.2352,NA,476.1904762,,476.1904761904762
+634,Eperua,falcata,Eperua falcata,20,163,1392x1040,NA,0.2352,NA,693.0272109,,693.0272108843537
+635,Eperua,falcata,Eperua falcata,20,161,1392x1040,NA,0.2352,NA,684.5238095,,684.5238095238095
+636,Eperua,falcata,Eperua falcata,20,138,1392x1040,NA,0.2352,NA,586.7346939,,586.7346938775511
+637,Eperua,falcata,Eperua falcata,20,143,1392x1040,NA,0.2352,NA,607.9931973,,607.9931972789116
+638,Eperua,falcata,Eperua falcata,20,152,1392x1040,NA,0.2352,NA,646.2585034,,646.2585034013606
+639,Eperua,falcata,Eperua falcata,20,148,1392x1040,NA,0.2352,NA,629.2517007,,629.2517006802722
+585,Eschweilera,coriacea,Eschweilera coriacea,20,152,1392x1040,NA,0.2352,NA,646.2585034,,646.2585034013606
+586,Eschweilera,coriacea,Eschweilera coriacea,20,78,1392x1040,NA,0.2352,NA,331.6326531,il y en a juste moins ,331.6326530612245
+591,Eschweilera,coriacea,Eschweilera coriacea,20,145,1392x1040,NA,0.2352,NA,616.4965986,,616.4965986394558
+592,Eschweilera,coriacea,Eschweilera coriacea,20,123,1392x1040,NA,0.2352,NA,522.9591837,,522.9591836734694
+593,Eschweilera,coriacea,Eschweilera coriacea,20,158,1392x1040,NA,0.2352,NA,671.7687075,,671.7687074829932
+595,Eschweilera,coriacea,Eschweilera coriacea,20,114,1392x1040,NA,0.2352,NA,484.6938776,,484.6938775510204
+596,Eschweilera,coriacea,Eschweilera coriacea,20,143,1392x1040,NA,0.2352,NA,607.9931973,,607.9931972789116
+597,Eschweilera,coriacea,Eschweilera coriacea,20,158,1392x1040,NA,0.2352,NA,671.7687075,,671.7687074829932
+598,Eschweilera,coriacea,Eschweilera coriacea,20,125,1392x1040,NA,0.2352,NA,531.462585,,531.4625850340136
+599,Eschweilera,coriacea,Eschweilera coriacea,20,99,1392x1040,NA,0.2352,NA,420.9183673,,420.9183673469388
+526,Gustavia,hexapetala,Gustavia hexapetala,20,68,1392x1040,NA,0.2352,NA,289.1156463,,289.11564625850343
+584,Gustavia,hexapetala,Gustavia hexapetala,20,61,1392x1040,NA,0.2352,NA,259.3537415,,259.3537414965987
+588,Gustavia,hexapetala,Gustavia hexapetala,20,78,1392x1040,NA,0.2352,NA,331.6326531,,331.6326530612245
+589,Gustavia,hexapetala,Gustavia hexapetala,20,85,1392x1040,NA,0.2352,NA,361.3945578,,361.3945578231293
+590,Gustavia,hexapetala,Gustavia hexapetala,20,79,1392x1040,NA,0.2352,NA,335.8843537,,335.8843537414966
+481,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,45,1392x1040,NA,0.2352,NA,191.3265306,,191.3265306122449
+484,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,76,1392x1040,NA,0.2352,NA,323.1292517,,323.1292517006803
+495,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,55,1392x1040,NA,0.2352,NA,233.8435374,,233.843537414966
+500,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,55,1392x1040,NA,0.2352,NA,233.8435374,,233.843537414966
+601,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,44,1392x1040,NA,0.2352,NA,187.0748299,,187.0748299319728
+602,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,115,1392x1040,0.9408,0.2352,0.0588,488.9455782,semble echelle diff,488.94557823129253
+604,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,118,1392x1040,0.9408,0.2352,0.0588,501.7006803,semble echelle diff,501.70068027210885
+519,Hymenopus,heteromorphus,Hymenopus heteromorphus,20,129,1392x1040,0.9408,0.2352,0.0588,548.4693878,semble echelle diff,548.469387755102
+489,Iryanthera,sagotiana,Iryanthera sagotiana,20,38,1392x1040,NA,0.2352,NA,161.5646259,,161.56462585034015
+520,Iryanthera,sagotiana,Iryanthera sagotiana,20,33,1392x1040,NA,0.2352,NA,140.3061224,,140.3061224489796
+521,Iryanthera,sagotiana,Iryanthera sagotiana,20,34,1392x1040,NA,0.2352,NA,144.5578231,,144.55782312925172
+522,Iryanthera,sagotiana,Iryanthera sagotiana,10,36,1392x1040,NA,0.2352,NA,153.0612245,ce n'est pas a x20 mais x10 je pense,153.06122448979593
+578,Iryanthera,sagotiana,Iryanthera sagotiana,20,47,1392x1040,NA,0.2352,NA,199.829932,,199.82993197278913
+581,Iryanthera,sagotiana,Iryanthera sagotiana,20,123,1392x1040,NA,0.2352,NA,522.9591837,tres bizarre,522.9591836734694
+582,Iryanthera,sagotiana,Iryanthera sagotiana,20,42,1392x1040,NA,0.2352,NA,178.5714286,,178.57142857142858
+645,Iryanthera,hostmannii,Iryanthera hostmannii,20,69,1392x1040,NA,0.2352,NA,293.3673469,,293.36734693877554
+646,Iryanthera,hostmannii,Iryanthera hostmannii,20,63,1392x1040,NA,0.2352,NA,267.8571429,,267.8571428571429
+647,Iryanthera,hostmannii,Iryanthera hostmannii,20,73,1392x1040,NA,0.2352,NA,310.3741497,,310.374149659864
+648,Iryanthera,hostmannii,Iryanthera hostmannii,20,63,1392x1040,NA,0.2352,NA,267.8571429,,267.8571428571429
+649,Iryanthera,hostmannii,Iryanthera hostmannii,20,49,1392x1040,NA,0.2352,NA,208.3333333,,208.33333333333334
+650,Iryanthera,hostmannii,Iryanthera hostmannii,20,33,1392x1040,NA,0.2352,NA,140.3061224,"pas super belle, peu de stomates car flou on one side",140.3061224489796
+653,Iryanthera,hostmannii,Iryanthera hostmannii,20,58,1392x1040,NA,0.2352,NA,246.5986395,,246.59863945578232
+654,Iryanthera,hostmannii,Iryanthera hostmannii,20,52,1392x1040,NA,0.2352,NA,221.0884354,,221.08843537414967
+655,Iryanthera,hostmannii,Iryanthera hostmannii,20,77,1392x1040,NA,0.2352,NA,327.3809524,,327.3809523809524
+656,Iryanthera,hostmannii,Iryanthera hostmannii,20,69,1392x1040,NA,0.2352,NA,293.3673469,,293.36734693877554
+573,Jacaranda,copaia,Jacaranda copaia,20,57,1392x1040,NA,0.2352,NA,242.3469388,,242.3469387755102
+577,Jacaranda,copaia,Jacaranda copaia,20,113,1392x1040,NA,0.2352,NA,480.4421769,,480.4421768707483
+625,Jacaranda,copaia,Jacaranda copaia,20,101,1392x1040,NA,0.2352,NA,429.4217687,,429.421768707483
+643,Jacaranda,copaia,Jacaranda copaia,20,78,1392x1040,NA,0.2352,NA,331.6326531,,331.6326530612245
+644,Jacaranda,copaia,Jacaranda copaia,20,96,1392x1040,NA,0.2352,NA,408.1632653,,408.16326530612247
+651,Jacaranda,copaia,Jacaranda copaia,20,90,1392x1040,NA,0.2352,NA,382.6530612,,382.6530612244898
+652,Jacaranda,copaia,Jacaranda copaia,20,87,1392x1040,NA,0.2352,NA,369.8979592,,369.8979591836735
+502,Jacaranda,copaia,Jacaranda copaia,20,80,1392x1040,NA,0.2352,NA,340.1360544,,340.13605442176873
+504,Jacaranda,copaia,Jacaranda copaia,20,85,1392x1040,NA,0.2352,NA,361.3945578,,361.3945578231293
+506,Jacaranda,copaia,Jacaranda copaia,20,116,1392x1040,NA,0.2352,NA,493.1972789,,493.19727891156464
+508,Jacaranda,copaia,Jacaranda copaia,20,93,1392x1040,NA,0.2352,NA,395.4081633,,395.40816326530614
+510,Jacaranda,copaia,Jacaranda copaia,20,91,1392x1040,NA,0.2352,NA,386.9047619,,386.9047619047619
+514,Jacaranda,copaia,Jacaranda copaia,20,98,1392x1040,NA,0.2352,NA,416.6666667,,416.6666666666667
+517,Jacaranda,copaia,Jacaranda copaia,20,155,1392x1040,NA,0.2352,NA,659.0136054,,659.0136054421769
+524,Jacaranda,copaia,Jacaranda copaia,20,83,1392x1040,NA,0.2352,NA,352.8911565,,352.89115646258506
+546,Laetia,procera,Laetia procera,40,89,1392x1040,NA,NA,0.0588,1513.605442,,1513.6054421768708
+548,Laetia,procera,Laetia procera,40,70,1392x1040,NA,NA,0.0588,1190.47619,,1190.4761904761906
+549,Laetia,procera,Laetia procera,40,73,1392x1040,NA,NA,0.0588,1241.496599,,1241.496598639456
+555,Laetia,procera,Laetia procera,20,263,1392x1040,NA,0.2352,NA,1118.197279,,1118.1972789115646
+570,Laetia,procera,Laetia procera,40,62,1392x1040,NA,NA,0.0588,1054.421769,,1054.4217687074831
+626,Laetia,procera,Laetia procera,40,58,1392x1040,NA,NA,0.0588,986.3945578,,986.3945578231293
+627,Laetia,procera,Laetia procera,40,67,1392x1040,NA,NA,0.0588,1139.455782,,1139.4557823129253
+477,Poraqueiba,guianensis,Poraqueiba guianensis,20,112,1392x1040,NA,0.2352,NA,476.1904762,,476.1904761904762
+480,Poraqueiba,guianensis,Poraqueiba guianensis,20,91,1392x1040,NA,0.2352,NA,386.9047619,,386.9047619047619
+482,Poraqueiba,guianensis,Poraqueiba guianensis,20,98,1392x1040,NA,0.2352,NA,416.6666667,,416.6666666666667
+488,Poraqueiba,guianensis,Poraqueiba guianensis,20,91,1392x1040,NA,0.2352,NA,386.9047619,,386.9047619047619
+491,Poraqueiba,guianensis,Poraqueiba guianensis,20,27,1392x1040,NA,NA,0.0588,459.1836735,its x40,459.18367346938777
+492,Poraqueiba,guianensis,Poraqueiba guianensis,20,76,1392x1040,NA,0.2352,NA,323.1292517,,323.1292517006803
+496,Poraqueiba,guianensis,Poraqueiba guianensis,20,89,1392x1040,NA,0.2352,NA,378.4013605,,378.4013605442177
+527,Poraqueiba,guianensis,Poraqueiba guianensis,20,132,1392x1040,NA,0.2352,NA,561.2244898,marche tres bien la reco sur cette epsèce,561.2244897959184
+580,Poraqueiba,guianensis,Poraqueiba guianensis,20,100,1392x1040,NA,0.2352,NA,425.170068,joli,425.1700680272109
+583,Poraqueiba,guianensis,Poraqueiba guianensis,20,73,1392x1040,NA,0.2352,NA,310.3741497,,310.374149659864
+542,Protium,opacum,Protium opacum,20,173,1392x1040,NA,0.2352,NA,735.5442177,,735.5442176870748
+543,Protium,opacum,Protium opacum,40,32,1392x1040,NA,NA,0.0588,544.2176871,,544.21768707483
+547,Protium,opacum,Protium opacum,20,169,1392x1040,NA,0.2352,NA,718.537415,,718.5374149659864
+550,Protium,opacum,Protium opacum,40,61,1392x1040,NA,NA,0.0588,1037.414966,,1037.4149659863947
+553,Protium,opacum,Protium opacum,40,41,1392x1040,NA,NA,0.0588,697.2789116,,697.2789115646259
+554,Protium,opacum,Protium opacum,40,57,1392x1040,NA,NA,0.0588,969.3877551,,969.3877551020408
+576,Protium,stevensonii,Protium stevensonii,20,161,1392x1040,NA,0.2352,NA,684.5238095,,684.5238095238095
+603,Protium,opacum,Protium opacum,20,152,1392x1040,NA,0.2352,NA,646.2585034,,646.2585034013606
+606,Protium,opacum,Protium opacum,20,152,1392x1040,NA,0.2352,NA,646.2585034,,646.2585034013606
+614,Pterocarpus,officinalis,Pterocarpus officinalis,20,64,1392x1040,NA,0.2352,NA,272.1088435,,272.108843537415
+615,Pterocarpus,officinalis,Pterocarpus officinalis,20,86,1392x1040,NA,0.2352,NA,365.6462585,,365.6462585034014
+617,Pterocarpus,officinalis,Pterocarpus officinalis,40,28,1392x1040,NA,0.2352,0.0588,476.1904762,,476.1904761904762
+618,Pterocarpus,officinalis,Pterocarpus officinalis,20,83,1392x1040,NA,0.2352,NA,352.8911565,,352.89115646258506
+619,Pterocarpus,officinalis,Pterocarpus officinalis,20,83,1392x1040,NA,0.2352,NA,352.8911565,,352.89115646258506
+620,Pterocarpus,officinalis,Pterocarpus officinalis,20,79,1392x1040,NA,0.2352,NA,335.8843537,,335.8843537414966
+621,Pterocarpus,officinalis,Pterocarpus officinalis,20,144,1392x1040,0.9408,0.2352,NA,612.244898,,612.2448979591837
+622,Pterocarpus,officinalis,Pterocarpus officinalis,20,78,1392x1040,NA,0.2352,NA,331.6326531,,331.6326530612245
+623,Pterocarpus,officinalis,Pterocarpus officinalis,20,104,1392x1040,NA,0.2352,NA,442.1768707,,442.17687074829934
+624,Pterocarpus,officinalis,Pterocarpus officinalis,20,96,1392x1040,NA,0.2352,NA,408.1632653,,408.16326530612247
+534,Symphonia,globulifera,Symphonia globulifera,20,65,1392x1040,NA,0.2352,NA,276.3605442,,276.3605442176871
+535,Symphonia,globulifera,Symphonia globulifera,20,62,1392x1040,NA,0.2352,NA,263.6054422,,263.6054421768708
+544,Symphonia,globulifera,Symphonia globulifera,20,60,1392x1040,NA,0.2352,NA,255.1020408,,255.10204081632654
+556,Symphonia,globulifera,Symphonia globulifera,20,56,1392x1040,NA,0.2352,NA,238.0952381,,238.0952380952381
+563,Symphonia,globulifera,Symphonia globulifera,20,69,1392x1040,NA,0.2352,NA,293.3673469,,293.36734693877554
+605,Symphonia,globulifera,Symphonia globulifera,20,68,1392x1040,NA,0.2352,NA,289.1156463,,289.11564625850343
+610,Symphonia,globulifera,Symphonia globulifera,20,65,1392x1040,NA,0.2352,NA,276.3605442,,276.3605442176871
+611,Symphonia,globulifera,Symphonia globulifera,20,59,1392x1040,NA,0.2352,NA,250.8503401,,250.85034013605443
+612,Symphonia,globulifera,Symphonia globulifera,20,59,1392x1040,NA,0.2352,NA,250.8503401,,250.85034013605443
+613,Symphonia,globulifera,Symphonia globulifera,20,67,1392x1040,NA,0.2352,NA,284.8639456,,284.8639455782313
+474,Tachigali,melinonii,Tachigali melinonii,20,83,1392x1040,NA,0.2352,NA,352.8911565,joli,352.89115646258506
+475,Tachigali,melinonii,Tachigali melinonii,20,102,1392x1040,NA,0.2352,NA,433.6734694,,433.6734693877551
+476,Tachigali,melinonii,Tachigali melinonii,20,98,1392x1040,NA,0.2352,NA,416.6666667,,416.6666666666667
+497,Tachigali,melinonii,Tachigali melinonii,20,112,1392x1040,NA,0.2352,NA,476.1904762,,476.1904761904762
+499,Tachigali,melinonii,Tachigali melinonii,20,106,1392x1040,NA,0.2352,NA,450.6802721,,450.68027210884355
+503,Tachigali,melinonii,Tachigali melinonii,20,68,1392x1040,NA,0.2352,NA,289.1156463,written proopa,289.11564625850343
+528,Tachigali,melinonii,Tachigali melinonii,20,127,1392x1040,NA,0.2352,NA,539.9659864,,539.9659863945578
+572,Tachigali,melinonii,Tachigali melinonii,20,121,1392x1040,NA,0.2352,NA,514.4557823,,514.4557823129252
+574,Tachigali,melinonii,Tachigali melinonii,20,134,1392x1040,NA,0.2352,NA,569.7278912,,569.7278911564626
+575,Tachigali,melinonii,Tachigali melinonii,20,105,1392x1040,NA,0.2352,NA,446.4285714,,446.42857142857144
+640,Tachigali,melinonii,Tachigali melinonii,20,103,1392x1040,NA,0.2352,NA,437.9251701,,437.9251700680272
+641,Tachigali,melinonii,Tachigali melinonii,20,117,1392x1040,NA,0.2352,NA,497.4489796,,497.44897959183675
+642,Tachigali,melinonii,Tachigali melinonii,20,176,1392x1040,NA,0.2352,NA,748.2993197,,748.2993197278912
