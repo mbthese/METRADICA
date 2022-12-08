@@ -165,26 +165,6 @@ shapiro.test(Subdata_shapiro$LA)
 
 ```
 
-## SLA
-```{r}
-
-ggplot(Metradica) +
- aes(x = SLA) +
- geom_histogram(bins = 30L, fill = "#112446") +
- theme_minimal()
-
-
-#qqplot
-qqnorm(Metradica$SLA, pch = 1, frame = FALSE, main= "log(SLA)")
-qqline(Metradica$SLA, col = "steelblue", lwd = 2)
-
-#shapiro 
-shapiro.test(Metradica$SLA)
-
-
-shapiro.test(log(SLA_sub$SLA))
-
-```
 
 ## LSWC (pas normal)
 ```{r}

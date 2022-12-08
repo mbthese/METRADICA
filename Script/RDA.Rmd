@@ -38,20 +38,25 @@ library("Hmisc")
 
 ```{r Data_results, message=FALSE, warning=FALSE}
 
-#not log
+Metradica_log <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Metradica_trait_OUT.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP) 
+  #na.omit() 
 
-Data <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=738111573", range = "Metradica") %>% 
-  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, StomatalDensity, K, P, C, N, TreeHeight, BranchHeight, TreeDawkins, BranchDawkins, DBH, TWI) %>% 
-  mutate(TreeHeight = as.numeric(TreeHeight), BranchHeight = as.numeric(BranchHeight)) %>% 
-  na.omit()
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
 
-#log
-Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
-  select(Code, Genus, Species, Name, Habitat, Type, HabitatType,Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
-  mutate(TLP = -TLP) %>% 
-  na.omit() 
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eschweilera_coraicea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica <- sub_data
 
 ```
 
@@ -64,21 +69,22 @@ Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets
 ```{r Subdata_Specialisation_Results}
 
 # matrice with envt variables
-Envt <- Metradica_log %>% select(Code, Habitat, Type, HabitatType,Forest, TWI)
+Envt <- Metradica %>% select(Code, Habitat, Type, Forest)
   
 # matrice with trais
-traits <- Data %>% select(TLP, Gmin, LA, SLA, LSWC, MajVLA, K, P, C, N)
+traits <- Metradica %>% select(TLP, Gmin, LSWC, MajVLA, SD, Potassium, Phosphorous, Carbon, Nitrogen)
 traits$TLP <- abs(traits$TLP)
 
 # species
   
-species <- Metradica_log %>% select(Code, Species, Genus, Name)
+species <- Metradica %>% select(Code, Species, Genus, Name)
   
 ```
 
 ## Colinearity
 
 ```{r}
+library(corrplot)
 
 traits %>% 
   na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
@@ -87,12 +93,12 @@ traits %>%
 
 #autre facon de le faire
 df2 <- cor(traits, use = "na.or.complete", method = "spearman")
-corrplot(df2, method="shade",shade.col=NA, tl.col="black", tl.srt=45)
+corrplot::corrplot(df2, method="shade",shade.col=NA, tl.col="black", tl.srt=45)
 
 ## add significant level stars
-testRes = cor.mtest(traits, conf.level = 0.95,  method = "spearman")
+testRes = corrplot::cor.mtest(traits, conf.level = 0.95,  method = "spearman")
 
-corrplot(df2, type = 'lower',
+corrplot::corrplot(df2, type = 'lower',
          order = "alphabet", 
          p.mat = testRes$p, 
          sig.level = c(.001, .01, .05), #significant level, with default value 0.05. If the p-value in p-mat is bigger than sig.level, then the corresponding correlation coefficient is regarded as insignificant.

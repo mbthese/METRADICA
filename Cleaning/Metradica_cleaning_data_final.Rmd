@@ -325,8 +325,20 @@ Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K571"] <- 80
 Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K571"] <- "10/11/2021"
 
 
-Metradica_OUT_2 <- Metradica_OUT_2 %>% rename(LSWC = LSWC.per)
+Metradica_OUT_2 <- Metradica_OUT_2 %>% rename(LSWC = LSWC.per, 
+                                              Gmin = gmin,
+                                              TLP = ptlp_Bartlett2012,
+                                              Forest = Name_Site,
+                                              Phosphorous = `P (g/kg)`,
+                                              Potassium = `K (g/kg)`,
+                                              Carbon = `%C`,
+                                              Nitrogen = `%N`) 
+                                              
+                                              
+                                       
 ```
+
+
 
 
 #Final trait data
@@ -336,6 +348,24 @@ without DBH, CWD, TWI, Hauteur, Dawkins, Gmax
 ```{r}
 write.csv(Metradica_OUT_2, "Metradica_trait_OUT.csv")
 ```
+
+# Add DBH, TWI, Dawkins, Hauteurs
+
+```{r}
+Lastinfo <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Metradica_TWI_DBH_UTM.csv") %>% select(Code, idTree, Xutm, Yutm, Latitude, Longitude, DBH, TWI)
+
+traits <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Metradica_trait_OUT.csv") 
+  
+traits$Code <- str_sub(traits$Code, 2,-1)
+traits$Code <- as.integer(traits$Code)
+
+Final_Metradica_OUT_30112022 <- left_join(traits, Lastinfo, by="Code")
+
+#table_join <- Lastinfo %>% anti_join(traits, "Code") #to check
+
+write.csv(Final_Metradica_OUT_30112022, "Final_Metradica_OUT_30112022.csv")
+```
+
 
 
 VI - Additional traits
@@ -359,10 +389,10 @@ Gmax_subset_data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20
   rename(Code = Code_ind, StomatalPoreLength=lp..mm., StomatalLength=L..mm., StomatalWidth=W..mm.) %>%
   select(Code, Stomate, -Species, StomatalPoreLength, StomatalLength, StomatalWidth)
 
-StomataDensity <-  read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv") %>%
-  select(Code, Genus, Species, Name, gmin, SD)
+StomatalDensity <-  read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Final_Metradica_OUT_30112022.csv") %>%
+  select(Code, Genus, Species, Name, Gmin, SD)
 
-Gmax_subset_data <- left_join(Gmax_subset_data, StomataDensity, by = "Code")
+Gmax_subset_data <- left_join(Gmax_subset_data, StomatalDensity, by = "Code")
 
 #calculate SS
 
@@ -380,7 +410,7 @@ Gmax_subset_data <- Gmax_subset_data %>%
 
 #merge with the data
 
-Gmax_subset_data <- left_join(Gmax_subset_data, StomataDensity) %>%
+Gmax_subset_data <- left_join(Gmax_subset_data, StomatalDensity) %>%
   na.omit()
 
 Gmax <- Gmax_subset_data %>%
@@ -392,10 +422,10 @@ Gmax <- Gmax_subset_data %>%
 
 ##merge gmax with final metradica
 ```{r}
-Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv") 
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Final_Metradica_OUT_30112022.csv") 
 
 Metradica <- left_join(Metradica, Gmax)
 
-write_csv(Metradica, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv")
+write_csv(Metradica, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica_OUT_301122_gmax.csv")
 ```
 

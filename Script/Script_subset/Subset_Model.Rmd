@@ -31,36 +31,461 @@ library(lmerTest) #same
 library(emmeans)#same
 library(ggplotify)
 library(car)
+ 
 ```
+#function
+```{r}
+log_abs_trans <- function() {
+    scales::trans_new(
+        name = "log_abs", 
+        transform = function(x) log(abs(x)), 
+        inverse = function(x) exp(x));
+}
+
+library(broom)
+get_formula <- function(model) {
+  
+  broom::tidy(model)[, 1:2] %>%
+    mutate(sign = ifelse(sign(estimate) == 1, ' + ', ' - ')) %>% #coeff signs
+    mutate_if(is.numeric, ~ abs(round(., 2))) %>% #for improving formatting
+    mutate(a = ifelse(term == '(Intercept)', paste0('y ~ ', estimate), paste0(sign, estimate, ' * ', term))) %>%
+    summarise(formula = paste(a, collapse = '')) %>%
+    as.character
+  
+}
+
+
+
+```
+#Colors
+```{r}
+#From color blind palette
+library(ggpubfigs)
+#from palette ito_seven
+E79F02 #orange for TF
+56B4E9 #blue for SF
+009E72 #green for Generalists
+
+```
+
 
 # Data
 
-```{r Data_results, message=FALSE, warning=FALSE}
+
+
+```{r Data log subset, message=FALSE, warning=FALSE}
 
 # data
-library(googlesheets4)
-gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
 
-Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% dplyr::select(Code, Genus, Species, Name, Habitat, Type, HabitatType, Forest, Gmin, TLP, LA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
-  mutate_at(c("Gmin","TLP" ,"LA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
-  mutate(TLP = -TLP) %>% 
-  na.omit() 
+library(dplyr)
+Metradica_log <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
 
 sub_data_TF <- Metradica_log %>%
   filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
 
 sub_data_SF <- Metradica_log %>%
-  filter(Name %in% c("Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Eschweilera_coriacea"))
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis"))
 
 sub_data_G <-  Metradica_log %>%
-  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Tachigali_melinonii", "Protium_stevensonii"))
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica_log <- sub_data
+
+
+
+```
+
+```{r Data not log subset}
+
+# data
+
+library(dplyr)
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis"))
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
 
 sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
 
 Metradica <- sub_data
 
 ```
+
+#exploring na
+```{r}
+
+#check the nas
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(Metradica,2,pMiss)
+
+#we see that SD is almost 30% missing values, the rest is below a threshold of 5%
+library(VIM)
+aggr_plot <- aggr(Metradica, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(Metradica), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+
+#imputing th emissing data for all traits 
+library(mice)
+tempData <- mice(Metradica,m=5,maxit=50,meth='pmm',seed=500)
+summary(tempData)
+completedData <- complete(tempData,1)
+
+#no imputation of SD
+data <- Metradica %>% dplyr::select(-SD)
+tempData_noSD <- mice(data,m=5,maxit=50,meth='pmm',seed=500) #m=5 is 5 datasets
+summary(tempData_noSD)
+completedData <- complete(tempData_noSD,1) #1 is choosing dataset 1 out of the 5
+
+B <- Metradica %>% dplyr::select(Code, SD)
+
+A <- left_join(completedData, B,  c("Code"))
+
+write.csv(A, "Subset_imputation_exceptSD.csv", col.names = FALSE, row.names = FALSE)
+
+#inspecting data after imputation
+densityplot(tempData_noSD)
+tempData_noSD$imp$K
+
+```
+
+
+# Trait variation - raw data 
+
+No imputation.
+
+```{r}
+
+data <- sub_data %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+```
+
+
+```{r Trait distribution coord_flip}
+data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
+p <-  data %>%
+  mutate(Trait = as.character(Trait)) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]~(mmol%.%m^{-2}%.%s^{-1})", "TLP" = "pi[tlp]~(MPa)", "C"= "C~('%')", "N" = "N~('%')", "K"= "K~(g%.%kg^{-1})", "LSWC" = "LSWC~('%')", "MajVLA" = "MajVLA~(mm%.%mm^{-2})", "P" = "P~(g%.%kg^{-1})", "SD" = "SD~(mm^{-2})")) %>% 
+  left_join(dplyr::select(data, Type, Name) %>%
+              unique() %>%
+              arrange(Type, Name) %>%
+              mutate(order_graph = 1:n())) %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x = reorder(Name, order_graph), y= value)) +
+  geom_boxplot(aes(fill = Type),
+  #              alpha = 0.5, col = "lightgrey") +
+  #geom_violin(aes(fill = Type),
+               alpha = 0.5, col = "lightgrey") +
+  scale_fill_manual(name = "Habitat preference", 
+                    values = c("TF" = "#E79F02", #orange for TF
+                                "BF" =  "#56B4E9", #blue for SF
+                                "Generalist" = "#009E72"),  #green for Generalists
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  facet_wrap(~ Trait, scales = "free_x", label = label_parsed) +
+  theme_minimal() +
+  coord_flip() +
+  theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
+
+ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+
+#PCA
+
+##no trait imputation
+
+###PCA without stomata
+
+```{r}
+#data is already logged
+
+data_withOUTNA_no_stomata <-read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/METRADICA_subset.csv") %>% dplyr::select(-SD) %>% na.omit() #537 indv
+
+
+data <- data_withOUTNA_no_stomata  %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type) 
+
+data$Type <- dplyr::recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+
+g_nostomata <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ #scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_noSD.png", plot = g_nostomata, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+
+
+###PCA with stomata
+
+```{r}
+
+
+data_without_NA <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/METRADICA_subset.csv") %>% na.omit() #379 indv 
+
+data <- data_without_NA %>%
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type)  
+
+data$Type <- dplyr::recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+ 
+gSD <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen + SD, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_SD.png", plot = gSD, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+##trait imputation for all traits except Stomata
+
+###PCA without stomata
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+Data <- Data %>% na.omit()
+
+g <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data, cor = T),
+         data = Data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+```
+
+###PCA with stomata
+
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+Data <- Data %>% na.omit()
+
+g_with_stomata <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen + SD, data = Data, cor = T),
+         data = Data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_SD_imputed.png", plot = g_with_stomata, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+# Colinearity
+
+No trait imputation for this section.
+Log or not logged, correlations are going to be the same.
+
+```{r}
+
+library(corrplot)
+
+traits <- Metradica_log %>% 
+  dplyr::select(Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD, TWI) 
+
+png(height=500, width=500, file="mycorr.png", type = "cairo")
+traits %>% na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "spearman") %>% 
+  corrplot::corrplot.mixed()
+dev.off()
+
+#other way to do it
+corrplot(df2, #type = 'lower',
+        # order = "alphabet", 
+         p.mat = testRes$p, 
+         sig.level = c(.001, .01, .05), #significant level, with default value 0.05. If the p-value in p-mat is bigger than sig.level, then the corresponding correlation coefficient is regarded as insignificant.
+         pch.cex = 1.8, #star size
+         insig = 'label_sig', pch.col = 'grey20',
+         tl.pos="d", #write names of variables in the diagonal
+         outline=FALSE,
+         tl.cex = 1, #size of trait labels,
+         col = COL2('RdBu', 10))
+
+```
+
+#Summary of variables 
+```{r}
+png(height=500, width=500, file="summary_traits.png")
+plot(Metradica[,8:16])
+dev.off()
+
+#logged traits
+png(height=500, width=500, file="summary_traits_log.png")
+plot(Metradica_log[,8:16])
+dev.off()
+
+```
+Interesting variables to look at
+```{r}
+#TLP and LSWC
+p <- ggplot(Metradica_log) +
+  aes(x = TLP, y = LSWC) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(LSWC ~ TLP, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+p + geom_text(x = -0.8, y = 5.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = -0.8, y = 5.4,
+            label = r_squared,
+            color = 'blue')
+
+#TLP and SD
+l <- ggplot(Metradica) +
+  aes(x = TLP, y = SD) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(SD ~ TLP, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+l + geom_text(x = -0.8, y = 7.2,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = -0.8, y = 6.8,
+            label = r_squared,
+            color = 'blue')
+
+#LSWC and K
+n <- ggplot(Metradica_log) +
+  aes(x = K, y = LSWC) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(LSWC ~ K, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+n + geom_text(x = 0.8, y = 5.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 5.4,
+            label = r_squared,
+            color = 'blue')
+
+#SD and P
+m <- ggplot(Metradica) +
+  aes(x = P, y = SD) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(SD ~ P, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+m + geom_text(x = -0.8, y = 7.2,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = -0.8, y = 6.8,
+            label = r_squared,
+            color = 'blue')
+
+```
+
+
+
 
 # Question 1
 **Question (H1) Specialist species of contrasting habitats differ in trait values.**
@@ -88,6 +513,8 @@ $$ M_{comp} : Y_{ijsk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} +  A_{is} +  E_
 Metradica$Type <- as.character(Metradica$Type)
 Metradica$Name <- as.character(Metradica$Name)
 Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
 
 data_specialist <- Metradica %>% filter(Type !="Generalist")
 
@@ -139,21 +566,25 @@ data_specialist$Type <- as.factor(data_specialist$Type)
 data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "TF")) #changer la reference
 gmin_habitat <- lm(Gmin ~Type, data= data_specialist)
 summary(gmin_habitat)
-anova(gmin_habitat)
+anova(gmin_habitat) #table analyse de la variance avec petit A. calcule des sommes de carrés seulement de type 1. 1 objet : type 1 / 2 objets : comparaisons de deux modeles. 
+Anova(gmin_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
 
 gmin_forest <- lm(Gmin ~Type + Forest, data =  data_specialist)
 anova(gmin_habitat, gmin_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
-Anova(gmin_forest) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+Anova(gmin_forest, gmin_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
 
-gmin_comp <- lmer(Gmin ~ Type + Forest + (1|Name), data=data_specialist) 
+model_gmin <- lmer(Gmin ~ Type + Forest + (1|Name), data=data_specialist) 
 
 
 
-summary(gmin_comp)
+summary(model_gmin)
 
 #Check normality of residuals 
 
-plot(model_gmin1) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+plot(model_gmin) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
 
 #pour lmer
 str(model_gmin)
@@ -165,7 +596,7 @@ qqnorm(resid(model_gmin))
 qqline(resid(model_gmin))
 
 #plot
-sjPlot::plot_model(gmin_comp)
+sjPlot::plot_model(model_gmin)
 # Notes: axis labels should be in order from bottom to top. 
 # To see the values of the effect size and p-value, set show.values and show.p= TRUE. Pvalues will only be shown if the effect size values are too
 
@@ -720,10 +1151,10 @@ Fixed effet of habitat preference and forest and nested random effect of species
 ```{r boucle}
 
 #data from the clean data from Checks per trait per species script
-data <- clean
+library(ggplotify)
 
 name_list <- NULL
-Nbcol <- match(colnames(data)[9:18],colnames(data)) 
+Nbcol <- match(colnames(data)[8:17],colnames(data)) 
 count <- 0
 for ( i in data[,Nbcol]){
   count <-  count + 1
@@ -843,8 +1274,11 @@ $$ M0 : Y_{ik} = \mu + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
 
 ##generalist data
 ```{r data generalist}
-
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
 Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
 
 data_generalist <- Metradica %>% filter(Type =="Generalist")
 ```
@@ -895,7 +1329,7 @@ CV is defined as the ratio of the standard deviation \sigma to the mean , expres
 ```{r}
 
 
-cv <- function(traits){
+cv_eff <- function(traits){
   if(any(is.na(traits)))
     traits=traits[!is.na(traits)]
   N=length(traits)
@@ -914,35 +1348,40 @@ cv <- function(traits){
 } 
 
 
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+}
+
+
 # For generalists
 
-
-
-  
 cv_G <- sub_data_G %>% 
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "K", "C", "N", "P"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "K", "C", "N", "P", "SD"), funs(cv))
 
 cv_G <- bind_rows(cv_G,
-                ungroup(cv_G) %>% 
+                  ungroup(cv_G) %>% 
                   summarise_all(mean) %>% 
-                  mutate(Name = "mean")) 
+                  mutate(Name = "mean"))
 
 cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
 
 cv_long_G$Type <- c("Generalist")
 
-cv_long_G %>%  
-  filter(Name != "mean") %>% 
-  ggplot(aes(x = trait, y = CV)) +
-  geom_boxplot() +
-  geom_jitter(aes(col = Name), size=3) +
-  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
-            data = filter(cv_long_G, Name == "mean")) +
-  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
-  ylab("Coefficient of variation") +
-  scale_color_discrete("") +
-  scale_x_discrete(labels = scales::label_parse())
 
 
 # For TF specialist
@@ -950,35 +1389,31 @@ cv_long_G %>%
 
 cv_TF <- sub_data_TF %>% 
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "K", "C", "N", "P"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "K", "C", "N", "P", "SD"), funs(cv))
+#cannot calculate mean for lic.mem because does not exist. I do it by hand.
+cv_SD <- (cv_TF$SD[1] + cv_TF$SD[2] + cv_TF$SD[3] + cv_TF$SD[5] + cv_TF$SD[6])/5
 
 cv_TF <- bind_rows(cv_TF,
-                ungroup(cv_TF) %>% 
+                   ungroup(cv_TF) %>% 
                   summarise_all(mean) %>% 
-                  mutate(Name = "mean")) 
+                  mutate(Name = "mean"))
+
+cv_TF$SD[1] <- cv_SD
 
 cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
 
 cv_long_TF$Type <- c("TF")
 
-cv_long_TF%>% 
-  filter(Name != "mean") %>% 
-  ggplot(aes(x = trait, y = CV)) +
-  geom_boxplot() +
-  geom_jitter(aes(col = Name), size=3) +
-  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
-            data = filter(cv_long_TF, Name == "mean")) +
-  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
-  ylab("Coefficient of variation") +
-  scale_color_discrete("") +
-  scale_x_discrete(labels = scales::label_parse())
- 
+cv_long_TF[35,3] <- cv_SD
 
 # For BF specialist
 
 cv_BF <- sub_data_SF %>% 
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA","K", "C", "N", "P"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA","K", "C", "N", "P", "SD"), funs(cv))
+
+#cannot calculate mean for car.sur because does not exist. I do it by hand.
+cv_SD_BF <- (cv_BF$SD[2] + cv_BF$SD[3] + cv_BF$SD[4] + cv_BF$SD[5] + cv_BF$SD[6] +cv_BF$SD[7] + cv_BF$SD[8] + cv_BF$SD[9])/8
 
 cv_BF <- bind_rows(cv_BF,
                 ungroup(cv_BF) %>% 
@@ -989,84 +1424,216 @@ cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name 
 
 cv_long_BF$Type <- c("BF")
 
- cv_long_BF%>%  
-  filter(Name != "mean") %>% 
-  ggplot(aes(x = trait, y = CV)) +
-  geom_boxplot() +
-  geom_jitter(aes(col = Name), size=3) +
-  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
-            data = filter(cv_long_BF, Name == "mean")) +
-  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
-  ylab("Coefficient of variation") +
-  scale_color_discrete("") +
-  scale_x_discrete(labels = scales::label_parse())
-
-
-cv_tot <- bind_rows(cv_long_G, cv_long_BF, cv_long_TF)
-
+cv_tot <- bind_rows(cv_long_G, cv_long_BF, cv_long_TF) 
+cv_long_BF[90,3] <- cv_SD_BF
 
 ```
 
 
-## graphs all
+### plot cv
 ```{r}
 # plot all 
-cv_tot %>% mutate(CV =CV*100)%>%
+
+cv_plot <- cv_tot %>% 
+  mutate(CV =CV*100) %>%
+  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
   filter(Name != "mean") %>% 
-  filter(CV>0)%>%
   ggplot(aes(x = trait, y = CV, fill = Type, alpha=0.4)) +
   #scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404", "Bocoa_prouacensis"="#34e042", "Eschweilera_coriacea"="#34e042", "Conceveiba_guianensis"="#34e042", "Virola_michelii"="#34e042", "Protium_stevensonii"="#34e042", "Hymenopus_heteromorphus"="#34e042", "Jacaranda_copaia subsp. copaia"="#34e042"))+
   geom_jitter() + 
   geom_boxplot(alpha=0.7)+
-  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
   scale_shape_discrete("Habitat\npreference") +
-  ggtitle("Coefficient of variation %")+
+  ggtitle("Coefficient of variation (%)")+
+  scale_x_discrete(labels = scales::label_parse()) +
   theme(axis.title.x = element_blank(), axis.text.x = element_text())+
   theme(plot.title = element_text(size=14, face="bold")) +
   ylab("") + xlab("")+
-    theme_minimal()
+    theme_minimal(base_size = 22)
 
-# Anova on CV
-#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 12, height = 8, dpi = 600)
 
-kruskal.test(CV ~ Type, data = cv_tot)
-
-cv_tot2<- cv_tot %>% filter(Name != "mean") %>% select(-Name) %>% filter(trait =="TLP")
-View(cv_tot2)
-
-pairwise.wilcox.test(cv_tot2$CV, cv_tot2$Type,
-                 p.adjust.method = "BH")
-
-
-#nothing is significant except for LSWC: BF and Generalists
 ```
 
-
-## gmin graph
-
+###anova cv
 ```{r}
-cv_tot %>% mutate(CV =CV*100)%>%
-  filter(Name != "mean") %>% 
-  filter(trait == "Gmin") %>% 
-  ggplot(aes(x = trait, y = CV, fill = Type))+
-  geom_jitter() + 
-  geom_boxplot(alpha=0.7)+
-  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
-  scale_shape_discrete("Habitat\npreference") +
-  ggtitle("Coefficient of variation %")+
-  theme(axis.title.x = element_blank(), axis.text.x = element_text())+
-  theme(plot.title = element_text(size=14, face="bold")) +
+# Anova on CV
+#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+cv_BF$Type <- c("BF")
+cv_TF$Type <- c("TF")
+cv_G$Type <- c("Generalist")
+
+cv_tot2 <- rbind(cv_G, cv_BF, cv_TF) %>% filter(Name != "mean")
+
+cv_tot2$Type <- as.factor(cv_tot2$Type)
+levels(cv_tot2$Type)
+
+#do it one trait at a time
+cv_gmin <- cv_tot2 %>% dplyr::select(Name, Gmin, Type)
+# Compute the analysis of variance
+res.aov <- aov(Gmin ~ Type, data = cv_gmin)
+# 1. Homogeneity of variances
+plot(res.aov, 1)
+# 2. Normality
+plot(res.aov, 2)
+# Summary of the analysis
+summary(res.aov)
+kruskal.test(Gmin ~ Type, data = cv_gmin)
+
+#tlp
+cv_tlp <- cv_tot2 %>% dplyr::select(Name,TLP, Type)
+res.aov <- aov(TLP ~ Type, data = cv_tlp)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(TLP ~ Type, data = cv_tlp)
+
+#SD
+cv_SD <- cv_tot2 %>% dplyr::select(Name,SD, Type)
+res.aov <- aov(SD ~ Type, data = cv_SD)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(SD ~ Type, data = cv_SD)
+
+#majvla
+cv_MajVLA <- cv_tot2 %>% dplyr::select(Name,MajVLA, Type)
+res.aov <- aov(MajVLA ~ Type, data = cv_MajVLA)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(MajVLA ~ Type, data = cv_MajVLA)
+
+#K
+cv_K <- cv_tot2 %>% dplyr::select(Name,K, Type)
+res.aov <- aov(K ~ Type, data = cv_K)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) #pvalue <0.05
+pairwise.t.test(cv_K$K, cv_K$Type,
+                 p.adjust.method = "BH") #generalist and BF are different
+kruskal.test(K ~ Type, data = cv_K)
+
+#C
+cv_C <- cv_tot2 %>% dplyr::select(Name,C, Type)
+res.aov <- aov(C ~ Type, data = cv_C)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) 
+
+#P
+cv_P <- cv_tot2 %>% dplyr::select(Name,P, Type)
+res.aov <- aov(P ~ Type, data = cv_P)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) 
+
+#N
+cv_N <- cv_tot2 %>% dplyr::select(Name,N, Type)
+res.aov <- aov(N ~ Type, data = cv_N)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+
+#LSWC
+cv_LSWC <- cv_tot2 %>% dplyr::select(Name,LSWC, Type)
+res.aov <- aov(LSWC ~ Type, data = cv_LSWC)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+
+```
+
+#VP - variance partitioning
+
+
+[Géraldine DERROIRE] Be careful with variance partitioning as your sample is not balance between the different level (your work with Sylvain), and think carefully of the order you nest things into one another, there may be different possibility showing different things
+```{r}
+# Take into account only generalists. Variance partitioning 
+
+vars <- sub_data_G %>% 
+  dplyr::select(Forest, Habitat, Name, LSWC, TLP, Gmin, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Forest", "Habitat", "Name"), variable.name = "trait") %>% 
+  na.omit() %>% 
+  group_by(trait, Name) %>%
+  group_by(trait) %>%
+  do(var = nlme::lme(value ~ 1, random=~1|Forest/Habitat/Name, data = .) %>% 
+       ape::varcomp(scale = F, cum = F) %>% 
+       as.vector() %>% 
+       data.frame(level = c("Forest", "Habitat", "Name"), variance = as.vector(.))) %>% 
+  unnest(var) %>% 
+  group_by(trait) %>% 
+  mutate(pct = variance / sum(variance)*100)
+
+#variance partitionning for these traits
+library(ape)
+
+varcomp.gmin<-varcomp(lme(Gmin~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1) 
+
+varcomp.gmin$Trait <- c("Gmin")
+
+varcomp.tlp<-varcomp(lme(TLP~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.tlp$Trait <- c("TLP")
+
+varcomp.LSWC<-varcomp(lme(LSWC~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.LSWC$Trait <- c("LSWC")
+
+varcomp.MajVLA<-varcomp(lme(MajVLA~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.MajVLA$Trait <- c("MajVLA")
+
+varcomp.SD<-varcomp(lme(SD~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.SD$Trait <- c("SD")
+
+varcomp.C<-varcomp(lme(C~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.C$Trait <- c("C")
+
+varcomp.K<-varcomp(lme(K~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.K$Trait <- c("K")
+
+varcomp.N<-varcomp(lme(N~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.N$Trait <- c("N")
+
+varcomp.P<-varcomp(lme(P~1,random=~1|Forest/Habitat/Species, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.P$Trait <- c("P")
+
+
+vars <- bind_rows(varcomp.gmin, varcomp.tlp, varcomp.MajVLA, varcomp.LSWC, varcomp.SD, varcomp.C, varcomp.N, varcomp.K, varcomp.P) 
+
+
+vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "variance") 
+
+#plot
+
+library(paletteer) 
+paletteer_d("RColorBrewer::GnBu")
+
+v<- vars %>%  
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  ggplot(aes(fill=level, y=variance, x=Trait)) + 
+  geom_bar(position="stack", stat="identity") +
+  theme_minimal(base_size = 22) +
   ylab("") + xlab("")+
-    theme_minimal()
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+    scale_fill_manual("", values = c("#029A88","#C33110", "#CCBC44", "#EE6778"), 
+                    labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
+                               "Habitat" = "Habitat\n(SF, TF)", 
+                               "Species" = "Species\n(n=6)")) +
+  scale_x_discrete(labels = scales::label_parse()) +
+  ggtitle("Portion of total variance (%)")
 
-cv_tot_gmin <- cv_tot %>% filter(trait == "Gmin")
-
-M_CV <- lm(CV ~ Type, data = cv_tot_gmin, weights = nbre_esp) # mettre un poids car cv n'a pas ete calculer pour meme individu par espece par trait.
-summary(M_CV)
-
-M_CV_0 <- lm(CV ~1, data=cv_tot_gmin)
-anova(M_CV_0, M_CV)
-
+ggsave(filename = "Variance_partitioning.png", plot = v, bg = "white", width = 10, height = 8, dpi = 600)
 ```
 
 
