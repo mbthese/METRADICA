@@ -31,6 +31,7 @@ library(gridExtra)
 library(rio)
 library(dplyr)
 library(tidyr)
+library(janitor)
 ```
 
 # Species phylo
@@ -57,7 +58,7 @@ species <- data.frame(taxon = c(
   "Hymenopus_heteromorphus",
   "Protium_stevensonii",
   "Virola_michelii",
-#  "Carapa_surinamensis",
+  "Carapa_surinamensis",
 #  "Carapa_guianensis",
   "Laetia_procera",
   "Protium_opacum subsp. rabelianum",
@@ -85,8 +86,8 @@ paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xl
   mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
   dplyr::select(species, genus, family, taxon) %>% 
   mutate(taxon = as.character(taxon))
-#tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
-#save(tree, file = "./Results/phylogeny_subset.Rdata")
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+save(tree, file = "./Results/phylogeny_subset.Rdata")
 load("./Results/phylogeny_subset.Rdata")
 A<- fortify(tree$scenario.3) %>% 
   mutate(species = gsub("_", " ", label)) %>% 
@@ -127,26 +128,60 @@ Totaux  %>%
 
 ```{r Tab. S1. Individuals per species collected in the three sampling sites. }
 
-Totaux <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv") %>%
-  select(-X, -Indval_SF, -Indval_TF, - P.value, -Type)
+Family <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv") %>%
+  select(Family, Genus, Species)
+
+Totaux <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv") 
+
+Paracou <- Totaux_subset %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Totaux_subset %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Totaux_subset %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Totaux <- Totaux %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Totaux <-   left_join(Totaux_table, Totaux)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Totaux, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") %>%
+  adorn_totals("row")
+
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
 
 options(knitr.kable.NA = '') #replace NA by blank spaces in table
 
 
 
-library(janitor)
-
-Totaux <- Totaux %>%
-  adorn_totals("col") 
-
-Totaux  %>%
+Totaux_table %>%
   kbl(caption = "Individuals per species collected on the 3 sites") %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
   column_spec(2:3, italic = T) %>%
   row_spec(0, bold= T) %>%
-  row_spec(21, background = "#666;", color = "white") %>%
+  row_spec(22, background = "#666;", color = "white") %>%
   column_spec(7,  background = "#666;", color = "white" ) %>%
-save_kable(file = "Sampling.png", zoom = 10)
+save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png", zoom = 10)
 
 
 
@@ -158,19 +193,18 @@ save_kable(file = "Sampling.png", zoom = 10)
 
 ```{r Table S2: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
 
-Indval <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv") %>%
-  select(-X, -Paracou, -Kaw, -Bafog)
+Indval <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv")
 
 Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
 
 options(knitr.kable.NA = '') #replace NA by blank spaces in table
 
 
-B<- Indval %>%
+Indval %>%
   kbl() %>%
   row_spec(0, bold = TRUE) %>% 
   column_spec(1:2, italic = TRUE) %>%
-  kable_classic_2(full_width = F) %>% save_kable(file = "IndVal_subset.png", zoom = 10)
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
 
 ```
 

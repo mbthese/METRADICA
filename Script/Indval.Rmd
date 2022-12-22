@@ -74,7 +74,7 @@ identified_species <- data.frame(Species = c("Eperua_falcata",
   "Hymenopus_heteromorphus",
   "Protium_stevensonii",
   "Virola_michelii", #devient un spe TF
-  #"Carapa_surinamensis", #on enleve
+  "Carapa_surinamensis", 
   #"Carapa_guianensis",#on enleve
   "Laetia_procera",
   "Protium_opacum", #en vrai  subsp. rabelianum
@@ -250,7 +250,7 @@ table <- data.frame(taxon = c(
   "Hymenopus_heteromorphus",
   "Protium_stevensonii",
   "Virola_michelii",
-#  "Carapa_surinamensis",
+  "Carapa_surinamensis",
 #  "Carapa_guianensis",
   "Laetia_procera",
   "Protium_opacum subsp. rabelianum",
