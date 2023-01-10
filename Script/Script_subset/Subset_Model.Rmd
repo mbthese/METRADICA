@@ -10,12 +10,14 @@ editor_options:
 
 # Libraries
 
-```{r}
+```{r libraries}
+library(ape)
 library(tidyverse)
 library(dplyr)
 library(ggfortify)
 library(corrplot) 
-library(ggpubr)
+library(ggpubr) #for stats compare means on ggplot
+#devtools::install_github("kassambara/ggpubr")
 library(ggplot2)
 library(ggfortify)
 library(agricolae)
@@ -36,8 +38,9 @@ library(kableExtra)
 library(gt)
 library(sjPlot) #for plotting lmer and glmer mods error of thos package
 ```
-#function
-```{r}
+
+# My functions
+```{r functions}
 log_abs_trans <- function() {
     scales::trans_new(
         name = "log_abs", 
@@ -66,24 +69,87 @@ get_formula <- function(model) {
   
 }
 
+cv_eff <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(list(cv= re, eff = N))
+} 
 
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+}
 
 ```
-#Colors
-```{r}
+
+# Colors 
+```{r colors}
 #From color blind palette
 library(ggpubfigs)
 #from palette ito_seven
-E79F02 #orange for TF
-56B4E9 #blue for SF
-009E72 #green for Generalists
-
+#E79F02 #orange for TF
+#56B4E9 #blue for SF
+#009E72 #green for Generalists
 ```
 
 
+# Trait table
+
+```{r Trait summary table}
+
+#get authorization
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+trait_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1-LBjUas_flNGwAlDGFvGoq6GyqQsBiFmmiJyFtQYkMU/edit#gid=0")
+
+
+trait_table$Unit[trait_table$Abbreviation == 'K'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'P'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'gmin'] <- "mmol.m<sup>-2</sup>.s<sup>-1</sup>"
+
+trait_table$Abbreviation[trait_table$Unit == 'mmol.m<sup>-2</sup>.s<sup>-1</sup>'] <- "<i>gmin</i>"
+
+trait_table$Unit[trait_table$Abbreviation == 'LSWC'] <- "g.g<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'MajVLA'] <- "cm.cm<sup>-2</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
+  
+trait_table %>%
+  kbl(caption = "Table 1. Leaf functional traits.", escape = FALSE) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
+
+```
+
 # Data
 
-
+*From the original complete dataset, selecting 21 focal species. Transforming data in log.*
 
 ```{r Data log subset, message=FALSE, warning=FALSE}
 
@@ -117,8 +183,9 @@ sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF'
 
 Metradica_log <- sub_data #552 indv
 
-
 ```
+
+**From the original complete dataset, selecting 21 focal species. No transformation.**
 
 ```{r Data not log subset}
 
@@ -152,8 +219,11 @@ Metradica <- sub_data
 #write.csv(Metradica, "Subset.csv")
 ```
 
-#exploring na
-```{r}
+## Exploring na
+
+Exploring where Nas are located in the dataset and imputing traits except SD.
+
+```{r exploring NA}
 
 #check the nas
 pMiss <- function(x){sum(is.na(x))/length(x)*100}
@@ -187,20 +257,44 @@ tempData_noSD$imp$K
 
 ```
 
+## Field & trait info joined
 
-# Trait variation - raw data 
+```{r filed information}
+Data_subset_imputed <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
 
-No imputation.
+Bafog_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Bafog/Bafog_individuals.csv") %>% 
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
 
-```{r}
+Kaw_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Kaw/Kaw_individuals.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
 
-data <- Metradica %>%
-  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
-  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+Paracou_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/Paracou.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+individuals_FTH2021 <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/individuals_FTH2021.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+c <- rbind(Paracou_individuals, Bafog_individuals, Kaw_individuals, individuals_FTH2021)
+
+#adding Dawkins & height (tree + branch)
+
+D <- Data_subset_imputed %>% left_join(c, by = "Code")
+
+D %>% group_by(TreeDawkins, BranchDawkins) %>% tally()
+D %>% group_by(BranchDawkins) %>% tally()
+
 ```
 
 
+## Trait variation - raw data 
+
+No imputation. Vizualizing trait variation.
+
 ```{r Trait distribution coord_flip}
+data <- Metradica %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+
 data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
 p <-  data %>%
   mutate(Trait = as.character(Trait)) %>% 
@@ -404,7 +498,7 @@ g_with_stomata <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + P
 ggsave(filename = "PCA_full_HabitatPref_SD_imputed.png", plot = g_with_stomata, bg = "white", width = 8, height = 8, dpi = 600)
 
 ```
-#MANOVA
+##MANOVA
 
 ```{r}
 
@@ -451,7 +545,7 @@ pairwise_adonis %>%
 ```
 
 
-# Colinearity
+##Colinearity
 
 No trait imputation for this section.
 Log or not logged, correlations are going to be the same.
@@ -474,7 +568,7 @@ dev.off()
 
 ```
 
-#Summary of variables 
+##Summary of variables 
 ```{r}
 png(height=500, width=500, file="summary_traits.png")
 plot(Metradica[,8:16])
@@ -569,6 +663,10 @@ m + geom_text(x = 0.5, y = 1500,
 
 
 
+
+
+
+
 # Question 1
 **Question (H1) Specialist species of contrasting habitats differ in trait values.**
 
@@ -585,7 +683,7 @@ $$ M2 : Y_{ijk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} + E_{ijk}, \quad E_{ij
 
 Et prendre en compte que j'ai plein d'espèces differentes. 
 
-Ces espèces ne sont pas très equilibrée. 
+Ces espèces ne sont pas très equilibrée en terme d'échantillonage. 
 
 
 $$ M_{comp} : Y_{ijsk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} +  A_{is} +  E_{ijsk}, \quad E_{ijsk}\sim \mathcal{N} (0,\sigma^2), \quad A_{is}\sim \mathcal{N} (0,\sigma^2_S),  $$
@@ -593,13 +691,9 @@ $$ M_{comp} : Y_{ijsk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} +  A_{is} +  E_
 
 ## Specialist data
 ```{r data specialist}
-#log 
-Metradica$Type <- as.factor(Metradica$Type)
-Metradica$Name <- as.factor(Metradica$Name)
-Metradica$Forest <- as.factor(Metradica$Forest)
-data_specialist <- Metradica %>% filter(Type !="Generalist")
 
-#not log
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
 Metradica$Type <- as.factor(Metradica$Type)
 Metradica$Name <- as.factor(Metradica$Name)
 Metradica$Forest <- as.factor(Metradica$Forest)
@@ -1288,6 +1382,471 @@ prow2 <- ggpubr::ggarrange(
 
 ggsave(filename = "Specialists_plots_H1.png", plot = prow2, bg = "white", width = 10, height = 8, dpi = 600)
 ```
+
+#Among specialists - intra-habitat variation
+
+```{r SF specialists}
+# ----------Replace for each trait --------------
+#for SD, remove C. surinamensis %>% filter(Name != "Carapa_surinamensis")
+# Compute the analysis of variance
+res.aov <- aov(log(N) ~ Name, data = data_specialist %>%
+ filter(Type %in% "BF"))
+# 1. Homogeneity of variances
+plot(res.aov, 1)
+# 2. Normality
+plot(res.aov, 2)
+# Summary of the analysis
+summary(res.aov)
+
+# Perorm pairwise comparisons
+#compare each of the seven groups against “all” (i.e. base-mean). When the test is significant, then you can conclude that the trait is significantly overexpressed or downexpressed in species xxx compared to all.
+#compare_means(K ~ Name,  data = data_specialist %>%
+ #filter(Type %in% "BF"), ref.group = ".all.", method = "t.test")
+
+#with letters
+library(multcompView)
+#Species followed by the same letter did not differ significantly (Tukey test, p>0.05).
+TUKEY <- HSD.test(res.aov, "Name", console=TRUE)
+tukey <- TukeyHSD(res.aov)
+# compact letter display
+cld <- multcompLetters4(res.aov, tukey)
+print(cld)
+
+# table with factors and 3rd quantile
+Tk <- group_by(data_specialist %>%
+ filter(Type %in% "BF"), Name) %>%
+  summarise(mean=mean(log(N)), quant = quantile(log(N), probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# #for SD
+# Tk <- group_by(data_specialist %>%
+#  filter(Type %in% "BF") %>% filter(Name != "Carapa_surinamensis") %>% na.omit(), Name) %>%
+#   summarise(mean=mean(log(SD)), quant = quantile(log(SD), probs = 0.75)) %>%
+#   arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$Name)
+Tk$cld <- cld$Letters
+
+print(Tk)
+
+Tk <- Tk %>% mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species))
+Tk
+# -------------------------- GRAPHS-------------------
+
+#gmin graph ---------------
+gmin_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(Gmin), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(g[min]~(mmol.m^-2~.s^-1))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        # Add global annova p-value
+ geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# TLP graph --------------
+
+TLP_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(abs(TLP)), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(TLP~(MPa))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.9, label.x = 2)+        
+ geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1)    
+
+#LSWC graph -------------------------
+
+LSWC_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(LSWC), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(LSWC~('%'))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 5.75, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#MajVLA ----------------
+
+MajVLA_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(MajVLA), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(MajVLA~(mm.mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+ 
+     geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+  
+
+#SD ----------------
+
+SD_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(SD), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(SD~(mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 7.8, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#K --------------------
+K_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(K), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(K~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3.2, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# P graph -----------------
+P_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(P), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(P~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#N graph ------------
+N_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(N), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(N~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#C graph -------------
+C_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(C), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(C~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 4.12, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# SF graph, all traits combined --------
+SF <- ggpubr::ggarrange(
+  TLP_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  gmin_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  LSWC_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  MajVLA_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  SD_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  K_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  P_SF + theme(legend.position="none"),
+  N_SF + theme(legend.position="none"),
+  C_SF + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Specialists_SF.png", plot = SF, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+*TF specialists*
+
+```{r TF specialists}
+# ----------Replace for each trait --------------
+#for SD, remove C. surinamensis %>% filter(Name != "Carapa_surinamensis")
+# Compute the analysis of variance
+res.aov <- aov(log(C) ~ Name, data = data_specialist %>%
+ filter(Type %in% "TF"))
+
+#with letters
+library(multcompView)
+#Species followed by the same letter did not differ significantly (Tukey test, p>0.05).
+TUKEY <- HSD.test(res.aov, "Name", console=TRUE)
+tukey <- TukeyHSD(res.aov)
+# compact letter display
+cld <- multcompLetters4(res.aov, tukey)
+print(cld)
+
+# table with factors and 3rd quantile
+Tk <- group_by(data_specialist %>%
+ filter(Type %in% "TF"), Name) %>%
+  summarise(mean=mean(log(C)), quant = quantile(log(C), probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# #for SD
+# Tk <- group_by(data_specialist %>%
+#  filter(Type %in% "TF") %>% filter(Name != "Licania_membranacea") %>% na.omit(), Name) %>%
+#   summarise(mean=mean(log(SD)), quant = quantile(log(SD), probs = 0.75)) %>%
+#   arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$Name)
+Tk$cld <- cld$Letters
+
+print(Tk)
+
+Tk <- Tk %>% mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species))
+Tk
+
+#gmin graph -----------
+gmin_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(Gmin), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+   ylab(expression(g[min]~(mmol.m^-2~.s^-1))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        # Add global annova p-value
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# TLP graph ----------
+
+TLP_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(abs(TLP)), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(TLP~(MPa))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.9, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1)     
+
+#LSWC graph ------------
+
+LSWC_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(LSWC), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(LSWC~('%'))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 5.75, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#MajVLA graph --------------
+
+MajVLA_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(MajVLA), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(MajVLA~(mm.mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 2.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#SD graph ----------------
+
+SD_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(SD), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(SD~(mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 6.9, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#K graph -------------
+K_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(K), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(K~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#P graph ---------------
+P_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(P), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(P~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.7, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# N graph -------------
+N_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(N), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(N~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#C graph -------------
+C_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(C), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(C~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 4.15, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+# TF all trait combined --------------
+TF <- ggpubr::ggarrange(
+  TLP_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  gmin_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  LSWC_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  MajVLA_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  SD_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  K_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  P_TF + theme(legend.position="none"),
+  N_TF + theme(legend.position="none"),
+  C_TF + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Specialists_TF.png", plot = TF, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
 
 
 # Question 2
@@ -2258,80 +2817,44 @@ table %>%
 # Question 3
 **(H3) Generalist species express a higher intraspecific trait variability than specialist species.**
 
-CV : pour quantifier l’ITV : absolute variation of the intraspecific trait with respect to the interspecific mean. 
+CV to quantify ITV : absolute variation of the intraspecific trait with respect to the interspecific mean. 
 
 CV is defined as the ratio of the standard deviation \sigma to the mean , expressed as a percentage. CV is convenient to compare variation of traits among species as it requires no ad hoc assumptions and is unitless. 
 
 # CV
-```{r}
+```{r Coefficient of variation calculation}
+#data ----------
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
 
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
 
-cv_eff <- function(traits){
-  if(any(is.na(traits)))
-    traits=traits[!is.na(traits)]
-  N=length(traits)
-  y_bar=mean(traits)
-  s2_hat=var(traits)
-  cv_2=s2_hat/y_bar^2
-  cv_1=sqrt(cv_2)
-  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
-  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
-  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
-  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
-  cv1=sd(traits)/mean(traits)
-  cv4=cv_1-bias2
-  re=cv4
-  return(list(cv= re, eff = N))
-} 
+# For generalists ----------
 
-
-cv <- function(traits){
-  if(any(is.na(traits)))
-    traits=traits[!is.na(traits)]
-  N=length(traits)
-  y_bar=mean(traits)
-  s2_hat=var(traits)
-  cv_2=s2_hat/y_bar^2
-  cv_1=sqrt(cv_2)
-  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
-  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
-  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
-  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
-  cv1=sd(traits)/mean(traits)
-  cv4=cv_1-bias2
-  re=cv4
-  return(re)
-}
-
-
-# For generalists
-
-# cv_G <- sub_data_G %>% 
-#   group_by(Name) %>% 
-#   summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "K", "C", "N", "P", "SD"), funs(cv))
-# 
-# cv_G <- bind_rows(cv_G,
-#                   ungroup(cv_G) %>% 
-#                   summarise_all(mean) %>% 
-#                   mutate(Name = "mean"))
-# 
-# cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
-# 
-# cv_long_G$Type <- c("Generalist")
-
-
-
-# For TF specialist
-
-
-cv_TF <- data_specialist %>% 
-  dplyr::select(-SD)  %>%
-  filter(Type =="TF") %>%
-    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K"), log) %>% 
+cv_G <- Metradica %>% filter(Type =="Generalist") %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
   mutate(TLP = -TLP)%>%
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                  ungroup(cv_G) %>%
+                  summarise_all(mean) %>%
+                  mutate(Name = "mean"))
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G$Type <- c("Generalist")
+
+# For TF specialist -------------
+
+cv_TF <- Metradica %>% filter(Type =="TF") %>%
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
 
 
 cv_TF <- bind_rows(cv_TF,
@@ -2339,52 +2862,53 @@ cv_TF <- bind_rows(cv_TF,
                   summarise_all(mean) %>% 
                   mutate(Name = "mean"))
 
+cv_TF$SD[7] <- (cv_TF$SD[1]+cv_TF$SD[2]+cv_TF$SD[3]+cv_TF$SD[5]+cv_TF$SD[6])/5
+
 cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
 
 cv_long_TF$Type <- c("TF")
 
+# For BF specialist-----------
 
-# For BF specialist
-
-cv_BF <- data_specialist %>% 
-  dplyr::select(-SD)  %>%
-  filter(Type =="BF") %>%
-   mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K"), log) %>% 
+cv_BF <-  Metradica %>% filter(Type =="BF") %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
   mutate(TLP = -TLP)%>%
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
 
 cv_BF <- bind_rows(cv_BF,
                 ungroup(cv_BF) %>% 
                   summarise_all(mean) %>% 
                   mutate(Name = "mean")) 
 
+cv_BF$SD[10] <- (cv_BF$SD[2]+cv_BF$SD[3]+cv_BF$SD[4]+cv_BF$SD[5]+cv_BF$SD[6]+cv_BF$SD[7]+cv_BF$SD[8]+cv_BF$SD[9])/8
+
 cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") 
 
 cv_long_BF$Type <- c("BF")
 
-cv_tot <- bind_rows(cv_long_BF, cv_long_TF) 
+cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G) 
 
 
 ```
 
 
 ### plot cv
-```{r}
+```{r Plot CV}
 # plot all 
 
 cv_plot <- cv_tot %>% 
   mutate(CV =CV*100) %>%
   mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
   filter(Name != "mean") %>% 
-  ggplot(aes(x = trait, y = CV, fill = Type)) +
+  ggplot(aes(x = Type, y = CV, fill = Type)) +
   geom_jitter() + 
   geom_boxplot(alpha=0.7)+
   scale_fill_manual("Habitat\npreference", 
                     values = c("#56B4E9", "#009E72",  "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               #"Generalist" = "Generalist", 
+                               "Generalist" = "Generalist", 
                                "BF" = "SF specialist")) +
   scale_shape_discrete("Habitat\npreference") +
   theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
@@ -2396,47 +2920,26 @@ cv_plot <- cv_tot %>%
 
 cv_plot
 
-##plot each trait differently
-
-
-
 ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 12, height = 8, dpi = 600)
 
 ```
 
 
-###anova cv
-```{r}
+###Anova on cv
+```{r CV anova}
 # Anova on CV
 #We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
 cv_BF$Type <- c("BF")
 cv_TF$Type <- c("TF")
-#cv_G$Type <- c("Generalist")
+cv_G$Type <- c("Generalist")
 
-cv_tot2 <- rbind(cv_BF, cv_TF) %>% filter(Name != "mean")
+cv_tot2 <- rbind(cv_BF, cv_TF, cv_G) %>% filter(Name != "mean")
 
 cv_tot2$Type <- as.factor(cv_tot2$Type)
 levels(cv_tot2$Type)
 
 
-#do it one trait at a time
-cv_gmin <- cv_tot2 %>% dplyr::select(Name, Gmin, Type) %>%
-  mutate(Gmin =Gmin*100) %>%
-  ggplot() +
-  aes(x = Type, y = Gmin, fill= Type) +
-  geom_boxplot(alpha =0.7) +
-  geom_jitter() + 
-  labs(y = bquote(g[min])) +
-  scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
-                    labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
-  theme_minimal() +
-  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
- # stat_compare_means(aes(label =                         paste("p=",as.numeric(..p.format..))),method="anova",size=5)
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =100)
-
-
+#gmin-----------
 # Compute the analysis of variance
 res.aov <- aov(Gmin ~ Type, data = cv_tot2 %>% dplyr::select(Name, Gmin, Type) %>%
   mutate(Gmin =Gmin*100))
@@ -2446,101 +2949,124 @@ plot(res.aov, 1)
 plot(res.aov, 2)
 # Summary of the analysis
 summary(res.aov)
-kruskal.test(Gmin ~ Type, data = cv_tot2 %>% dplyr::select(Name, Gmin, Type))
+#non parametric test
+kruskal.test(Gmin ~ Type, data = cv_tot2 %>% dplyr::select(Name, Gmin, Type)) #p-value = 0.3252
 
-#tlp
-cv_tlp <- cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
-  mutate(TLP =TLP*100) %>%
+cv_gmin <- cv_tot2 %>% dplyr::select(Name, Gmin, Type) %>%
+  mutate(Gmin =Gmin*100) %>%
   ggplot() +
-  aes(x = Type, y = TLP, fill= Type) +
+  aes(x = Type, y = Gmin, fill= Type) +
   geom_boxplot(alpha =0.7) +
-  geom_jitter() +
-  labs(y = bquote(pi[tlp])) +
+  geom_jitter() + 
+  labs(y = bquote(g[min])) +
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist"))+
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =27)
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =100) #ns
 
+
+#tlp --------------------------
 res.aov <- aov(TLP ~ Type, data = cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
   mutate(TLP =TLP*100) )
 plot(res.aov, 1)
 plot(res.aov, 2)
 summary(res.aov)
 kruskal.test(TLP ~ Type, data = cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
-  mutate(TLP =TLP*100) )
+  mutate(TLP =TLP*100) ) #p-value = 0.2233
 
-# #SD
-# cv_SD <- cv_tot2 %>% dplyr::select(Name,SD, Type) %>%
-#   mutate(SD =SD*100) %>%
-#   ggplot() +
-#   aes(x = Type, y = SD, fill= Type) +
-#   geom_boxplot(alpha =0.7) +
-#   geom_jitter() + 
-#   scale_fill_manual("Habitat\npreference", 
-#                     values = c("#56B4E9", "#E79F02"), 
-#                     labels = c("TF" = "TF specialist",
-#                                "BF" = "SF specialist"))+
-#   theme_minimal() +
-#   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-#     stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =8)
-# res.aov <- aov(SD ~ Type, data = cv_SD)
-# plot(res.aov, 1)
-# plot(res.aov, 2)
-# summary(res.aov)
-# kruskal.test(SD ~ Type, data = cv_SD)
+cv_tlp <- cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
+  mutate(TLP =TLP*100) %>%
+  ggplot() +
+  aes(x = Type, y = TLP, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() +
+ # labs(y = bquote(pi[tlp])) +
+    scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =29) #ns
 
-#majvla
+#SD --------------
+res.aov <- aov(SD ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(SD ~ Type, data = cv_tot2) #p-value = 0.798
+
+cv_SD <- cv_tot2 %>% dplyr::select(Name,SD, Type) %>%
+  mutate(SD =SD*100) %>%
+  ggplot() +
+  aes(x = Type, y = SD, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() +
+   scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+    stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =8) #ns
+
+#majvla------------------
+res.aov <- aov(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) )
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) ) # p-value = 0.8236
+
 cv_MajVLA <- cv_tot2 %>% dplyr::select(Name,MajVLA, Type) %>%
   mutate(MajVLA =MajVLA*100) %>%
   ggplot() +
   aes(x = Type, y = MajVLA, fill= Type) +
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
-  scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+   scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =30)
-res.aov <- aov(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) )
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =30) #ns
+
+#K ---------------
+
+res.aov <- aov(K ~ Type, data = cv_tot2)
 plot(res.aov, 1)
 plot(res.aov, 2)
-summary(res.aov)
-kruskal.test(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) )
+summary(res.aov) # p-value = 0.0213 *
 
-#K
-cv_K <- cv_tot2 %>% dplyr::select(Name,K, Type) %>%
+compare_means(K ~ Type,  data = cv_tot2, method = "anova", p.adjust.method = "fdr") # p-value = 0.0213
+compare_means(K ~ Type,  data = cv_tot2 %>% dplyr::select(Name,K, Type), method = "t.test") #generalist and BF are different; method = t.test.
+
+my_comparison <- list(c("BF", "Generalist"), c("BF", "TF"), c("Generalist", "TF"))
+
+#graph
+cv_K <- cv_tot2 %>% dplyr::select(Name,K, Type)%>%
   mutate(K =K*100) %>%
   ggplot() +
   aes(x = Type, y = K, fill= Type) +
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
-  ylim(8,35)+
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-   stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =30)
-  # stat_compare_means(method ="anova", size= 4, label.x =1, label.y =35) +
-  # stat_compare_means(comparisons = my_comparaison, hide.ns = TRUE) # Add pairwise comparisons p-value
+  stat_compare_means(method ="anova", size= 4, label.x =0.9, label.y =37) + stat_compare_means(comparisons = list(c("BF", "Generalist")), label.y = c(32, 35, 39), method = "t.test")  # Add pairwise comparisons p-value 
 
-res.aov <- aov(K ~ Type, data = cv_tot2 %>% dplyr::select(Name,K, Type) )
-plot(res.aov, 1)
-plot(res.aov, 2)
-summary(res.aov) #pvalue <0.05
-compare_means(K ~ Type,  data = cv_tot2 %>% dplyr::select(Name,K, Type))
-my_comparaison<- list(c("BF", "TF"))
-A<- pairwise.t.test(cv_K$K, cv_K$Type,
-                 p.adjust.method = "BH") #generalist and BF are different
-kruskal.test(K ~ Type, data = cv_tot2 %>% dplyr::select(Name,K, Type))
-
-#C
+#C---------
 cv_C <- cv_tot2 %>% dplyr::select(Name,C, Type) %>%
   mutate(C =C*100) %>%
   ggplot() +
@@ -2548,18 +3074,24 @@ cv_C <- cv_tot2 %>% dplyr::select(Name,C, Type) %>%
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =2)
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =2.2)
 res.aov <- aov(C ~ Type, data = cv_tot2 %>% dplyr::select(Name,C, Type))
 plot(res.aov, 1)
 plot(res.aov, 2)
 summary(res.aov) 
 
-#P
+#P --------------
+res.aov <- aov(P ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) 
+
 cv_P <- cv_tot2 %>% dplyr::select(Name,P, Type)%>% 
   mutate(P =P*100) %>%
   ggplot() +
@@ -2567,18 +3099,19 @@ cv_P <- cv_tot2 %>% dplyr::select(Name,P, Type)%>%
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =100)
-res.aov <- aov(P ~ Type, data = cv_P)
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =100)
+
+#N ----------------
+res.aov <- aov(N ~ Type, data = cv_tot2)
 plot(res.aov, 1)
 plot(res.aov, 2)
-summary(res.aov) 
-
-#N
+summary(res.aov)
 cv_N <- cv_tot2 %>% dplyr::select(Name,N, Type) %>%
   mutate(N =N*100) %>%
   ggplot() +
@@ -2586,18 +3119,20 @@ cv_N <- cv_tot2 %>% dplyr::select(Name,N, Type) %>%
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =80)
-res.aov <- aov(N ~ Type, data = cv_N)
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =80)
+
+
+#LSWC ------------------
+res.aov <- aov(LSWC ~ Type, data = cv_tot2)
 plot(res.aov, 1)
 plot(res.aov, 2)
 summary(res.aov)
-
-#LSWC
 cv_LSWC <- cv_tot2 %>% dplyr::select(Name,LSWC, Type)%>%
   mutate(LSWC =LSWC*100) %>%
   ggplot() +
@@ -2605,26 +3140,22 @@ cv_LSWC <- cv_tot2 %>% dplyr::select(Name,LSWC, Type)%>%
   geom_boxplot(alpha =0.7) +
   geom_jitter() + 
   scale_fill_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#E79F02"), 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
                     labels = c("TF" = "TF specialist",
-                               "BF" = "SF specialist")) +
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
   theme_minimal() +
   theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
-  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =1.5, label.y =6)
-res.aov <- aov(LSWC ~ Type, data = cv_LSWC)
-plot(res.aov, 1)
-plot(res.aov, 2)
-summary(res.aov)
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =5.5)
 
-```
-##combine CV post anova
-```{r}
+
+#combine all graphs -------------------
 prow_cv <- ggpubr::ggarrange(
   cv_tlp + theme(legend.position="none", axis.title.x = element_blank()),
   cv_gmin + theme(legend.position="none", axis.title.x = element_blank()),
   cv_LSWC + theme(legend.position="none", axis.title.x = element_blank()),
   cv_MajVLA + theme(legend.position="none", axis.title.x = element_blank()),
-#  cv_SD + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_SD + theme(legend.position="none", axis.title.x = element_blank()),
   cv_K + theme(legend.position="none", axis.title.x = element_blank()),
   cv_P + theme(legend.position="none"),
   cv_N + theme(legend.position="none"),
@@ -2634,20 +3165,19 @@ prow_cv <- ggpubr::ggarrange(
   legend = 'bottom',
   nrow= 3, ncol=3)
 
-ggsave(filename = "CV_plots_H3.png", plot = prow_cv, bg = "white", width = 10, height = 8, dpi = 600)
+ggsave(filename = "CV_plots_H3.png", plot = prow_cv, bg = "white", width = 10, height = 10, dpi = 600)
 ```
 
 
 #VP - variance partitioning
 
-
-[Géraldine DERROIRE] Be careful with variance partitioning as your sample is not balance between the different level (your work with Sylvain), and think carefully of the order you nest things into one another, there may be different possibility showing different things
-
-Inspiration from Julie Messier's code: https://juliemessier.org/code/
+*Inspiration from Julie Messier's code: https://juliemessier.org/code/*
 
 
-```{r}
+```{r variance partitionning}
 # Take into account only generalists. Variance partitioning 
+
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
 sub_data_G <- Metradica %>% filter(Type == 'Generalist')
 
 vars <- sub_data_G %>% 
@@ -2659,13 +3189,27 @@ vars <- sub_data_G %>%
   do(var = nlme::lme(value ~ 1, random=~1|Forest/Habitat/Name, data = .) %>% 
        ape::varcomp(scale = F, cum = F) %>% 
        as.vector() %>% 
-       data.frame(level = c("Forest", "Habitat", "Name"), variance = as.vector(.))) %>% 
+       data.frame(level = c("Forest", "Habitat", "Name", "Within"), variance = as.vector(.))) %>% 
   unnest(var) %>% 
   group_by(trait) %>% 
   mutate(pct = variance / sum(variance)*100)
 
-#variance partitionning for these traits V1
-library(ape)
+#plot graph, first rough draft version
+ggplot(vars) +
+  aes(x = trait, y = pct, fill = level) +
+  geom_col() +
+   ylab("") + xlab("")+
+  scale_fill_manual("",
+    values =c("#029A88","#C33110", "#CCBC44", "#BBBBBB"), 
+                    labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
+                               "Habitat" = "Habitat\n(SF, TF)", 
+                               "Species" = "Species\n(n=6)",
+                               "Within" = "Individuals")) +
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+  theme_minimal()
+
+#second longer version.
+#variance partitionning for these traits
 
 varcomp.gmin<-varcomp(lme(log(Gmin)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1) 
 
@@ -2713,7 +3257,8 @@ vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "var
 
 
 v<- vars %>%  
-  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  #mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]")) %>%
   ggplot(aes(fill=level, y=variance, x=Trait)) + 
   geom_bar(position="stack", stat="identity") +
   theme_minimal(base_size = 22) +
@@ -2723,15 +3268,15 @@ v<- vars %>%
                     labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
                                "Habitat" = "Habitat\n(SF, TF)", 
                                "Species" = "Species\n(n=6)")) +
-  scale_x_discrete(labels = scales::label_parse()) +
-  ggtitle("Portion of total variance (%)")
+  scale_x_discrete(labels = scales::label_parse())
+  #ggtitle("Portion of total variance (%)")
 v
 ggsave(filename = "Variance_partitioning_v1.png", plot = v, bg = "white", width = 10, height = 8, dpi = 600)
 ```
 
 ##v2
-```{r}
-#variance partitionning for these traits V1
+```{r VP - plots}
+#variance partitionning for these traits V2 - with plots as an additional level
 library(ape)
 
 varcomp.gmin<-varcomp(lme(log(Gmin)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1) 
@@ -2803,4 +3348,6 @@ ggsave(filename = "Variance_partitioning_v2_with_plots.png", plot = v2, bg = "wh
  m.gmin<-lmer(log(Gmin)~1+(1|Habitat/Name) + (1|Forest/Plot), data = sub_data_G, na.action = na.omit)
 boundary (singular) fit: see help('isSingular') 
 
-#i tried that but i don't have that many sites or plots per sites.
+*i tried that but i don't have that many sites or plots per sites.*
+
+#**END**
