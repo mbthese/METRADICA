@@ -21,6 +21,9 @@ library(ggpubr) #for stats compare means on ggplot
 library(ggplot2)
 library(ggfortify)
 library(agricolae)
+library(FactoMineR)
+library(factoextra)
+library(Factoshiny)
 library(vegan)
 library(rstatix)
 library(readxl)
@@ -450,15 +453,36 @@ ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", wi
 
 
 #get contribution of trait in the different dimensions
+
 res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
 fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
 
 # Contributions of variables to PC1
-fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
 # Contributions of variables to PC2
-fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
 # Contributions of variables to PC3
-fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+
+ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
 ```
 
 ###PCA with stomata
@@ -582,6 +606,89 @@ dev.off()
 ```
 Interesting variables to look at
 ```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv")
+#SD and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(SD), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(SD) ~ log(Gmin), data = Data)
+get_formula(model) #"y ~ 5.65 + 0.09 * log(Gmin)"
+
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared # 0.01071759
+summary(model)$r.squared #0.01328716
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 4.5, y = 2.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 4.5, y = 2.5,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "Gmin_SD.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
+#MajVLA and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(MajVLA), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(MajVLA) ~ log(Gmin), data = Data)
+get_formula(model)
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared
+summary(model)$r.squared
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 0.8, y = 2.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 2.5,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "Gmin_MajVLA.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
+#MajVLA and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(MajVLA), y = log(SD)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(MajVLA) ~ log(SD), data = Data)
+get_formula(model)
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared
+summary(model)$r.squared
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 0.8, y = 7,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 6.9,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "SD_MajVLA.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
 #TLP and LSWC
 p <- ggplot(Metradica_log) +
   aes(x = TLP, y = LSWC) +
@@ -3267,7 +3374,7 @@ v<- vars %>%
     scale_fill_manual("", values = c("#029A88","#C33110", "#CCBC44", "#BBBBBB"), 
                     labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
                                "Habitat" = "Habitat\n(SF, TF)", 
-                               "Species" = "Species\n(n=6)")) +
+                               "Name" = "Species\n(n=6)")) +
   scale_x_discrete(labels = scales::label_parse())
   #ggtitle("Portion of total variance (%)")
 v
