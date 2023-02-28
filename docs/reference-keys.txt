@@ -1,5 +1,6 @@
 url-your-book-url-like-httpsbookdown.orgyihuibookdown
 project-introduction
+hypotheses
 sampling
 sites
 habitats

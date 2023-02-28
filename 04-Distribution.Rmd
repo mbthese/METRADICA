@@ -1385,7 +1385,7 @@ plot(vein)
 
 # Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA
 
-```{r Summary tlp, gmin, vein, lswc}
+```{r Summary for tlp, gmin, vein, lswc}
 library(ggpubr)
 
 ggarrange(tlp, gmin, lswc, veins, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
