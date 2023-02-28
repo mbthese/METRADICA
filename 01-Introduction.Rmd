@@ -1,12 +1,5 @@
 # (PART) Part one: general introduction {-}
 
-# Background 
-
-* Tropical ecosystems, Amazon basin, focus on French Guiana 
-* Threats : droughts 
-* Trait-based ecology to define species strategies; a mechanistic understanding with hydraulic traits 
-
-
 # Project introduction
 
 My thesis is included in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
@@ -22,7 +15,7 @@ There are 4 tasks :
 3. prediction of species distribution from traits using *four-corners* joint species distribution models 
 4. shifts in species distribution through the lens of demographic process: interaction between models 
 
-![METRADICA](../Metradica_Paracou/Document/Pictures/Overall_project.png "Metradica") 
+![Metradica](./Documents/Pictures/Overall_project.PNG  "Project organisation")
 
 I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
 

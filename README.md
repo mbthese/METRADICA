@@ -1,6 +1,6 @@
 Welcome to the *Metradica* project Github.
 
-This repositpry supports all code and documentation about the project.
+This repository supports all code and documentation about the project.
 
 The global objectives of *Metradica* are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent. 
 
