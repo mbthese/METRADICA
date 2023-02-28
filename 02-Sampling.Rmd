@@ -41,6 +41,7 @@ Permanent forest plots of the *Guyafor network* (https://paracou.cirad.fr/websit
 The three sites were chosen in order to sample species along the rainfall gradient. 
 
 ![Rainfall gradient in French Guyana](./Documents/Pictures/41597_2019_218_Fig1_HTML.png "Rainfall gradient in French Guyana")
+
 ## Habitats
 
 The tropical forest of the Guianan Shield is characterized by heterogeneous meso-topographic conditions with numerous small hills, distinguishing two main contrasting habitats, terra firme (TF) forests and seasonally flooded forests (SF) (Ferry et al. 2010). 
