@@ -8,6 +8,6 @@ It combines: current species distribution, hydrological indices, climatic predic
 
 Part of my PhD project is included in the METRADICA strategic project. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
 
-The analyses are available as a digital book at the following link: mbthese.github.io/METRADICA/ 
+The analyses are available as a digital book at the following link: https://mbthese.github.io/METRADICA/ 
 
 **Marion Boisseaux**

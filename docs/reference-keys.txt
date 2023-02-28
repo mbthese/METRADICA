@@ -111,3 +111,7 @@ cv
 cv-table
 par-habitat-trait-en-fonction-du-gradient-de-précipitation
 par-habitat-trait-en-fonction-du-gradient-de-précipitation-1
+tab:unnamed-chunk-2
+tab:unnamed-chunk-4
+graph-indvals
+sampling-strategy

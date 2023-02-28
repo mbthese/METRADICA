@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Graph Indvals | Literature</title>
+  <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Graph Indvals | Literature" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="github-repo" content="mbthese/METRADICA" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Graph Indvals | Literature" />
+  
+  <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  
+
+<meta name="author" content="Marion Boisseaux" />
+
+
+<meta name="date" content="2022-08-03" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="sampling.html"/>
+<link rel="next" href="traits.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Metradica</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> url: your book url like https://bookdown.org/yihui/bookdown</a></li>
+<li class="part"><span><b>I Part one: general introduction</b></span></li>
+<li class="chapter" data-level="2" data-path="project-introduction.html"><a href="project-introduction.html"><i class="fa fa-check"></i><b>2</b> Project introduction</a></li>
+<li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
+<li class="chapter" data-level="3" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>3</b> Sampling</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>3.1</b> Sites</a></li>
+<li class="chapter" data-level="3.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>3.2</b> Habitats</a></li>
+<li class="chapter" data-level="3.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>3.3</b> Species</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="graph-indvals.html"><a href="graph-indvals.html"><i class="fa fa-check"></i><b>4</b> Graph Indvals</a>
+<ul>
+<li class="chapter" data-level="4.0.1" data-path="graph-indvals.html"><a href="graph-indvals.html#more-details-about-indval"><i class="fa fa-check"></i><b>4.0.1</b> More details about IndVal</a></li>
+<li class="chapter" data-level="4.0.2" data-path="graph-indvals.html"><a href="graph-indvals.html#chosen-species"><i class="fa fa-check"></i><b>4.0.2</b> Chosen species</a></li>
+<li class="chapter" data-level="4.0.3" data-path="graph-indvals.html"><a href="graph-indvals.html#phylogeny"><i class="fa fa-check"></i><b>4.0.3</b> Phylogeny</a></li>
+<li class="chapter" data-level="4.1" data-path="graph-indvals.html"><a href="graph-indvals.html#individuals"><i class="fa fa-check"></i><b>4.1</b> Individuals</a></li>
+<li class="chapter" data-level="4.2" data-path="graph-indvals.html"><a href="graph-indvals.html#summary"><i class="fa fa-check"></i><b>4.2</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>5</b> Traits</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="traits.html"><a href="traits.html#morphological-traits"><i class="fa fa-check"></i><b>5.1</b> Morphological traits</a></li>
+<li class="chapter" data-level="5.2" data-path="traits.html"><a href="traits.html#hydraulic-traits"><i class="fa fa-check"></i><b>5.2</b> Hydraulic traits</a></li>
+<li class="chapter" data-level="5.3" data-path="traits.html"><a href="traits.html#photochemical-trait"><i class="fa fa-check"></i><b>5.3</b> Photochemical trait</a></li>
+<li class="chapter" data-level="5.4" data-path="traits.html"><a href="traits.html#measured-traits"><i class="fa fa-check"></i><b>5.4</b> Measured traits</a></li>
+<li class="chapter" data-level="5.5" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>5.5</b> Protocols</a></li>
+</ul></li>
+<li class="part"><span><b>III Part three : Results</b></span></li>
+<li class="chapter" data-level="6" data-path="libraries.html"><a href="libraries.html"><i class="fa fa-check"></i><b>6</b> Libraries</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="libraries.html"><a href="libraries.html#gmin"><i class="fa fa-check"></i><b>6.1</b> Gmin</a></li>
+<li class="chapter" data-level="6.2" data-path="libraries.html"><a href="libraries.html#tlp"><i class="fa fa-check"></i><b>6.2</b> TLP</a></li>
+<li class="chapter" data-level="6.3" data-path="libraries.html"><a href="libraries.html#la"><i class="fa fa-check"></i><b>6.3</b> LA</a></li>
+<li class="chapter" data-level="6.4" data-path="libraries.html"><a href="libraries.html#sla"><i class="fa fa-check"></i><b>6.4</b> SLA</a></li>
+<li class="chapter" data-level="6.5" data-path="libraries.html"><a href="libraries.html#lswc"><i class="fa fa-check"></i><b>6.5</b> LSWC</a></li>
+<li class="chapter" data-level="6.6" data-path="libraries.html"><a href="libraries.html#majvla"><i class="fa fa-check"></i><b>6.6</b> MajVLA</a></li>
+<li class="chapter" data-level="6.7" data-path="libraries.html"><a href="libraries.html#height-branch-dawkins"><i class="fa fa-check"></i><b>6.7</b> Height , Branch, Dawkins</a></li>
+<li class="chapter" data-level="6.8" data-path="libraries.html"><a href="libraries.html#chemistry"><i class="fa fa-check"></i><b>6.8</b> Chemistry</a></li>
+<li class="chapter" data-level="6.9" data-path="libraries.html"><a href="libraries.html#summary-of-main-variables"><i class="fa fa-check"></i><b>6.9</b> Summary of main variables</a></li>
+<li class="chapter" data-level="6.10" data-path="libraries.html"><a href="libraries.html#first-pca-interpretations"><i class="fa fa-check"></i><b>6.10</b> First PCA interpretations</a></li>
+<li class="chapter" data-level="6.11" data-path="libraries.html"><a href="libraries.html#pca-with-factoextra"><i class="fa fa-check"></i><b>6.11</b> PCA with factoextra</a>
+<ul>
+<li class="chapter" data-level="6.11.1" data-path="libraries.html"><a href="libraries.html#plots"><i class="fa fa-check"></i><b>6.11.1</b> Plots</a></li>
+</ul></li>
+<li class="chapter" data-level="6.12" data-path="libraries.html"><a href="libraries.html#gmin-and-other-variables"><i class="fa fa-check"></i><b>6.12</b> Gmin and other variables?</a></li>
+<li class="chapter" data-level="6.13" data-path="libraries.html"><a href="libraries.html#plots-1"><i class="fa fa-check"></i><b>6.13</b> Plots</a>
+<ul>
+<li class="chapter" data-level="6.13.1" data-path="libraries.html"><a href="libraries.html#paracou-data-set"><i class="fa fa-check"></i><b>6.13.1</b> Paracou data set</a></li>
+<li class="chapter" data-level="6.13.2" data-path="libraries.html"><a href="libraries.html#bafog-data-set"><i class="fa fa-check"></i><b>6.13.2</b> Bafog data set</a></li>
+<li class="chapter" data-level="6.13.3" data-path="libraries.html"><a href="libraries.html#kaw-data-set"><i class="fa fa-check"></i><b>6.13.3</b> Kaw data set</a></li>
+<li class="chapter" data-level="6.13.4" data-path="libraries.html"><a href="libraries.html#anova-and-plots"><i class="fa fa-check"></i><b>6.13.4</b> Anova and plots</a></li>
+<li class="chapter" data-level="6.13.5" data-path="libraries.html"><a href="libraries.html#plots-2"><i class="fa fa-check"></i><b>6.13.5</b> Plots</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="to-do.html"><a href="to-do.html"><i class="fa fa-check"></i><b>7</b> To do</a></li>
+<li class="chapter" data-level="8" data-path="vein-traits.html"><a href="vein-traits.html"><i class="fa fa-check"></i><b>8</b> Vein traits</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="vein-traits.html"><a href="vein-traits.html#hypothesis"><i class="fa fa-check"></i><b>8.1</b> Hypothesis</a></li>
+<li class="chapter" data-level="8.2" data-path="vein-traits.html"><a href="vein-traits.html#materials-and-method"><i class="fa fa-check"></i><b>8.2</b> Materials and Method</a></li>
+<li class="chapter" data-level="8.3" data-path="vein-traits.html"><a href="vein-traits.html#statistical-analysis"><i class="fa fa-check"></i><b>8.3</b> Statistical analysis</a></li>
+<li class="chapter" data-level="8.4" data-path="vein-traits.html"><a href="vein-traits.html#results"><i class="fa fa-check"></i><b>8.4</b> Results</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="vein-traits.html"><a href="vein-traits.html#across-species-from-all-habitats"><i class="fa fa-check"></i><b>8.4.1</b> Across species from all habitats</a></li>
+<li class="chapter" data-level="8.4.2" data-path="vein-traits.html"><a href="vein-traits.html#sff-vs-tf-habitats"><i class="fa fa-check"></i><b>8.4.2</b> SFF vs TF habitats</a></li>
+<li class="chapter" data-level="8.4.3" data-path="vein-traits.html"><a href="vein-traits.html#specialists-sff-vs-specialists-tf-vs-generalists"><i class="fa fa-check"></i><b>8.4.3</b> Specialists SFF vs Specialists TF vs Generalists</a></li>
+<li class="chapter" data-level="8.4.4" data-path="vein-traits.html"><a href="vein-traits.html#bafog-vs-kaw-vs-paracou"><i class="fa fa-check"></i><b>8.4.4</b> Bafog vs Kaw vs Paracou</a></li>
+<li class="chapter" data-level="8.4.5" data-path="vein-traits.html"><a href="vein-traits.html#vla-against-other-variables"><i class="fa fa-check"></i><b>8.4.5</b> VLA against other variables</a></li>
+<li class="chapter" data-level="8.4.6" data-path="vein-traits.html"><a href="vein-traits.html#herbivory"><i class="fa fa-check"></i><b>8.4.6</b> Herbivory?</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="waterlogging-litterature.html"><a href="waterlogging-litterature.html"><i class="fa fa-check"></i><b>9</b> Waterlogging litterature</a></li>
+<li class="chapter" data-level="10" data-path="general-potential-hypotheses.html"><a href="general-potential-hypotheses.html"><i class="fa fa-check"></i><b>10</b> general potential hypotheses</a></li>
+<li class="part"><span><b>IV Part four : Notes</b></span></li>
+<li class="chapter" data-level="11" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>11</b> 26/01/2022</a></li>
+<li class="chapter" data-level="12" data-path="libraries-1.html"><a href="libraries-1.html"><i class="fa fa-check"></i><b>12</b> Libraries</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="libraries-1.html"><a href="libraries-1.html#variables"><i class="fa fa-check"></i><b>12.1</b> variables</a></li>
+<li class="chapter" data-level="12.2" data-path="libraries-1.html"><a href="libraries-1.html#biplot-12"><i class="fa fa-check"></i><b>12.2</b> Biplot 1,2</a></li>
+<li class="chapter" data-level="12.3" data-path="libraries-1.html"><a href="libraries-1.html#dim-34"><i class="fa fa-check"></i><b>12.3</b> dim 3,4</a></li>
+<li class="chapter" data-level="12.4" data-path="libraries-1.html"><a href="libraries-1.html#forest"><i class="fa fa-check"></i><b>12.4</b> Forest</a></li>
+<li class="chapter" data-level="12.5" data-path="libraries-1.html"><a href="libraries-1.html#habitattype"><i class="fa fa-check"></i><b>12.5</b> HabitatType</a></li>
+<li class="chapter" data-level="12.6" data-path="libraries-1.html"><a href="libraries-1.html#habitat-de-collecte"><i class="fa fa-check"></i><b>12.6</b> Habitat de collecte</a></li>
+<li class="chapter" data-level="12.7" data-path="libraries-1.html"><a href="libraries-1.html#a---tf-vs-bf"><i class="fa fa-check"></i><b>12.7</b> A - TF vs BF</a></li>
+<li class="chapter" data-level="12.8" data-path="libraries-1.html"><a href="libraries-1.html#gmin-habitat-collected"><i class="fa fa-check"></i><b>12.8</b> gmin habitat collected</a></li>
+<li class="chapter" data-level="12.9" data-path="libraries-1.html"><a href="libraries-1.html#tlp-habitat-collected"><i class="fa fa-check"></i><b>12.9</b> TLP habitat collected</a></li>
+<li class="chapter" data-level="12.10" data-path="libraries-1.html"><a href="libraries-1.html#lswc-habitat-collected"><i class="fa fa-check"></i><b>12.10</b> LSWC habitat collected</a></li>
+<li class="chapter" data-level="12.11" data-path="libraries-1.html"><a href="libraries-1.html#majvla-habitat-collected"><i class="fa fa-check"></i><b>12.11</b> MajVLA habitat collected</a></li>
+<li class="chapter" data-level="12.12" data-path="libraries-1.html"><a href="libraries-1.html#b---trait-twi"><i class="fa fa-check"></i><b>12.12</b> B - Trait ~ TWI</a></li>
+<li class="chapter" data-level="12.13" data-path="libraries-1.html"><a href="libraries-1.html#gmin-1"><i class="fa fa-check"></i><b>12.13</b> gmin</a></li>
+<li class="chapter" data-level="12.14" data-path="libraries-1.html"><a href="libraries-1.html#tlp-1"><i class="fa fa-check"></i><b>12.14</b> TLP</a></li>
+<li class="chapter" data-level="12.15" data-path="libraries-1.html"><a href="libraries-1.html#lswc-1"><i class="fa fa-check"></i><b>12.15</b> LSWC</a></li>
+<li class="chapter" data-level="12.16" data-path="libraries-1.html"><a href="libraries-1.html#majvla-1"><i class="fa fa-check"></i><b>12.16</b> MajVLA</a></li>
+<li class="chapter" data-level="12.17" data-path="libraries-1.html"><a href="libraries-1.html#c---strategies-in-each-habitat"><i class="fa fa-check"></i><b>12.17</b> C - Strategies in each habitat</a></li>
+<li class="chapter" data-level="12.18" data-path="libraries-1.html"><a href="libraries-1.html#a---trait-twi"><i class="fa fa-check"></i><b>12.18</b> A - Trait ~ TWI</a></li>
+<li class="chapter" data-level="12.19" data-path="libraries-1.html"><a href="libraries-1.html#gmin-2"><i class="fa fa-check"></i><b>12.19</b> gmin</a></li>
+<li class="chapter" data-level="12.20" data-path="libraries-1.html"><a href="libraries-1.html#tlp-2"><i class="fa fa-check"></i><b>12.20</b> TLP</a></li>
+<li class="chapter" data-level="12.21" data-path="libraries-1.html"><a href="libraries-1.html#lswc-2"><i class="fa fa-check"></i><b>12.21</b> LSWC</a></li>
+<li class="chapter" data-level="12.22" data-path="libraries-1.html"><a href="libraries-1.html#majvla-2"><i class="fa fa-check"></i><b>12.22</b> MajVLA</a></li>
+<li class="chapter" data-level="12.23" data-path="libraries-1.html"><a href="libraries-1.html#b--boxplot-generalist-bf-vs-generalist-tf"><i class="fa fa-check"></i><b>12.23</b> B- Boxplot generalist BF vs generalist TF ?</a></li>
+<li class="chapter" data-level="12.24" data-path="libraries-1.html"><a href="libraries-1.html#gmin-3"><i class="fa fa-check"></i><b>12.24</b> gmin</a></li>
+<li class="chapter" data-level="12.25" data-path="libraries-1.html"><a href="libraries-1.html#tlp-3"><i class="fa fa-check"></i><b>12.25</b> TLP</a>
+<ul>
+<li class="chapter" data-level="12.25.1" data-path="libraries-1.html"><a href="libraries-1.html#cv"><i class="fa fa-check"></i><b>12.25.1</b> CV</a></li>
+</ul></li>
+<li class="chapter" data-level="12.26" data-path="libraries-1.html"><a href="libraries-1.html#cv-table"><i class="fa fa-check"></i><b>12.26</b> CV table</a>
+<ul>
+<li class="chapter" data-level="12.26.1" data-path="libraries-1.html"><a href="libraries-1.html#par-habitat-trait-en-fonction-du-gradient-de-précipitation"><i class="fa fa-check"></i><b>12.26.1</b> Par habitat : Trait en fonction du gradient de précipitation</a></li>
+<li class="chapter" data-level="12.26.2" data-path="libraries-1.html"><a href="libraries-1.html#par-habitat-trait-en-fonction-du-gradient-de-précipitation-1"><i class="fa fa-check"></i><b>12.26.2</b> Par habitat : Trait en fonction du gradient de précipitation</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Literature</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="graph-indvals" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Graph Indvals<a href="graph-indvals.html#graph-indvals" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word <strong>preference</strong>), but are also a high probability of being sampled in the given habitat.</p>
+<p>Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.</p>
+<div id="more-details-about-indval" class="section level3 hasAnchor" number="4.0.1">
+<h3><span class="header-section-number">4.0.1</span> More details about IndVal<a href="graph-indvals.html#more-details-about-indval" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies.</p>
+<p>Other indicators:</p>
+<ul>
+<li>Contrary to <strong>TWINSPAN</strong>, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies</li>
+<li>Species richness (sensitive to several factors)</li>
+<li>Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots.</li>
+</ul>
+</div>
+<div id="chosen-species" class="section level3 hasAnchor" number="4.0.2">
+<h3><span class="header-section-number">4.0.2</span> Chosen species<a href="graph-indvals.html#chosen-species" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Family
+</th>
+<th style="text-align:left;">
+Genus
+</th>
+<th style="text-align:left;">
+Species
+</th>
+<th style="text-align:left;">
+Type
+</th>
+<th style="text-align:right;">
+Paracou
+</th>
+<th style="text-align:right;">
+Bafog
+</th>
+<th style="text-align:right;">
+Kaw
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Bocoa
+</td>
+<td style="text-align:left;">
+prouacensis
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sapotaceae
+</td>
+<td style="text-align:left;">
+Chrysophyllum
+</td>
+<td style="text-align:left;">
+prieurii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Euphorbiaceae
+</td>
+<td style="text-align:left;">
+Conceveiba
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lecythidaceae
+</td>
+<td style="text-align:left;">
+Eschweilera
+</td>
+<td style="text-align:left;">
+coriacea
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chrysobalanaceae
+</td>
+<td style="text-align:left;">
+Hymenopus
+</td>
+<td style="text-align:left;">
+heteromorphus
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bignoniaceae
+</td>
+<td style="text-align:left;">
+Jacaranda
+</td>
+<td style="text-align:left;">
+copaia subs. copaia
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burseraceae
+</td>
+<td style="text-align:left;">
+Protium
+</td>
+<td style="text-align:left;">
+stevensonii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Tachigali
+</td>
+<td style="text-align:left;">
+melinonii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;">
+Virola
+</td>
+<td style="text-align:left;">
+michelii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Meliaceae
+</td>
+<td style="text-align:left;">
+Carapa
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Meliaceae
+</td>
+<td style="text-align:left;">
+Carapa
+</td>
+<td style="text-align:left;">
+surinamensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Eperua
+</td>
+<td style="text-align:left;">
+falcata
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;">
+Iryanthera
+</td>
+<td style="text-align:left;">
+hostmannii
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salicacea
+</td>
+<td style="text-align:left;">
+Laetia
+</td>
+<td style="text-align:left;">
+procera
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burseraceae
+</td>
+<td style="text-align:left;">
+Protium
+</td>
+<td style="text-align:left;">
+opacum subsp. rabelianum
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Pterocarpus
+</td>
+<td style="text-align:left;">
+officinalis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Clusiaceae
+</td>
+<td style="text-align:left;">
+Symphonia
+</td>
+<td style="text-align:left;">
+globulifera
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;">
+Virola
+</td>
+<td style="text-align:left;">
+surinamensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salicacea
+</td>
+<td style="text-align:left;">
+Casearia
+</td>
+<td style="text-align:left;">
+javitensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Dicorynia
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lecythidaceae
+</td>
+<td style="text-align:left;">
+Gustavia
+</td>
+<td style="text-align:left;">
+hexapetala
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;">
+Iryanthera
+</td>
+<td style="text-align:left;">
+sagotiana
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chrysobalanaceae
+</td>
+<td style="text-align:left;">
+Licania
+</td>
+<td style="text-align:left;">
+membranacea
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Metteniusaceae
+</td>
+<td style="text-align:left;">
+Poraqueiba
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;">
+Vouacapoua
+</td>
+<td style="text-align:left;">
+americana
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+276
+</td>
+<td style="text-align:right;">
+227
+</td>
+<td style="text-align:right;">
+178
+</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>
+<span id="tab:unnamed-chunk-2">Table 4.1: </span>Studied species.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Genus
+</th>
+<th style="text-align:left;">
+Species
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Eperua
+</td>
+<td style="text-align:left;">
+falcata
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iryanthera
+</td>
+<td style="text-align:left;">
+hostmannii
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jacaranda
+</td>
+<td style="text-align:left;">
+copaia subsp. copaia
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pterocarpus
+</td>
+<td style="text-align:left;">
+officinalis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Symphonia
+</td>
+<td style="text-align:left;">
+globulifera
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tachigali
+</td>
+<td style="text-align:left;">
+melinonii
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Virola
+</td>
+<td style="text-align:left;">
+surinamensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bocoa
+</td>
+<td style="text-align:left;">
+prouacensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chrysophyllum
+</td>
+<td style="text-align:left;">
+prieurii
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Conceveiba
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Eschweilera
+</td>
+<td style="text-align:left;">
+coriacea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hymenopus
+</td>
+<td style="text-align:left;">
+heteromorphus
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Protium
+</td>
+<td style="text-align:left;">
+stevensonii
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Virola
+</td>
+<td style="text-align:left;">
+michelii
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carapa
+</td>
+<td style="text-align:left;">
+surinamensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Carapa
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Laetia
+</td>
+<td style="text-align:left;">
+procera
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Protium
+</td>
+<td style="text-align:left;">
+opacum subsp. rabelianum
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Casearia
+</td>
+<td style="text-align:left;">
+javitensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dicorynia
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gustavia
+</td>
+<td style="text-align:left;">
+hexapetala
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iryanthera
+</td>
+<td style="text-align:left;">
+sagotiana
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Licania
+</td>
+<td style="text-align:left;">
+membranacea
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poraqueiba
+</td>
+<td style="text-align:left;">
+guianensis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vouacapoua
+</td>
+<td style="text-align:left;">
+americana
+</td>
+</tr>
+</tbody>
+</table>
+<p>Un espèce : bc mortlité chez les jeunes donc parti pris de les considerer dans le choix des habitats. (percentile 10-90).
+For <em>Eperua falcata</em>: BF?? see Laurens porter 2007 (are species adapted …)</p>
+</div>
+<div id="phylogeny" class="section level3 hasAnchor" number="4.0.3">
+<h3><span class="header-section-number">4.0.3</span> Phylogeny<a href="graph-indvals.html#phylogeny" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.</p>
+<div class="figure">
+<img src="../Metradica_Paracou/Document/phylo_metradica.jpeg" title="Phylogeny" alt="" />
+<p class="caption">Phylogeny</p>
+</div>
+</div>
+<div id="individuals" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Individuals<a href="graph-indvals.html#individuals" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The individuals were selected with a DBH value between the 10<sup>th</sup> and the 90<sup>th</sup> percentile of the species’ distribution pattern, in order to have a sampling that best reflects the forest structure. In this percentile interval, species were randomly selected for sampling.</p>
+<p>Sampling strategy :</p>
+<ul>
+<li>Maps were produced by QGIS software</li>
+<li><a href="../Metradica_Paracou/Document/Protocol/Field.Rmd"><strong>Field</strong> protocol</a></li>
+<li>Fill the fieldworksheet <a href="../Metradica_Paracou/Document/Protocol/Feuille_terrain_releve.xlsx"><strong>Fieldworksheet</strong></a></li>
+<li><input type="checkbox" disabled="" />Assess tree and branch height</li>
+<li><input type="checkbox" disabled="" />Assess tree and branch Dawkins : <img src="../Metradica_Paracou/Document/Protocol/Dawkins.png" title="Dawkins" alt="Dawkins" /></li>
+</ul>
+</div>
+<div id="summary" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Summary<a href="graph-indvals.html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>2 habitats (Terra firme; Seasonally flooded soils)</li>
+<li>24 species (9 generalists; 8 SFF; 7 TF)</li>
+<li>10 individuals per species per site</li>
+<li>9 traits to investigate for drought tolerance</li>
+</ul>
+<img src="_main_files/figure-html/unnamed-chunk-4-1.png" width="768" />
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-4">Table 4.2: </span>Individuals per species collected on the 3 sites
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Family
+</th>
+<th style="text-align:left;font-weight: bold;">
+Genus
+</th>
+<th style="text-align:left;font-weight: bold;">
+Species
+</th>
+<th style="text-align:left;font-weight: bold;">
+Type
+</th>
+<th style="text-align:right;font-weight: bold;">
+Paracou
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bafog
+</th>
+<th style="text-align:right;font-weight: bold;">
+Kaw
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Bocoa
+</td>
+<td style="text-align:left;font-style: italic;">
+prouacensis
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sapotaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Chrysophyllum
+</td>
+<td style="text-align:left;font-style: italic;">
+prieurii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Euphorbiaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Conceveiba
+</td>
+<td style="text-align:left;font-style: italic;">
+guianensis
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lecythidaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Eschweilera
+</td>
+<td style="text-align:left;font-style: italic;">
+coriacea
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chrysobalanaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Hymenopus
+</td>
+<td style="text-align:left;font-style: italic;">
+heteromorphus
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bignoniaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Jacaranda
+</td>
+<td style="text-align:left;font-style: italic;">
+copaia subs. copaia
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burseraceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Protium
+</td>
+<td style="text-align:left;font-style: italic;">
+stevensonii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Tachigali
+</td>
+<td style="text-align:left;font-style: italic;">
+melinonii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Virola
+</td>
+<td style="text-align:left;font-style: italic;">
+michelii
+</td>
+<td style="text-align:left;">
+Generalists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Meliaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Carapa
+</td>
+<td style="text-align:left;font-style: italic;">
+guianensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Meliaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Carapa
+</td>
+<td style="text-align:left;font-style: italic;">
+surinamensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Eperua
+</td>
+<td style="text-align:left;font-style: italic;">
+falcata
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Iryanthera
+</td>
+<td style="text-align:left;font-style: italic;">
+hostmannii
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salicacea
+</td>
+<td style="text-align:left;font-style: italic;">
+Laetia
+</td>
+<td style="text-align:left;font-style: italic;">
+procera
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burseraceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Protium
+</td>
+<td style="text-align:left;font-style: italic;">
+opacum subsp. rabelianum
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Pterocarpus
+</td>
+<td style="text-align:left;font-style: italic;">
+officinalis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Clusiaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Symphonia
+</td>
+<td style="text-align:left;font-style: italic;">
+globulifera
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Virola
+</td>
+<td style="text-align:left;font-style: italic;">
+surinamensis
+</td>
+<td style="text-align:left;">
+SF specialists
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Salicacea
+</td>
+<td style="text-align:left;font-style: italic;">
+Casearia
+</td>
+<td style="text-align:left;font-style: italic;">
+javitensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Dicorynia
+</td>
+<td style="text-align:left;font-style: italic;">
+guianensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lecythidaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Gustavia
+</td>
+<td style="text-align:left;font-style: italic;">
+hexapetala
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Myristicaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Iryanthera
+</td>
+<td style="text-align:left;font-style: italic;">
+sagotiana
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chrysobalanaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Licania
+</td>
+<td style="text-align:left;font-style: italic;">
+membranacea
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Metteniusaceae
+</td>
+<td style="text-align:left;font-style: italic;">
+Poraqueiba
+</td>
+<td style="text-align:left;font-style: italic;">
+guianensis
+</td>
+<td style="text-align:left;">
+TF specialists
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;color: white !important;background-color: #666; !important;">
+Fabaceae
+</td>
+<td style="text-align:left;font-style: italic;color: white !important;background-color: #666; !important;">
+Vouacapoua
+</td>
+<td style="text-align:left;font-style: italic;color: white !important;background-color: #666; !important;">
+americana
+</td>
+<td style="text-align:left;color: white !important;background-color: #666; !important;">
+TF specialists
+</td>
+<td style="text-align:right;color: white !important;background-color: #666; !important;">
+5
+</td>
+<td style="text-align:right;color: white !important;background-color: #666; !important;">
+7
+</td>
+<td style="text-align:right;color: white !important;background-color: #666; !important;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:left;font-style: italic;">
+</td>
+<td style="text-align:left;font-style: italic;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+276
+</td>
+<td style="text-align:right;">
+227
+</td>
+<td style="text-align:right;">
+178
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="sampling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="traits.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
