@@ -1,13 +1,13 @@
-Welcome! 
+Welcome to the *Metradica* project Github.
 
-This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). 
+This repositpry supports all code and documentation about the project.
 
-This template provides a skeleton file structure that you can edit to create your book. 
+The global objectives of *Metradica* are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent. 
 
-The contents inside the .Rmd files provide some pointers to help you get started, but feel free to also delete the content in each file and start fresh.
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
 
-Additional resources:
+Part of my PhD project is included in the METRADICA strategic project. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
 
-The **bookdown** book: https://bookdown.org/yihui/bookdown/
+The analyses are available as a digital book at the following link: mbthese.github.io/METRADICA/ 
 
-The **bookdown** package reference site: https://pkgs.rstudio.com/bookdown
+**Marion Boisseaux**
