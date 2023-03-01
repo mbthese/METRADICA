@@ -1,9 +1,90 @@
+--- 
+title: "Metradica"
+author: "Marion Boisseaux"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: mbthese/METRADICA
+---
+
+# url: your book url like https://bookdown.org/yihui/bookdown
+
+Placeholder
+
+
+
+<!--chapter:end:index.Rmd-->
+
+
+# (PART) Part one: general introduction {-}
+# Project introduction
+
+Placeholder
+
+
+
+<!--chapter:end:01-Introduction.Rmd-->
+
+
+# (PART) Part two : Materials & Method {-}
+# Sampling
+
+Placeholder
+
+
+## Sites
+## Habitats
+## Species
+## Individuals
+## Sampling strategy
+
+<!--chapter:end:02-Sampling.Rmd-->
+
+
+# Traits
+
+Placeholder
+
+
+## Water- and carbon-related traits
+## Additional traits
+## Protocols
+## Organisation
+
+<!--chapter:end:03-Traits.Rmd-->
+
+
+# (PART) Part three : Results {-}
+
+## Distribution of major traits 
+### Water traits 
+### Chemistry traits
+### DBH
+### Crown position 
+### TreeDawkins 
+## Gmin
+## LSWC
+## TLP
+## MajVLA
+
+<!--chapter:end:04-Distribution.Rmd-->
+
 ---
 title: "Results_bis"
 author: "Marion Boisseaux"
 date: "01/02/2022"
-output: html_document
-editor_options: 
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -424,4 +505,60 @@ ggplot(Paracou) +
 
 
 ```
+
+
+<!--chapter:end:55-Results_PARACOU.Rmd-->
+
+
+# Vein traits
+
+Placeholder
+
+
+## Hypothesis
+## Materials and Method
+## Statistical analysis
+## Results
+### Across species from all habitats
+### SFF vs TF habitats
+### Specialists SFF vs Specialists TF vs Generalists
+### Bafog vs Kaw vs Paracou
+### VLA against other variables
+### Herbivory? 
+
+<!--chapter:end:66-Results_Venation.Rmd-->
+
+---
+title: "Literature"
+author: "Marion Boisseaux"
+date: "08/03/2022"
+output: html_document
+---
+# Waterlogging litterature
+
+- From **Abiotic Stress Physiology of Horticultural Crops** *edited by N.K. Srinivasa Rao, K.S. Shivashankara, R.H. Laxman*
+
+Section 1.3 : one of the earliest responses to soil flooding is a reduction in stomatal conductance, inhibition of stomatal aperture. Low O2 level may also reduce hydraulic conductivity and csqtly decrease root permeability. This descrease in hydraulic permeability may b liked to aqaporins [...] limiting water uptake and this leading to internal water deficit. Oxygen deficiency generally induces a rapid reduction in the rate of photoS which is generally considered as the result of reduced stomatal aperture, decrease in leaf chloro content + early leaf senescence and a reduction in LA. Waterlogged soils reduce the translocation of photoS product from 'source' to 'sink' root. As a result, the maintenance of photoS acitivity and accumulation of soluble sugar in roots are clearly important adaptations to flooding. 
+
+Plant responses to waterlogging include low stomatal conductance, decrease in leaf, root, and shoot dev't, changes in osmotic potential and nu uptake, reduced chloro content and photoS.
+
+The oxygen diffusion is 10,000 times slower in waterlogged soils as compared to aerated soil. 
+
+The decrease in O evel in soils affects the bioavailability of nu and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reducedleaf concentrations of N, P, K, Ca, Mg in avocado + pea. 
+
+# general potential hypotheses
+
+with waterlogging: i should find a decrease of stomatal conductance corrolated with an increase of leaf water potential.
+
+<!--chapter:end:80-Literature.Rmd-->
+
+
+# (PART) Part four : Notes {-}
+# 26/01/2022
+
+Placeholder
+
+
+
+<!--chapter:end:99-MeetingNotes.Rmd-->
 

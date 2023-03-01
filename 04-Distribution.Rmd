@@ -3,8 +3,8 @@ title: "Distribution"
 author: "Marion Boisseaux"
 date: "04/05/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 editor_options:
   chunk_output_type: inline
 ---
@@ -586,9 +586,7 @@ Plan analyses:
   * Trait en fonction topo "BF/TF"
   * Trait en fonction gradient precipitation Habitat TF
   * Trait en fonction gradient precipitation Habitat BF
-  * Trait en fonction dawkins
-  * Trait en fonction TWI
-  * Trait en fonction DBH
+
   
 3- Modele avec un indice de stress hydrique
 
