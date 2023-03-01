@@ -4,10 +4,10 @@
 %
 \documentclass[
 ]{book}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -33,15 +33,48 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  pdftitle={Metradica},
-  pdfauthor={Marion Boisseaux},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
-\usepackage{longtable,booktabs}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
 \makeatletter
@@ -50,7 +83,7 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
-\usepackage{graphicx,grffile}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -82,12 +115,23 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 \usepackage[]{natbib}
 \bibliographystyle{plainnat}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Meeting Notes},
+  pdfauthor={Marion Boisseaux},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-\title{Metradica}
+\title{Meeting Notes}
 \author{Marion Boisseaux}
-\date{2022-05-11}
+\date{31/01/2022}
 
 \begin{document}
 \maketitle
@@ -99,23 +143,20 @@
 \hypertarget{about}{%
 \chapter{About}\label{about}}
 
-\emph{to describe}
+Welcome to the \emph{Metradica} project Github.
+
+This repository supports all code and documentation about the project.
+
+The global objectives of \emph{Metradica} are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent.
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+Part of my PhD project is included in the METRADICA strategic project. \textbf{Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest.}
+
+Have a nice reading !
 
 \hypertarget{part-part-one-general-introduction}{%
 \part{Part one: general introduction}\label{part-part-one-general-introduction}}
-
-\hypertarget{background}{%
-\chapter{Background}\label{background}}
-
-\begin{itemize}
-\tightlist
-\item
-  Tropical ecosystems, Amazon basin, focus on French Guiana
-\item
-  Threats : droughts
-\item
-  Trait-based ecology to define species strategies; a mechanistic understanding with hydraulic traits
-\end{itemize}
 
 \hypertarget{project-introduction}{%
 \chapter{Project introduction}\label{project-introduction}}
@@ -143,8 +184,8 @@ There are 4 tasks :
 
 \begin{figure}
 \centering
-\includegraphics{../Metradica_Paracou/Document/Pictures/Overall_project.png}
-\caption{METRADICA}
+\includegraphics{./Documents/Pictures/Overall_project.PNG}
+\caption{Metradica project organisation}
 \end{figure}
 
 I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
@@ -166,7 +207,17 @@ I am involved in task 2 : to acquire additional traits information in order to h
 
 \emph{I will focus on topographic-driven variation in the water table, which is hypothesized to explain variation in forest responses to drought (Nobre et al.,2011) and species distribution (Schietti et al., 2014; Lourenço Jr.~et al., 2021), where trees with higher hydraulic efficiency and drought sensitivity are mostly found in seasonally flooded habitats (Oliveira et al., 2019), which seems to buffer the impact of short-term droughts on Amazon forest survival and productivity (Esteban et al., 2020; Sousa et al., 2020).}
 
-\textbf{(2) Patterns of functional responses to drought along a precipitation and topographic gradient}
+\textbf{(2) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits}
+
+\begin{itemize}
+\tightlist
+\item
+  Metradica data : exploring generalists species ITV (\textasciitilde60 individuals per species)
+\item
+  Hypothesis : because species' responses to the environment manifest through functional traits, the higher the ITV of a species is, the more diverse abiotic environments the species may be able to adapt to (Umaña et al., 2015).
+\end{itemize}
+
+\textbf{(3) Patterns of functional responses to drought along a precipitation and topographic gradient}
 
 \begin{itemize}
 \tightlist
@@ -180,34 +231,50 @@ I am involved in task 2 : to acquire additional traits information in order to h
 
 \emph{shifts in trait variation across environmental gradients can provide powerful insights into the drivers of community assembly} (Junior et al 2021)
 
-\textbf{(3) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits}
-
-Metradica data : exploring generalists species ITV (\textasciitilde60 individuals per species)
-Hypothesis : because species' responses to the environment manifest through functional traits, the higher the ITV of a species is, the more diverse abiotic environments the species may be able to adapt to (Umaña et al., 2015).
-
 \hypertarget{part-part-two-materials-method}{%
 \part{Part two : Materials \& Method}\label{part-part-two-materials-method}}
 
 \hypertarget{sampling}{%
 \chapter{Sampling}\label{sampling}}
 
+\hypertarget{sites}{%
+\section{Sites}\label{sites}}
+
+Permanent forest plots of the \emph{Guyafor network} (\url{https://paracou.cirad.fr/website/experimental-design/guyafor-network}) monitor since 1970 individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network covers \textgreater{} 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes.
+
+\begin{figure}
+\centering
+\includegraphics{./Documents/Pictures/Guyafor.png}
+\caption{Guyafor stations for tropical forest monitoring}
+\end{figure}
+
+\textbf{Paracou }: The first site is Paracou field station (\url{http://paracou.cirad.fr/}), characterized by an average annual rainfall of 3102 mm and a mean air temperature of 25.7°C (Aguillos et al 2019). Sampling was done in six control permanent plots of 6.25 ha each with an elevation between 33-50 m (IGN-F). In total, 226 trees were sampled between 26/10/2020-7/12/2020 and 13/09/2021-17/09/2021.
+
+\textbf{Bafog}: 5 permanent plots monitored of the ONF institute, characterized by an average annual rainfall of 2357 mm and a mean air temperature of 27.4°C (weather station of MétéoFrance). Sampling was done in 4-ha plots and with an elevation between 7-39 m (IGN-F). In total, 181 trees were sampled in the BAFOG site between 01/03/2021-18/03/2021.
+
+\textbf{Est}: The third site is the Kaw area characterized by an average annual rainfall of 3851 mm and a mean air temperature of 26.3°C (weather station of MétéoFrance). The area groups several plots (see Table. S3) with an elevation between 7-250 m (IGN-F). In total, 145 trees were sampled between 05/10/2021-20/10/2021.
+
+The three sites were chosen in order to sample species along the rainfall gradient.
+
+\begin{figure}
+\centering
+\includegraphics{./Documents/Pictures/41597_2019_218_Fig1_HTML.png}
+\caption{Rainfall gradient in French Guyana}
+\end{figure}
+
 \hypertarget{habitats}{%
 \section{Habitats}\label{habitats}}
 
-Two main forest habitats are present in French Guiana, \emph{terra firme} (high clay content and high water drainage) and \emph{seasonally flooded forests} (nutrient rich soils and at least 3 months of annual flooding) (INSERER BIBLIO Ferry, 2010). The water table is never observed to descend below 60 cm depth and remains at the soil surface for at least two consecutive months each year (Baraloto et al., 2007; Ferry et al., 2010).
-During the field campaigns, we ensure that all trees sampled correspond to the correct habitat. In this case, any errors of habitat classification on the maps are being rectified.
+The tropical forest of the Guianan Shield is characterized by heterogeneous meso-topographic conditions with numerous small hills, distinguishing two main contrasting habitats, terra firme (TF) forests and seasonally flooded forests (SF) (Ferry et al.~2010).
 
-The habitat classification of the tree species are based on all the past project achieved.
+\begin{itemize}
+\item
+  Terra firme covers 77 \% of French Guiana. They are also called \emph{plateau} and are higher areas characterized by a high clay content (47 \%, Baraloto et al.~2021) and have a high water drainage.
+\item
+  Seasonally flooded habitats are located in the valleys, with a maximum slope of 1\% and are characterized by relatively more fertile soils compared to terra firme forests (Baraloto et al.~2011). These soils are sandy (65\%, Baraloto et al.~2021) and interestingly richer in phosphorus (Ferry et al.~2010; Baraloto et al.~2021). In SF forest, Tthe water table is never observed to descend below 60 cm depth, remaining at the soil surface for at least two consecutive months each year (Baraloto et al.~2007; Ferry et al.~2010) during the rainy season. The classification for waterlogged habitat may be loose and not as precise as for the \emph{terra firme}, but it does not impact the sampling. \emph{in natura}, we assess if the tree is really in a waterlogged habitat or not.
+\end{itemize}
 
-\hypertarget{hydrological-indexes}{%
-\subsection{Hydrological indexes}\label{hydrological-indexes}}
-
-Topographic variables are strong proxies for soil hydrology, which correlates with a combination of physico-chemical properties. A new hydrological index that accounts for both variations in climate and soil / topography across sites by combining the concept of MCWD with the one of Relative Extractable Water (e.g.~Wagner et al.~2011) or Plant Available Water capacity (Nepstad et al.~2004, Ouédraogo et al.~2016). For Paracou, there is the topography classification established by Allié, Pélissier et al., 2015. \emph{Sylvain}: The topographic wetness index (𝑇𝑊𝐼), identifies water accumulation areas. TWI was derived from 185 a 1-m resolution digital elevation model built based on data from a LiDAR campaign done in 186 2015 using SAGA-GIS (Conrad et al.~2015).
-
-\hypertarget{how-do-we-define-seasonally-flooded-soils}{%
-\subsection{How do we define seasonally flooded soils?}\label{how-do-we-define-seasonally-flooded-soils}}
-
-On maps, pixels located at an altitude difference of less than 2 m from the altitude of the nearest surface run-off of the same catchment area. \emph{pixels situés à moins de 2m de dénivelé du plus proche écoulement de surface appartenant au même bassin versant}. Surface run-off corresponds to pixels receiving the waterflow of at least 75 pixels upstream. Everything is being calculated from the SRTM 30 m (after adjusting the basin area with fillings.)
+\emph{How do we define seasonally flooded soils?} On maps, pixels located at an altitude difference of less than 2 m from the altitude of the nearest surface run-off of the same catchment area. \textbf{Pixels situés à moins de 2m de dénivelé du plus proche écoulement de surface appartenant au même bassin versant}. Surface run-off corresponds to pixels receiving the waterflow of at least 75 pixels upstream. Everything is being calculated from the SRTM 30 m (after adjusting the basin area with fillings.)
 
 Gaelle information:
 
@@ -216,68 +283,59 @@ Gaelle information:
 \item
   utilisation couche sig onf
 \item
-  critere pente (inf 20° = BF, pente moins forte espece de lissage avec bc d'arbres en BF, durcissement des criteres, affiner et bien tomber dans du BF) \emph{comment:} SRTM pente 20° à 30m ne correspond pas n'ont plus à la pente sur le terrain, il y a une imprecision. but again in natura we make sure the tree is really in the corresponding habitat.
+  critere pente (inf 20° = BF, pente moins forte espece de lissage avec bc d'arbres en BF, durcissement des criteres, affiner et bien tomber dans du BF) \emph{comment: SRTM pente 20° à 30m ne correspond pas n'ont plus à la pente sur le terrain, il y a une imprecision. but again in natura we make sure the tree is really in the corresponding habitat.}
 \item
   distance à la crique (inf 50m) (marginale)
 \end{itemize}
 
-The classification in the waterlogged habitat may be loose and not as precise as for the \emph{terra firme}, but it does not impact the sampling. As we mentioned above, \emph{in natura} we assess if the tree is really in a waterlogegd habitat or not.
+\textbf{Soil nutrient availability} is another important driver of species distribution and plant community assembly in these forests (Quesada et al.~2012; Baldeck et al.~2013; Oliveira et al.~2019; Fortunel et al.~2020; Baraloto et al.~2021). The pre-Cambrian rocks of the Guiana Shield have been exposed to weathering and erosion for over 2 billion years, which has produced highly and therefore originate overall nutrient-poor soils (Flores et al.~2020; Grau et al.~2017; Soong et al.~2020). TF soils are richer in organic matter than SF, while SF soils havewhich distinguishes itself with a higher phosphorus content (Ferry et al.~2010).
 
-\hypertarget{sites}{%
-\section{Sites}\label{sites}}
+The habitat classification of the tree species are based on all the past project achieved and mostly on HABITAT ONF project.
 
-Permanent forest plots of the Guyafor network monitor since 1970 (Bafog, Paracou) individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network coves \textgreater{} 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes. METRADICA leaf samplings took place in the control plots.
+\includegraphics{_main_files/figure-latex/Soil analyses-1.pdf}
 
-\begin{figure}
-\centering
-\includegraphics{../Metradica_Paracou/Document/Pictures/Guyafor.png}
-\caption{Guyafor stations for tropical forest monitoring}
-\end{figure}
-
-\textbf{Paracou }: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually)
-
-\textbf{Bafog}: 5 permanent plots monitored of the ONF institute. Samplings were done in plots 2, 3, 4, and 5 and off plots from the 1st to 16th of March 2021.
-
-\textbf{Est}: Samplings were done in plots KawGuyafor (1 ha) and Trésor from the 4th to 23rd of October 2021. Some trees were also sampled outside the plots.
-
-The three sites were chosen in order to sample species along the rainfall gradient.
-
-\begin{figure}
-\centering
-\includegraphics{../Metradica_Paracou/Document/Pictures/41597_2019_218_Fig1_HTML.png}
-\caption{Rainfall gradient in French Guyana}
-\end{figure}
+\textbf{Topographic} variables are strong proxies for soil hydrology, which correlates with a combination of physico-chemical properties. A new hydrological index that accounts for both variations in climate and soil / topography across sites by combining the concept of MCWD with the one of Relative Extractable Water (e.g.~Wagner et al.~2011) or Plant Available Water capacity (Nepstad et al.~2004, Ouédraogo et al.~2016). For Paracou, there is the topography classification established by Allié, Pélissier et al., 2015. \emph{Sylvain}: The topographic wetness index (𝑇𝑊𝐼), identifies water accumulation areas. TWI was derived from 185 a 1-m resolution digital elevation model built based on data from a LiDAR campaign done in 186 2015 using SAGA-GIS (Conrad et al.~2015).
 
 \hypertarget{species}{%
 \section{Species}\label{species}}
 
-Specialist species are species that have a habitat preference, either for \emph{terra firme} soils or for seasonally flooded soils in French Guiana. Generalist species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species.
+\begin{itemize}
+\item
+  \textbf{Specialist} species are species that have a habitat preference, either for \emph{terra firme} soils or for seasonally flooded soils in French Guiana.
+\item
+  \textbf{Generalist} species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species.
+\end{itemize}
 
-We \textbf{hypothesize} that they should display large ITV since they inhabit a large ecological spectrum. We are interested to see how ITV of functional traits is structured for these generalist species.
-
-\hypertarget{indicator-species-analysis}{%
-\subsection{Indicator Species Analysis}\label{indicator-species-analysis}}
+\textbf{Indicator Species Analysis}
 
 We explored the degree of habitat preference using \textbf{Indicator Species Analysis} (Dufrene \& Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
 
-\begin{itemize}
-\tightlist
-\item
-  Generalist: IndVal ≠ 0 in the habitats (pVal\textgreater0.08 )
-\item
-  Specialists: IndVal \textgreater{} 0.24 in one habitat (pVal\textless0.08)
-\end{itemize}
+Habitat preferences were determined based on (Baraloto et al.~2021) study. The Dufrene and Legendre method (Dufrêne and Legendre 1997) was used as a measure of habitat association for each species in each habitat, while taking into account spatial auto-correlation with the MSR method (Wagner and Dray 2015). This measure, named IndVal for Indicator value, scales from 0 to 1 and integrates both the relative frequency of each species across plots in a given habitat and its relative abundance in each habitat. Out of the 654 species identified from (Baraloto et al.~2021), we only considered the 5 \% highest Indval values in each habitat to qualify them as specialists of a habitat. This corresponded to a threshold of IndValSF specialist ≥ 0.200 for SF specialists and IndValTF specialist ≥ 0.259 for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists.
 
 Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word \textbf{preference}), but are also a high probability of being sampled in the given habitat.
 
-Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.
 
-\hypertarget{more-details-about-indval}{%
-\subsection{More details about IndVal}\label{more-details-about-indval}}
+We thus studied 21 tropical tree species, which included 6 generalist species, 9 SF specialist species, and 6 TF specialist species.
+
+\begin{verbatim}
+## [1] "Taxonomic classification not consistent between sp.list and tree."
+##           genus family_in_sp.list family_in_tree
+## 33 Chaetocarpus          Peraceae  Euphorbiaceae
+## 41       Cordia        Cordiaceae   Boraginaceae
+## [1] "Note: 2 taxa fail to be binded to the tree,"
+## [1] "Indet.Indet._Indet."      "Indet.Indet._sp.3Guyafor"
+\end{verbatim}
+
+\includegraphics{_main_files/figure-latex/Species phylo-1.pdf}
+
+\includegraphics{_main_files/figure-latex/Indval-1.pdf} \includegraphics{_main_files/figure-latex/Indval-2.pdf} \includegraphics{_main_files/figure-latex/Indval-3.pdf}
+
+\emph{More details about IndVal} :
 
 IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies.
 
-Other indicators:
+\emph{Other indicators} :
 
 \begin{itemize}
 \tightlist
@@ -289,144 +347,70 @@ Other indicators:
   Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots.
 \end{itemize}
 
-\hypertarget{chosen-species}{%
-\subsection{Chosen species}\label{chosen-species}}
-
-Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
-
-\begin{tabular}{l|l|l|l|r|r|r|r|r}
-\hline
-Family & Genus & Species & Type & Paracou & FTH & ParacouTotal & Bafog & Kaw\\
-\hline
-Fabaceae & Bocoa & prouacensis & Generalists & 15 & NA & 15 & 10 & 3\\
-\hline
-Sapotaceae & Chrysophyllum & prieurii & Generalists & 12 & 5 & 17 & 11 & 1\\
-\hline
-Euphorbiaceae & Conceveiba & guianensis & Generalists & 18 & 2 & 20 & 16 & 0\\
-\hline
-Lecythidaceae & Eschweilera & coriacea & Generalists & 20 & NA & 20 & 19 & 10\\
-\hline
-Chrysobalanaceae & Hymenopus & heteromorphus & Generalists & 20 & NA & 20 & 14 & 8\\
-\hline
-Bignoniaceae & Jacaranda & copaia & Generalists & 18 & 2 & 20 & 12 & 15\\
-\hline
-Burseraceae & Protium & stevensonii & Generalists & 4 & 8 & 12 & 11 & 1\\
-\hline
-Fabaceae & Tachigali & melinonii & Generalists & 15 & 1 & 16 & 13 & 13\\
-\hline
-Myristicaceae & Virola & michelii & Generalists & 6 & 5 & 11 & 16 & 6\\
-\hline
-Meliaceae & Carapa & surinamensis & SFF specialists & 10 & NA & 10 & 1 & 10\\
-\hline
-Fabaceae & Eperua & falcata & SFF specialists & 11 & NA & 11 & 0 & 10\\
-\hline
-Myristicaceae & Iryanthera & hostmannii & SFF specialists & 9 & NA & 9 & 9 & 10\\
-\hline
-Salicacea & Laetia & procera & SFF specialists & 8 & 1 & 9 & 10 & 10\\
-\hline
-Burseraceae & Protium & opcaum & SFF specialists & 10 & NA & 10 & 0 & 10\\
-\hline
-Fabaceae & Pterocarpus & officinalis & SFF specialists & 10 & NA & 10 & 10 & 10\\
-\hline
-Clusiaceae & Symphonia & globulifera & SFF specialists & 10 & NA & 10 & 9 & 10\\
-\hline
-Myristicaceae & Virola & surinamensis & SFF specialists & 1 & 5 & 6 & 10 & 10\\
-\hline
-Salicacea & Casearia & javitensis & TF specialists & 6 & 5 & 11 & 9 & 0\\
-\hline
-Fabaceae & Dicorynia & guianensis & TF specialists & 6 & NA & 6 & 7 & 0\\
-\hline
-Lecythidaceae & Gustavia & hexapetala & TF specialists & 4 & 1 & 5 & 9 & 5\\
-\hline
-Myristicaceae & Iryanthera & sagotiana & TF specialists & 5 & NA & 5 & 5 & 10\\
-\hline
-Chrysobalanaceae & Licania & membranacea & TF specialists & 5 & NA & 5 & 4 & 5\\
-\hline
-Metteniusaceae & Poraqueiba & guianensis & TF specialists & 11 & NA & 11 & 10 & 10\\
-\hline
-Fabaceae & Vouacapoua & americana & TF specialists & 5 & NA & 5 & 7 & 10\\
-\hline
-\end{tabular}
-
-\begin{table}
-
-\caption{\label{tab:unnamed-chunk-2}Studied species.}
-\centering
-\begin{tabular}[t]{l|l}
-\hline
-Genus & Species\\
-\hline
-Eperua & falcata\\
-\hline
-Iryanthera & hostmannii\\
-\hline
-Jacaranda & copaia subsp. copaia\\
-\hline
-Pterocarpus & officinalis\\
-\hline
-Symphonia & globulifera\\
-\hline
-Tachigali & melinonii\\
-\hline
-Virola & surinamensis\\
-\hline
-Bocoa & prouacensis\\
-\hline
-Chrysophyllum & prieurii\\
-\hline
-Conceveiba & guianensis\\
-\hline
-Eschweilera & coriacea\\
-\hline
-Hymenopus & heteromorphus\\
-\hline
-Protium & stevensonii\\
-\hline
-Virola & michelii\\
-\hline
-Carapa & surinamensis\\
-\hline
-Laetia & procera\\
-\hline
-Protium & opacum\\
-\hline
-Casearia & javitensis\\
-\hline
-Dicorynia & guianensis\\
-\hline
-Gustavia & hexapetala\\
-\hline
-Iryanthera & sagotiana\\
-\hline
-Licania & membranacea\\
-\hline
-Poraqueiba & guianensis\\
-\hline
-Vouacapoua & americana\\
-\hline
-\end{tabular}
-\end{table}
-
-Un espèce : bc mortlité chez les jeunes donc parti pris de les considerer dans le choix des habitats. (percentile 10-90).
-For \emph{Eperua falcata}: BF?? see Laurens porter 2007 (are species adapted \ldots)
-
-\hypertarget{phylogeny}{%
-\subsection{Phylogeny}\label{phylogeny}}
-
-We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.
-
-\begin{figure}
-\centering
-\includegraphics{../Metradica_Paracou/Document/phylo_metradica.jpeg}
-\caption{Phylogeny}
-\end{figure}
-
 \hypertarget{individuals}{%
 \section{Individuals}\label{individuals}}
 
 The individuals were selected with a DBH value between the 10th and the 90th percentile of the species' distribution pattern, in order to have a sampling that best reflects the forest structure. In this percentile interval, species were randomly selected for sampling.
 
-Sampling strategy :
+\emph{Total individuals collected for the paper.}
+
+\begin{table}
+
+\caption{(\#tab:Individuals per species collected in the three sampling sites.)Individuals per species collected on the 3 sites}
+\centering
+\begin{tabular}[t]{l|>{}l|>{}l|r|r|r|>{}r}
+\hline
+\textbf{Family} & \textbf{Genus} & \textbf{Species} & \textbf{Paracou} & \textbf{Bafog} & \textbf{Kaw} & \textbf{Total}\\
+\hline
+Fabaceae & \em{Bocoa} & \em{prouacensis} & 15 & 10 & 3 & \cellcolor[HTML]{666;}{\textcolor{white}{56}}\\
+\hline
+Meliaceae & \em{Carapa} & \em{surinamensis} & 10 & 1 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{22}}\\
+\hline
+Euphorbiaceae & \em{Conceveiba} & \em{guianensis} & 20 & 16 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{72}}\\
+\hline
+Fabaceae & \em{Dicorynia} & \em{guianensis} & 6 & 6 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{24}}\\
+\hline
+Fabaceae & \em{Eperua} & \em{falcata} & 10 & 0 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{40}}\\
+\hline
+Lecythidaceae & \em{Eschweilera} & \em{coriacea} & 10 & 10 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{40}}\\
+\hline
+Lecythidaceae & \em{Gustavia} & \em{hexapetala} & 5 & 9 & 5 & \cellcolor[HTML]{666;}{\textcolor{white}{38}}\\
+\hline
+Chrysobalanaceae & \em{Hymenopus} & \em{heteromorphus} & 22 & 14 & 8 & \cellcolor[HTML]{666;}{\textcolor{white}{88}}\\
+\hline
+Myristicaceae & \em{Iryanthera} & \em{hostmannii} & 9 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Myristicaceae & \em{Iryanthera} & \em{sagotiana} & 5 & 5 & 9 & \cellcolor[HTML]{666;}{\textcolor{white}{38}}\\
+\hline
+Bignoniaceae & \em{Jacaranda} & \em{copaia subsp. copaia} & 20 & 13 & 15 & \cellcolor[HTML]{666;}{\textcolor{white}{96}}\\
+\hline
+Salicacea & \em{Laetia} & \em{procera} & 9 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Chrysobalanaceae & \em{Licania} & \em{membranacea} & 5 & 4 & 5 & \cellcolor[HTML]{666;}{\textcolor{white}{28}}\\
+\hline
+Metteniusaceae & \em{Poraqueiba} & \em{guianensis} & 11 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{62}}\\
+\hline
+Burseraceae & \em{Protium} & \em{opacum subsp. rabelianum} & 10 & 0 & 11 & \cellcolor[HTML]{666;}{\textcolor{white}{42}}\\
+\hline
+Burseraceae & \em{Protium} & \em{stevensonii} & 12 & 12 & 1 & \cellcolor[HTML]{666;}{\textcolor{white}{50}}\\
+\hline
+Fabaceae & \em{Pterocarpus} & \em{officinalis} & 10 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{60}}\\
+\hline
+Clusiaceae & \em{Symphonia} & \em{globulifera} & 10 & 9 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Fabaceae & \em{Tachigali} & \em{melinonii} & 16 & 15 & 13 & \cellcolor[HTML]{666;}{\textcolor{white}{88}}\\
+\hline
+Myristicaceae & \em{Virola} & \em{michelii} & 5 & 7 & 6 & \cellcolor[HTML]{666;}{\textcolor{white}{36}}\\
+\hline
+Myristicaceae & \em{Virola} & \em{surinamensis} & 6 & 10 & 9 & \cellcolor[HTML]{666;}{\textcolor{white}{50}}\\
+\hline
+\cellcolor[HTML]{666;}{\textcolor{white}{Total}} & \cellcolor[HTML]{666;}{\textcolor{white}{\em{-}}} & \cellcolor[HTML]{666;}{\textcolor{white}{\em{-}}} & \cellcolor[HTML]{666;}{\textcolor{white}{226}} & \cellcolor[HTML]{666;}{\textcolor{white}{181}} & \cellcolor[HTML]{666;}{\textcolor{white}{145}} & \cellcolor[HTML]{666;}{\textcolor{white}{\cellcolor[HTML]{666;}{1104}}}\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{sampling-strategy}{%
+\section{Sampling strategy}\label{sampling-strategy}}
 
 \begin{itemize}
 \tightlist
@@ -442,107 +426,36 @@ Sampling strategy :
   Assess tree and branch Dawkins : \includegraphics{../Metradica_Paracou/Document/Protocol/Dawkins.png}
 \end{itemize}
 
-\hypertarget{summary}{%
-\section{Summary}\label{summary}}
-
-\begin{itemize}
-\tightlist
-\item
-  2 habitats (Terra firme; Seasonally flooded soils)
-\item
-  24 species (9 generalists; 8 SFF; 7 TF)
-\item
-  10 individuals per species per site
-\item
-  9 traits to investigate for drought tolerance
-\end{itemize}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-4-1.pdf}
-
-\begin{table}
-
-\caption{\label{tab:unnamed-chunk-4}Individuals per species collected on the 3 sites}
-\centering
-\begin{tabular}[t]{l|l|l|l|r|r|r|r|r}
-\hline
-Family & Genus & Species & Type & Paracou & FTH & ParacouTotal & Bafog & Kaw\\
-\hline
-Fabaceae & Bocoa & prouacensis & Generalists & 15 & NA & 15 & 10 & 3\\
-\hline
-Sapotaceae & Chrysophyllum & prieurii & Generalists & 12 & 5 & 17 & 11 & 1\\
-\hline
-Euphorbiaceae & Conceveiba & guianensis & Generalists & 18 & 2 & 20 & 16 & 0\\
-\hline
-Lecythidaceae & Eschweilera & coriacea & Generalists & 20 & NA & 20 & 19 & 10\\
-\hline
-Chrysobalanaceae & Hymenopus & heteromorphus & Generalists & 20 & NA & 20 & 14 & 8\\
-\hline
-Bignoniaceae & Jacaranda & copaia & Generalists & 18 & 2 & 20 & 12 & 15\\
-\hline
-Burseraceae & Protium & stevensonii & Generalists & 4 & 8 & 12 & 11 & 1\\
-\hline
-Fabaceae & Tachigali & melinonii & Generalists & 15 & 1 & 16 & 13 & 13\\
-\hline
-Myristicaceae & Virola & michelii & Generalists & 6 & 5 & 11 & 16 & 6\\
-\hline
-Meliaceae & Carapa & surinamensis & SFF specialists & 10 & NA & 10 & 1 & 10\\
-\hline
-Fabaceae & Eperua & falcata & SFF specialists & 11 & NA & 11 & 0 & 10\\
-\hline
-Myristicaceae & Iryanthera & hostmannii & SFF specialists & 9 & NA & 9 & 9 & 10\\
-\hline
-Salicacea & Laetia & procera & SFF specialists & 8 & 1 & 9 & 10 & 10\\
-\hline
-Burseraceae & Protium & opcaum & SFF specialists & 10 & NA & 10 & 0 & 10\\
-\hline
-Fabaceae & Pterocarpus & officinalis & SFF specialists & 10 & NA & 10 & 10 & 10\\
-\hline
-Clusiaceae & Symphonia & globulifera & SFF specialists & 10 & NA & 10 & 9 & 10\\
-\hline
-Myristicaceae & Virola & surinamensis & SFF specialists & 1 & 5 & 6 & 10 & 10\\
-\hline
-Salicacea & Casearia & javitensis & TF specialists & 6 & 5 & 11 & 9 & 0\\
-\hline
-Fabaceae & Dicorynia & guianensis & TF specialists & 6 & NA & 6 & 7 & 0\\
-\hline
-Lecythidaceae & Gustavia & hexapetala & TF specialists & 4 & 1 & 5 & 9 & 5\\
-\hline
-Myristicaceae & Iryanthera & sagotiana & TF specialists & 5 & NA & 5 & 5 & 10\\
-\hline
-Chrysobalanaceae & Licania & membranacea & TF specialists & 5 & NA & 5 & 4 & 5\\
-\hline
-Metteniusaceae & Poraqueiba & guianensis & TF specialists & 11 & NA & 11 & 10 & 10\\
-\hline
-Fabaceae & Vouacapoua & americana & TF specialists & 5 & NA & 5 & 7 & 10\\
-\hline
-\end{tabular}
-\end{table}
-
 \hypertarget{traits}{%
 \chapter{Traits}\label{traits}}
 
-This chapter defines measured and sampled traits with associated protocols.
-
-\hypertarget{morphological-traits}{%
-\section{Morphological traits}\label{morphological-traits}}
+To guarantee that measurements were carried out on healthy leaves, we assessed chlorophyll fluorescence with a fluorescence meter (Mini-PAM II, WALZ, Effeltrich, Germany), which measures the maximum quantum yield of photosystem II (Fv/Fm). Only leaves with a FvFm value above 0.65 were considered for the study. Knowing that the sampled leaves were healthy, we then measured nine leaf functional traits (Table 1) related to resource investment strategies through light interception and carbon assimilation (Wright et al.~2004) or hydraulic functioning (Rosas et al.~2019) :
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{LA}: leaf area \(cm^{2}\) : carbo- acquisition related trait which informs on the light capture strategy.
+  leaf chemistry (C, N, K, P)
 \item
-  \textbf{SLA}: leaf specific area \(cm².g{^-1}\) (leaf area/ dry mass).
+  leaf saturated water content (LSWC, g.g-1),
+\item
+  leaf water potential at which leaf cells lose turgor (TLP, MPa),
+\item
+  leaf minimum conductance (gmin, mmol.m-2.s-1),
+\item
+  major vein length density (MajVLA, mm.mm-2)
+\item
+  stomatal density (SD, mm-2)
 \end{itemize}
 
-\hypertarget{hydraulic-traits}{%
-\section{Hydraulic traits}\label{hydraulic-traits}}
+\hypertarget{water--and-carbon-related-traits}{%
+\section{Water- and carbon-related traits}\label{water--and-carbon-related-traits}}
 
 \begin{itemize}
 \tightlist
 \item
   \textbf{LSWC} : Leaf-saturated water content (g g−1) was calculated as the mass of leaf water (WT -- WD) divided by leaf dry mass (WD).
 \item
-  \textbf{\(\pi_{TLP}\)}: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait.
+  \textbf{\(TLP\)}: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait.
 \item
   \textbf{\(g_{min}\)}: leaf minimum conductance \(mmol.m^{-2}.s^{-1}\) taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait.
 \item
@@ -551,23 +464,77 @@ This chapter defines measured and sampled traits with associated protocols.
   \textbf{Nervation density}: determining the capacity of water supply in leaves. (\emph{INSERER BIBLIO Julio V. Schneider 2016})
 \item
   \textbf{Leaf chemistry} : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
+\end{itemize}
+
+\hypertarget{additional-traits}{%
+\section{Additional traits}\label{additional-traits}}
+
+\begin{itemize}
+\item
+  \textbf{LA}: leaf area \(cm^{2}\) : carbo- acquisition related trait which informs on the light capture strategy.
+\item
+  \textbf{\(\frac{Fv}{Fm}\)}: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency (\(\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}\)). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (\emph{INSERER BIBLIO Manzi et al 2021}) but decline after other leaf hydraulic traits (\emph{INSERER BIBLIO Trueba et al 2019}).
 \item
   \textbf{Pmidday}: Water potential at the driest point of the day.
 \item
   \textbf{\(\delta\) 18 O and \(\delta\) 13 C} : Informs patterns of carbon and water use, related to water use efficiency. (\emph{INSERER BIBLIO Farquhar et al 1989}) Measured in Vienna.
 \end{itemize}
 
-\hypertarget{photochemical-trait}{%
-\section{Photochemical trait}\label{photochemical-trait}}
+\emph{Trait table}
+
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-2}Table 1. Leaf functional traits.}
+\centering
+\begin{tabular}[t]{l|l|l|l|l}
+\hline
+\textbf{Trait} & \textbf{Abbreviation} & \textbf{Unit} & \textbf{Type} & \textbf{Mechanisms}\\
+\hline
+Carbon concentration & C & % & Chemical & Resource capture & defense\\
+\hline
+Potassium concentration & K & g.kg<sup>-1</sup> & Chemical & Resource capture & water-use efficiency\\
+\hline
+Phosphorous concentration & P & g.kg<sup>-1</sup> & Chemical & Resource capture\\
+\hline
+Nitrogen concentration & N & % & Chemical & Resource capture & defense\\
+\hline
+Minimal conductance & <i>gmin</i> & mmol.m<sup>-2</sup>.s<sup>-1</sup> & Water-related & Water loss\\
+\hline
+Turgor loss point & TLP & MPa & Water-related & Drought resistance\\
+\hline
+Leaf saturated water content & LSWC & g.g<sup>-1</sup> & Water-related & Water capacitance\\
+\hline
+Major vein length density & MajVLA & cm.cm<sup>-2</sup> & Water & carbon related & Water, sugar and hormone transport; 
+mechinical support\\
+\hline
+Stomatal density & SD & mm<sup>-2</sup> & Water & carbon related & Carbon uptake & water status\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{protocols}{%
+\section{Protocols}\label{protocols}}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{\(\frac{Fv}{Fm}\)}: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency (\(\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}\)). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (\emph{INSERER BIBLIO Manzi et al 2021}) but decline after other leaf hydraulic traits (\emph{INSERER BIBLIO Trueba et al 2019}).
+  \href{./Documents/Protocol/Field.Rmd}{\textbf{Field} protocol}
+\item
+  \href{./Documents/Protocol/Protocole_Ptlp.pdf}{\textbf{\(\pi_{TLP}\)} protocol}
+\item
+  \href{./Documents/Protocol/RWC_Boisseaux.docx}{\textbf{RWC} protocol}
+\item
+  \href{./Documents/Protocol/Analyse\%20Stomates_Marion.docx}{\textbf{Stomata} protocol}
+\item
+  \href{./Documents/Protocol/Fluo_Bellifa.docx}{\textbf{FvFm} protocol}
+\item
+  \href{./Documents/Protocol/Gmin\%20protocol.docx}{\textbf{gmin} protocol}
+\item
+  \href{./Documents/Protocol/ProtocolLeafVeins_MB_2.docx}{\textbf{leaf venation} protocol}
 \end{itemize}
 
-\hypertarget{measured-traits}{%
-\section{Measured traits}\label{measured-traits}}
+\hypertarget{organisation}{%
+\section{Organisation}\label{organisation}}
 
 \begin{itemize}
 \tightlist
@@ -629,81 +596,8 @@ This chapter defines measured and sampled traits with associated protocols.
   \end{itemize}
 \end{itemize}
 
-\hypertarget{protocols}{%
-\section{Protocols}\label{protocols}}
-
-\begin{itemize}
-\tightlist
-\item
-  \href{../Metradica_Paracou/Document/Protocol/Field.Rmd}{\textbf{Field} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/Protocole_Ptlp.pdf}{\textbf{\(\pi_{TLP}\)} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/RWC_Boisseaux.docx}{\textbf{RWC} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/Analyse\%20Stomates_Marion.docx}{\textbf{Stomata} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/Fluo_Bellifa.docx}{\textbf{FvFm} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/Gmin\%20protocol.docx}{\textbf{gmin} protocol}
-\item
-  \href{../Metradica_Paracou/Document/Protocol/ProtocolLeafVeins_MB_2.docx}{\textbf{leaf venation} protocol}
-\end{itemize}
-
-\hypertarget{part-part-three-results}{%
-\part{Part three : Results}\label{part-part-three-results}}
-
-The data
-
-\hypertarget{hypotheses-1}{%
-\chapter{Hypotheses :}\label{hypotheses-1}}
-
-Part I (Habitat preference - type) : \emph{specialists} species should have a more adequate set of trait to a given habitat than the generalists in the same habitat. Generalists would express a wider range of traits.
-
-PArt II (Precipitation gradient) :
-
-\hypertarget{data-exploration}{%
-\chapter{Data exploration}\label{data-exploration}}
-
-How to visualize the data and show the links between the variables and identify the same responses of the individuals?
-
-\hypertarget{general-pca}{%
-\section{General PCA}\label{general-pca}}
-
-\hypertarget{contribution-of-individuals-and-variables-1-2-dimensions}{%
-\subsection{Contribution of individuals and variables : 1-2 dimensions}\label{contribution-of-individuals-and-variables-1-2-dimensions}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-6-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-6-2.pdf}
-
-\hypertarget{contribution-of-individuals-and-variables-1-2-dimensions-1}{%
-\subsection{Contribution of individuals and variables : 1-2 dimensions}\label{contribution-of-individuals-and-variables-1-2-dimensions-1}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-7-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-7-2.pdf}
-
-\hypertarget{habitat-collected}{%
-\subsection{Habitat collected}\label{habitat-collected}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-8-1.pdf}
-
-\hypertarget{habitat-preference--type}{%
-\subsection{Habitat preference -type}\label{habitat-preference--type}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-9-1.pdf}
-
-\hypertarget{forest-sites}{%
-\subsection{Forest sites}\label{forest-sites}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-10-1.pdf}
-
-\hypertarget{dawkins-of-tree}{%
-\subsection{Dawkins of tree}\label{dawkins-of-tree}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-11-1.pdf}
-
-\hypertarget{species-1}{%
-\subsection{Species}\label{species-1}}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-12-1.pdf}
+\hypertarget{results}{%
+\chapter{Results}\label{results}}
 
 \hypertarget{distribution-of-major-traits}{%
 \section{Distribution of major traits}\label{distribution-of-major-traits}}
@@ -727,124 +621,87 @@ concept of phenotype-environment matching and environmental optimality, where sp
   kurtosis (measure of tailness with heavy tail referring to outliers)
 \end{itemize}
 
-\emph{after log tranform}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Metradica }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT\_cleaning/ALL/Final\_Metradica\_OUT\_30112022.csv"}\NormalTok{)}
 
-\hypertarget{leaf-minimal-conductance}{%
-\subsection{leaf minimal conductance}\label{leaf-minimal-conductance}}
+\NormalTok{sub\_data\_TF }\OtherTok{\textless{}{-}}\NormalTok{ Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Dicorynia\_guianensis"}\NormalTok{, }\StringTok{"Iryanthera\_sagotiana"}\NormalTok{, }\StringTok{"Gustavia\_hexapetala"}\NormalTok{, }\StringTok{"Licania\_membranacea"}\NormalTok{, }\StringTok{"Poraqueiba\_guianensis"}\NormalTok{, }\StringTok{"Virola\_michelii"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(Habitat }\SpecialCharTok{==} \StringTok{"TF"}\NormalTok{)}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-13-1.pdf}
+\NormalTok{sub\_data\_SF }\OtherTok{\textless{}{-}}\NormalTok{ Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Eschweilera\_coriacea"}\NormalTok{,}\StringTok{"Eperua\_falcata"}\NormalTok{, }\StringTok{"Iryanthera\_hostmannii"}\NormalTok{, }\StringTok{"Laetia\_procera"}\NormalTok{, }\StringTok{"Protium\_opacum subsp. rabelianum"}\NormalTok{, }\StringTok{"Pterocarpus\_officinalis"}\NormalTok{, }\StringTok{"Symphonia\_globulifera"}\NormalTok{, }\StringTok{"Virola\_surinamensis"}\NormalTok{, }\StringTok{"Carapa\_surinamensis"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(Habitat }\SpecialCharTok{==} \StringTok{"BF"}\NormalTok{)}
 
-\hypertarget{turgor-loss-point}{%
-\subsection{Turgor loss point}\label{turgor-loss-point}}
+\NormalTok{sub\_data\_G }\OtherTok{\textless{}{-}}\NormalTok{  Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Bocoa\_prouacensis"}\NormalTok{, }\StringTok{"Conceveiba\_guianensis"}\NormalTok{, }\StringTok{"Jacaranda\_copaia subsp. copaia"}\NormalTok{, }\StringTok{"Hymenopus\_heteromorphus"}\NormalTok{, }\StringTok{"Protium\_stevensonii"}\NormalTok{, }\StringTok{"Tachigali\_melinonii"}\NormalTok{))}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-14-1.pdf}
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(sub\_data\_TF, sub\_data\_SF, sub\_data\_G)}
+
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Type=} \FunctionTok{ifelse}\NormalTok{(Name }\SpecialCharTok{==} \StringTok{\textquotesingle{}Virola\_michelii\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}TF\textquotesingle{}}\NormalTok{,Type))}
+
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Type=} \FunctionTok{ifelse}\NormalTok{(Name }\SpecialCharTok{==} \StringTok{\textquotesingle{}Eschweilera\_coriacea\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}BF\textquotesingle{}}\NormalTok{,Type))}
+
+\NormalTok{Metradica }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\CommentTok{\#552 indv}
+
+
+\NormalTok{Subdata\_shapiro }\OtherTok{\textless{}{-}} \FunctionTok{slice\_sample}\NormalTok{(Metradica, }\AttributeTok{n=}\DecValTok{30}\NormalTok{) }\CommentTok{\# Shapiro test is used for small sample size (n=30)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{water-traits}{%
+\subsection{Water traits}\label{water-traits}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{verbatim}
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+\end{verbatim}
 
 The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were ``wetter'' than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al.~1992; Abrams \& Kubiske 1994; Cao 2000; Merchant et al.~2007; Zhu \& Cao 2009; Bartlett, Scoffoni \& Sack 2012b; Bartlett et al.~2014).
 
-\hypertarget{leaf-area}{%
-\subsection{Leaf area}\label{leaf-area}}
+\#\#\#Vein traits
+\includegraphics{_main_files/figure-latex/unnamed-chunk-6-1.pdf}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-15-1.pdf}
+\begin{verbatim}
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+\end{verbatim}
 
-\hypertarget{specifig-leaf-area}{%
-\subsection{Specifig leaf area}\label{specifig-leaf-area}}
+\hypertarget{chemistry-traits}{%
+\subsection{Chemistry traits}\label{chemistry-traits}}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-7-1.pdf}
 
-\hypertarget{leaf-saturated-water-content}{%
-\subsection{leaf saturated water content}\label{leaf-saturated-water-content}}
+Nitrogen data is not normal{[}1{]}
+X.S data is not normal{[}1{]}
+Mg..g.kg. data is not normal{[}1{]}
+Ca..g.kg. data is not normal{[}1{]}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-17-1.pdf}
+\hypertarget{dbh}{%
+\subsection{DBH}\label{dbh}}
 
-\hypertarget{major-vein-density}{%
-\subsection{Major vein density}\label{major-vein-density}}
+\includegraphics{_main_files/figure-latex/DBH-1.pdf} \includegraphics{_main_files/figure-latex/DBH-2.pdf} \includegraphics{_main_files/figure-latex/DBH-3.pdf}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-18-1.pdf}
+\hypertarget{crown-position}{%
+\subsection{Crown position}\label{crown-position}}
 
-\hypertarget{summary-of-main-variables}{%
-\section{Summary of main variables}\label{summary-of-main-variables}}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-8-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-8-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-8-3.pdf}
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-19-1.pdf}
+\hypertarget{treedawkins}{%
+\subsection{TreeDawkins}\label{treedawkins}}
 
-\hypertarget{gmin---exploration}{%
-\section{Gmin - exploration}\label{gmin---exploration}}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-9-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-9-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-9-3.pdf}
+
+\hypertarget{gmin}{%
+\section{Gmin}\label{gmin}}
 
 The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
 
-ANOVA reports a p-value far below 0.05, indicating there are differences in the means in the forest sites and habitat collect. Tukey post-hoc test shows groups a Bafog and b for Paracou and Kaw. It also shows groups TF a and BF b.
-
-Model\_gmin \textless- lm(log10(Gmin) \textasciitilde{} Forest + Habitat, data = Metradica)
-
-The data
-
-\begin{verbatim}
-## # A tibble: 3 x 2
-##   Forest   Gmin
-##   <chr>   <dbl>
-## 1 Bafog    5.47
-## 2 Kaw      3.60
-## 3 Paracou  3.08
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = log10(Gmin) ~ Forest + Habitat, data = Metradica)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.63849 -0.21047 -0.01908  0.18124  1.00943 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    0.60964    0.02449  24.889  < 2e-16 ***
-## ForestKaw     -0.20127    0.03086  -6.522 1.36e-10 ***
-## ForestParacou -0.26243    0.02768  -9.480  < 2e-16 ***
-## HabitatTF      0.04678    0.02372   1.973    0.049 *  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.3058 on 671 degrees of freedom
-##   (16 observations deleted due to missingness)
-## Multiple R-squared:  0.1346, Adjusted R-squared:  0.1307 
-## F-statistic: 34.78 on 3 and 671 DF,  p-value: < 2.2e-16
-\end{verbatim}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: log10(Gmin)
-##            Df Sum Sq Mean Sq F value  Pr(>F)    
-## Forest      2  9.396  4.6980 50.2291 < 2e-16 ***
-## Habitat     1  0.364  0.3639  3.8911 0.04895 *  
-## Residuals 671 62.760  0.0935                    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\hypertarget{plots}{%
-\subsection{Plots}\label{plots}}
-
 \includegraphics{_main_files/figure-latex/gmin-plot-1.pdf} \includegraphics{_main_files/figure-latex/gmin-plot-2.pdf}
-
-The adjusted mean arises when statistical averages must be corrected to compensate for data imbalances and large variances.
-
-\includegraphics{_main_files/figure-latex/gmin-ajustmeans-1.pdf}
-
-\hypertarget{gmin-and-other-variables}{%
-\subsection{Gmin and other variables?}\label{gmin-and-other-variables}}
-
-Yes : MajVLA and SLA.
-\$quanti
-correlation p.value
-MajVLA 0.09328913682 0.01618976310
-FvFm 0.06178897606 0.10874004687
-LSWC -0.04404830581 0.25416539130
-Ptlp -0.05363521589 0.17134527454
-LA -0.08838865629 0.02213220611
-SLA -0.09932187546 0.01009827694
-
-\includegraphics{_main_files/figure-latex/gmin-MajVLA and SLA-1.pdf} \includegraphics{_main_files/figure-latex/gmin-MajVLA and SLA-2.pdf}
 
 \emph{interpretation} Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326, p-value: \textless{} 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m--2 s--1 in Paracou to 3.60 mmol m--2 s--1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic: 50.0139, p-value: \textless{} 2.2204e-16).
 
@@ -855,94 +712,24 @@ It is unclear whether a higher gmin in the Bafog site is assigned to stomatal op
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Test the phylogenetic signal.}
-\item
   \textbf{compare with stomatal density}
 \item
   \textbf{see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?}
 \end{itemize}
 
-\hypertarget{lswc---exploration}{%
-\section{LSWC - exploration}\label{lswc---exploration}}
+\hypertarget{lswc}{%
+\section{LSWC}\label{lswc}}
 
 One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
 
-\begin{verbatim}
-## # A tibble: 4 x 2
-##   Type         LSWC
-##   <chr>       <dbl>
-## 1 BF           1.63
-## 2 Generalist   1.42
-## 3 TF           1.45
-## 4 <NA>       NaN
-\end{verbatim}
+\includegraphics{_main_files/figure-latex/LSWC plot1-1.pdf} \includegraphics{_main_files/figure-latex/LSWC plot1-2.pdf} \includegraphics{_main_files/figure-latex/LSWC plot1-3.pdf}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = log10(LSWC) ~ Type, data = Metradica)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.32201418 -0.06950474 -0.00598801  0.05773049  0.35088686 
-## 
-## Coefficients:
-##                    Estimate   Std. Error  t value   Pr(>|t|)    
-## (Intercept)     0.203434520  0.007300890 27.86435 < 2.22e-16 ***
-## TypeGeneralist -0.064338761  0.009272691 -6.93852 9.3169e-12 ***
-## TypeTF         -0.050323073  0.011603422 -4.33692 1.6660e-05 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.1047875 on 674 degrees of freedom
-##   (14 observations deleted due to missingness)
-## Multiple R-squared:  0.06805087, Adjusted R-squared:  0.06528544 
-## F-statistic: 24.60772 on 2 and 674 DF,  p-value: 4.843664e-11
-\end{verbatim}
+\hypertarget{tlp}{%
+\section{TLP}\label{tlp}}
 
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: log10(LSWC)
-##            Df    Sum Sq     Mean Sq  F value     Pr(>F)    
-## Type        2 0.5404060 0.270202986 24.60772 4.8437e-11 ***
-## Residuals 674 7.4008001 0.010980416                        
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\hypertarget{plots-1}{%
-\subsection{Plots}\label{plots-1}}
-
-\includegraphics{_main_files/figure-latex/HabitatPref_LSWC plot1-1.pdf}
-
-\hypertarget{ptlp---exploration}{%
-\section{Ptlp - exploration}\label{ptlp---exploration}}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-10-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-10-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-10-3.pdf}
 
 Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought.
-
-\includegraphics{_main_files/figure-latex/Ptlp-plot-1.pdf}
-
-\hypertarget{paracou-data-set}{%
-\subsection{Paracou data set}\label{paracou-data-set}}
-
-Several outliers are either marked as ``herbivory'', are ``young'', or have Run = 4 and trace of fungi (659).
-
-\includegraphics{_main_files/figure-latex/Ptlp-Paracou-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Paracou-5.pdf}
-
-\hypertarget{bafog-data-set}{%
-\subsection{Bafog data set}\label{bafog-data-set}}
-
-\includegraphics{_main_files/figure-latex/Ptlp-Bafog-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Bafog-5.pdf}
-
-Several outliers are either marked as ``Erreur bota'', ``pas de stabilisation'', and two leaves are Run 4 and 3.
-
-\hypertarget{kaw-data-set}{%
-\subsection{Kaw data set}\label{kaw-data-set}}
-
-\includegraphics{_main_files/figure-latex/Ptlp-Kaw-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-4.pdf} \includegraphics{_main_files/figure-latex/Ptlp-Kaw-5.pdf}
-
-Several outliers are either marked as ``Epiphytes'', ``herbivory'', One run is 4.
 
 \begin{itemize}
 \item
@@ -974,51 +761,6 @@ Several outliers are either marked as ``Epiphytes'', ``herbivory'', One run is 4
   We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including \emph{Voucapoua americana} and both \emph{Protium} species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006).
 \end{itemize}
 
-Correlation with other variable : LSWC and SLA
-
-\includegraphics{_main_files/figure-latex/Ptlp-LSWC and SLA-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-LSWC and SLA-2.pdf}
-
-\hypertarget{anova-and-plots}{%
-\subsection{Anova and plots}\label{anova-and-plots}}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = Ptlp ~ Forest + Habitat, data = Metradica)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.83951909 -0.14950221  0.02155209  0.16410242  0.78474577 
-## 
-## Coefficients:
-##                  Estimate  Std. Error   t value   Pr(>|t|)    
-## (Intercept)   -1.64836556  0.02032153 -81.11425 < 2.22e-16 ***
-## ForestKaw     -0.06762974  0.02552452  -2.64960  0.0082535 ** 
-## ForestParacou -0.13666285  0.02311207  -5.91305 5.4111e-09 ***
-## HabitatTF     -0.05506271  0.01967143  -2.79912  0.0052753 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.2507383 on 654 degrees of freedom
-##   (33 observations deleted due to missingness)
-## Multiple R-squared:  0.05737529, Adjusted R-squared:  0.05305133 
-## F-statistic: 13.26913 on 3 and 654 DF,  p-value: 2.036469e-08
-\end{verbatim}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: Ptlp
-##            Df    Sum Sq    Mean Sq  F value    Pr(>F)    
-## Forest      2  2.010091 1.00504546 15.98616 1.666e-07 ***
-## Habitat     1  0.492589 0.49258922  7.83508 0.0052753 ** 
-## Residuals 654 41.116794 0.06286972                       
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/Ptlp-anova-1.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-2.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-3.pdf} \includegraphics{_main_files/figure-latex/Ptlp-anova-4.pdf}
-
 \emph{Litterature}
 * The paper by Zhu et al.~(2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China.
 
@@ -1026,579 +768,10 @@ Correlation with other variable : LSWC and SLA
 
 *This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree \& Dainty 1975; Abrams, Kubiske \& Steiner 1990; Brodribb et al.~2003; Bartlett, Scoffoni \& Sack 2012b; Guyot, Scoffoni \& Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance.
 
-\hypertarget{majvla---exploration}{%
-\section{MajVLA - exploration}\label{majvla---exploration}}
+\hypertarget{majvla}{%
+\section{MajVLA}\label{majvla}}
 
-\begin{verbatim}
-## # A tibble: 4 x 2
-##   Type       MajVLA
-##   <chr>       <dbl>
-## 1 BF           6.41
-## 2 Generalist   5.63
-## 3 TF           5.32
-## 4 <NA>       NaN
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = log10(MajVLA) ~ Type, data = Metradica)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.59189747 -0.12120945  0.00958487  0.12882243  0.43658978 
-## 
-## Coefficients:
-##                   Estimate  Std. Error  t value   Pr(>|t|)    
-## (Intercept)     0.76682151  0.01242013 61.74020 < 2.22e-16 ***
-## TypeGeneralist -0.05065717  0.01577216 -3.21181 0.00138233 ** 
-## TypeTF         -0.06769758  0.01972569 -3.43195 0.00063621 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.177395 on 668 degrees of freedom
-##   (20 observations deleted due to missingness)
-## Multiple R-squared:  0.02167874, Adjusted R-squared:  0.01874964 
-## F-statistic: 7.401148 on 2 and 668 DF,  p-value: 0.0006619382
-\end{verbatim}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: log10(MajVLA)
-##            Df     Sum Sq     Mean Sq F value     Pr(>F)    
-## Type        2  0.4658132 0.232906593 7.40115 0.00066194 ***
-## Residuals 668 21.0212791 0.031468981                       
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\hypertarget{plots-2}{%
-\subsection{Plots}\label{plots-2}}
-
-\includegraphics{_main_files/figure-latex/MajVLA plot1-1.pdf}
-
-\hypertarget{summary-anova---4-major-traits-ptlp-gmin-lswc-majvla}{%
-\section{Summary Anova - 4 major traits: Ptlp, Gmin, LSWC, MajVLA}\label{summary-anova---4-major-traits-ptlp-gmin-lswc-majvla}}
-
-\includegraphics{_main_files/figure-latex/Summary tlp, gmin, vein, lswc-1.pdf}
-
-We used a combination of univariate and multivariate analyses to evaluate trait response to habitat characteristics.
-
-\emph{Hypothesis:} (adapted from Fichaux et al 2019)
-
-How does the functional diversity of tree assemblages vary across habitats and along a precipitation gradient ?
-
-If habitats are filtering species based on their tolerance to abiotic conditions,
-then ecological strategies of tree assemblages should differ across contrasted habitats. We predicted that contrasted habitats would differ in terms of niches for tree species.
-
-1- log transform data
-2- Calculate indices based on a convex hull
-
-\emph{All functional indices were computed using the ``MultidimFD'' function (Mouillot et al.~2013, \url{http://www.ecolag.univ-montp2.fr/software}).} NOT AVAILABLE.
-
-\hypertarget{convex-hull}{%
-\chapter{Convex hull}\label{convex-hull}}
-
-Methods that estimate the niche of a species by calculating a convex hull or an elliptical envelope have become popular due to their simplicity and interpretation, given Hutchinson's conception of the niche as an n-dimensional hypervolume
-
-\hypertarget{functional-diversity}{%
-\chapter{Functional diversity}\label{functional-diversity}}
-
-Functional diversity was measured using the multidimensional framework proposed by Mouillot et al.~(2013) which includes:
-
-\begin{itemize}
-\item
-  \textbf{functional richness} : represents the volume of the minimum convex hull occupied by all species of the assemblage (Cornwell et al.~2006), expressed here as the proportion of functional space filled by species present in the assemblage.It is not weighted by species abundance.
-\item
-  \textbf{functional evenness} : represents the regularity of species distribution in the functional trait space, weighted by their occurrences.
-\item
-  \textbf{functional divergence} : measures the occurrence-weighted deviation of species from the non-weighted center of gravity of the convex hull.
-\item
-  \textbf{functional dispersion} : quantifies the occurrence-weighted mean dispersion of species from the occurrence-weighted center of gravity of all the species.
-\item
-  \textbf{functional specialization} : measures the global weighted mean distance to the centroid of the functional space of the community.
-\item
-  \textbf{functional originality} : measures the weighted mean distance to the nearest species in the functional space of the community; this index reveals the functional redundancy between species.
-\end{itemize}
-
-To return the functional composition of a set of communities, as measured by the communitylevel weighted means of trait values, I need 2 matrixes:
-
-\begin{itemize}
-\tightlist
-\item
-  data containing traits (x)
-\item
-  matrix containing the abundances of the species in x (or presence-absence, i.e.~0 or 1). Rows are sites and species are columns. The number of species (columns) must match the number of species (rows) in x. In addition, the species labels in a and x must be identical and in the same order. NAs will be replaced by 0.
-\end{itemize}
-
-\hypertarget{community-weighted-mean-cwm}{%
-\chapter{Community weighted mean (CWM)}\label{community-weighted-mean-cwm}}
-
-It represents the average trait values in a community weighted by the relative abundance of species and is an indicator of functional composition.
-
-\hypertarget{null-model}{%
-\chapter{Null model}\label{null-model}}
-
-A null model approach to investigate whether env't filtering drives the observed patterns. It compares the observed functional diversity metrics to the metrics generated with the null model at the assemblage level.
-
-\hypertarget{to-do}{%
-\chapter{To do}\label{to-do}}
-
-What is missing:
-* stomatal densities
-* FTH data
-* vein densities
-* check gmin function
-* check for outliers -\textgreater{} see Daniela
-
-\hypertarget{import-paracou-dataset}{%
-\chapter{Import Paracou dataset}\label{import-paracou-dataset}}
-
-il manque encore les quelques individus résoltés avec Sylvain dans les indv de Paracou.
-
-\begin{verbatim}
-## # A tibble: 265 x 31
-##    RWCnr_original idTree  Plot SubPlot TreeFieldNum SpecCode_CorrBota
-##    <chr>           <dbl> <dbl>   <dbl>        <dbl> <chr>            
-##  1 M1             145493    15       1          182 Iry.hos          
-##  2 M2             147663    15       3          178 Gus.hex          
-##  3 M3             147783    15       3          298 Iry.hos          
-##  4 M4             147625    15       3          140 Tac.mel          
-##  5 M5             148586    15       3         1103 Chr.pri          
-##  6 M6             149072    15       4          369 Con.gui          
-##  7 M7             146131    15       1          824 Lic.mem          
-##  8 M8             149660    15       4          960 Iry.hos          
-##  9 M9             146342    15       2           84 Hym.het          
-## 10 M10            146466    15       2          209 Con.gui          
-## # ... with 255 more rows, and 25 more variables: spName_CorrBota.x <chr>,
-## #   Genus_CorrBota <chr>, Species_CorrBota <chr>, Family_CorrBota <chr>,
-## #   Tree_Dawkins <dbl>, Tree_Height <dbl>, Branch_Dawkins <dbl>,
-## #   Branch_Height <dbl>, Branch_Position_crown <chr>, Habitat_preference <chr>,
-## #   Habitat_real <chr>, ...1 <dbl>, spName_CorrBota.y <chr>,
-## #   My_LSWC_E.per_corr <dbl>, My_RWC_E.per_corr <dbl>, My_ptlp <dbl>,
-## #   My_posm <dbl>, My_gmin.slope <dbl>, My_gmin_manual <dbl>, ...
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = My_ptlp ~ Habitat_real, data = data)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.32372154 -0.10954903  0.00086063  0.09043193  0.39611578 
-## 
-## Coefficients:
-##                  Estimate Std. Error  t value Pr(>|t|)    
-## (Intercept)    0.54365996 0.01142657 47.57859  < 2e-16 ***
-## Habitat_realTF 0.02758826 0.01790527  1.54079  0.12465    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.1385398 on 246 degrees of freedom
-##   (17 observations deleted due to missingness)
-## Multiple R-squared:  0.009558298,    Adjusted R-squared:  0.005532112 
-## F-statistic: 2.374033 on 1 and 246 DF,  p-value: 0.1246533
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = My_ptlp ~ Habitat_preference + Habitat_real, data = data)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.33587496 -0.10881675 -0.01224824  0.08440152  0.42481904 
-## 
-## Coefficients:
-##                                 Estimate  Std. Error  t value Pr(>|t|)    
-## (Intercept)                   0.56957570  0.01636211 34.81066  < 2e-16 ***
-## Habitat_preferenceGeneralist -0.04884120  0.02246211 -2.17438 0.030638 *  
-## Habitat_preferenceTF          0.02363455  0.03562569  0.66341 0.507692    
-## Habitat_realTF                0.02181046  0.02323052  0.93887 0.348726    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.1359139 on 244 degrees of freedom
-##   (17 observations deleted due to missingness)
-## Multiple R-squared:  0.0544985,  Adjusted R-squared:  0.04287348 
-## F-statistic: 4.688035 on 3 and 244 DF,  p-value: 0.003340864
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/ptlp-1.pdf} \includegraphics{_main_files/figure-latex/ptlp-2.pdf} \includegraphics{_main_files/figure-latex/ptlp-3.pdf} \includegraphics{_main_files/figure-latex/ptlp-4.pdf} \includegraphics{_main_files/figure-latex/ptlp-5.pdf} \includegraphics{_main_files/figure-latex/ptlp-6.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 3
-##   variable           statistic p.value
-##   <chr>                  <dbl>   <dbl>
-## 1 residuals(modele4)     0.990  0.0961
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/ptlp-7.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 4
-##     df1   df2 statistic      p
-##   <int> <int>     <dbl>  <dbl>
-## 1     1   246      3.73 0.0546
-\end{verbatim}
-
-\begin{verbatim}
-## 
-##  Bartlett test of homogeneity of variances
-## 
-## data:  My_ptlp by Habitat_real
-## Bartlett's K-squared = 2.507089, df = 1, p-value = 0.1133351
-\end{verbatim}
-
-\begin{verbatim}
-## # A tibble: 1 x 7
-##   .y.         n statistic   DFn   DFd     p method     
-## * <chr>   <int>     <dbl> <dbl> <dbl> <dbl> <chr>      
-## 1 My_ptlp   265      2.25     1  194. 0.135 Welch ANOVA
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = My_gmin.slope ~ Habitat_real, data = data)
-## 
-## Residuals:
-##        Min         1Q     Median         3Q        Max 
-## -2.6928590 -1.4901146 -0.6281806  0.5393048 14.7669882 
-## 
-## Coefficients:
-##                 Estimate Std. Error  t value Pr(>|t|)    
-## (Intercept)    2.8905919  0.1980907 14.59227  < 2e-16 ***
-## Habitat_realTF 0.5520879  0.3061350  1.80341 0.072557 .  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.36882 on 244 degrees of freedom
-##   (19 observations deleted due to missingness)
-## Multiple R-squared:  0.01315377, Adjusted R-squared:  0.009109313 
-## F-statistic: 3.252299 on 1 and 244 DF,  p-value: 0.07255689
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = My_gmin.slope ~ Habitat_preference + Habitat_real, 
-##     data = data)
-## 
-## Residuals:
-##        Min         1Q     Median         3Q        Max 
-## -2.7767711 -1.5100875 -0.6961231  0.6157774 14.3335811 
-## 
-## Coefficients:
-##                                Estimate Std. Error t value   Pr(>|t|)    
-## (Intercept)                  2.39896597 0.28728977 8.35034 5.2913e-15 ***
-## Habitat_preferenceGeneralist 0.92503300 0.39407727 2.34734   0.019715 *  
-## Habitat_preferenceTF         1.06222272 0.61751070 1.72017   0.086680 .  
-## Habitat_realTF               0.06540324 0.40067098 0.16323   0.870470    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.351568 on 242 degrees of freedom
-##   (19 observations deleted due to missingness)
-## Multiple R-squared:  0.03544718, Adjusted R-squared:  0.02348991 
-## F-statistic: 2.964488 on 3 and 242 DF,  p-value: 0.03277794
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/gmin-1.pdf} \includegraphics{_main_files/figure-latex/gmin-2.pdf} \includegraphics{_main_files/figure-latex/gmin-3.pdf} \includegraphics{_main_files/figure-latex/gmin-4.pdf} \includegraphics{_main_files/figure-latex/gmin-5.pdf} \includegraphics{_main_files/figure-latex/gmin-6.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 3
-##   variable           statistic  p.value
-##   <chr>                  <dbl>    <dbl>
-## 1 residuals(modele4)     0.779 6.28e-18
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/gmin-7.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 4
-##     df1   df2 statistic     p
-##   <int> <int>     <dbl> <dbl>
-## 1     1   244     0.878 0.350
-\end{verbatim}
-
-\begin{verbatim}
-## 
-##  Bartlett test of homogeneity of variances
-## 
-## data:  My_gmin.slope by Habitat_real
-## Bartlett's K-squared = 1.6853787, df = 1, p-value = 0.1942113
-\end{verbatim}
-
-\begin{verbatim}
-## # A tibble: 1 x 7
-##   .y.               n statistic   DFn   DFd     p method     
-## * <chr>         <int>     <dbl> <dbl> <dbl> <dbl> <chr>      
-## 1 My_gmin.slope   265      3.38     1  234. 0.067 Welch ANOVA
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = LSWC ~ Habitat_real, data = data)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.74338656 -0.17445207 -0.03452023  0.14166074  0.70845148 
-## 
-## Coefficients:
-##                   Estimate  Std. Error   t value Pr(>|t|)    
-## (Intercept)     4.92737223  0.01944433 253.40920  < 2e-16 ***
-## Habitat_realTF -0.03675476  0.03065273  -1.19907  0.23164    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.2381434 on 249 degrees of freedom
-##   (14 observations deleted due to missingness)
-## Multiple R-squared:  0.005741019,    Adjusted R-squared:  0.001748011 
-## F-statistic: 1.437768 on 1 and 249 DF,  p-value: 0.2316407
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = LSWC ~ Habitat_preference + Habitat_real, data = data)
-## 
-## Residuals:
-##         Min          1Q      Median          3Q         Max 
-## -0.66575519 -0.13759999 -0.04424304  0.12440242  0.68452761 
-## 
-## Coefficients:
-##                                 Estimate  Std. Error   t value   Pr(>|t|)    
-## (Intercept)                   5.01850472  0.02767850 181.31420 < 2.22e-16 ***
-## Habitat_preferenceGeneralist -0.16876385  0.03766566  -4.48058 1.1392e-05 ***
-## Habitat_preferenceTF         -0.18089317  0.06022211  -3.00377  0.0029408 ** 
-## Habitat_realTF                0.04556021  0.03879687   1.17433  0.2413951    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.2299149 on 247 degrees of freedom
-##   (14 observations deleted due to missingness)
-## Multiple R-squared:  0.0807069,  Adjusted R-squared:  0.0695414 
-## F-statistic: 7.228237 on 3 and 247 DF,  p-value: 0.0001143635
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-21-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-3.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-4.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-5.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-21-6.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 3
-##   variable           statistic   p.value
-##   <chr>                  <dbl>     <dbl>
-## 1 residuals(modele4)     0.968 0.0000234
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-21-7.pdf}
-
-\begin{verbatim}
-## # A tibble: 1 x 4
-##     df1   df2 statistic     p
-##   <int> <int>     <dbl> <dbl>
-## 1     1   249     0.146 0.703
-\end{verbatim}
-
-\begin{verbatim}
-## 
-##  Bartlett test of homogeneity of variances
-## 
-## data:  LSWC by Habitat_real
-## Bartlett's K-squared = 0.092181246, df = 1, p-value = 0.7614223
-\end{verbatim}
-
-\begin{verbatim}
-## # A tibble: 1 x 7
-##   .y.       n statistic   DFn   DFd     p method     
-## * <chr> <int>     <dbl> <dbl> <dbl> <dbl> <chr>      
-## 1 LSWC    265      1.45     1  219. 0.229 Welch ANOVA
-\end{verbatim}
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-23-1.pdf}
-
-\hypertarget{vein-traits}{%
-\chapter{Vein traits}\label{vein-traits}}
-
-The leaf is a critical component in the plant water transport system, accounting for 30\% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species---see Sack \& Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr \& Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack \& Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl \& Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack \& Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack \& Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack \& Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011).
-
-\hypertarget{hypothesis}{%
-\section{Hypothesis}\label{hypothesis}}
-
-\begin{itemize}
-\tightlist
-\item
-  Smaller leaves tend to have a higher major VLA. For SFF specialists, the replacement of water lost to transpiration during photosynthesis would be no problem during the wet season, since water is not a limiting factor. We collected the leaves during the dry season, therefore, SFF specialists would either have an adapted mechanisms to overcome water scarcity or not.
-\item
-  Leaves from the driest habitat, \emph{Terra firme} are smaller and have a higher major VLA than the leaves from seasonally flooded habitats.
-\item
-  Leaves from Bafog (lower precipitation regime) are smaller with a higher major VLA than leaves in Kaw (higher precipitation regime). Paracou leaves major VLA values would range in the middle.
-\end{itemize}
-
-Litterature :
-
-\emph{Smaller leaves tend to have higher major VLA intrinsically as a result of their development. The drought tolerance and protection conferred by higher major VLA in smaller leaves provides an explanation for the greater abundance of smaller leaves in drier and more exposed habitats (Scoffoni et al., 2011).}
-
-\emph{Drought impacts less leaves with higher major vein density because they can provide more numerous water flow pathways around the damaged vein. (Scoffoni et al 2011)}
-
-\emph{Smaller leaves, which generally have higher major vein density, would thus have lower hydraulic vulnerability. Tests using simulations with a spatially explicit model confirmed that smaller leaves with higher major vein density were more tolerant of major vein embolism.(Scoffoni et al 2011)}
-
-From Loundry \emph{et al} 2012:
-
-\begin{itemize}
-\tightlist
-\item
-  SFF : Leaves from SFF have a higher production rates. This result correlates with the higher soil resources found in
-  these habitats and rapid rates of turnover of stems in
-  these forests due to seasonal flooding (Ferry et al.~2010,
-  Baraloto et al.~2011).
-\item
-  no herbivory trends differing from SFF and TF
-\item
-  but sapling stage not adult or seedling stage
-\item
-  more herbivory found in Peru than in French Guyana
-\end{itemize}
-
-From Scoffoni \emph{et al} 2011:
-
-\begin{itemize}
-\tightlist
-\item
-  Smaller leaves more frequent in dry habitats
-\item
-  Smaller leaves have thinner boundary layer: more rapid convective cooling\\
-\item
-  Direct hydraulic benefit of small leaves, if their greater major vein redundancy protects K leaf from decline and thus contributes to drought tolerance.
-\end{itemize}
-
-\hypertarget{materials-and-method}{%
-\section{Materials and Method}\label{materials-and-method}}
-
-Leaf area (LA, mm2 )
-Major vein density (Major VLA, mm/mm2) : vein length per unit area
-Sum of vein densities for 1°, 2° and 3° veins (mm mm-2)
-Double sided lamp flatbed scanner
-ImageJ
-
-\emph{Why a higher VLA? To confer redundancy and drought tolerance}
-
-Measurements from Scoffoni's Lab. These measures were calculated by a student group project from January - March 2022.
-
-\hypertarget{statistical-analysis}{%
-\section{Statistical analysis}\label{statistical-analysis}}
-
-\begin{itemize}
-\tightlist
-\item
-  ANOVAs for the differences between SFF and TF habitat
-\item
-  ANOVAs for the differences between the three sites
-\item
-  ANOVAs for the differences between habitat specialists and generalists
-  Species nested within those categories
-\end{itemize}
-
-Additional data to confront VLA with :
-
-Linear regression analysis to performe to test the correlations between the other variables.
-
-\begin{itemize}
-\tightlist
-\item
-  Ptlp
-
-  \begin{itemize}
-  \tightlist
-  \item
-    hypotheses : Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e.~small leaves with high VLA associated with more negative values for osmotic potential at at turgor loss point.
-  \end{itemize}
-\item
-  gmin (same VLA leaf)
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e.~small leaves with high VLA associated with lower minimal cuticular conductance.
-  \end{itemize}
-\item
-  LSWC
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e.~small leaves with high VLA associated with higher LSWC more water per unit dry weight, that would provide a larger buffering capacity when water supply becomes limiting (higher water storage)
-  \end{itemize}
-\item
-  Stomatal density \emph{waiting for data}
-\item
-  leaf chemistry \emph{waiting for data}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Palatability was positively correlated with N content, SLA and water content of leaves and negatively correlated with leaf C content and leaf C/N-ratio. (Schadler et al 2003)
-  \end{itemize}
-\end{itemize}
-
-Data:
-
-\hypertarget{results}{%
-\section{Results}\label{results}}
-
-To do :
--merge vein data set with the rest of data of each site through the individual code
-
-Vein data joing with other traits
-
-Student data
-
-\hypertarget{across-species-from-all-habitats}{%
-\subsection{Across species from all habitats}\label{across-species-from-all-habitats}}
-
-\hypertarget{sff-vs-tf-habitats}{%
-\subsection{SFF vs TF habitats}\label{sff-vs-tf-habitats}}
-
-\hypertarget{specialists-sff-vs-specialists-tf-vs-generalists}{%
-\subsection{Specialists SFF vs Specialists TF vs Generalists}\label{specialists-sff-vs-specialists-tf-vs-generalists}}
-
-\hypertarget{bafog-vs-kaw-vs-paracou}{%
-\subsection{Bafog vs Kaw vs Paracou}\label{bafog-vs-kaw-vs-paracou}}
-
-\hypertarget{vla-against-other-variables}{%
-\subsection{VLA against other variables}\label{vla-against-other-variables}}
-
-VLA and LA
-
-VLA and LA relation
-
-\includegraphics{_main_files/figure-latex/unnamed-chunk-30-1.pdf}
-
-VLA and Ptlp
-
-\hypertarget{herbivory}{%
-\subsection{Herbivory?}\label{herbivory}}
-
-\hypertarget{other-venation-traits}{%
-\chapter{Other venation traits}\label{other-venation-traits}}
-
-Traits that gives us info on the construction cost.
-
-VC : vein density x π × the vein diameter
-VP : Vein projected area per leaf area = vein diameter x vein density
-VV : Vein volume per leaf area = vein density x π x (diameter/2)²
-
-For each vein order!!!
-
-VC : the vein cross-sectional surface area per leaf area was estimated by multiplying the vein density by π×the vein diameter.
-
-VP : The vein-projected area per leaf area \emph{(the proportion of leaf lamina obstructed by vein)} was determined by multiplying the vein diameter by vein density.
-+ global value :0.00712 for 2° veins (Sack et al 2012)
-
-VV: Vein volume per leaf area was determined by multiplying the vein density by π× the square of half the diameter.
+\includegraphics{_main_files/figure-latex/unnamed-chunk-11-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-11-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-11-3.pdf}
 
 \hypertarget{waterlogging-litterature}{%
 \chapter{Waterlogging litterature}\label{waterlogging-litterature}}
@@ -1657,6 +830,7 @@ Objectives:
 
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
+\tightlist
 \item
 \end{enumerate}
 
@@ -1709,6 +883,7 @@ Travaux de Damien:
 \begin{enumerate}
 \def\labelenumi{(\arabic{enumi})}
 \setcounter{enumi}{1}
+\tightlist
 \item
 \end{enumerate}
 

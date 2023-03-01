@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 9 26/01/2022 | Meeting Notes</title>
+  <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 9 26/01/2022 | Meeting Notes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  <meta name="github-repo" content="mbthese/METRADICA" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 9 26/01/2022 | Meeting Notes" />
+  
+  <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
+The HTML output format for this example is bookdown::gitbook,
+set in the _output.yml file.</p>" />
+  
+
+<meta name="author" content="Marion Boisseaux" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="general-potential-hypotheses.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Metradica</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
+<li class="part"><span><b>I Part one: general introduction</b></span></li>
+<li class="chapter" data-level="2" data-path="project-introduction.html"><a href="project-introduction.html"><i class="fa fa-check"></i><b>2</b> Project introduction</a></li>
+<li class="chapter" data-level="3" data-path="hypotheses.html"><a href="hypotheses.html"><i class="fa fa-check"></i><b>3</b> Hypotheses</a></li>
+<li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
+<li class="chapter" data-level="4" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>4</b> Sampling</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>4.1</b> Sites</a></li>
+<li class="chapter" data-level="4.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>4.2</b> Habitats</a></li>
+<li class="chapter" data-level="4.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>4.3</b> Species</a></li>
+<li class="chapter" data-level="4.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>4.4</b> Individuals</a></li>
+<li class="chapter" data-level="4.5" data-path="sampling.html"><a href="sampling.html#sampling-strategy"><i class="fa fa-check"></i><b>4.5</b> Sampling strategy</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>5</b> Traits</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="traits.html"><a href="traits.html#water--and-carbon-related-traits"><i class="fa fa-check"></i><b>5.1</b> Water- and carbon-related traits</a></li>
+<li class="chapter" data-level="5.2" data-path="traits.html"><a href="traits.html#additional-traits"><i class="fa fa-check"></i><b>5.2</b> Additional traits</a></li>
+<li class="chapter" data-level="5.3" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>5.3</b> Protocols</a></li>
+<li class="chapter" data-level="5.4" data-path="traits.html"><a href="traits.html#organisation"><i class="fa fa-check"></i><b>5.4</b> Organisation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>6</b> Results</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="results.html"><a href="results.html#distribution-of-major-traits"><i class="fa fa-check"></i><b>6.1</b> Distribution of major traits</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="results.html"><a href="results.html#water-traits"><i class="fa fa-check"></i><b>6.1.1</b> Water traits</a></li>
+<li class="chapter" data-level="6.1.2" data-path="results.html"><a href="results.html#chemistry-traits"><i class="fa fa-check"></i><b>6.1.2</b> Chemistry traits</a></li>
+<li class="chapter" data-level="6.1.3" data-path="results.html"><a href="results.html#dbh"><i class="fa fa-check"></i><b>6.1.3</b> DBH</a></li>
+<li class="chapter" data-level="6.1.4" data-path="results.html"><a href="results.html#crown-position"><i class="fa fa-check"></i><b>6.1.4</b> Crown position</a></li>
+<li class="chapter" data-level="6.1.5" data-path="results.html"><a href="results.html#treedawkins"><i class="fa fa-check"></i><b>6.1.5</b> TreeDawkins</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="results.html"><a href="results.html#gmin"><i class="fa fa-check"></i><b>6.2</b> Gmin</a></li>
+<li class="chapter" data-level="6.3" data-path="results.html"><a href="results.html#lswc"><i class="fa fa-check"></i><b>6.3</b> LSWC</a></li>
+<li class="chapter" data-level="6.4" data-path="results.html"><a href="results.html#tlp"><i class="fa fa-check"></i><b>6.4</b> TLP</a></li>
+<li class="chapter" data-level="6.5" data-path="results.html"><a href="results.html#majvla"><i class="fa fa-check"></i><b>6.5</b> MajVLA</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="waterlogging-litterature.html"><a href="waterlogging-litterature.html"><i class="fa fa-check"></i><b>7</b> Waterlogging litterature</a></li>
+<li class="chapter" data-level="8" data-path="general-potential-hypotheses.html"><a href="general-potential-hypotheses.html"><i class="fa fa-check"></i><b>8</b> general potential hypotheses</a></li>
+<li class="part"><span><b>III Part four : Notes</b></span></li>
+<li class="chapter" data-level="9" data-path="section.html"><a href="section.html"><i class="fa fa-check"></i><b>9</b> 26/01/2022</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Meeting Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="section" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">Chapter 9</span> 26/01/2022<a href="section.html#section" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Metradica meeting</p>
+<p>Presents:</p>
+<ul>
+<li>Ghislain</li>
+<li>Clément<br />
+</li>
+<li>Sabrina</li>
+<li>Damien<br />
+</li>
+<li>Jeanne</li>
+<li>Marion</li>
+</ul>
+<p>Objectives:</p>
+<p>1- les données 13C<br />
+2- les modèles joints</p>
+<p><strong>Notes:</strong></p>
+<ol style="list-style-type: decimal">
+<li></li>
+</ol>
+<p>L’estimation de l’efficience d’utilisation de l’eau intrinsèque peut être obtenue à l’aide de msures directes des échanges gazeux entre feuille et atm. Farquar 1982 propose un modèle simple reliant WUE (water use efficiency) à la discrimination isotopique du C au cours de la photosynthèse.</p>
+<p>Relation WUE et <span class="math inline">\(\delta\)</span> 13C positive.</p>
+<p>Drivers de la compo iso:</p>
+<ul>
+<li>Lumière (feuille d’ombre valeurs 13C nettement plus négatives)</li>
+<li>génétique</li>
+<li>sécheresse atm + sol</li>
+<li>VPD</li>
+<li>teneur en mx du sol</li>
+<li>ontogénie de l’individu</li>
+<li>conductance hydraulique</li>
+</ul>
+<p>Attention: la compo iso n’est pas un trait lié à la sécheresse. Il caractérise <em>l’acclimation</em> à la sécheresse. Il est utile pour une expé en serre de comparer le <span class="math inline">\(\delta\)</span> 13C entre le groupe controle et le groupe dry. Une espèce sensible: on trouvera une forte différence vs. une espèce peu sensible, une faible différence. Et le <em>delta</em> ser aun trait de réponse à la sécheresse.</p>
+<p>Travaux de Damien:</p>
+<ul>
+<li>16 parcelles à travers la Guyane</li>
+<li>9-10 sites<br />
+</li>
+<li>~100 arbres / parcelles</li>
+<li>~1600 valeurs de compo iso de feuille d’arbres dominant</li>
+<li>70 espèces différentes avec qq indet. par site; total de 392 espèces identifiées</li>
+<li>Moyenne valeur <span class="math inline">\(\delta\)</span> 13C ~ -30 %0 pour les forêts en Guyane</li>
+<li>Lorsque le climat est le même, on observe le même fonctionnement</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li></li>
+</ol>
+<p>Avant nous procédions par espèces, le but des modèles joints: faire avec plusieurs espèces en même temps.Les modèles joints de distribution des espèces permettent d’estimer la niche des espèces, de prédire leur distribution, tout en prenant en compte les intéractions entre espèces. Ils peuvent être utilisés pour déterminer les communautés ou assemblages d’espèces et comment ces assemblages changent spatialement, selon des gradients environnementaux.</p>
+<p>Prendre en compte: la co-occurence des espèces + relation trait-env’t pour déterminer la présence d’une espèce sur 1 site.</p>
+<div class="figure">
+<img src="../Metradica_Paracou/Document/Pictures/ModeleJoint.png" title="Modele Joint" alt="" />
+<p class="caption">Modèle joint</p>
+</div>
+<p>Si l’on inclu les données 13C dans les modèles joints: on s’attend à une abscence de réponse.</p>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="general-potential-hypotheses.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
