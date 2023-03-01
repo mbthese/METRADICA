@@ -53,3 +53,6 @@ chemistry-traits
 dbh
 crown-position
 treedawkins
+about
+hypotheses
+distribution-of-major-traits

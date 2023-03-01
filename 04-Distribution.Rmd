@@ -9,7 +9,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-# (PART) Part three : Results {-}
+# Results
 
 ## Distribution of major traits 
 
@@ -25,7 +25,7 @@ concept of phenotype-environment matching and environmental optimality, where sp
 * kurtosis (measure of tailness with heavy tail referring to outliers)
 
 
-```{r}
+```{r include=FALSE}
 library(tidyverse)
 library(dplyr)
 library(factoextra)
@@ -69,7 +69,7 @@ Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for smal
 
 ### Water traits 
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 yaxis_water <<- c(expression("TLP"),
             expression("Gmin"),
             expression("SD"),
@@ -138,7 +138,7 @@ print("Data is normal")
 The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
 
 ###Vein traits
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 
 
 yaxis_MajVLA <<- c(expression("midribVLA"),
@@ -211,7 +211,7 @@ print("Data is normal")
 
 
 ### Chemistry traits
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 yaxis_chem <<- c(expression("Nitrogen"),
             expression("Carbon"),
             expression("X.S"),
@@ -299,7 +299,7 @@ Mg..g.kg. data is not normal[1]
 Ca..g.kg. data is not normal[1]
 
 ### DBH
-```{r DBH, echo=FALSE}
+```{r DBH, echo=FALSE, warning=FALSE}
 #chem traits
 count <- 0
 count_water <- 0
@@ -378,7 +378,7 @@ print(plot_DBH_majvla)
 
 
 ### Crown position 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition)
 
 Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
@@ -488,7 +488,7 @@ print(plot_CP_majvla)
 
 
 ### TreeDawkins 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins)
 
 Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
@@ -575,55 +575,6 @@ print(plot_TreeDawkins_majvla)
 
 
 ```
-
-
-
-Plan analyses:
-
-1- ACP
-2- Boxplot :
-  * Trait en fonction site "precipitation"
-  * Trait en fonction topo "BF/TF"
-  * Trait en fonction gradient precipitation Habitat TF
-  * Trait en fonction gradient precipitation Habitat BF
-
-  
-3- Modele avec un indice de stress hydrique
-
-    D'apres le work package, avoir un indice plus fin pour distinguer BF/TF     et avoir le plant water availability (avec CWD+ TWI + type de sol). Ce      que je peux faire c'est inclure précipitation + evapotranspiration          (mensuel) = CWD *climatic water deficit* et aussi en incluant le TWI        *topographic wetness index*. 
-
-    Recuperer precipitation *P* + evapotranspiration *ETP* avec Chelsa ou       WorldClim. CWD = P - ETP.
-
-    Modele : Trait en fonction(TWI, CWD) avec TWI qui varie intra- + inter- site. CWD qui varie inter-site. 
-    
-    lm(Trait ~ 1 + SH) avec SH = CWD/TWI. Faire log du trait et log d' l'indice. 
-
-
-Interprétation avec Ghislain 01/06/2022 - AMAP
-
-* The first axis is driven by LA/SLA and MajVLA, representing the leaves' dimensions. 
-* The second axis is driven by the TLP and LSWC, representing turgor loss and maximum capacity of water retention, therefore the water reservoir/supply. 
-* The thirst axis is driven by gmin, the minimal conductance, representating passive water leaks when stomata are supposedly closed. It represents le fait d'etre hermétique/sealed. 
-
-* hypotheses for drought resistance:
-  - do not lose water
-  - the search to have more water supply/reserve 
-
-BF leaves have a less negative TLP, more water storage and less leaks compared to TF leaves. TF leaves tend to be bigger *(opposite to what expected).* 
-
-BF and TF species communities are different but water does not seem to be the limiting factor here, and is not responsible for the environmental filtering of the species, according to my data. This environmental filtering is not based on drought resistance. It could be due to :
-
-* resistance to hypoxia in BF (O2)
-* fertility gradient (Phosphorous is limiting)
-
-
-For the 3 sites :
-
-* put precipitation gradient
-* we observe the opposite trend and paracou is not always in the middle for the response traits. 
-
-Il n'y a pas forcément de trade-offs en 2-dimensions. On est sur des trade-offs en multidimensions. Plus le stress est fort, plus l'espace du trait sera contraint. On en conclu d'après les données que l'eau n'est pas le facteur limitant ici. 
-
 
 ## Gmin
 
@@ -820,7 +771,7 @@ range of species responses to drought within Amazonian forest communities.
 
 ## MajVLA
 
-```{r}
+```{r echo=FALSE}
 plot_ly(Metradica, x=~Name, y = ~MajVLA, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='MajVLA'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
 
 #forest
