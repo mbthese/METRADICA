@@ -121,35 +121,6 @@ library(ggpubfigs)
 #009E72 #green for Generalists
 ```
 
-
-# Trait table
-
-```{r Trait summary table}
-
-#get authorization
-googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
-
-trait_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1-LBjUas_flNGwAlDGFvGoq6GyqQsBiFmmiJyFtQYkMU/edit#gid=0")
-
-
-trait_table$Unit[trait_table$Abbreviation == 'K'] <- "g.kg<sup>-1</sup>"
-trait_table$Unit[trait_table$Abbreviation == 'P'] <- "g.kg<sup>-1</sup>"
-trait_table$Unit[trait_table$Abbreviation == 'gmin'] <- "mmol.m<sup>-2</sup>.s<sup>-1</sup>"
-
-trait_table$Abbreviation[trait_table$Unit == 'mmol.m<sup>-2</sup>.s<sup>-1</sup>'] <- "<i>gmin</i>"
-
-trait_table$Unit[trait_table$Abbreviation == 'LSWC'] <- "g.g<sup>-1</sup>"
-trait_table$Unit[trait_table$Abbreviation == 'MajVLA'] <- "cm.cm<sup>-2</sup>"
-trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
-  
-trait_table %>%
-  kbl(caption = "Table 1. Leaf functional traits.", escape = FALSE) %>%
-  row_spec(0, bold = TRUE) %>% 
-  kable_classic(full_width = F, html_font = "Cambria") %>%
-  save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
-
-```
-
 # Data
 
 *From the original complete dataset, selecting 21 focal species. Transforming data in log.*

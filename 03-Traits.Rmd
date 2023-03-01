@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
 # Traits
 
 To guarantee that measurements were carried out on healthy leaves, we assessed chlorophyll fluorescence with a fluorescence meter (Mini-PAM II, WALZ, Effeltrich, Germany), which measures the maximum quantum yield of photosystem II (Fv/Fm). Only leaves with a FvFm value above 0.65 were considered for the study. Knowing that the sampled leaves were healthy, we then measured nine leaf functional traits (Table 1) related to resource investment strategies through light interception and carbon assimilation (Wright et al. 2004) or hydraulic functioning (Rosas et al. 2019) :  
@@ -27,6 +32,40 @@ To guarantee that measurements were carried out on healthy leaves, we assessed c
 * **P<sub>midday</sub>**: Water potential at the driest point of the day. 
 
 * **$\delta$ <sup>18</sup> O and $\delta$ <sup>13</sup> C** : Informs patterns of carbon and water use, related to water use efficiency. (*INSERER BIBLIO Farquhar et al 1989*) Measured in Vienna.
+
+*Trait table*
+
+```{r Trait summary intro table, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(janitor)
+#get authorization
+#googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+trait_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1-LBjUas_flNGwAlDGFvGoq6GyqQsBiFmmiJyFtQYkMU/edit#gid=0")
+
+
+trait_table$Unit[trait_table$Abbreviation == 'K'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'P'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'gmin'] <- "mmol.m<sup>-2</sup>.s<sup>-1</sup>"
+
+trait_table$Abbreviation[trait_table$Unit == 'mmol.m<sup>-2</sup>.s<sup>-1</sup>'] <- "<i>gmin</i>"
+
+trait_table$Unit[trait_table$Abbreviation == 'LSWC'] <- "g.g<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'MajVLA'] <- "cm.cm<sup>-2</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
+
+```
+```{r echo=FALSE}
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+trait_table %>%
+  kbl(caption = "Table 1. Leaf functional traits.", escape = FALSE) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+ # save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
+```
+
 
 
 ## Protocols
