@@ -4,7 +4,10 @@ author: "Marion Boisseaux"
 date: "08/03/2022"
 output: html_document
 ---
-# Waterlogging litterature
+
+# Part four : Discussion {-}
+
+## Waterlogging
 
 - From **Abiotic Stress Physiology of Horticultural Crops** *edited by N.K. Srinivasa Rao, K.S. Shivashankara, R.H. Laxman*
 
@@ -14,8 +17,6 @@ Plant responses to waterlogging include low stomatal conductance, decrease in le
 
 The oxygen diffusion is 10,000 times slower in waterlogged soils as compared to aerated soil. 
 
-The decrease in O evel in soils affects the bioavailability of nu and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reducedleaf concentrations of N, P, K, Ca, Mg in avocado + pea. 
-
-# general potential hypotheses
+The decrease in Oxygen level in soils affects the bioavailability of nutrients and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reduced leaf concentrations of N, P, K, Ca, Mg in avocado + pea. 
 
 with waterlogging: i should find a decrease of stomatal conductance corrolated with an increase of leaf water potential.

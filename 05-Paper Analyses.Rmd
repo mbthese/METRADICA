@@ -1,0 +1,579 @@
+---
+title: "05-Paper Analyses"
+author: "Marion Boisseaux"
+date: "2023-03-03"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+#Paper Analyses
+
+```{r libraries, include=FALSE}
+library(ape)
+library(tidyverse)
+library(dplyr)
+library(ggfortify)
+library(corrplot) 
+library(ggpubr) #for stats compare means on ggplot
+#devtools::install_github("kassambara/ggpubr")
+library(ggplot2)
+library(ggfortify)
+library(agricolae)
+library(FactoMineR)
+library(factoextra)
+library(Factoshiny)
+library(vegan)
+library(rstatix)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(gridExtra)
+library(rio)
+library(multcomp) #for lmer model to do anovas
+library(lmerTest) #same
+library(emmeans)#same
+library(ggplotify)
+library(car)
+library(kableExtra)
+library(gt)
+library(sjPlot) #for plotting lmer and glmer mods error of thos package
+```
+
+My functions
+```{r functions}
+log_abs_trans <- function() {
+    scales::trans_new(
+        name = "log_abs", 
+        transform = function(x) log(abs(x)), 
+        inverse = function(x) exp(x));
+}
+
+library("scales")
+reverselog_trans <- function(base = exp(1)) {
+    trans <- function(x) -log(x, base)
+    inv <- function(x) base^(-x)
+    trans_new(paste0("reverselog-", format(base)), trans, inv, 
+              log_breaks(base = base), 
+              domain = c(1e-100, Inf))
+}
+
+library(broom)
+get_formula <- function(model) {
+  
+  broom::tidy(model)[, 1:2] %>%
+    mutate(sign = ifelse(sign(estimate) == 1, ' + ', ' - ')) %>% #coeff signs
+    mutate_if(is.numeric, ~ abs(round(., 2))) %>% #for improving formatting
+    mutate(a = ifelse(term == '(Intercept)', paste0('y ~ ', estimate), paste0(sign, estimate, ' * ', term))) %>%
+    summarise(formula = paste(a, collapse = '')) %>%
+    as.character
+  
+}
+
+cv_eff <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(list(cv= re, eff = N))
+} 
+
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+}
+
+```
+
+Colors 
+```{r colors}
+#From color blind palette
+library(ggpubfigs)
+#from palette ito_seven
+#E79F02 #orange for TF
+#56B4E9 #blue for SF
+#009E72 #green for Generalists
+```
+
+## Data
+
+*From the original complete dataset, selecting 21 focal species. Transforming data in log.*
+
+```{r Data log subset, message=FALSE, warning=FALSE}
+
+# data
+
+library(dplyr)
+Metradica_log <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD", "DBH", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD", "DBH", "TWI"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica_log <- sub_data #552 indv
+
+```
+
+## Exploring na
+
+Exploring where Nas are located in the dataset and imputing traits except SD.
+
+```{r exploring NA}
+
+#check the nas
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(Metradica,2,pMiss)
+
+#we see that SD is almost 30% missing values, the rest is below a threshold of 5%
+library(VIM)
+aggr_plot <- aggr(Metradica, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(Metradica), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+
+#imputing th emissing data for all traits 
+library(mice)
+tempData <- mice(Metradica,m=5,maxit=50,meth='pmm',seed=500)
+summary(tempData)
+completedData <- complete(tempData,1)
+
+#no imputation of SD
+data <- Metradica %>% dplyr::select(-SD)
+tempData_noSD <- mice(data,m=5,maxit=50,meth='pmm',seed=500) #m=5 is 5 datasets
+summary(tempData_noSD)
+completedData <- complete(tempData_noSD,1) #1 is choosing dataset 1 out of the 5
+
+B <- Metradica %>% dplyr::select(Code, SD)
+
+A <- left_join(completedData, B,  c("Code"))
+
+#write.csv(A, "Subset_imputation_exceptSD.csv", col.names = FALSE, row.names = FALSE)
+
+#inspecting data after imputation
+densityplot(tempData_noSD)
+tempData_noSD$imp$K
+
+```
+
+## Field & trait info joined
+
+```{r field information}
+Data_subset_imputed <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+
+#Bafog_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Bafog/Bafog_individuals.csv") %>% 
+#  # dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+# 
+# Kaw_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Kaw/Kaw_individuals.csv") %>%
+#   dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+# 
+# Paracou_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/Paracou.csv") %>%
+#   dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+# 
+# individuals_FTH2021 <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/individuals_FTH2021.csv") %>%
+#   dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+#c <- rbind(Paracou_individuals, Bafog_individuals, Kaw_individuals, individuals_FTH2021)
+
+Fieldsheet_info <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>%
+   dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins, CrownPosition)
+
+
+
+
+#adding Dawkins & height (tree + branch)
+
+D <- Data_subset_imputed %>% left_join(Fieldsheet_info, by = "Code")
+
+D %>% group_by(TreeDawkins, BranchDawkins) %>% tally()
+D %>% group_by(BranchDawkins) %>% tally()
+
+```
+
+##trait imputation for all traits except Stomata
+
+###PCA without stomata
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+Data <- Data %>% na.omit()
+
+g <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data, cor = T), #  If TRUE, the data will be centered and scaled before the analysis. Standardization typically means rescale data to have a mean of 0 and a standard deviation of 1 (unit variance). it computes a correlation matrix
+         data = Data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+#ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+#get contribution of trait in the different dimensions
+
+res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+# Contributions of variables to PC1
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC2
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC3
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+
+#ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+Generalist 
+
+```{r}
+Data_G <- Data %>% filter(Type == "Generalist")
+
+generalist <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data_G, cor = T), #  If TRUE, the data will be centered and scaled before the analysis. Standardization typically means rescale data to have a mean of 0 and a standard deviation of 1 (unit variance). it computes a correlation matrix
+         data = Data_G, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+#get contribution of trait in the different dimensions
+
+res.pca_g <- PCA(Data_G %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+fviz_eig(res.pca_g, addlabels = TRUE, ylim = c(0, 50))
+
+# Contributions of variables to PC1
+axe1_g <- fviz_contrib(res.pca_g, choice = "var", axes = 1, top = 10)
+#ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC2
+axe2_g <- fviz_contrib(res.pca_g, choice = "var", axes = 2, top = 10)
+#ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC3
+axe3_g <- fviz_contrib(res.pca_g, choice = "var", axes = 3, top = 10)
+#ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+# axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+# ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution_generalist <- ggpubr::ggarrange(
+  generalist,
+  axe1_g,
+  axe2_g,
+  axe3_g,
+  labels = c("A", "B", "C", "D"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+```
+
+TF specialist
+
+```{r}
+Data_TF <- Data %>% filter(Type == "TF Specialist")
+
+specialist_TF <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data_TF, cor = T), #  If TRUE, the data will be centered and scaled before the analysis. Standardization typically means rescale data to have a mean of 0 and a standard deviation of 1 (unit variance). it computes a correlation matrix
+         data = Data_TF, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+#get contribution of trait in the different dimensions
+
+res.pca_tf <- PCA(Data_TF %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+fviz_eig(res.pca_tf, addlabels = TRUE, ylim = c(0, 50))
+
+# Contributions of variables to PC1
+axe1_tf <- fviz_contrib(res.pca_tf, choice = "var", axes = 1, top = 10)
+#ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC2
+axe2_tf <- fviz_contrib(res.pca_tf, choice = "var", axes = 2, top = 10)
+#ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC3
+axe3_tf <- fviz_contrib(res.pca_tf, choice = "var", axes = 3, top = 10)
+#ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+# axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+# ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution_TF <- ggpubr::ggarrange(
+  specialist_TF,
+  axe1_tf,
+  axe2_tf,
+  axe3_tf,
+  labels = c("A", "B", "C", "D"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+```
+
+SF specialist
+```{r}
+Data_SF <- Data %>% filter(Type == "SF Specialist")
+
+specialist_SF <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data_SF, cor = T), #  If TRUE, the data will be centered and scaled before the analysis. Standardization typically means rescale data to have a mean of 0 and a standard deviation of 1 (unit variance). it computes a correlation matrix
+         data = Data_SF, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#56B4E9")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+#get contribution of trait in the different dimensions
+
+res.pca_sf <- PCA(Data_SF %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+fviz_eig(res.pca_sf, addlabels = TRUE, ylim = c(0, 50))
+
+# Contributions of variables to PC1
+axe1_sf <- fviz_contrib(res.pca_sf, choice = "var", axes = 1, top = 10)
+#ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC2
+axe2_sf <- fviz_contrib(res.pca_sf, choice = "var", axes = 2, top = 10)
+#ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC3
+axe3_sf <- fviz_contrib(res.pca_sf, choice = "var", axes = 3, top = 10)
+#ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+# axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+# ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution_SF <- ggpubr::ggarrange(
+  specialist_SF,
+  axe1_sf,
+  axe2_sf,
+  axe3_sf,
+  labels = c("A", "B", "C", "D"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+```
+### Permanova
+
+To explore differences along each PC axis. Fortunel, C., Stahl, C., Heuret, P., Nicolini, E. & Baraloto, C. (2020). Disentangling the effects of environment and ontogeny on tree functional dimensions for congeneric species in tropical forests. New Phytol., 226, 385–395.
+
+* The dependent variables should be normally distribute within groups.
+  + yes but except for nitrogen
+```{r}
+Data %>%
+ggplot() +
+ aes(x = Nitrogen) + #already log
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab("Nitrogen")+
+ theme_minimal()
+```
+
+* Homogeneity of variances across the range of predictors.Levene's and Barlett's test.
+  + Bartlett’s test: Compare the variances of two or more groups. The data must be normally distributed.
+  
+```{r}
+count <- 5
+list <- list()
+
+for (i in Data[,6:13]){
+  count <- count + 1
+  name <- names(Data[,count])
+  
+  list[[name]] <- local({
+   
+    i <- i
+  bartlett.test(i ~ Type, data = Data)
+  
+  })
+  
+}
+
+print(list)
+#The critical value of chi square is 9.488. If the Bartlett test statistic is greater than this critical value, there is a significant difference in the variances. If the Bartlett test statistic is less than this critical value, there is not a significance difference.
+
+# p-values less than 0.05 suggest variances are significantly different and the homogeneity of variance assumption has been violated, which is the case for all except Gmin, phosphorous, and Potassium. 
+```
+
+  + Levene’s test: A robust alternative to the Bartlett’s test that is less sensitive to departures from normality.
+
+* Linearity between all pairs of dependent variables, all pairs of covariates, and all dependent variable-covariate pairs in each cell
+
+PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.
+
+Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.
+
+After having computed an ordination such as PCA, it shows that habitat preferences do overlap. I want to know if the trait assemblage is different between the 3 habtiat preferences. A PERMANOVA lets me statistically determine if the centroid of the cluster of samples for the generalist differ from the centroid of samples for the specialist TF and specalist SF. Note that PERMANOVA is not done on the output of a ordination technique but rather on the underlying distance matrices. 
+
+The test statistic is a pseudo F-ratio, similar to the F-ratio in ANOVA. It compares the total sum of squared dissimilarities (or ranked dissimilarities) among objects belonging to different groups to that of objects belonging to the same group. Larger F-ratios indicate more pronounced group seperation, however, the significance of this ratiio is usually of more interest than its magnitude. (https://archetypalecology.wordpress.com/2018/02/21/permutational-multivariate-analysis-of-variance-permanova-in-r-preliminary/)
+
+
+```{r}
+
+data_PCA <- Data[, c(1:13)][,-c(1,2,3,4,5)]
+
+res.PCA <- FactoMineR::PCA(data_PCA, quali.sup = 1, graph = F)
+
+```
+
+
+```{r}
+dis <- vegdist(data_PCA,method="euclidean") #Dissimilarity Indices for Community Ecologists
+#dis2 <- vegdist(data_PCA, method ="bray")
+mod <- betadisper(dis,Data$Type)
+anova(mod)
+```
+the null hypothesis of no differences between types is cannot be rejected (pvalue 0.3816)
+
+H0 = means are not different
+
+P-value = 0.3816 so we cannot reject H0 : our group dispersions are not different between types.
+
+Check if our treatments have different means. Use a permuting method to check if the difference is really due to the treatments.
+
+```{r}
+a<-adonis2(data_PCA~Data$Type, permutations = 999, method = "euclidean") 
+
+permanova <-a %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+ kable_classic(full_width = F, html_font = "Cambria") #%>%
+  #save_kable(file = "Permanova.png")
+
+
+```
+
+P-value (0.001) *** is significant so our group types have different means.
+
+Process a pairwise analyse to detect which treatments are different from each other.
+
+install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")`
+
+```{r}
+library(pairwiseAdonis)
+pairwise_adonis <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+
+
+pairwise_aaadonis <- pairwise_adonis %>%
+  kbl(caption = "Post-hoc pairwise analysis") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "pairwise_adonis.png", zoom = 10)
+
+```
+In order to reject the null hypothesis that the group means are equal, we need pvalue < 0.05 and a high F-value. We use the F-value to determine whether the between group variability of means is larger than the within the group variability of the individual values. If the ratio of between group and within group variation is sufficiently large, you can conclude that not all the means are equal.
+
+If the variation between the sample means is high relative to the variation within each of the samples, then the F-value will be large.
+
+```{r}
+tt1 <- ttheme_default()
+tt2 <- ttheme_minimal()
+
+grid.arrange(
+  tableGrob(permanova, theme=tt1),
+  tableGrob(pairwise_adonis, theme=tt2),
+  nrow=1) %>%  
+  kbl(caption = "Permutational MANOVA on habitat preference*") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") 
+```
+
+
