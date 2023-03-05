@@ -1058,6 +1058,14 @@ apply(traits.z, 2, sd)
 
 ### Correlation
 
+Summary of variables 
+```{r}
+#logged traits
+png(height=500, width=500, file="summary_traits.png")
+plot(log(abs(Metradica[,9:16])))
+dev.off()
+```
+
 The **correlation coefficient** is a representation of the strength of relationship between one variable and another.
 
 Spearman’s correlation in statistics is a nonparametric alternative to Pearson’s correlation. Use Spearman’s correlation for data that follow curvilinear, **and not linear** (aka monotonic relationships) and for ordinal data. Statisticians also refer to Spearman’s rank order correlation coefficient as Spearman’s ρ (rho).

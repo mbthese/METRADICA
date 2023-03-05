@@ -2975,7 +2975,7 @@ cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G)
 ### plot cv
 ```{r Plot CV}
 # plot all 
-
+#option 1
 cv_plot <- cv_tot %>% 
   mutate(CV =CV*100) %>%
   mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
@@ -2983,6 +2983,27 @@ cv_plot <- cv_tot %>%
   ggplot(aes(x = Type, y = CV, fill = Type)) +
   geom_jitter() + 
   geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("Coefficient of variation (%)") + xlab("")+
+    theme_minimal(base_size = 22) +
+  facet_wrap(~trait, scales ="free_y") +
+  theme(legend.position = "bottom")
+
+#option 2
+cv_plot <- cv_tot %>% 
+  mutate(CV =CV*100) %>%
+  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = Type, y = CV, fill = Type)) +
+  geom_jitter() + 
+ # geom_boxplot(alpha=0.7)+
   scale_fill_manual("Habitat\npreference", 
                     values = c("#56B4E9", "#009E72",  "#E79F02"), 
                     labels = c("TF" = "TF specialist",
