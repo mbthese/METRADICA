@@ -3,9 +3,9 @@
 ##############################################
 
 #library used
-library(lme4)
-library(dplyr)
-library(ggplot2)
+library(lme4) #to fit the model and do the variance partitioning
+library(dplyr) #to pipe
+library(ggplot2) #to plot
 
 #data used (log on all traits)
 Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
@@ -28,20 +28,21 @@ Var_par <- function(Trait, Mydata){
   
   
   # Fit the linear mixed-effects model
-  model <- lmer(Trait ~ TWI + Forest + (1 | Name), data = Mydata)
+  model <- lme4::lmer(Trait ~ TWI + Forest + (1 | Name), data = Mydata)
   
   #Fit the associated null model with random intercept on species
-  null_model <- lmer(Trait~ (1 | Name), data = Mydata)
+  null_model <- lme4::lmer(Trait~ (1 | Name), data = Mydata)
   
   # Extract the variance components 
-  var_sp <-  varcomp(model)[1,1] #for the random effects - species
-  var_indv <- varcomp(model)[2,1] #model residual, also known as the intraspecific residual variance (linked to the individual but also error measures)
+  Var_components <- lme4::VarCorr(model)
+  var_sp <- Var_components$Name[1] #for the random effects - species
+  var_indv <- attr(Var_components, "sc")^2 #model residual, also known as the intraspecific residual variance (linked to the individual but also error measures). I square because it returns the residual standard deviation and I want the residual variance.
   
   # Obtain the variance of the random effect in the null model.
-  random_variance_null <- varcomp(null_model)$vcov[1]
+  random_variance_null <- lme4::VarCorr(null_model)$Name[1]
   
   # Obtain the residual variance
-  residual_variance_null <- varcomp(null_model)$vcov[2]
+  residual_variance_null <- attr(lme4::VarCorr(null_model), "sc")^2
   
   # Obtain the total variance of the null model
   v_0 <- random_variance_null + residual_variance_null
