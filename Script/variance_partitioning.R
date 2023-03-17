@@ -9,14 +9,13 @@ library(ggplot2) #to plot
 
 #data used (log on all traits)
 Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-C, -N) %>%
   rename(Potassium = K, 
-         Phosphorous = P, 
-         Nitrogen = N,
-         Carbon = C) %>% 
+         Phosphorous = P) %>% 
   relocate(SD, .after = MajVLA) %>%
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
-  mutate(TLP = -TLP) 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP)
 
 Data$Forest <- as.factor(Data$Forest)
 
@@ -61,7 +60,7 @@ Var_par <- function(Trait, Mydata){
 # Loop to calculate the variance partitioning for all traits
 vars <- c()
 
-for (i in colnames(Data)[9:17]){
+for (i in colnames(Data)[9:15]){
   
   vars <- bind_rows(vars, Var_par(Trait = i, Mydata = Data))
   
@@ -69,17 +68,19 @@ for (i in colnames(Data)[9:17]){
 
 #plot the results
 
+vars$Levels <- as.factor(vars$Levels)
+
 variance_plot<- vars %>%  
+  mutate(Levels = factor(Levels, levels=c("Environment", "Species", "Individual"))) %>%
   mutate(Traits = dplyr::recode(Traits, "Gmin" = "g[min]")) %>% #recode gmin
   ggplot(aes(fill=Levels, y=Variances, x=Traits)) + 
   geom_bar(position="stack", stat="identity") +
   theme_minimal(base_size = 22) +
   ylab("") + xlab("")+
   theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
-  scale_fill_manual("", values = c("#029A88", "#CCBC44", "#BBBBBB"), 
-                    labels = c("Environment", 
-                               "Species", 
-                               "Individual")) +
+  scale_fill_manual("", values=c("#BBBBBB", "#CCBC44", "#029A88"),
+                    breaks=c("Individual", "Species", "Environment"),
+                    labels=c("Individual", "Species", "Environment"))  +
   coord_flip() +
   scale_x_discrete(labels = scales::label_parse())
 
