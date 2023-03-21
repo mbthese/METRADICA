@@ -33,10 +33,10 @@ PCA_type <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phospho
   geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
   theme_classic(base_size = 10) +
   # scale_y_reverse() +
-  scale_color_manual("Habitat preference", values = c("#009E72", "#56B4E9", "#E79F02")) +
-  scale_shape_discrete("Habitat preference") +
+  scale_color_manual("Species' preferences", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Species' preferences") +
   stat_ellipse(aes(col = Type), level = 0.85, size = 1.2)+
-  guides(color = guide_legend(title = "Habitat preference", 
+  guides(color = guide_legend(title = "Species' preferences", 
                               title.position = "top", 
                               nrow = 2, 
                               override.aes = list(size = 3)), 
@@ -100,7 +100,7 @@ pairwise_adonis_type <- pairwise.adonis(data_PCA,Metradica_log$Type, sim.method 
 pairwise_adonis_type_table <- pairwise_adonis_type %>%
   dplyr::select(-pairs) %>%
   dplyr::mutate(pairs = c("TF specialist vs SF specialist", "TF specialist vs generalist", "SF specialist vs generalist")) %>%
-  kbl(caption = "A. Habitat preference") %>% 
+  kbl(caption = "A. Species' preferences") %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
   save_kable(file = "pairwise_adonis_type.png", zoom = 10)
 
@@ -212,20 +212,136 @@ Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
 #merge TWI class 6,7 and 8 together to have approximately the same individuals per class
 #class 6,7 & 8 are the highest classes for seasonally flooded soils
 #class 1, 2 & 3 are the highest classes for terra firme soils
-Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6
-Metradica_log$class_TWI[which(Metradica_log$class_TWI == 8)]  <- 6
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 5)]  <- 4
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 9)]  <- 7
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 10)]  <- 7
 table(Metradica_log$class_TWI) #number of individuals per class
 table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
 
 #in the data of classes, merge the 6th, 7th and 8th categories
-data$max[which(data$class == 6 )] <- data$max[which(data$class == 8)]
-data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
-data <- slice(data, 1:(n() - 2)) 
+data$max[which(data$class == 4 )] <- data$max[which(data$class == 5)]
+data$mean[which(data$class == 4 )] <- (data$max[4] + data$min[4])/2
+data <- slice(data, 1:(n() - 1)) 
 
 
 ###################################################################################################
 #Construction of the PCAs for each TWI class level and calculating the observed trait correlation
 ###################################################################################################
+
+# Function to calculate the observed index values per community and the standardized index values by the associated null community
+
+TI_index <- function(NbClass, Data, Data_TWI){ 
+  #data that has a column named TWI as calculated before
+  essai <- data.frame(TWI_class = numeric(), range_i = numeric(), sd_i = numeric()) #create an empty dataframe with columns
+
+  for (i in 1:NbClass){  
+    
+    #calculate observed index
+    
+    Data_i <- Data %>% filter(class_TWI == i) #filter the data set for the first class of TWI
+    
+    res.pca_i <- PCA(Data_i %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+    
+    range_i <- res.pca_i$eig[1,1] - res.pca_i$eig[8,1] #observed range of the eigen values
+    
+    sd_i <- sd(res.pca_i$eig[,1]) #observed standard deviation of the eigen values
+    
+    class_i <- c()
+    class_i_sd <- c()
+    indv_rich_i <- length(levels(as.factor(Data_i$Code)))
+    indv_rich_total <- length(levels(as.factor(Data$Code)))
+    for (i in 1:1000){  #sampling 1,000 random communities from the whole individual pool
+      indv_list <- sample(levels(as.factor(Data$Code)), size = indv_rich_i, replace =FALSE) # sampling random individuals from the whole dataset, same number of individuals as the dataset of class TWI 1 
+      Data_i_abon <- c() 
+      for (s in 1:indv_rich_i){
+        
+        Data_i_abon <- rbind(Data_i_abon, 
+                             Data[sample(which(Data$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 1 and getting all the characteristics (i.e. traits) for these individuals
+      }
+      
+      PCA_comm_i <- PCA(Data_i_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+      class_i <- c(class_i, PCA_comm_i$eig[1,1] - PCA_comm_i$eig[8,1])
+      class_i_sd <- c(class_i_sd , sd(PCA_comm_i$eig[,1]))
+    }
+    
+      #Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+    ITI_i <- (range_i - mean(class_i)) / sd(class_i)
+    ITI_i_sd <- (sd_i - mean(class_i_sd))/sd(class_i_sd)
+    
+    essai_i <- data.frame(range_i, sd_i, ITI_i, ITI_i_sd)
+    essai <- rbind(essai, essai_i) 
+    
+   
+  }
+
+  #Plot ranges along TWI
+  Data_TWI <- cbind(Data_TWI, essai)
+  A <- ggplot(Data_TWI) +
+    aes(x = mean, y = range_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("Ranges")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  #Plot SD along TWI
+  B <- ggplot(Data_TWI) +
+    aes(x = mean, y = sd_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("sd")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  
+  #Plot TI (ranges standardized by effect size) along TWI 
+  C <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12) +
+    guides(color = "none") #remove legend
+  
+  
+  #Plot TI_sd along TWI
+  D <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i_sd) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12)+
+    guides(color = "none")
+  
+  
+  #arrange plots together
+  E <- ggpubr::ggarrange(A, B, C, D, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE)
+  plot_publi <- ggpubr::ggarrange(C, D, labels = c("A", "B"), ncol = 2, nrow = 1, common.legend = TRUE)
+  
+  
+  
+  #save plot
+  ggsave(filename = "Multivariate covariation_6_class_specialist.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
+    ggsave(filename = "Multivariate covariation_6_class_4plot_specialist.png", plot = E, bg = "white", width = 7, height = 4, dpi = 600)
+  return(list(essai, A, B, C, D, E, plot_publi))
+  
+ }
+
+
 #1------------
 
 Data_1 <- Metradica_log %>% filter(class_TWI == 1) #filter the data set for the first class of TWI
@@ -260,7 +376,7 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole individual
 plot_1 <- hist(class_1)
 
 #Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
-ITI_1 <- (range_1 - mean(class_1)) / sd(class_1_sd)
+ITI_1 <- (range_1 - mean(class_1)) / sd(class_1)
 ITI_1_sd <- (sd_1 - mean(class_1_sd))/sd(class_1_sd)
 
 #2--------------------------
@@ -294,7 +410,7 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal 
 plot_2 <- hist(class_2)
 
 #Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
-ITI_2 <- (range_2 - mean(class_2)) / sd(class_2_sd)
+ITI_2 <- (range_2 - mean(class_2)) / sd(class_2)
 ITI_2_sd <- (sd_2 - mean(class_2_sd))/sd(class_2_sd)
 
 #3--------------
@@ -327,7 +443,7 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal 
 
 plot_3 <- hist(class_3)
 
-ITI_3 <- (range_3 - mean(class_3))/sd(class_3_sd)
+ITI_3 <- (range_3 - mean(class_3))/sd(class_3)
 ITI_3_sd <- (sd_3 - mean(class_3_sd))/sd(class_3_sd)
 
 #4------------
@@ -359,7 +475,7 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal 
 
 plot_4 <- hist(class_4)
 
-ITI_4 <- (range_4 - mean(class_4))/sd(class_4_sd)
+ITI_4 <- (range_4 - mean(class_4))/sd(class_4)
 ITI_4_sd <- (sd_4 - mean(class_4_sd))/sd(class_4_sd)
 
 #5----------
@@ -391,7 +507,7 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal 
 
 plot_5 <- hist(class_5)
 
-ITI_5 <- (range_5 - mean(class_5))/sd(class_5_sd)
+ITI_5 <- (range_5 - mean(class_5))/sd(class_5)
 ITI_5_sd <- (sd_5 - mean(class_5_sd))/sd(class_5_sd)
 #6----------------
 
@@ -423,17 +539,49 @@ for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal 
 
 plot_6 <- hist(class_6)
 
-ITI_6 <- (range_6 - mean(class_6))/sd(class_6_sd)
+ITI_6 <- (range_6 - mean(class_6))/sd(class_6)
 ITI_6_sd <- (sd_6 - mean(class_6_sd))/sd(class_6_sd)
 
+##
+
+Data_9 <- Metradica_log %>% filter(class_TWI == 9) #filter the data set for the first class of TWI
+res.pca_9 <- PCA(Data_9 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_9$eig #look at the eigen values 
+range_9 <- res.pca_9$eig[1,1] - res.pca_9$eig[8,1] #observed range of the eigen values
+sd_9 <- sd(res.pca_9$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_9, addlabels = TRUE, ylim = c(0, 90)) #visualization of the scree plot
+
+#null community associated to the Data_9
+class_9 <- c()
+class_9_sd <- c()
+indv_rich_9 <- length(levels(as.factor(Data_9$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_9, replace =FALSE) # first null community for class TWI 9 sampled from the whole dataset
+  Data_9_abon <- c()
+  for (s in 1:indv_rich_9){
+    
+    Data_9_abon <- rbind(Data_9_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 9 
+  }
+  
+  PCA_comm_9 <- PCA(Data_9_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_9 <- c(class_9, PCA_comm_9$eig[1,1] - PCA_comm_9$eig[8,1])
+  class_9_sd <- c(class_9_sd , sd(PCA_comm_9$eig[,1]))
+}
+
+plot_9 <- hist(class_9)
+
+ITI_9 <- (range_9 - mean(class_9))/sd(class_9)
+ITI_9_sd <- (sd_9 - mean(class_9_sd))/sd(class_9_sd)
 #####################
 #Plots
 #####################
  #data for plot
-data$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6)
-data$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6)
-data$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6)
-data$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd)
+data$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6, range_7, range_8, range_9)
+data$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6, sd_7, sd_8, sd_9)
+data$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6, ITI_7, ITI_8, ITI_9)
+data$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd, ITI_7_sd, ITI_8_sd, ITI_9_sd)
 
 #Plot ranges along TWI
 A <- ggplot(data) +
@@ -458,7 +606,7 @@ B <- ggplot(data) +
         axis.title.x = element_text(size = 16))
 
 
-#Plot ITI (ranges standardized by effect size) along TWI #the range of the eigenvalues of each PCA
+#Plot TI (ranges standardized by effect size) along TWI 
 C <- ggplot(data) +
   aes(x = mean, y = ITI) +
   geom_point(shape = "circle", size = 5, aes(color = mean)) +
@@ -473,7 +621,7 @@ C <- ggplot(data) +
   guides(color = "none") #remove legend
 
 
-#Plot ITI_sd along TWI
+#Plot TI_sd along TWI
 D <- ggplot(data) +
   aes(x = mean, y = ITI_sd) +
   geom_point(shape = "circle", size = 5, aes(color = mean)) +
@@ -489,10 +637,10 @@ D <- ggplot(data) +
 
 
 #arrange plots together
-plot_publi <- ggpubr::ggarrange(C, D, labels = c("A", "B"), ncol = 2, nrow = 1, common.legend = TRUE)
+plot_publi <- ggpubr::ggarrange(A, B, C, D, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE)
 
 
 
 #save plot
-ggsave(filename = "Multivariate covariation.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
+ggsave(filename = "Multivariate covariation_9 class.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
 ggsave(filename = "Multivariate covariation.png", plot = C, bg = "white", width = 7, height = 4, dpi = 600)
