@@ -2951,11 +2951,15 @@ Metradica$Name <- as.character(Metradica$Name)
 # For generalists ----------
 
 cv_G <- Metradica %>% filter(Type =="Generalist") %>% 
-    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
-  mutate(TLP = -TLP)%>%
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP) %>%
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
 
 cv_G <- bind_rows(cv_G,
                   ungroup(cv_G) %>%
@@ -2969,11 +2973,15 @@ cv_long_G$Type <- c("Generalist")
 # For TF specialist -------------
 
 cv_TF <- Metradica %>% filter(Type =="TF") %>%
-    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
   mutate(TLP = -TLP)%>%
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
 
 
 cv_TF <- bind_rows(cv_TF,
@@ -2990,11 +2998,15 @@ cv_long_TF$Type <- c("TF")
 # For BF specialist-----------
 
 cv_BF <-  Metradica %>% filter(Type =="BF") %>% 
-    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+   rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
   mutate(TLP = -TLP)%>%
   group_by(Name) %>% 
-  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
 
 cv_BF <- bind_rows(cv_BF,
                 ungroup(cv_BF) %>% 
@@ -3045,12 +3057,12 @@ cv_plot <- cv_tot %>%
    mutate(trait = dplyr::recode(trait, 
                                 "Gmin" = "g[min]", 
                                 "TLP" = "TLP", 
-                                "C"= "C", 
-                                "N" = "N", 
-                                "K"= "K", 
+                                "Carbon"= "Carbon", 
+                                "Nitrogen" = "Nitrogen", 
+                                "Potassium"= "Potassium", 
                                 "LSWC" = "LSWC", 
                                 "MajVLA" = "MajVLA", 
-                                "P" = "P", 
+                                "Phosphorous" = "Phosphorous", 
                                 "SD" = "SD")) %>%
   mutate(CV =CV*100) %>%
   filter(Name != "mean") %>% 

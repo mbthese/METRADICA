@@ -3,68 +3,74 @@
 ##############################################
 
 #library used
-library(lme4) #to fit the model and do the variance partitioning
+library(nlme) #to fit the model and do the variance partitioning with ML method
+library(lme4) #for the VarCorr function
 library(dplyr) #to pipe
 library(ggplot2) #to plot
 
 #data used (log on all traits)
 Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
-  dplyr::select(-C, -N) %>%
-  rename(Potassium = K, 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
          Phosphorous = P) %>% 
   relocate(SD, .after = MajVLA) %>%
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous", "Potassium", "TWI"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous", "Potassium", "TWI"), log) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), log) %>% 
   mutate(TLP = -TLP)
 
 Data$Forest <- as.factor(Data$Forest)
 
 #function for variance partitioning
 Var_par <- function(Trait, Mydata){
-  
+
   #Rename the trait column
   colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
   
-  
   # Fit the linear mixed-effects model
-  model <- lme4::lmer(Trait ~ TWI + Forest + (1 | Name), data = Mydata)
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
   
   #Fit the associated null model with random intercept on species
-  null_model <- lme4::lmer(Trait~ (1 | Name), data = Mydata)
+  null_model <- nlme::lme(Trait~ 1,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
   
   # Extract the variance components 
-  Var_components <- lme4::VarCorr(model)
-  var_sp <- Var_components$Name[1] #for the random effects - species
-  var_indv <- attr(Var_components, "sc")^2 #model residual, also known as the intraspecific residual variance (linked to the individual but also error measures). I square because it returns the residual standard deviation and I want the residual variance.
+  Var_components <-lme4::VarCorr(model)
+  var_sp <- as.numeric(Var_components[1,1]) #for the random effects - species
+  var_indv <- as.numeric(Var_components[2,1]) #model residual, also known as the intraspecific residual variance (linked to the individual but also error measures).
   
   # Obtain the variance of the random effect in the null model.
-  random_variance_null <- lme4::VarCorr(null_model)$Name[1]
+  random_variance_null <- as.numeric(lme4::VarCorr(null_model)[1,1])
   
   # Obtain the residual variance
-  residual_variance_null <- attr(lme4::VarCorr(null_model), "sc")^2
+  residual_variance_null <- as.numeric(lme4::VarCorr(null_model)[2,1])
   
   # Obtain the total variance of the null model
   v_0 <- random_variance_null + residual_variance_null
   
   # Calculate the variance component linked to the env't by substracting the residual variance of the model (var_indv) and the variance explained by the random factor, the species (var_sp), from the variance of the null model
-  var_envt <- v_0 - var_indv - var_sp
+ 
+  # Variance partitioning
+  var_sp <- round(100 * var_sp / v_0)
+  var_indv <- round(100 * var_indv / v_0)
+  var_envt <- round(100 - (var_sp + var_indv))  # or it works also , var_envt <- v_0 - var_indv - var_sp Marion calcul
   
   Traits <- c(Trait, Trait, Trait)
   Levels <- c("Environment", "Species", "Individual")
-  Variances <- c(var_envt/v_0, var_sp/v_0, var_indv/v_0)
-  
-  
+  Variances <- c(var_envt,var_sp,var_indv)
+
   return(data.frame(Traits, Levels, Variances))
 }
 
 # Loop to calculate the variance partitioning for all traits
 vars <- c()
+Data <- Data %>% filter(Type != "Generalist")
 
-for (i in colnames(Data)[9:15]){
+for (i in colnames(Data)[9:17]){
   
   vars <- bind_rows(vars, Var_par(Trait = i, Mydata = Data))
   
 }
+vars
 
 #plot the results
 

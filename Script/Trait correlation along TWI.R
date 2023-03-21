@@ -186,8 +186,9 @@ image_write(img_resized, "corr_pvalue_resized.png")
 ###########################################
 # Dividing the range of TWI into classes#
 ###########################################
-
-nb_class <- 8
+#Metradica_log <- Metradica_log %>% filter(Type != "Generalist") for specialists
+Metradica_log <- Metradica_log %>% filter(Type == "Generalist") #for generalists
+nb_class <- 8 #7 for specialists and then merge classes to get enough individuals per class
 class_size <- (max(Metradica_log$TWI)-min(Metradica_log$TWI))/nb_class #each class have the same range of TWI
 data <- as.data.frame(seq(1:nb_class))
 colnames(data)[1] <- "class"
@@ -209,20 +210,22 @@ for (i in 1:nb_class){ #attribute the individuals of the dataset to each of the 
 #attribute the individuals with the lowest TWI to the first class
 Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
 
-#merge TWI class 6,7 and 8 together to have approximately the same individuals per class
-#class 6,7 & 8 are the highest classes for seasonally flooded soils
-#class 1, 2 & 3 are the highest classes for terra firme soils
-Metradica_log$class_TWI[which(Metradica_log$class_TWI == 5)]  <- 4
-Metradica_log$class_TWI[which(Metradica_log$class_TWI == 9)]  <- 7
-Metradica_log$class_TWI[which(Metradica_log$class_TWI == 10)]  <- 7
+#merge TWI classes together to have approximately the same individuals per class
+
+#Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for specialists
+
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for generalists
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 8)]  <- 6 #for generalists
+
 table(Metradica_log$class_TWI) #number of individuals per class
 table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
 
-#in the data of classes, merge the 6th, 7th and 8th categories
-data$max[which(data$class == 4 )] <- data$max[which(data$class == 5)]
-data$mean[which(data$class == 4 )] <- (data$max[4] + data$min[4])/2
-data <- slice(data, 1:(n() - 1)) 
-
+#in the data of classes, merge categories
+#data$max[which(data$class == 6 )] <- data$max[which(data$class == 7)] #for specialists
+data$max[which(data$class == 6 )] <- data$max[which(data$class == 8)] #for generalists
+data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
+data <- slice(data, 1:(n() - 2)) 
+data
 
 ###################################################################################################
 #Construction of the PCAs for each TWI class level and calculating the observed trait correlation
@@ -542,72 +545,70 @@ plot_6 <- hist(class_6)
 ITI_6 <- (range_6 - mean(class_6))/sd(class_6)
 ITI_6_sd <- (sd_6 - mean(class_6_sd))/sd(class_6_sd)
 
-##
-
-Data_9 <- Metradica_log %>% filter(class_TWI == 9) #filter the data set for the first class of TWI
-res.pca_9 <- PCA(Data_9 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
-res.pca_9$eig #look at the eigen values 
-range_9 <- res.pca_9$eig[1,1] - res.pca_9$eig[8,1] #observed range of the eigen values
-sd_9 <- sd(res.pca_9$eig[,1]) #observed standard deviation of the eigen values
-fviz_eig(res.pca_9, addlabels = TRUE, ylim = c(0, 90)) #visualization of the scree plot
-
-#null community associated to the Data_9
-class_9 <- c()
-class_9_sd <- c()
-indv_rich_9 <- length(levels(as.factor(Data_9$Code)))
-indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
-for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
-  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_9, replace =FALSE) # first null community for class TWI 9 sampled from the whole dataset
-  Data_9_abon <- c()
-  for (s in 1:indv_rich_9){
-    
-    Data_9_abon <- rbind(Data_9_abon, 
-                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 9 
-  }
-  
-  PCA_comm_9 <- PCA(Data_9_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
-  class_9 <- c(class_9, PCA_comm_9$eig[1,1] - PCA_comm_9$eig[8,1])
-  class_9_sd <- c(class_9_sd , sd(PCA_comm_9$eig[,1]))
-}
-
-plot_9 <- hist(class_9)
-
-ITI_9 <- (range_9 - mean(class_9))/sd(class_9)
-ITI_9_sd <- (sd_9 - mean(class_9_sd))/sd(class_9_sd)
 #####################
 #Plots
 #####################
- #data for plot
-data$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6, range_7, range_8, range_9)
-data$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6, sd_7, sd_8, sd_9)
-data$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6, ITI_7, ITI_8, ITI_9)
-data$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd, ITI_7_sd, ITI_8_sd, ITI_9_sd)
+ #data for generalists
+data$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6)
+data$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6)
+data$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6)
+data$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd)
 
-#Plot ranges along TWI
-A <- ggplot(data) +
-  aes(x = mean, y = ranges) +
-  geom_point(shape = "circle", size = 4, colour = "#112446") +
-  theme_minimal()+
-  ylab("Ranges")+
-  xlab("")+
-  theme(axis.text = element_text(size = 14),
-        axis.title.y = element_text(size = 16),
-        axis.title.x = element_text(size = 16))
+#data for specialists
+data_s <- data
+data_s$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6)
+data_s$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6)
+data_s$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6)
+data_s$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd)
 
-#Plot SD along TWI
-B <- ggplot(data) +
-  aes(x = mean, y = sd) +
-  geom_point(shape = "circle", size = 4, colour = "#112446") +
-  theme_minimal()+
-  ylab("sd")+
-  xlab("")+
-  theme(axis.text = element_text(size = 14),
-        axis.title.y = element_text(size = 16),
-        axis.title.x = element_text(size = 16))
+#plot generalists
+
+title <- "Generalist"
+
+# Create a text grob
+tgrob <- text_grob(title,size = 16)
+# Draw the text
+plot_0 <- as_ggplot(tgrob) + theme(plot.margin = margin(0,3,0,0, "cm"))
 
 
 #Plot TI (ranges standardized by effect size) along TWI 
-C <- ggplot(data) +
+A <- ggplot(data) +
+  aes(x = mean, y = ITI) +
+  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12) +
+  guides(color = "none") #remove legend
+
+
+#Plot TI_sd along TWI
+B <- ggplot(data) +
+  aes(x = mean, y = ITI_sd) +
+  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12)+
+  guides(color = "none")
+
+#plot specialist
+title_s <- "Specialist"
+
+# Create a text grob
+tgrob_s <- text_grob(title_s,size = 16)
+# Draw the text
+plot_s <- as_ggplot(tgrob_s) + theme(plot.margin = margin(0,3,0,0, "cm"))
+
+
+#Plot TI (ranges standardized by effect size) along TWI 
+C <- ggplot(data_s) +
   aes(x = mean, y = ITI) +
   geom_point(shape = "circle", size = 5, aes(color = mean)) +
   scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
@@ -622,7 +623,7 @@ C <- ggplot(data) +
 
 
 #Plot TI_sd along TWI
-D <- ggplot(data) +
+D <- ggplot(data_s) +
   aes(x = mean, y = ITI_sd) +
   geom_point(shape = "circle", size = 5, aes(color = mean)) +
   scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
@@ -635,12 +636,15 @@ D <- ggplot(data) +
   theme_minimal(base_size = 12)+
   guides(color = "none")
 
-
 #arrange plots together
-plot_publi <- ggpubr::ggarrange(A, B, C, D, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE)
+plot_generalists <- ggpubr::ggarrange(plot_0, NULL, A, B, labels = c("", "", "A", "B"), ncol = 2, nrow = 2, common.legend = TRUE, heights = c(1,5))
+plot_generalists
 
+plot_specialists <- ggpubr::ggarrange(plot_s, NULL, C, D, labels = c("", "", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE, heights = c(1,5))
+plot_specialists
 
+plot_publi <- ggpubr::ggarrange(plot_generalists, plot_specialists, ncol = 1, nrow = 2)
+plot_publi
 
 #save plot
-ggsave(filename = "Multivariate covariation_9 class.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
-ggsave(filename = "Multivariate covariation.png", plot = C, bg = "white", width = 7, height = 4, dpi = 600)
+ggsave(filename = "Multivariate covariation_6 class.png", plot = plot_publi, bg = "white", width = 8, height = 7, dpi = 600)
