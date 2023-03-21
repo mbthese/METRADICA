@@ -4,7 +4,7 @@ author: "Marion Boisseaux"
 date: "2023-03-03"
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 #Paper Analyses
@@ -326,14 +326,14 @@ g <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + 
          loadings.label.size = 6) +
   geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
   geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
-  theme_classic() +
+  theme_classic(base_size = 22) +
  # scale_y_reverse() +
   scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
   scale_shape_discrete("Habitat\npreference") +
   stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
     theme(legend.position = c(0.85,0.2))
 
-#ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
 
 
 
@@ -966,14 +966,14 @@ class_2 <- c()
 class_2_sd <- c()
 indv_rich_2 <- length(levels(as.factor(Data_2$Code)))
 indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
-for (i in 1:1000){ #i eme communauté
+for (i in 1:3){ #i eme communauté
   
   indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_2, replace =FALSE)
   
   #maintient abondance 
 Data_2_abon <- data.frame()
 
-for (s in 1:111){
+for (s in 1:indv_rich_2){
   for (j in 1:111){
     
       Data_2_abon <- rbind(Data_2_abon, 
@@ -1251,27 +1251,34 @@ Log or not logged, correlations are going to be the same.
 
 library(corrplot)
 
-traits <- Data %>% 
-  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) #already log
+traits <- Data %>% #already log
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
 
+#to add significance
+testRes = cor.mtest(traits, conf.level = 0.95)
+
+#image output, have to run until last live dev.off() for it to work.
 png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
-traits %>% na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
-  cor(method = "spearman") %>% 
-  corrplot::corrplot.mixed()
-dev.off()
 
-#pairwise table correlation coef
-coef_corr <- traits %>%
+#create correlation matrix
+cor_matrix <- traits %>%
   na.omit() %>%
-  cor(method = "spearman") %>%
-  kbl(caption ="Pairwise table of the correlation coefficients", digits =2) %>%
-  kable_classic(full_width = F, html_font = "Cambria") 
+  cor(method = "spearman")
 
-coef_corr
+#correlation plot with no rows and column labels and without colors in the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
 
+# Add labels to the diagonal
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
 
-```
-```{r}
+dev.off()
 
 #significance
 install.packages("Hmisc")
@@ -1279,15 +1286,37 @@ library("Hmisc")
 res <- rcorr(as.matrix(traits), type = "spearman")
 res
 # Extract the correlation coefficients
+library(kableExtra)
+library(magick)
+
 res$r %>%
-  kbl(caption ="Pairwise table of the correlation coefficients", digits =2)  %>%
+  kbl(caption ="", digits =2)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients</span>" = 9), escape = FALSE) %>%
   kable_classic(full_width = F, html_font = "Cambria")  %>%
   save_kable("corr_coef.png")
+  
+img <- image_read("corr_coef.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_coef_resized.png")
+
+
+
 # Extract p-values
 res$P%>%
-  kbl(caption ="Pairwise table of the associated pvalues", digits =3)  %>%
+  kbl(caption ="", digits =3)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the associated p-values</span>" = 9), escape = FALSE) %>%
   kable_classic(full_width = F, html_font = "Cambria") %>%
   save_kable("corr_pvalue.png")
+
+img <- image_read("corr_pvalue.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_pvalue_resized.png")
+
+
 ```
 
 ## Question 1
@@ -2995,12 +3024,12 @@ cv_plot <- cv_tot %>%
   ggplot(aes(x = Type, y = CV, fill = Type)) +
   geom_jitter() + 
   geom_boxplot(alpha=0.7)+
-  scale_fill_manual("Habitat\npreference", 
+  scale_fill_manual("Species'\npreference", 
                     values = c("#56B4E9", "#009E72",  "#E79F02"), 
                     labels = c("TF" = "TF specialist",
                                "Generalist" = "Generalist", 
                                "BF" = "SF specialist")) +
-  scale_shape_discrete("Habitat\npreference") +
+  scale_shape_discrete("Species'\npreference") +
   theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
   theme(plot.title = element_text(size=14, face="bold")) +
   ylab("Coefficient of variation (%)") + xlab("")+
@@ -3009,29 +3038,42 @@ cv_plot <- cv_tot %>%
   theme(legend.position = "bottom")
 
 #option 2
+cv_tot$Type <- dplyr::recode(cv_tot$Type, "TF" = "TF specialist", "BF" = "SF specialist")
+
 cv_plot <- cv_tot %>% 
+  # mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "TLP", "C"= "C", "N" = "N", "K"= "K", "LSWC" = "LSWC", "MajVLA" = "MajVLA", "P" = "P", "SD" = "SD")) %>%
+   mutate(trait = dplyr::recode(trait, 
+                                "Gmin" = "g[min]", 
+                                "TLP" = "TLP", 
+                                "C"= "C", 
+                                "N" = "N", 
+                                "K"= "K", 
+                                "LSWC" = "LSWC", 
+                                "MajVLA" = "MajVLA", 
+                                "P" = "P", 
+                                "SD" = "SD")) %>%
   mutate(CV =CV*100) %>%
-  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]")) %>%
   filter(Name != "mean") %>% 
   ggplot(aes(x = Type, y = CV, color = Type)) +
-  geom_jitter() + 
   #geom_point()+
-  scale_color_manual("Habitat\npreference", 
-                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
-                    labels = c("TF" = "TF specialist",
-                               "Generalist" = "Generalist", 
-                               "BF" = "SF specialist")) +
-  scale_shape_discrete("Habitat\npreference") +
-  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
-  theme(plot.title = element_text(size=14, face="bold")) +
-  ylab("Coefficient of variation (%)") + xlab("")+
-    theme_minimal(base_size = 22) +
-  facet_wrap(~trait, scales ="free_y") +
+  geom_jitter(size = 2) +
+  scale_color_manual(
+    values = c(Generalist = "#009E72",
+    `SF specialist` = "#56B4E9",
+    `TF specialist` = "#E79F02")
+  ) +
+  scale_shape_discrete("Species'\npreference") +
+  theme_minimal(base_size = 12) +
+   theme(axis.text.x = element_blank())+
+    theme(plot.title = element_text(size=12, face="bold")) +
+  facet_wrap(~trait, scales ="free_y", labeller = label_parsed) +
+  labs(x = "", y = "Coefficient of variation (%)", color = "Species' preference") +
   theme(legend.position = "bottom")
+ 
 
 cv_plot
 
-ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 12, height = 8, dpi = 600)
+ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 7, height = 5, dpi = 600)
 
 ```
 
