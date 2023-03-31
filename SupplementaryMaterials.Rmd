@@ -1,0 +1,772 @@
+---
+title: "SupplementaryMaterials"
+author: "Marion Boisseaux"
+date: "2023-03-31"
+output: html_document
+---
+
+# Supporting Information
+
+Article title: The importance of local habitat in shaping functional tropical tree species’ strategies.
+
+Authors: Marion Boisseaux1*, Daniela  Krebber1,2, Christopher Baraloto7, Benoit Burban1, Angela Casado-Garcia3, Jocelyn Cazal1, Jeanne Clément2, Géraldine Derroire1, Claire Fortunel2 Jean-Yves Goret1, Jonathan Heras3, Gaelle JaouenORCID=0000-0002-5655-904411, Isabelle Maréchaux2, Christine Scoffoni4, Ghislain Vieilledent2, Jason Vleminckx5, Sabrina Coste1, Heidy Schimann6, Clément Stahl1.
+
+
+```{r libraries_SI}
+library(tidyverse)
+library(ggfortify)
+library(factoextra)
+library(FactoMineR) #for PCAs
+library(kableExtra) #for tables
+library(V.PhyloMaker) #phylogeny
+library(ggtree) #tree vizualisation and annotation
+library(readxl)
+library(gridExtra)
+library(rio)
+library(dplyr)
+library(tidyr)
+library(janitor)
+library(forcats)
+library(ggplot2)
+library(corrplot) #correlation
+library("Hmisc") #for the significance for the correlation
+library(magick) #for tables
+library(vegan) #for permanova
+library(pairwiseAdonis) #for pairwise comparaison after permanova
+```
+
+
+#Figures
+
+##Figure S1: The 21 selected species’ phylogeny.
+
+```{r Phylogeny, echo=FALSE, message=FALSE, warning=FALSE}
+
+#select focal species
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+#Use paracou database 30/08/2021 as the backbone phylogeny
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+#This function makes phylogenetic hypotheses for the focal species under three scenarios based on paracou database 30/08/2021. I use the default senario.
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#remove "#" for the next two lines when running for the first time, to save and reload the phylogeny.
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+#build tree and visualize it
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+#save and choose saving format
+ggsave(file="phylo_subset.svg", plot=A, width=15, height=10)
+ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
+```
+
+##Figure S2: Discrimination of the habitats using the topographic wetness index.
+
+```{r Habitat and TWI}
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+Data$Forest <- as.factor(Data$Forest)
+Data$Habitat <- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra Firme')
+
+TWI_plot <- Data %>%
+mutate(Forest = fct_relevel(Forest, 
+            "Bafog", "Paracou", "Kaw")) %>%
+ggplot() +
+aes(x = Forest, y = log(TWI), fill = Habitat) +
+geom_boxplot() +
+scale_fill_manual(
+    values = c(`Seasonally flooded` = "#56B4E9",
+    `Terra Firme` = "#E79F02")
+                  ) +
+ylab("Topographic wetness index")+
+theme_minimal()+
+theme(text = element_text(size = 16))     
+
+ggsave(filename = "TWI in habitats.png", plot = TWI_plot, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##Figure S3. Indval values for the studied species. 
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+*Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists and IndVal ≥  0.2598  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any preference and therefore called generalists.*
+
+```{r Indval}
+#Supplementary data from the Baraloto et al 2021.
+
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF data 
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF data
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+```
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r Species within indval threshold}
+
+species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia", # subsp. copaia
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", #subsp. rabelianum
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+Generalist_high_indval_both_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui in both, removed it
+   mutate(Type = "SF specialist")
+
+#indval graphs
+
+#SF specialists
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#TF specialists
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#Generalists
+Generalist <- left_join(identified_species, indval_FG) 
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#casearia too high in one habitat to consider it a generalist!
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal(base_size = 12) +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none")
+
+group_figure <- ggpubr::ggarrange(
+  indval_TF_plot + theme(legend.position="none"),
+  indval_SF_plot + theme(legend.position="none"),
+  Generalist_diff_indval + theme(legend.position="none"),
+  labels = c("A", "B", "C"),
+  nrow= 3, ncol=1)
+ggsave(file="indval.svg", plot=group_figure, width=10, height=12)
+ggsave(file="indval.png", plot=group_figure, width=10, height=12)
+
+```
+
+##Figure S4: Variation of leaf trait values among species. 
+
+No imputation, not transformed. Visualizing raw trait variation.
+
+```{r Data fr trait variation}
+
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data
+
+data <- Metradica %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+
+data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
+
+p <-  data %>%
+  mutate(Trait = as.character(Trait)) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]~(mmol%.%m^{-2}%.%s^{-1})", "TLP" = "pi[tlp]~(MPa)", "C"= "C~('%')", "N" = "N~('%')", "K"= "K~(g%.%kg^{-1})", "LSWC" = "LSWC~('%')", "MajVLA" = "MajVLA~(mm%.%mm^{-2})", "P" = "P~(g%.%kg^{-1})", "SD" = "SD~(mm^{-2})")) %>% 
+  left_join(dplyr::select(data, Type, Name) %>%
+              unique() %>%
+              arrange(Type, Name) %>%
+              mutate(order_graph = 1:n())) %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x = reorder(Name, order_graph), y= value)) +
+  geom_boxplot(aes(fill = Type),
+  #              alpha = 0.5, col = "lightgrey") +
+  #geom_violin(aes(fill = Type),
+               alpha = 0.5, col = "lightgrey") +
+  scale_fill_manual(name = "Species preference", 
+                    values = c("TF" = "#E79F02", #orange for TF
+                                "BF" =  "#56B4E9", #blue for SF
+                                "Generalist" = "#009E72"),  #green for Generalists
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  facet_wrap(~ Trait, scales = "free_x", label = label_parsed) +
+  theme_minimal() +
+  coord_flip() +
+  theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
+
+#ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##Figure S5: Trait contributions to first four principal component axes among leaf traits. 
+
+PCA with log-transformed traits, that were imputed but without stomata.
+
+```{r PCA contribution of variables}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+Data <- Data %>% na.omit()
+
+#PCA without stomata
+res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+
+#Eigenvalues
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+#Contributions of variables to PC1
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+
+#Contributions of variables to PC2
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+
+#Contributions of variables to PC3
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+
+#Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+
+ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+##Figure S6: Spearman correlation coefficients among leaf traits. 
+
+```{r Spearman correlation}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+traits <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+testRes = cor.mtest(traits, conf.level = 0.95)
+
+#image output, have to run until last live dev.off() for it to work.
+png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+
+#create correlation matrix
+cor_matrix <- traits %>%
+  na.omit() %>%
+  cor(method = "spearman")
+
+#correlation plot with no rows and column labels and without colors in the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
+
+# Add labels to the diagonal
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+dev.off()
+
+```
+
+##Figure S7: Correlation between stomatal density and minimal leaf conductance. 
+
+Leaf traits are ln-transformed. The adjusted R squared is equal to 0.011. 
+
+```{r Stomatal density and minimal conductance}
+
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv")
+#SD and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(SD), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+library(jtools)
+model <- lm(log(SD) ~ log(Gmin), data = Data)
+A <- get_formula(model)
+```
+
+#Tables
+
+##Table S1. Sampling sites supplementary information. 
+
+```{r Sampling site information }
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#googlesheet
+Plot_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=0")
+
+Plot_table <- Plot_table %>% 
+  dplyr::select(-PlotName, -Xutm, -Yutm, -Localization)
+  
+Plot_table %>%
+  kbl(caption = "Summary of sampling site information", escape = FALSE, digits = 2) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Plot_info_summary.png", zoom = 5)
+```
+
+##Table S2. Individuals per species collected in the three sampling sites. 
+
+```{r Individuals per species collected in the three sampling sites. }
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Family <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") %>%
+  adorn_totals("row")
+
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) %>%
+save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+##Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. 
+
+```{r Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
+
+#get authorization
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#indval data 
+Indval <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(-Paracou, -Bafog, -Kaw)
+
+Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Indval %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1:2, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
+
+```
+
+
+##Table S4: Permutational Manova analysis and post-hoc pairwise analysis.
+
+To explore differences along each PC axis. Fortunel, C., Stahl, C., Heuret, P., Nicolini, E. & Baraloto, C. (2020). Disentangling the effects of environment and ontogeny on tree functional dimensions for congeneric species in tropical forests. New Phytol., 226, 385–395.
+
+* The dependent variables should be normally distribute within groups.
+  + yes but except for nitrogen
+```{r}
+#Data
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+#Nitrogen trait data
+Data %>%
+ggplot() +
+ aes(x = Nitrogen) + 
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab("Nitrogen")+
+ theme_minimal()
+```
+
+* Homogeneity of variances across the range of predictors.Levene's and Barlett's test.
+  + Bartlett’s test: Compare the variances of two or more groups. The data must be normally distributed.
+  
+```{r}
+count <- 5
+list <- list()
+
+for (i in Data[,6:13]){
+  count <- count + 1
+  name <- names(Data[,count])
+  
+  list[[name]] <- local({
+   
+    i <- i
+  bartlett.test(i ~ Type, data = Data)
+  
+  })
+  
+}
+
+print(list)
+#The critical value of chi square is 9.488. If the Bartlett test statistic is greater than this critical value, there is a significant difference in the variances. If the Bartlett test statistic is less than this critical value, there is not a significance difference.
+
+# p-values less than 0.05 suggest variances are significantly different and the homogeneity of variance assumption has been violated, which is the case for all except Gmin, phosphorous, and Potassium. 
+```
+
+  + Levene’s test: A robust alternative to the Bartlett’s test that is less sensitive to departures from normality.
+
+* Linearity between all pairs of dependent variables, all pairs of covariates, and all dependent variable-covariate pairs in each cell
+
+PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.
+
+Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.
+
+After having computed an ordination such as PCA, it shows that habitat preferences do overlap. I want to know if the trait assemblage is different between the 3 habtiat preferences. A PERMANOVA lets me statistically determine if the centroid of the cluster of samples for the generalist differ from the centroid of samples for the specialist TF and specalist SF. Note that PERMANOVA is not done on the output of a ordination technique but rather on the underlying distance matrices. 
+
+The test statistic is a pseudo F-ratio, similar to the F-ratio in ANOVA. It compares the total sum of squared dissimilarities (or ranked dissimilarities) among objects belonging to different groups to that of objects belonging to the same group. Larger F-ratios indicate more pronounced group seperation, however, the significance of this ratiio is usually of more interest than its magnitude. (https://archetypalecology.wordpress.com/2018/02/21/permutational-multivariate-analysis-of-variance-permanova-in-r-preliminary/)
+
+
+```{r}
+
+data_PCA <- Data[, c(1:13)][,-c(1,2,3,4,5)]
+
+res.PCA <- FactoMineR::PCA(data_PCA, quali.sup = 1, graph = F)
+
+dis <- vegdist(data_PCA,method="euclidean") #Dissimilarity Indices for Community Ecologists
+mod <- betadisper(dis,Data$Type)
+anova(mod)
+```
+the null hypothesis of no differences between types is cannot be rejected (pvalue 0.3816)
+
+H0 = means are not different
+
+P-value = 0.3816 so we cannot reject H0 : our group dispersions are not different between types.
+
+Check if our treatments have different means. Use a permuting method to check if the difference is really due to the treatments.
+
+```{r}
+a<-adonis2(data_PCA~Data$Type, permutations = 999, method = "euclidean") 
+
+permanova <-a %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+ kable_classic(full_width = F, html_font = "Cambria") #%>%
+  #save_kable(file = "Permanova.png")
+```
+
+P-value (0.001) *** is significant so our group types have different means.
+
+Process a pairwise analyse to detect which treatments are different from each other.
+
+install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")`
+
+```{r}
+
+pairwise_adonis_type <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+
+pairwise_adonis_type$pairs[1] <- "TF specialist vs SF specialist"
+pairwise_adonis_type$pairs[2] <- "TF specialist vs generalist"
+pairwise_adonis_type$pairs[3] <- "SF specialist vs generalist"
+
+pairwise_adonis_habitat <- pairwise.adonis(data_PCA,Data$Habitat, sim.method = "euclidean") 
+
+pairwise_adonis_habitat$pairs[1] <- "TF habitat vs SF habitat"
+
+#Species preference
+pairwise_adonis_type_table <- pairwise_adonis_type %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "A. Species' preferences",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "A. Species' preferences.png", zoom = 5)
+
+#Habitat of collect
+pairwise_adonis_habitat_table <- pairwise_adonis_habitat %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "B. Habitat of collect",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "B. Habitat of collect.png", zoom = 5)
+
+```
+In order to reject the null hypothesis that the group means are equal, we need pvalue < 0.05 and a high F-value. We use the F-value to determine whether the between group variability of means is larger than the within the group variability of the individual values. If the ratio of between group and within group variation is sufficiently large, you can conclude that not all the means are equal.
+
+If the variation between the sample means is high relative to the variation within each of the samples, then the F-value will be large.
+
+## Table S5: Pairwise tables for the spearman correlation.
+
+Coefficients (A) and associated p-values (B) of leaf traits for the 21 studied species (n=552).
+
+```{r}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+traits <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+testRes = cor.mtest(traits, conf.level = 0.95)
+
+#image output, have to run until last live dev.off() for it to work.
+png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+
+#create correlation matrix
+cor_matrix <- traits %>%
+  na.omit() %>%
+  cor(method = "spearman")
+
+#correlation plot with no rows and column labels and without colors in the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
+
+# Add labels to the diagonal
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+dev.off()
+
+#significance
+res <- rcorr(as.matrix(traits), type = "spearman")
+res
+# Extract the correlation coefficients
+
+
+res$r %>%
+  kbl(caption ="", digits =2)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria")  %>%
+  save_kable("corr_coef.png")
+  
+img <- image_read("corr_coef.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_coef_resized.png")
+
+
+# Extract p-values associated to the correlation coefficients
+res$P%>%
+  kbl(caption ="", digits =3)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the associated p-values</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable("corr_pvalue.png")
+
+img <- image_read("corr_pvalue.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_pvalue_resized.png")
+
+
+```
+
