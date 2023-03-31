@@ -118,26 +118,26 @@ indval_SF_plot <- Specialist_SF  %>%
   ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
   geom_col() +
   scale_fill_brewer(palette = "YlGnBu", direction = 1) +
-  theme_minimal() +
+  theme_minimal(base_size = 12) +
   # theme(palette = "Tol") #color blind palette
-  theme(axis.text.x=element_text(angle=50, hjust = 1))+
-  theme(legend.position="none")
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
 
-ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
-ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
+#ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
+#ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
 
 indval_TF_plot<- Specialist_TF  %>%
   mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
   ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
   geom_col() +
   scale_fill_brewer(palette = "YlOrRd", direction = 1) +
-  theme_minimal() +
+  theme_minimal(base_size = 12) +
   # theme(palette = "Tol") #color blind palette
-  theme(axis.text.x=element_text(angle=50, hjust = 1))+
-  theme(legend.position="none")
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
 
-ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
-ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
+#ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+#ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
 #now for generalists
 
 
@@ -170,13 +170,25 @@ Generalist_diff_indval<- ggplot(Generalist_all) +
    aes(x = Species, y = Diff_Indval, fill = Species) +
    geom_col() +
    scale_fill_brewer(palette = "RdYlBu", direction = 1) +
-   theme_minimal() +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
-  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+   theme_minimal(base_size = 12) +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
   theme(legend.position="none")
 
-ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
-ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
+#ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
+#ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
 #même ordre de grandeur entre les indval TF et BF sauf pour le tachigali plutot plus SF. mais en meme temps abondance faible.
+
+
+group_figure <- ggpubr::ggarrange(
+  indval_TF_plot + theme(legend.position="none"),
+  indval_SF_plot + theme(legend.position="none"),
+  Generalist_diff_indval + theme(legend.position="none"),
+  labels = c("A", "B", "C"),
+  nrow= 3, ncol=1)
+
+
+ggsave(file="indval.svg", plot=group_figure, width=10, height=12)
+ggsave(file="indval.png", plot=group_figure, width=10, height=12)
 
 ```
 

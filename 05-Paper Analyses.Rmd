@@ -160,7 +160,41 @@ Metradica_log <- sub_data #552 indv
 
 No imputation. Vizualizing trait variation.
 
+```{r Data not log subset}
+
+# data
+
+library(dplyr)
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data
+
+#write.csv(Metradica, "Subset.csv")
+```
+
 ```{r Trait distribution coord_flip}
+
+
 data <- Metradica %>%
   dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
   reshape2::melt(c("Name", "Type"), variable.name = "Trait")
@@ -181,7 +215,7 @@ p <-  data %>%
   #              alpha = 0.5, col = "lightgrey") +
   #geom_violin(aes(fill = Type),
                alpha = 0.5, col = "lightgrey") +
-  scale_fill_manual(name = "Habitat preference", 
+  scale_fill_manual(name = "Species preference", 
                     values = c("TF" = "#E79F02", #orange for TF
                                 "BF" =  "#56B4E9", #blue for SF
                                 "Generalist" = "#009E72"),  #green for Generalists
@@ -1215,13 +1249,29 @@ install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdon
 
 ```{r}
 library(pairwiseAdonis)
-pairwise_adonis <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+pairwise_adonis_type <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+
+pairwise_adonis_type$pairs[1] <- "TF specialist vs SF specialist"
+pairwise_adonis_type$pairs[2] <- "TF specialist vs generalist"
+pairwise_adonis_type$pairs[3] <- "SF specialist vs generalist"
+
+pairwise_adonis_habitat <- pairwise.adonis(data_PCA,Data$Habitat, sim.method = "euclidean") 
+
+pairwise_adonis_habitat$pairs[1] <- "TF habitat vs SF habitat"
 
 
-pairwise_aaadonis <- pairwise_adonis %>%
-  kbl(caption = "Post-hoc pairwise analysis") %>% 
+pairwise_adonis_type_table <- pairwise_adonis_type %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "A. Species' preferences",digits =3) %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
-  save_kable(file = "pairwise_adonis.png", zoom = 10)
+  save_kable(file = "A. Species' preferences.png", zoom = 5)
+
+
+pairwise_adonis_habitat_table <- pairwise_adonis_habitat %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "B. Habitat of collect",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "B. Habitat of collect.png", zoom = 5)
 
 ```
 In order to reject the null hypothesis that the group means are equal, we need pvalue < 0.05 and a high F-value. We use the F-value to determine whether the between group variability of means is larger than the within the group variability of the individual values. If the ratio of between group and within group variation is sufficiently large, you can conclude that not all the means are equal.
