@@ -27,6 +27,7 @@ library(dplyr)
 library(tidyr)
 library(janitor)
 library(forcats)
+library(ggpubr)
 library(ggplot2)
 library(corrplot) #correlation
 library("Hmisc") #for the significance for the correlation
@@ -351,6 +352,7 @@ Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
   mutate(TLP = -TLP)
 
 Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+Data$Habitat<- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra firme')
 Data <- Data %>% na.omit()
 
 #PCA without stomata
@@ -369,6 +371,38 @@ axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
 
 #Contributions of variables to PC3
 axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+
+fviz_pca_var(res.pca, axes = c(1, 3)) #variables 
+fviz_pca_ind(res.pca, axes = c(1, 3), col.ind = Data$Type, geom = "point") #individuals
+
+A <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Type,  
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+B <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Type,
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+E <- ggarrange(A, B, ncol = 2, nrow = 1, labels = c("A", "B"), common.legend = T, legend = "right")
+
+C <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+D <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+G <- ggarrange(C, D, ncol = 2, nrow = 1, labels = c("C", "D"), common.legend = T, legend = "right")
+H <- ggarrange(E, G, ncol = 1, nrow = 2)
+
+ggsave(filename = "Dimension3.png", plot = H, bg = "white", width = 10, height = 10, dpi = 600)
 
 #Contributions of variables to PC4
 axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
