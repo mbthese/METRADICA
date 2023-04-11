@@ -4,3 +4,8 @@
 .Ruserdata
 _bookdown_*
 Clean_data/
+
+
+*.pdf
+*.png
+*.svg
