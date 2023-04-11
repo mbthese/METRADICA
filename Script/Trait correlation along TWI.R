@@ -2,6 +2,11 @@
 ## R script related to the multitrait coordiantion along the topographic wetness index ##
 #########################################################################################
 
+library(devtools)
+library(ggfortify)
+library(ggplot2)
+
+
 ###########################################
 # Data preparation and log-transformation #
 ###########################################

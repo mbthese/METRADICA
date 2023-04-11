@@ -328,7 +328,7 @@ Plot_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/
 googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
 
 Plot_table <- Plot_table %>% 
-  dplyr::select(-PlotName)
+  dplyr::select(-PlotName, -Xutm, -Yutm, -Localization)
   
 Plot_table %>%
   kbl(caption = "Summary of sampling site information", escape = FALSE, digits = 2) %>%
