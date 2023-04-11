@@ -30,7 +30,7 @@ library(forcats)
 library(ggplot2)
 library(corrplot) #correlation
 library("Hmisc") #for the significance for the correlation
-library(magick) #for tables
+library(magick) #for images
 library(vegan) #for permanova
 library(pairwiseAdonis) #for pairwise comparaison after permanova
 ```
@@ -40,7 +40,7 @@ library(pairwiseAdonis) #for pairwise comparaison after permanova
 
 ##Figure S1: The 21 selected species’ phylogeny.
 
-```{r Phylogeny, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Figure S1, echo=FALSE, message=FALSE, warning=FALSE}
 
 #select focal species
 species <- data.frame(taxon = c(
@@ -103,7 +103,7 @@ ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
 
 ##Figure S2: Discrimination of the habitats using the topographic wetness index.
 
-```{r Habitat and TWI}
+```{r Figure S2}
 Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
 Data$Forest <- as.factor(Data$Forest)
 Data$Habitat <- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra Firme')
@@ -273,7 +273,7 @@ ggsave(file="indval.png", plot=group_figure, width=10, height=12)
 
 No imputation, not transformed. Visualizing raw trait variation.
 
-```{r Data fr trait variation}
+```{r Figure S4}
 
 Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
   dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
@@ -339,7 +339,7 @@ p <-  data %>%
 
 PCA with log-transformed traits, that were imputed but without stomata.
 
-```{r PCA contribution of variables}
+```{r Figure S5}
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
   dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
   rename(Potassium = K, 
@@ -389,7 +389,7 @@ ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "whit
 
 ##Figure S6: Spearman correlation coefficients among leaf traits. 
 
-```{r Spearman correlation}
+```{r Figure S6}
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
   dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
   rename(Potassium = K, 
@@ -435,7 +435,7 @@ dev.off()
 
 Leaf traits are ln-transformed. The adjusted R squared is equal to 0.011. 
 
-```{r Stomatal density and minimal conductance}
+```{r Figure S7}
 
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv")
 #SD and gmin
@@ -454,7 +454,7 @@ A <- get_formula(model)
 
 ##Table S1. Sampling sites supplementary information. 
 
-```{r Sampling site information }
+```{r Table S1 }
 
 #get authorization 
 googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
@@ -474,7 +474,7 @@ Plot_table %>%
 
 ##Table S2. Individuals per species collected in the three sampling sites. 
 
-```{r Individuals per species collected in the three sampling sites. }
+```{r Table S2}
 
 #get authorization 
 googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
@@ -538,7 +538,7 @@ save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
 
 ##Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. 
 
-```{r Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
+```{r Table S3}
 
 #get authorization
 googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
@@ -561,114 +561,48 @@ Indval %>%
 
 ##Table S4: Permutational Manova analysis and post-hoc pairwise analysis.
 
-To explore differences along each PC axis. Fortunel, C., Stahl, C., Heuret, P., Nicolini, E. & Baraloto, C. (2020). Disentangling the effects of environment and ontogeny on tree functional dimensions for congeneric species in tropical forests. New Phytol., 226, 385–395.
-
-* The dependent variables should be normally distribute within groups.
-  + yes but except for nitrogen
-```{r}
-#Data
-Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
-  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
-  rename(Potassium = K, 
-         Phosphorous = P, 
-         Nitrogen = N,
-         Carbon = C) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
-  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
-  mutate(TLP = -TLP)
-
-#Nitrogen trait data
-Data %>%
-ggplot() +
- aes(x = Nitrogen) + 
- geom_histogram(bins = 30L, fill = "#112446") +
- xlab("Nitrogen")+
- theme_minimal()
-```
-
-* Homogeneity of variances across the range of predictors.Levene's and Barlett's test.
-  + Bartlett’s test: Compare the variances of two or more groups. The data must be normally distributed.
-  
-```{r}
-count <- 5
-list <- list()
-
-for (i in Data[,6:13]){
-  count <- count + 1
-  name <- names(Data[,count])
-  
-  list[[name]] <- local({
-   
-    i <- i
-  bartlett.test(i ~ Type, data = Data)
-  
-  })
-  
-}
-
-print(list)
-#The critical value of chi square is 9.488. If the Bartlett test statistic is greater than this critical value, there is a significant difference in the variances. If the Bartlett test statistic is less than this critical value, there is not a significance difference.
-
-# p-values less than 0.05 suggest variances are significantly different and the homogeneity of variance assumption has been violated, which is the case for all except Gmin, phosphorous, and Potassium. 
-```
-
-  + Levene’s test: A robust alternative to the Bartlett’s test that is less sensitive to departures from normality.
-
-* Linearity between all pairs of dependent variables, all pairs of covariates, and all dependent variable-covariate pairs in each cell
-
 PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.
 
 Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.
 
-After having computed an ordination such as PCA, it shows that habitat preferences do overlap. I want to know if the trait assemblage is different between the 3 habtiat preferences. A PERMANOVA lets me statistically determine if the centroid of the cluster of samples for the generalist differ from the centroid of samples for the specialist TF and specalist SF. Note that PERMANOVA is not done on the output of a ordination technique but rather on the underlying distance matrices. 
+```{r Table S4}
+#Data
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
 
-The test statistic is a pseudo F-ratio, similar to the F-ratio in ANOVA. It compares the total sum of squared dissimilarities (or ranked dissimilarities) among objects belonging to different groups to that of objects belonging to the same group. Larger F-ratios indicate more pronounced group seperation, however, the significance of this ratiio is usually of more interest than its magnitude. (https://archetypalecology.wordpress.com/2018/02/21/permutational-multivariate-analysis-of-variance-permanova-in-r-preliminary/)
 
+data_PCA <- Data[, c(1:17)][,-c(1,2,3,4,5,6,7,8,13)]
 
-```{r}
+adonis_type<-adonis2(data_PCA~Metradica_log$Type, permutations = 999, method = "euclidean") 
+adonis_habitat<-adonis2(data_PCA~Metradica_log$Habitat, permutations = 999, method = "euclidean") 
 
-data_PCA <- Data[, c(1:13)][,-c(1,2,3,4,5)]
-
-res.PCA <- FactoMineR::PCA(data_PCA, quali.sup = 1, graph = F)
-
-dis <- vegdist(data_PCA,method="euclidean") #Dissimilarity Indices for Community Ecologists
-mod <- betadisper(dis,Data$Type)
-anova(mod)
-```
-the null hypothesis of no differences between types is cannot be rejected (pvalue 0.3816)
-
-H0 = means are not different
-
-P-value = 0.3816 so we cannot reject H0 : our group dispersions are not different between types.
-
-Check if our treatments have different means. Use a permuting method to check if the difference is really due to the treatments.
-
-```{r}
-a<-adonis2(data_PCA~Data$Type, permutations = 999, method = "euclidean") 
-
-permanova <-a %>%
+permanova <-adonis_type %>%
   kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
   kable_styling(latex_options="scale_down", full_width = FALSE) %>%
- kable_classic(full_width = F, html_font = "Cambria") #%>%
-  #save_kable(file = "Permanova.png")
-```
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
 
-P-value (0.001) *** is significant so our group types have different means.
+permanova <-adonis_habitat %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
 
-Process a pairwise analyse to detect which treatments are different from each other.
+#P-value (0.001) *** is significant so our group types have different means.
 
-install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")`
-
-```{r}
-
+#Process a pairwise analyse to detect which treatments are different from each other.
 pairwise_adonis_type <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
-
 pairwise_adonis_type$pairs[1] <- "TF specialist vs SF specialist"
 pairwise_adonis_type$pairs[2] <- "TF specialist vs generalist"
 pairwise_adonis_type$pairs[3] <- "SF specialist vs generalist"
-
 pairwise_adonis_habitat <- pairwise.adonis(data_PCA,Data$Habitat, sim.method = "euclidean") 
-
 pairwise_adonis_habitat$pairs[1] <- "TF habitat vs SF habitat"
 
 #Species preference
@@ -684,17 +618,14 @@ pairwise_adonis_habitat_table <- pairwise_adonis_habitat %>%
   kbl(caption = "B. Habitat of collect",digits =3) %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
   save_kable(file = "B. Habitat of collect.png", zoom = 5)
-
 ```
-In order to reject the null hypothesis that the group means are equal, we need pvalue < 0.05 and a high F-value. We use the F-value to determine whether the between group variability of means is larger than the within the group variability of the individual values. If the ratio of between group and within group variation is sufficiently large, you can conclude that not all the means are equal.
 
-If the variation between the sample means is high relative to the variation within each of the samples, then the F-value will be large.
 
 ## Table S5: Pairwise tables for the spearman correlation.
 
 Coefficients (A) and associated p-values (B) of leaf traits for the 21 studied species (n=552).
 
-```{r}
+```{r Table S5}
 #same beginning of script as for the Figure S6: Spearman corerlation.
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
   dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
@@ -768,5 +699,65 @@ img_resized <- image_scale(img, "800x600")
 image_write(img_resized, "corr_pvalue_resized.png")
 
 
+```
+
+## Table S6: Model summary for each trait from equation 1.
+
+```{r Table 6}
+#library used
+library(nlme) #to fit the model and do the variance partitioning with ML method
+library(lme4) #for the VarCorr function
+library(dplyr) #to pipe
+library(ggplot2) #to plot
+library(kableExtra) #to build nice tables
+
+#data used (log on all traits)
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Forest <- as.factor(Data$Forest)
+
+#function for extracting the coefficient of the model
+model_coef_table <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # build coef table 
+  coef_table <- coef(summary(model))
+  coef_table <- as.data.frame(coef_table)
+  
+  return(coef_table)
+}
+
+
+# For all traits call model_coef_table function
+coef_tables <- list()
+
+for (i in colnames(Data)[9:17]){
+
+  coef_tables[[i]] <- model_coef_table(i, Data)
+}
+
+# Combine all coefficient tables into one data frame
+coef_table <- do.call(rbind, coef_tables)
+
+
+# create nice table
+coef_table %>%
+  kbl(caption = "", escape = FALSE, digits = 3) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
 ```
 

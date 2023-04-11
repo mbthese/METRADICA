@@ -7,6 +7,7 @@ library(nlme) #to fit the model and do the variance partitioning with ML method
 library(lme4) #for the VarCorr function
 library(dplyr) #to pipe
 library(ggplot2) #to plot
+library(kableExtra) #to build nice tables
 
 #data used (log on all traits)
 Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
@@ -131,3 +132,44 @@ for (i in colnames(Data)[9:17]){
   
   
 }
+
+##############################
+###Build coefficient table ###
+##############################
+
+
+#function for extracting the coefficient of the model
+model_coef_table <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # build coef table 
+  coef_table <- coef(summary(model))
+  coef_table <- as.data.frame(coef_table)
+  
+  return(coef_table)
+}
+
+
+# For all traits call model_coef_table function
+coef_tables <- list()
+
+for (i in colnames(Data)[9:17]){
+
+  coef_tables[[i]] <- model_coef_table(i, Data)
+}
+
+# Combine all coefficient tables into one data frame
+coef_table <- do.call(rbind, coef_tables)
+
+
+# create nice table
+coef_table %>%
+  kbl(caption = "", escape = FALSE, digits = 3) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
