@@ -8,9 +8,9 @@ output:
 editor_options:
   chunk_output_type: inline
 ---
-# Part three : Results {-}
+# (PART) Part three : Analyses {-}
+# Distribution of traits
 
-## Distribution of major traits 
 
 A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
 
@@ -66,7 +66,7 @@ Metradica <- sub_data #552 indv
 Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for small sample size (n=30)
 ```
 
-### Water traits 
+## Water traits 
 
 ```{r echo=FALSE, warning=FALSE}
 yaxis_water <<- c(expression("TLP"),
@@ -136,7 +136,7 @@ print("Data is normal")
 
 The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
 
-###Vein traits
+##Vein traits
 ```{r echo=FALSE, warning=FALSE}
 
 
@@ -209,7 +209,7 @@ print("Data is normal")
 ```
 
 
-### Chemistry traits
+## Chemistry traits
 ```{r echo=FALSE, warning=FALSE}
 yaxis_chem <<- c(expression("Nitrogen"),
             expression("Carbon"),
@@ -297,7 +297,7 @@ X.S data is not normal[1]
 Mg..g.kg. data is not normal[1]
 Ca..g.kg. data is not normal[1]
 
-### DBH
+## DBH
 ```{r DBH, echo=FALSE, warning=FALSE}
 #chem traits
 count <- 0
@@ -376,7 +376,7 @@ print(plot_DBH_majvla)
 
 
 
-### Crown position 
+## Crown position 
 ```{r echo=FALSE, warning=FALSE}
 Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition)
 
@@ -486,7 +486,7 @@ print(plot_CP_majvla)
 
 
 
-### TreeDawkins 
+## TreeDawkins 
 ```{r echo=FALSE, warning=FALSE}
 Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins)
 
@@ -575,7 +575,7 @@ print(plot_TreeDawkins_majvla)
 
 ```
 
-## Gmin
+# Gmin
 
 The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
 
@@ -638,7 +638,7 @@ It is unclear whether a higher gmin in the Bafog site is assigned to stomatal op
 * **compare with stomatal density** 
 * **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
 
-## LSWC
+# LSWC
 
 One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
 
@@ -695,7 +695,7 @@ print(B)
 
 ``` 
 
-## TLP
+# TLP
 
 * TLP 
     + hypotheses : Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with more negative values for osmotic potential at at turgor loss point.
@@ -780,7 +780,7 @@ range of species responses to drought within Amazonian forest communities.
 
 
 
-## MajVLA
+# MajVLA
 
 The leaf is a critical component in the plant water transport system, accounting for 30% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011). 
 
@@ -1018,9 +1018,9 @@ Traits that gives us info on the construction cost. For each vein order, we can 
 
 
 
-## Trait covariation
+# Trait covariation
 
-### Sub data
+## Sub data
 
 ```{r Subdata_Specialisation_Results}
 
@@ -1042,12 +1042,13 @@ species <- Metradica %>% select(Code, Species, Genus, Name)
 ```
 
 
-### Standardize
+## Standardize
 ```{r}
+library(vegan)
 # the way you are using decostand with 'standardize', it is the same as scale option with rda with scale =TRUE. 
 
 # Scale and center variables; standardize: scale x to zero mean and unit variance (defaultMARGIN = 2)
-traits.z <- decostand(traits_log, method = "standardize") 
+traits.z <- vegan::decostand(traits_log, method = "standardize") 
 
 # Variables are now centered around a mean of 0
 round(apply(traits.z, 2, mean), 1)
@@ -1056,14 +1057,13 @@ round(apply(traits.z, 2, mean), 1)
 apply(traits.z, 2, sd)
 ```
 
-### Correlation
+## Correlation
 
 Summary of variables 
-```{r}
-#logged traits
-png(height=500, width=500, file="summary_traits.png")
+```{r eval=FALSE, include=FALSE}
+
 plot(log(abs(Metradica[,9:16])))
-dev.off()
+
 ```
 
 The **correlation coefficient** is a representation of the strength of relationship between one variable and another.
@@ -1081,7 +1081,7 @@ When you have continuous data that do not follow a line, you must determine whet
 Multicollinearity occurs when the multiple linear regression analysis includes several variables that are significantly correlated not only with the dependent variable but also to each other. Multicollinearity makes some of the significant variables under study to be statistically insignificant. Primary techniques for detecting the multicollinearity are correlation coefficients.
  
 
-```{r spearman}
+```{r spearman, eval=FALSE, include=FALSE}
 library(corrplot)
 library("Hmisc") #function rcorr() [in Hmisc package] can be used to compute the significance levels for pearson and spearman correlations. It returns both the correlation coefficients and the p-value of the correlation for all possible pairs of columns in the data table.
 
@@ -1118,12 +1118,10 @@ res2
 ```
 
 pearson 
-```{r pearson}
+```{r pearson, eval=FALSE, include=FALSE}
 traits_log %>% 
   na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
   cor(method = "pearson") %>% 
   corrplot::corrplot.mixed()
 ```
 
-
-###PCA

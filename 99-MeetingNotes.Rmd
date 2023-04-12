@@ -6,9 +6,9 @@ output:
   pdf_document: default
   html_document: default
 ---
-# Part five : Notes {-}
 
-## Meeting 26/01/2022
+
+# Meeting 26/01/2022
 
 Metradica meeting 
 
