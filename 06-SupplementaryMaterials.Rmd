@@ -137,7 +137,7 @@ We explored the degree of habitat preference using **Indicator Species Analysis*
 
 *Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists and IndVal ≥  0.2598  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any preference and therefore called generalists.*
 
-```{r Indval, include=FALSE}
+```{r Indval data, include=FALSE}
 #Supplementary data from the Baraloto et al 2021.
 
 indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")

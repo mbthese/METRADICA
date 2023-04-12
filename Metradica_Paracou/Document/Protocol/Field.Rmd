@@ -1,0 +1,43 @@
+---
+title: "Sampling METRADICA"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  bookdown::html_document2: default
+  pdf_document: default
+---
+
+## Preparation
+
+- [ ] Book vehicule
+- [ ] Charge satellite phone (if less than 3 people)
+- [ ] Charge GPS (+ take an additional pair of batteries)
+- [ ] BigShot material with rope + bags (cf. Jocelyn) + helmet + goggles
+- [ ] Maps produced by QGIS software
+
+
+- [ ] Prepare cooler/bucket with:
+    - [ ] 1 ziplock (large) bag for each individual
+    - [ ] 2 ziplock (medium) bags for the following traits 
+          - [ ] 1/ gmin + ptlp
+          - [ ] 2/ chemistry, stomatas, fvfm
+    - [ ] 1 ziplock bag for the RWC leaf that were **weighted** beforehand
+    - [ ] a bottle of water
+    - [ ] sharpies
+
+
+## Protocol
+
+- [ ] Find tree using the maps and the fieldnumbers
+- [ ] Bigshot the tree (Canopy trees but not only, best to collect in the upper crown: medium light exposed branch and trees (*not only the most exposed to the light*))
+- [ ] Fill in the field worksheet
+- [ ] Assess tree and branch height
+- [ ] Assess tree and branch Dawkins
+- [ ] Collect mature, undamaged, healthy leaves
+- [ ] Annote the ziplock bags with Plot, Subplot, FieldNumber, Species, Unique_Code of Metradica
+- [ ] Place a moist paper in the ziplock bags and blow inside the bags for CO2 saturation (*to close stomatas*) 
+- [ ] Place 1 leaf separately in the **weighted** RWC ziplock bag : 
+- [ ] Place small ziplocks in bigger one, carry within the cooler/bucket
+
+

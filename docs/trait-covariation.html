@@ -4,13 +4,13 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 10 Trait covariation | Literature</title>
+  <title>Chapter 11 Trait covariation | Meeting Notes</title>
   <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
 set in the _output.yml file.</p>" />
   <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 10 Trait covariation | Literature" />
+  <meta property="og:title" content="Chapter 11 Trait covariation | Meeting Notes" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
@@ -19,7 +19,7 @@ set in the _output.yml file.</p>" />
   <meta name="github-repo" content="mbthese/METRADICA" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 10 Trait covariation | Literature" />
+  <meta name="twitter:title" content="Chapter 11 Trait covariation | Meeting Notes" />
   
   <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
@@ -29,7 +29,6 @@ set in the _output.yml file.</p>" />
 <meta name="author" content="Marion Boisseaux" />
 
 
-<meta name="date" content="2022-08-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +57,8 @@ set in the _output.yml file.</p>" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <script src="libs/plotly-binding-4.10.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
@@ -149,64 +150,72 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">Metradica</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> url: your book url like https://bookdown.org/yihui/bookdown</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
 <li class="part"><span><b>I Part one: general introduction</b></span></li>
 <li class="chapter" data-level="2" data-path="project-introduction.html"><a href="project-introduction.html"><i class="fa fa-check"></i><b>2</b> Project introduction</a></li>
+<li class="chapter" data-level="3" data-path="hypotheses.html"><a href="hypotheses.html"><i class="fa fa-check"></i><b>3</b> Hypotheses</a></li>
 <li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
-<li class="chapter" data-level="3" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>3</b> Sampling</a>
+<li class="chapter" data-level="4" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>4</b> Sampling</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>3.1</b> Sites</a></li>
-<li class="chapter" data-level="3.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>3.2</b> Habitats</a></li>
-<li class="chapter" data-level="3.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>3.3</b> Species</a></li>
-<li class="chapter" data-level="3.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>3.4</b> Individuals</a></li>
-<li class="chapter" data-level="3.5" data-path="sampling.html"><a href="sampling.html#sampling-strategy"><i class="fa fa-check"></i><b>3.5</b> Sampling strategy</a></li>
+<li class="chapter" data-level="4.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>4.1</b> Sites</a></li>
+<li class="chapter" data-level="4.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>4.2</b> Habitats</a></li>
+<li class="chapter" data-level="4.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>4.3</b> Species</a></li>
+<li class="chapter" data-level="4.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>4.4</b> Individuals</a></li>
+<li class="chapter" data-level="4.5" data-path="sampling.html"><a href="sampling.html#sampling-strategy"><i class="fa fa-check"></i><b>4.5</b> Sampling strategy</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>4</b> Traits</a>
+<li class="chapter" data-level="5" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>5</b> Traits</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="traits.html"><a href="traits.html#water--and-carbon-related-traits"><i class="fa fa-check"></i><b>4.1</b> Water- and carbon-related traits</a></li>
-<li class="chapter" data-level="4.2" data-path="traits.html"><a href="traits.html#additional-traits"><i class="fa fa-check"></i><b>4.2</b> Additional traits</a></li>
-<li class="chapter" data-level="4.3" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>4.3</b> Protocols</a></li>
-<li class="chapter" data-level="4.4" data-path="traits.html"><a href="traits.html#organisation"><i class="fa fa-check"></i><b>4.4</b> Organisation</a></li>
+<li class="chapter" data-level="5.1" data-path="traits.html"><a href="traits.html#water--and-carbon-related-traits"><i class="fa fa-check"></i><b>5.1</b> Water- and carbon-related traits</a></li>
+<li class="chapter" data-level="5.2" data-path="traits.html"><a href="traits.html#additional-traits"><i class="fa fa-check"></i><b>5.2</b> Additional traits</a></li>
+<li class="chapter" data-level="5.3" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>5.3</b> Protocols</a></li>
+<li class="chapter" data-level="5.4" data-path="traits.html"><a href="traits.html#organisation"><i class="fa fa-check"></i><b>5.4</b> Organisation</a></li>
 </ul></li>
 <li class="part"><span><b>III Part three : Analyses</b></span></li>
-<li class="chapter" data-level="5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html"><i class="fa fa-check"></i><b>5</b> Distribution of traits</a>
+<li class="chapter" data-level="6" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html"><i class="fa fa-check"></i><b>6</b> Distribution of traits</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#water-traits"><i class="fa fa-check"></i><b>5.1</b> Water traits</a></li>
-<li class="chapter" data-level="5.2" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#chemistry-traits"><i class="fa fa-check"></i><b>5.2</b> Chemistry traits</a></li>
-<li class="chapter" data-level="5.3" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#dbh"><i class="fa fa-check"></i><b>5.3</b> DBH</a></li>
-<li class="chapter" data-level="5.4" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#crown-position"><i class="fa fa-check"></i><b>5.4</b> Crown position</a></li>
-<li class="chapter" data-level="5.5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#treedawkins"><i class="fa fa-check"></i><b>5.5</b> TreeDawkins</a></li>
+<li class="chapter" data-level="6.1" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#water-traits"><i class="fa fa-check"></i><b>6.1</b> Water traits</a></li>
+<li class="chapter" data-level="6.2" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#chemistry-traits"><i class="fa fa-check"></i><b>6.2</b> Chemistry traits</a></li>
+<li class="chapter" data-level="6.3" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#dbh"><i class="fa fa-check"></i><b>6.3</b> DBH</a></li>
+<li class="chapter" data-level="6.4" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#crown-position"><i class="fa fa-check"></i><b>6.4</b> Crown position</a></li>
+<li class="chapter" data-level="6.5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#treedawkins"><i class="fa fa-check"></i><b>6.5</b> TreeDawkins</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="gmin.html"><a href="gmin.html"><i class="fa fa-check"></i><b>6</b> Gmin</a></li>
-<li class="chapter" data-level="7" data-path="lswc.html"><a href="lswc.html"><i class="fa fa-check"></i><b>7</b> LSWC</a></li>
-<li class="chapter" data-level="8" data-path="tlp.html"><a href="tlp.html"><i class="fa fa-check"></i><b>8</b> TLP</a></li>
-<li class="chapter" data-level="9" data-path="majvla.html"><a href="majvla.html"><i class="fa fa-check"></i><b>9</b> MajVLA</a></li>
-<li class="chapter" data-level="10" data-path="trait-covariation.html"><a href="trait-covariation.html"><i class="fa fa-check"></i><b>10</b> Trait covariation</a>
+<li class="chapter" data-level="7" data-path="gmin.html"><a href="gmin.html"><i class="fa fa-check"></i><b>7</b> Gmin</a></li>
+<li class="chapter" data-level="8" data-path="lswc.html"><a href="lswc.html"><i class="fa fa-check"></i><b>8</b> LSWC</a></li>
+<li class="chapter" data-level="9" data-path="tlp.html"><a href="tlp.html"><i class="fa fa-check"></i><b>9</b> TLP</a></li>
+<li class="chapter" data-level="10" data-path="majvla.html"><a href="majvla.html"><i class="fa fa-check"></i><b>10</b> MajVLA</a></li>
+<li class="chapter" data-level="11" data-path="trait-covariation.html"><a href="trait-covariation.html"><i class="fa fa-check"></i><b>11</b> Trait covariation</a>
 <ul>
-<li class="chapter" data-level="10.1" data-path="trait-covariation.html"><a href="trait-covariation.html#sub-data"><i class="fa fa-check"></i><b>10.1</b> Sub data</a></li>
-<li class="chapter" data-level="10.2" data-path="trait-covariation.html"><a href="trait-covariation.html#standardize"><i class="fa fa-check"></i><b>10.2</b> Standardize</a></li>
-<li class="chapter" data-level="10.3" data-path="trait-covariation.html"><a href="trait-covariation.html#correlation"><i class="fa fa-check"></i><b>10.3</b> Correlation</a></li>
+<li class="chapter" data-level="11.1" data-path="trait-covariation.html"><a href="trait-covariation.html#sub-data"><i class="fa fa-check"></i><b>11.1</b> Sub data</a></li>
+<li class="chapter" data-level="11.2" data-path="trait-covariation.html"><a href="trait-covariation.html#standardize"><i class="fa fa-check"></i><b>11.2</b> Standardize</a></li>
+<li class="chapter" data-level="11.3" data-path="trait-covariation.html"><a href="trait-covariation.html#correlation"><i class="fa fa-check"></i><b>11.3</b> Correlation</a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>11</b> Results</a>
+<li class="chapter" data-level="12" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>12</b> Results</a>
 <ul>
-<li class="chapter" data-level="11.1" data-path="results.html"><a href="results.html#contribution-of-the-environment-to-single-trait-variation"><i class="fa fa-check"></i><b>11.1</b> Contribution of the environment to single-trait variation</a></li>
-<li class="chapter" data-level="11.2" data-path="results.html"><a href="results.html#traits-covariation"><i class="fa fa-check"></i><b>11.2</b> Traits covariation</a></li>
-<li class="chapter" data-level="11.3" data-path="results.html"><a href="results.html#leaf-trait-syndrome-variation-along-the-twi-gradient"><i class="fa fa-check"></i><b>11.3</b> Leaf trait syndrome variation along the TWI gradient</a></li>
-<li class="chapter" data-level="11.4" data-path="results.html"><a href="results.html#intraspecific-trait-variability"><i class="fa fa-check"></i><b>11.4</b> Intraspecific trait variability</a></li>
+<li class="chapter" data-level="12.1" data-path="results.html"><a href="results.html#contribution-of-the-environment-to-single-trait-variation"><i class="fa fa-check"></i><b>12.1</b> Contribution of the environment to single-trait variation</a></li>
+<li class="chapter" data-level="12.2" data-path="results.html"><a href="results.html#traits-covariation"><i class="fa fa-check"></i><b>12.2</b> Traits covariation</a></li>
+<li class="chapter" data-level="12.3" data-path="results.html"><a href="results.html#leaf-trait-syndrome-variation-along-the-twi-gradient"><i class="fa fa-check"></i><b>12.3</b> Leaf trait syndrome variation along the TWI gradient</a></li>
+<li class="chapter" data-level="12.4" data-path="results.html"><a href="results.html#intraspecific-trait-variability"><i class="fa fa-check"></i><b>12.4</b> Intraspecific trait variability</a></li>
 </ul></li>
-<li class="chapter" data-level="12" data-path="supporting-information.html"><a href="supporting-information.html"><i class="fa fa-check"></i><b>12</b> Supporting Information</a>
+<li class="part"><span><b>IV Part four : Annexes</b></span></li>
+<li class="chapter" data-level="13" data-path="supporting-information.html"><a href="supporting-information.html"><i class="fa fa-check"></i><b>13</b> Supporting Information</a>
 <ul>
-<li class="chapter" data-level="12.1" data-path="supporting-information.html"><a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation."><i class="fa fa-check"></i><b>12.1</b> Table S5: Pairwise tables for the spearman correlation.</a></li>
-<li class="chapter" data-level="12.2" data-path="supporting-information.html"><a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1."><i class="fa fa-check"></i><b>12.2</b> Table S6: Model summary for each trait from equation 1.</a></li>
+<li class="chapter" data-level="13.1" data-path="supporting-information.html"><a href="supporting-information.html#figure-s1-the-21-selected-species-phylogeny."><i class="fa fa-check"></i><b>13.1</b> Figure S1: The 21 selected species’ phylogeny.</a></li>
+<li class="chapter" data-level="13.2" data-path="supporting-information.html"><a href="supporting-information.html#figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index."><i class="fa fa-check"></i><b>13.2</b> Figure S2: Discrimination of the habitats using the topographic wetness index.</a></li>
+<li class="chapter" data-level="13.3" data-path="supporting-information.html"><a href="supporting-information.html#figure-s3.-indval-values-for-the-studied-species."><i class="fa fa-check"></i><b>13.3</b> Figure S3. Indval values for the studied species.</a></li>
+<li class="chapter" data-level="13.4" data-path="supporting-information.html"><a href="supporting-information.html#figure-s4-variation-of-leaf-trait-values-among-species."><i class="fa fa-check"></i><b>13.4</b> Figure S4: Variation of leaf trait values among species.</a></li>
+<li class="chapter" data-level="13.5" data-path="supporting-information.html"><a href="supporting-information.html#figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits."><i class="fa fa-check"></i><b>13.5</b> Figure S5: Trait contributions to first four principal component axes among leaf traits.</a></li>
+<li class="chapter" data-level="13.6" data-path="supporting-information.html"><a href="supporting-information.html#figure-s6-spearman-correlation-coefficients-among-leaf-traits."><i class="fa fa-check"></i><b>13.6</b> Figure S6: Spearman correlation coefficients among leaf traits.</a></li>
+<li class="chapter" data-level="13.7" data-path="supporting-information.html"><a href="supporting-information.html#figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance."><i class="fa fa-check"></i><b>13.7</b> Figure S7: Correlation between stomatal density and minimal leaf conductance.</a></li>
+<li class="chapter" data-level="13.8" data-path="supporting-information.html"><a href="supporting-information.html#table-s1.-sampling-sites-supplementary-information."><i class="fa fa-check"></i><b>13.8</b> Table S1. Sampling sites supplementary information.</a></li>
+<li class="chapter" data-level="13.9" data-path="supporting-information.html"><a href="supporting-information.html#table-s2.-individuals-per-species-collected-in-the-three-sampling-sites."><i class="fa fa-check"></i><b>13.9</b> Table S2. Individuals per species collected in the three sampling sites.</a></li>
+<li class="chapter" data-level="13.10" data-path="supporting-information.html"><a href="supporting-information.html#table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana."><i class="fa fa-check"></i><b>13.10</b> Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana.</a></li>
+<li class="chapter" data-level="13.11" data-path="supporting-information.html"><a href="supporting-information.html#table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis."><i class="fa fa-check"></i><b>13.11</b> Table S4: Permutational Manova analysis and post-hoc pairwise analysis.</a></li>
+<li class="chapter" data-level="13.12" data-path="supporting-information.html"><a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation."><i class="fa fa-check"></i><b>13.12</b> Table S5: Pairwise tables for the spearman correlation.</a></li>
+<li class="chapter" data-level="13.13" data-path="supporting-information.html"><a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1."><i class="fa fa-check"></i><b>13.13</b> Table S6: Model summary for each trait from equation 1.</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="part-four-discussion.html"><a href="part-four-discussion.html"><i class="fa fa-check"></i>Part four : Discussion</a>
-<ul>
-<li class="chapter" data-level="12.3" data-path="part-four-discussion.html"><a href="part-four-discussion.html#waterlogging"><i class="fa fa-check"></i><b>12.3</b> Waterlogging</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="part-five-notes.html"><a href="part-five-notes.html"><i class="fa fa-check"></i>Part five : Notes</a>
-<ul>
-<li class="chapter" data-level="12.4" data-path="part-five-notes.html"><a href="part-five-notes.html#meeting-26012022"><i class="fa fa-check"></i><b>12.4</b> Meeting 26/01/2022</a></li>
-</ul></li>
+<li class="chapter" data-level="" data-path="part-five-notes.html"><a href="part-five-notes.html"><i class="fa fa-check"></i>Part five : Notes</a></li>
+<li class="chapter" data-level="14" data-path="waterlogging.html"><a href="waterlogging.html"><i class="fa fa-check"></i><b>14</b> Waterlogging</a></li>
+<li class="chapter" data-level="15" data-path="meeting-26012022.html"><a href="meeting-26012022.html"><i class="fa fa-check"></i><b>15</b> Meeting 26/01/2022</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
 
@@ -219,7 +228,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Literature</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Meeting Notes</a>
           </h1>
         </div>
 
@@ -227,58 +236,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="trait-covariation" class="section level1 hasAnchor" number="10">
-<h1><span class="header-section-number">Chapter 10</span> Trait covariation<a href="trait-covariation.html#trait-covariation" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="sub-data" class="section level2 hasAnchor" number="10.1">
-<h2><span class="header-section-number">10.1</span> Sub data<a href="trait-covariation.html#sub-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="trait-covariation.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># matrice with envt variables</span></span>
-<span id="cb40-2"><a href="trait-covariation.html#cb40-2" aria-hidden="true" tabindex="-1"></a>Envt <span class="ot">&lt;-</span> Metradica <span class="sc">%&gt;%</span> <span class="fu">select</span>(Code, Habitat, Type, Forest)</span>
-<span id="cb40-3"><a href="trait-covariation.html#cb40-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb40-4"><a href="trait-covariation.html#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># matrice with trais</span></span>
-<span id="cb40-5"><a href="trait-covariation.html#cb40-5" aria-hidden="true" tabindex="-1"></a>traits_log <span class="ot">&lt;-</span> Metradica <span class="sc">%&gt;%</span> </span>
-<span id="cb40-6"><a href="trait-covariation.html#cb40-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD) <span class="sc">%&gt;%</span> </span>
-<span id="cb40-7"><a href="trait-covariation.html#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">&quot;Gmin&quot;</span>,<span class="st">&quot;TLP&quot;</span>, <span class="st">&quot;LSWC&quot;</span>, <span class="st">&quot;MajVLA&quot;</span>, <span class="st">&quot;Nitrogen&quot;</span>, <span class="st">&quot;Carbon&quot;</span>, <span class="st">&quot;Phosphorous&quot;</span>, <span class="st">&quot;Potassium&quot;</span>, <span class="st">&quot;SD&quot;</span>), abs) <span class="sc">%&gt;%</span> </span>
-<span id="cb40-8"><a href="trait-covariation.html#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">&quot;Gmin&quot;</span>,<span class="st">&quot;TLP&quot;</span>, <span class="st">&quot;LSWC&quot;</span>, <span class="st">&quot;MajVLA&quot;</span>, <span class="st">&quot;Nitrogen&quot;</span>, <span class="st">&quot;Carbon&quot;</span>, <span class="st">&quot;Phosphorous&quot;</span>, <span class="st">&quot;Potassium&quot;</span>, <span class="st">&quot;SD&quot;</span>), log) <span class="sc">%&gt;%</span> </span>
-<span id="cb40-9"><a href="trait-covariation.html#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TLP =</span> <span class="sc">-</span>TLP) </span>
-<span id="cb40-10"><a href="trait-covariation.html#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#na.omit() </span></span>
-<span id="cb40-11"><a href="trait-covariation.html#cb40-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-12"><a href="trait-covariation.html#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="co"># species</span></span>
-<span id="cb40-13"><a href="trait-covariation.html#cb40-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb40-14"><a href="trait-covariation.html#cb40-14" aria-hidden="true" tabindex="-1"></a>species <span class="ot">&lt;-</span> Metradica <span class="sc">%&gt;%</span> <span class="fu">select</span>(Code, Species, Genus, Name)</span></code></pre></div>
+<div id="trait-covariation" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">Chapter 11</span> Trait covariation<a href="trait-covariation.html#trait-covariation" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="sub-data" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">11.1</span> Sub data<a href="trait-covariation.html#sub-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 </div>
-<div id="standardize" class="section level2 hasAnchor" number="10.2">
-<h2><span class="header-section-number">10.2</span> Standardize<a href="trait-covariation.html#standardize" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="trait-covariation.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vegan)</span></code></pre></div>
-<pre><code>## Warning: package &#39;vegan&#39; was built under R version 4.2.2</code></pre>
-<pre><code>## Loading required package: permute</code></pre>
-<pre><code>## Warning: package &#39;permute&#39; was built under R version 4.2.2</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Registered S3 methods overwritten by &#39;vegan&#39;:
-##   method      from
-##   plot.rda    klaR
-##   predict.rda klaR
-##   print.rda   klaR</code></pre>
-<pre><code>## This is vegan 2.6-4</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="trait-covariation.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the way you are using decostand with &#39;standardize&#39;, it is the same as scale option with rda with scale =TRUE. </span></span>
-<span id="cb48-2"><a href="trait-covariation.html#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-3"><a href="trait-covariation.html#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale and center variables; standardize: scale x to zero mean and unit variance (defaultMARGIN = 2)</span></span>
-<span id="cb48-4"><a href="trait-covariation.html#cb48-4" aria-hidden="true" tabindex="-1"></a>traits.z <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">decostand</span>(traits_log, <span class="at">method =</span> <span class="st">&quot;standardize&quot;</span>) </span>
-<span id="cb48-5"><a href="trait-covariation.html#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-6"><a href="trait-covariation.html#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Variables are now centered around a mean of 0</span></span>
-<span id="cb48-7"><a href="trait-covariation.html#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(traits.z, <span class="dv">2</span>, mean), <span class="dv">1</span>)</span></code></pre></div>
+<div id="standardize" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Standardize<a href="trait-covariation.html#standardize" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <pre><code>##        Gmin         TLP        LSWC      MajVLA    Nitrogen      Carbon 
 ##          NA          NA          NA          NA          NA          NA 
 ## Phosphorous   Potassium          SD 
 ##          NA          NA          NA</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="trait-covariation.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># and scaled to have a standard deviation of 1</span></span>
-<span id="cb50-2"><a href="trait-covariation.html#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(traits.z, <span class="dv">2</span>, sd)</span></code></pre></div>
 <pre><code>##        Gmin         TLP        LSWC      MajVLA    Nitrogen      Carbon 
 ##          NA          NA          NA          NA          NA          NA 
 ## Phosphorous   Potassium          SD 
 ##          NA          NA          NA</code></pre>
 </div>
-<div id="correlation" class="section level2 hasAnchor" number="10.3">
-<h2><span class="header-section-number">10.3</span> Correlation<a href="trait-covariation.html#correlation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="correlation" class="section level2 hasAnchor" number="11.3">
+<h2><span class="header-section-number">11.3</span> Correlation<a href="trait-covariation.html#correlation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Summary of variables</p>
 <p>The <strong>correlation coefficient</strong> is a representation of the strength of relationship between one variable and another.</p>
 <p>Spearman’s correlation in statistics is a nonparametric alternative to Pearson’s correlation. Use Spearman’s correlation for data that follow curvilinear, <strong>and not linear</strong> (aka monotonic relationships) and for ordinal data. Statisticians also refer to Spearman’s rank order correlation coefficient as Spearman’s ρ (rho).</p>
@@ -351,6 +326,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

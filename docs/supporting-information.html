@@ -4,13 +4,13 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 7 Supporting Information | Literature</title>
+  <title>Chapter 13 Supporting Information | Meeting Notes</title>
   <meta name="description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
 set in the _output.yml file.</p>" />
   <meta name="generator" content="bookdown 0.31 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 7 Supporting Information | Literature" />
+  <meta property="og:title" content="Chapter 13 Supporting Information | Meeting Notes" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="<p>This is a minimal example of using the bookdown package to write a book.
@@ -19,7 +19,7 @@ set in the _output.yml file.</p>" />
   <meta name="github-repo" content="mbthese/METRADICA" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 7 Supporting Information | Literature" />
+  <meta name="twitter:title" content="Chapter 13 Supporting Information | Meeting Notes" />
   
   <meta name="twitter:description" content="<p>This is a minimal example of using the bookdown package to write a book.
 The HTML output format for this example is bookdown::gitbook,
@@ -29,7 +29,6 @@ set in the _output.yml file.</p>" />
 <meta name="author" content="Marion Boisseaux" />
 
 
-<meta name="date" content="2022-08-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -37,7 +36,7 @@ set in the _output.yml file.</p>" />
   
   
 <link rel="prev" href="results.html"/>
-<link rel="next" href="part-four-discussion.html"/>
+<link rel="next" href="part-five-notes.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -60,6 +59,13 @@ set in the _output.yml file.</p>" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -144,69 +150,72 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">Metradica</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> url: your book url like https://bookdown.org/yihui/bookdown</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
 <li class="part"><span><b>I Part one: general introduction</b></span></li>
 <li class="chapter" data-level="2" data-path="project-introduction.html"><a href="project-introduction.html"><i class="fa fa-check"></i><b>2</b> Project introduction</a></li>
+<li class="chapter" data-level="3" data-path="hypotheses.html"><a href="hypotheses.html"><i class="fa fa-check"></i><b>3</b> Hypotheses</a></li>
 <li class="part"><span><b>II Part two : Materials &amp; Method</b></span></li>
-<li class="chapter" data-level="3" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>3</b> Sampling</a>
+<li class="chapter" data-level="4" data-path="sampling.html"><a href="sampling.html"><i class="fa fa-check"></i><b>4</b> Sampling</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>3.1</b> Sites</a></li>
-<li class="chapter" data-level="3.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>3.2</b> Habitats</a></li>
-<li class="chapter" data-level="3.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>3.3</b> Species</a></li>
-<li class="chapter" data-level="3.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>3.4</b> Individuals</a></li>
-<li class="chapter" data-level="3.5" data-path="sampling.html"><a href="sampling.html#sampling-strategy"><i class="fa fa-check"></i><b>3.5</b> Sampling strategy</a></li>
+<li class="chapter" data-level="4.1" data-path="sampling.html"><a href="sampling.html#sites"><i class="fa fa-check"></i><b>4.1</b> Sites</a></li>
+<li class="chapter" data-level="4.2" data-path="sampling.html"><a href="sampling.html#habitats"><i class="fa fa-check"></i><b>4.2</b> Habitats</a></li>
+<li class="chapter" data-level="4.3" data-path="sampling.html"><a href="sampling.html#species"><i class="fa fa-check"></i><b>4.3</b> Species</a></li>
+<li class="chapter" data-level="4.4" data-path="sampling.html"><a href="sampling.html#individuals"><i class="fa fa-check"></i><b>4.4</b> Individuals</a></li>
+<li class="chapter" data-level="4.5" data-path="sampling.html"><a href="sampling.html#sampling-strategy"><i class="fa fa-check"></i><b>4.5</b> Sampling strategy</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>4</b> Traits</a>
+<li class="chapter" data-level="5" data-path="traits.html"><a href="traits.html"><i class="fa fa-check"></i><b>5</b> Traits</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="traits.html"><a href="traits.html#water--and-carbon-related-traits"><i class="fa fa-check"></i><b>4.1</b> Water- and carbon-related traits</a></li>
-<li class="chapter" data-level="4.2" data-path="traits.html"><a href="traits.html#additional-traits"><i class="fa fa-check"></i><b>4.2</b> Additional traits</a></li>
-<li class="chapter" data-level="4.3" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>4.3</b> Protocols</a></li>
-<li class="chapter" data-level="4.4" data-path="traits.html"><a href="traits.html#organisation"><i class="fa fa-check"></i><b>4.4</b> Organisation</a></li>
+<li class="chapter" data-level="5.1" data-path="traits.html"><a href="traits.html#water--and-carbon-related-traits"><i class="fa fa-check"></i><b>5.1</b> Water- and carbon-related traits</a></li>
+<li class="chapter" data-level="5.2" data-path="traits.html"><a href="traits.html#additional-traits"><i class="fa fa-check"></i><b>5.2</b> Additional traits</a></li>
+<li class="chapter" data-level="5.3" data-path="traits.html"><a href="traits.html#protocols"><i class="fa fa-check"></i><b>5.3</b> Protocols</a></li>
+<li class="chapter" data-level="5.4" data-path="traits.html"><a href="traits.html#organisation"><i class="fa fa-check"></i><b>5.4</b> Organisation</a></li>
 </ul></li>
 <li class="part"><span><b>III Part three : Analyses</b></span></li>
-<li class="chapter" data-level="5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html"><i class="fa fa-check"></i><b>5</b> Distribution of traits</a>
+<li class="chapter" data-level="6" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html"><i class="fa fa-check"></i><b>6</b> Distribution of traits</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#water-traits"><i class="fa fa-check"></i><b>5.1</b> Water traits</a></li>
-<li class="chapter" data-level="5.2" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#chemistry-traits"><i class="fa fa-check"></i><b>5.2</b> Chemistry traits</a></li>
-<li class="chapter" data-level="5.3" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#dbh"><i class="fa fa-check"></i><b>5.3</b> DBH</a></li>
-<li class="chapter" data-level="5.4" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#crown-position"><i class="fa fa-check"></i><b>5.4</b> Crown position</a></li>
-<li class="chapter" data-level="5.5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#treedawkins"><i class="fa fa-check"></i><b>5.5</b> TreeDawkins</a></li>
-<li class="chapter" data-level="5.6" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#sub-data"><i class="fa fa-check"></i><b>5.6</b> Sub data</a></li>
-<li class="chapter" data-level="5.7" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#standardize"><i class="fa fa-check"></i><b>5.7</b> Standardize</a></li>
-<li class="chapter" data-level="5.8" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#correlation"><i class="fa fa-check"></i><b>5.8</b> Correlation</a></li>
+<li class="chapter" data-level="6.1" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#water-traits"><i class="fa fa-check"></i><b>6.1</b> Water traits</a></li>
+<li class="chapter" data-level="6.2" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#chemistry-traits"><i class="fa fa-check"></i><b>6.2</b> Chemistry traits</a></li>
+<li class="chapter" data-level="6.3" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#dbh"><i class="fa fa-check"></i><b>6.3</b> DBH</a></li>
+<li class="chapter" data-level="6.4" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#crown-position"><i class="fa fa-check"></i><b>6.4</b> Crown position</a></li>
+<li class="chapter" data-level="6.5" data-path="distribution-of-traits.html"><a href="distribution-of-traits.html#treedawkins"><i class="fa fa-check"></i><b>6.5</b> TreeDawkins</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>6</b> Results</a>
+<li class="chapter" data-level="7" data-path="gmin.html"><a href="gmin.html"><i class="fa fa-check"></i><b>7</b> Gmin</a></li>
+<li class="chapter" data-level="8" data-path="lswc.html"><a href="lswc.html"><i class="fa fa-check"></i><b>8</b> LSWC</a></li>
+<li class="chapter" data-level="9" data-path="tlp.html"><a href="tlp.html"><i class="fa fa-check"></i><b>9</b> TLP</a></li>
+<li class="chapter" data-level="10" data-path="majvla.html"><a href="majvla.html"><i class="fa fa-check"></i><b>10</b> MajVLA</a></li>
+<li class="chapter" data-level="11" data-path="trait-covariation.html"><a href="trait-covariation.html"><i class="fa fa-check"></i><b>11</b> Trait covariation</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="results.html"><a href="results.html#contribution-of-the-environment-to-single-trait-variation"><i class="fa fa-check"></i><b>6.1</b> Contribution of the environment to single-trait variation</a></li>
-<li class="chapter" data-level="6.2" data-path="results.html"><a href="results.html#traits-covariation"><i class="fa fa-check"></i><b>6.2</b> Traits covariation</a></li>
-<li class="chapter" data-level="6.3" data-path="results.html"><a href="results.html#leaf-trait-syndrome-variation-along-the-twi-gradient"><i class="fa fa-check"></i><b>6.3</b> Leaf trait syndrome variation along the TWI gradient</a></li>
-<li class="chapter" data-level="6.4" data-path="results.html"><a href="results.html#intraspecific-trait-variability"><i class="fa fa-check"></i><b>6.4</b> Intraspecific trait variability</a></li>
+<li class="chapter" data-level="11.1" data-path="trait-covariation.html"><a href="trait-covariation.html#sub-data"><i class="fa fa-check"></i><b>11.1</b> Sub data</a></li>
+<li class="chapter" data-level="11.2" data-path="trait-covariation.html"><a href="trait-covariation.html#standardize"><i class="fa fa-check"></i><b>11.2</b> Standardize</a></li>
+<li class="chapter" data-level="11.3" data-path="trait-covariation.html"><a href="trait-covariation.html#correlation"><i class="fa fa-check"></i><b>11.3</b> Correlation</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>12</b> Results</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="results.html"><a href="results.html#contribution-of-the-environment-to-single-trait-variation"><i class="fa fa-check"></i><b>12.1</b> Contribution of the environment to single-trait variation</a></li>
+<li class="chapter" data-level="12.2" data-path="results.html"><a href="results.html#traits-covariation"><i class="fa fa-check"></i><b>12.2</b> Traits covariation</a></li>
+<li class="chapter" data-level="12.3" data-path="results.html"><a href="results.html#leaf-trait-syndrome-variation-along-the-twi-gradient"><i class="fa fa-check"></i><b>12.3</b> Leaf trait syndrome variation along the TWI gradient</a></li>
+<li class="chapter" data-level="12.4" data-path="results.html"><a href="results.html#intraspecific-trait-variability"><i class="fa fa-check"></i><b>12.4</b> Intraspecific trait variability</a></li>
 </ul></li>
 <li class="part"><span><b>IV Part four : Annexes</b></span></li>
-<li class="chapter" data-level="7" data-path="supporting-information.html"><a href="supporting-information.html"><i class="fa fa-check"></i><b>7</b> Supporting Information</a>
+<li class="chapter" data-level="13" data-path="supporting-information.html"><a href="supporting-information.html"><i class="fa fa-check"></i><b>13</b> Supporting Information</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="supporting-information.html"><a href="supporting-information.html#figure-s1-the-21-selected-species-phylogeny."><i class="fa fa-check"></i><b>7.1</b> Figure S1: The 21 selected species’ phylogeny.</a></li>
-<li class="chapter" data-level="7.2" data-path="supporting-information.html"><a href="supporting-information.html#figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index."><i class="fa fa-check"></i><b>7.2</b> Figure S2: Discrimination of the habitats using the topographic wetness index.</a></li>
-<li class="chapter" data-level="7.3" data-path="supporting-information.html"><a href="supporting-information.html#figure-s3.-indval-values-for-the-studied-species."><i class="fa fa-check"></i><b>7.3</b> Figure S3. Indval values for the studied species.</a></li>
-<li class="chapter" data-level="7.4" data-path="supporting-information.html"><a href="supporting-information.html#figure-s4-variation-of-leaf-trait-values-among-species."><i class="fa fa-check"></i><b>7.4</b> Figure S4: Variation of leaf trait values among species.</a></li>
-<li class="chapter" data-level="7.5" data-path="supporting-information.html"><a href="supporting-information.html#figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits."><i class="fa fa-check"></i><b>7.5</b> Figure S5: Trait contributions to first four principal component axes among leaf traits.</a></li>
-<li class="chapter" data-level="7.6" data-path="supporting-information.html"><a href="supporting-information.html#figure-s6-spearman-correlation-coefficients-among-leaf-traits."><i class="fa fa-check"></i><b>7.6</b> Figure S6: Spearman correlation coefficients among leaf traits.</a></li>
-<li class="chapter" data-level="7.7" data-path="supporting-information.html"><a href="supporting-information.html#figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance."><i class="fa fa-check"></i><b>7.7</b> Figure S7: Correlation between stomatal density and minimal leaf conductance.</a></li>
-<li class="chapter" data-level="7.8" data-path="supporting-information.html"><a href="supporting-information.html#table-s1.-sampling-sites-supplementary-information."><i class="fa fa-check"></i><b>7.8</b> Table S1. Sampling sites supplementary information.</a></li>
-<li class="chapter" data-level="7.9" data-path="supporting-information.html"><a href="supporting-information.html#table-s2.-individuals-per-species-collected-in-the-three-sampling-sites."><i class="fa fa-check"></i><b>7.9</b> Table S2. Individuals per species collected in the three sampling sites.</a></li>
-<li class="chapter" data-level="7.10" data-path="supporting-information.html"><a href="supporting-information.html#table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana."><i class="fa fa-check"></i><b>7.10</b> Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana.</a></li>
-<li class="chapter" data-level="7.11" data-path="supporting-information.html"><a href="supporting-information.html#table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis."><i class="fa fa-check"></i><b>7.11</b> Table S4: Permutational Manova analysis and post-hoc pairwise analysis.</a></li>
-<li class="chapter" data-level="7.12" data-path="supporting-information.html"><a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation."><i class="fa fa-check"></i><b>7.12</b> Table S5: Pairwise tables for the spearman correlation.</a></li>
-<li class="chapter" data-level="7.13" data-path="supporting-information.html"><a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1."><i class="fa fa-check"></i><b>7.13</b> Table S6: Model summary for each trait from equation 1.</a></li>
+<li class="chapter" data-level="13.1" data-path="supporting-information.html"><a href="supporting-information.html#figure-s1-the-21-selected-species-phylogeny."><i class="fa fa-check"></i><b>13.1</b> Figure S1: The 21 selected species’ phylogeny.</a></li>
+<li class="chapter" data-level="13.2" data-path="supporting-information.html"><a href="supporting-information.html#figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index."><i class="fa fa-check"></i><b>13.2</b> Figure S2: Discrimination of the habitats using the topographic wetness index.</a></li>
+<li class="chapter" data-level="13.3" data-path="supporting-information.html"><a href="supporting-information.html#figure-s3.-indval-values-for-the-studied-species."><i class="fa fa-check"></i><b>13.3</b> Figure S3. Indval values for the studied species.</a></li>
+<li class="chapter" data-level="13.4" data-path="supporting-information.html"><a href="supporting-information.html#figure-s4-variation-of-leaf-trait-values-among-species."><i class="fa fa-check"></i><b>13.4</b> Figure S4: Variation of leaf trait values among species.</a></li>
+<li class="chapter" data-level="13.5" data-path="supporting-information.html"><a href="supporting-information.html#figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits."><i class="fa fa-check"></i><b>13.5</b> Figure S5: Trait contributions to first four principal component axes among leaf traits.</a></li>
+<li class="chapter" data-level="13.6" data-path="supporting-information.html"><a href="supporting-information.html#figure-s6-spearman-correlation-coefficients-among-leaf-traits."><i class="fa fa-check"></i><b>13.6</b> Figure S6: Spearman correlation coefficients among leaf traits.</a></li>
+<li class="chapter" data-level="13.7" data-path="supporting-information.html"><a href="supporting-information.html#figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance."><i class="fa fa-check"></i><b>13.7</b> Figure S7: Correlation between stomatal density and minimal leaf conductance.</a></li>
+<li class="chapter" data-level="13.8" data-path="supporting-information.html"><a href="supporting-information.html#table-s1.-sampling-sites-supplementary-information."><i class="fa fa-check"></i><b>13.8</b> Table S1. Sampling sites supplementary information.</a></li>
+<li class="chapter" data-level="13.9" data-path="supporting-information.html"><a href="supporting-information.html#table-s2.-individuals-per-species-collected-in-the-three-sampling-sites."><i class="fa fa-check"></i><b>13.9</b> Table S2. Individuals per species collected in the three sampling sites.</a></li>
+<li class="chapter" data-level="13.10" data-path="supporting-information.html"><a href="supporting-information.html#table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana."><i class="fa fa-check"></i><b>13.10</b> Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana.</a></li>
+<li class="chapter" data-level="13.11" data-path="supporting-information.html"><a href="supporting-information.html#table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis."><i class="fa fa-check"></i><b>13.11</b> Table S4: Permutational Manova analysis and post-hoc pairwise analysis.</a></li>
+<li class="chapter" data-level="13.12" data-path="supporting-information.html"><a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation."><i class="fa fa-check"></i><b>13.12</b> Table S5: Pairwise tables for the spearman correlation.</a></li>
+<li class="chapter" data-level="13.13" data-path="supporting-information.html"><a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1."><i class="fa fa-check"></i><b>13.13</b> Table S6: Model summary for each trait from equation 1.</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="part-four-discussion.html"><a href="part-four-discussion.html"><i class="fa fa-check"></i>Part four : Discussion</a>
-<ul>
-<li class="chapter" data-level="7.14" data-path="part-four-discussion.html"><a href="part-four-discussion.html#waterlogging"><i class="fa fa-check"></i><b>7.14</b> Waterlogging</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="part-five-notes.html"><a href="part-five-notes.html"><i class="fa fa-check"></i>Part five : Notes</a>
-<ul>
-<li class="chapter" data-level="7.15" data-path="part-five-notes.html"><a href="part-five-notes.html#meeting-26012022"><i class="fa fa-check"></i><b>7.15</b> Meeting 26/01/2022</a></li>
-</ul></li>
+<li class="chapter" data-level="" data-path="part-five-notes.html"><a href="part-five-notes.html"><i class="fa fa-check"></i>Part five : Notes</a></li>
+<li class="chapter" data-level="14" data-path="waterlogging.html"><a href="waterlogging.html"><i class="fa fa-check"></i><b>14</b> Waterlogging</a></li>
+<li class="chapter" data-level="15" data-path="meeting-26012022.html"><a href="meeting-26012022.html"><i class="fa fa-check"></i><b>15</b> Meeting 26/01/2022</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/mbthese/METRADICA" target="blank">Source</a></li>
 
@@ -219,7 +228,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Literature</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Meeting Notes</a>
           </h1>
         </div>
 
@@ -227,171 +236,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="supporting-information" class="section level1 hasAnchor" number="7">
-<h1><span class="header-section-number">Chapter 7</span> Supporting Information<a href="supporting-information.html#supporting-information" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="supporting-information" class="section level1 hasAnchor" number="13">
+<h1><span class="header-section-number">Chapter 13</span> Supporting Information<a href="supporting-information.html#supporting-information" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Article title: The importance of local habitat in shaping functional tropical tree species’ strategies.</p>
 <p>Authors: Marion Boisseaux1*, Daniela Krebber1,2, Christopher Baraloto7, Benoit Burban1, Angela Casado-Garcia3, Jocelyn Cazal1, Jeanne Clément2, Géraldine Derroire1, Claire Fortunel2 Jean-Yves Goret1, Jonathan Heras3, Gaelle JaouenORCID=0000-0002-5655-904411, Isabelle Maréchaux2, Christine Scoffoni4, Ghislain Vieilledent2, Jason Vleminckx5, Sabrina Coste1, Heidy Schimann6, Clément Stahl1.</p>
 <p>#Figures</p>
-<div id="figure-s1-the-21-selected-species-phylogeny." class="section level2 hasAnchor" number="7.1">
-<h2><span class="header-section-number">7.1</span> Figure S1: The 21 selected species’ phylogeny.<a href="supporting-information.html#figure-s1-the-21-selected-species-phylogeny." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="figure-s1-the-21-selected-species-phylogeny." class="section level2 hasAnchor" number="13.1">
+<h2><span class="header-section-number">13.1</span> Figure S1: The 21 selected species’ phylogeny.<a href="supporting-information.html#figure-s1-the-21-selected-species-phylogeny." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <pre><code>## [1] &quot;Taxonomic classification not consistent between sp.list and tree.&quot;
 ##           genus family_in_sp.list family_in_tree
 ## 33 Chaetocarpus          Peraceae  Euphorbiaceae
 ## 41       Cordia        Cordiaceae   Boraginaceae
 ## [1] &quot;Note: 2 taxa fail to be binded to the tree,&quot;
 ## [1] &quot;Indet.Indet._Indet.&quot;      &quot;Indet.Indet._sp.3Guyafor&quot;</code></pre>
-<p><img src="_main_files/figure-html/Figure%20S1-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/Figure%20S1-1.png" width="768" /></p>
 </div>
-<div id="figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index." class="section level2 hasAnchor" number="7.2">
-<h2><span class="header-section-number">7.2</span> Figure S2: Discrimination of the habitats using the topographic wetness index.<a href="supporting-information.html#figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="supporting-information.html#cb2-1" aria-hidden="true" tabindex="-1"></a>Data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv&quot;</span>)</span>
-<span id="cb2-2"><a href="supporting-information.html#cb2-2" aria-hidden="true" tabindex="-1"></a>Data<span class="sc">$</span>Forest <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(Data<span class="sc">$</span>Forest)</span>
-<span id="cb2-3"><a href="supporting-information.html#cb2-3" aria-hidden="true" tabindex="-1"></a>Data<span class="sc">$</span>Habitat <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">recode</span>(Data<span class="sc">$</span>Habitat, <span class="at">BF=</span><span class="st">&#39;Seasonally flooded&#39;</span>, <span class="at">TF=</span> <span class="st">&#39;Terra Firme&#39;</span>)</span>
-<span id="cb2-4"><a href="supporting-information.html#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="supporting-information.html#cb2-5" aria-hidden="true" tabindex="-1"></a>TWI_plot <span class="ot">&lt;-</span> Data <span class="sc">%&gt;%</span></span>
-<span id="cb2-6"><a href="supporting-information.html#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(<span class="at">Forest =</span> <span class="fu">fct_relevel</span>(Forest, </span>
-<span id="cb2-7"><a href="supporting-information.html#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Bafog&quot;</span>, <span class="st">&quot;Paracou&quot;</span>, <span class="st">&quot;Kaw&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-8"><a href="supporting-information.html#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb2-9"><a href="supporting-information.html#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">aes</span>(<span class="at">x =</span> Forest, <span class="at">y =</span> <span class="fu">log</span>(TWI), <span class="at">fill =</span> Habitat) <span class="sc">+</span></span>
-<span id="cb2-10"><a href="supporting-information.html#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb2-11"><a href="supporting-information.html#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_fill_manual</span>(</span>
-<span id="cb2-12"><a href="supporting-information.html#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Seasonally flooded</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;#56B4E9&quot;</span>,</span>
-<span id="cb2-13"><a href="supporting-information.html#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Terra Firme</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;#E79F02&quot;</span>)</span>
-<span id="cb2-14"><a href="supporting-information.html#cb2-14" aria-hidden="true" tabindex="-1"></a>                  ) <span class="sc">+</span></span>
-<span id="cb2-15"><a href="supporting-information.html#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">&quot;Topographic wetness index&quot;</span>)<span class="sc">+</span></span>
-<span id="cb2-16"><a href="supporting-information.html#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_minimal</span>()<span class="sc">+</span></span>
-<span id="cb2-17"><a href="supporting-information.html#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>))     </span>
-<span id="cb2-18"><a href="supporting-information.html#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="supporting-information.html#cb2-19" aria-hidden="true" tabindex="-1"></a>TWI_plot</span></code></pre></div>
-<p><img src="_main_files/figure-html/Figure%20S2-1.png" width="672" /></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="supporting-information.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">filename =</span> <span class="st">&quot;TWI in habitats.png&quot;</span>, <span class="at">plot =</span> TWI_plot, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">8</span>, <span class="at">dpi =</span> <span class="dv">600</span>)</span></code></pre></div>
+<div id="figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index." class="section level2 hasAnchor" number="13.2">
+<h2><span class="header-section-number">13.2</span> Figure S2: Discrimination of the habitats using the topographic wetness index.<a href="supporting-information.html#figure-s2-discrimination-of-the-habitats-using-the-topographic-wetness-index." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="_main_files/figure-html/Figure%20S2-1.png" width="768" /></p>
 </div>
-<div id="figure-s3.-indval-values-for-the-studied-species." class="section level2 hasAnchor" number="7.3">
-<h2><span class="header-section-number">7.3</span> Figure S3. Indval values for the studied species.<a href="supporting-information.html#figure-s3.-indval-values-for-the-studied-species." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="figure-s3.-indval-values-for-the-studied-species." class="section level2 hasAnchor" number="13.3">
+<h2><span class="header-section-number">13.3</span> Figure S3. Indval values for the studied species.<a href="supporting-information.html#figure-s3.-indval-values-for-the-studied-species." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We explored the degree of habitat preference using <strong>Indicator Species Analysis</strong> (Dufrene &amp; Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.</p>
 <p><em>Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥ 0.2 for SF specialists and IndVal ≥ 0.2598 for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any preference and therefore called generalists.</em></p>
 <p>Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="supporting-information.html#cb4-1" aria-hidden="true" tabindex="-1"></a>species <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Species =</span> <span class="fu">c</span>(<span class="st">&quot;Eperua_falcata&quot;</span>, </span>
-<span id="cb4-2"><a href="supporting-information.html#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Iryanthera_hostmannii&quot;</span>, </span>
-<span id="cb4-3"><a href="supporting-information.html#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Jacaranda_copaia&quot;</span>, <span class="co"># subsp. copaia</span></span>
-<span id="cb4-4"><a href="supporting-information.html#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Pterocarpus_officinalis&quot;</span>,</span>
-<span id="cb4-5"><a href="supporting-information.html#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Symphonia_globulifera&quot;</span>,</span>
-<span id="cb4-6"><a href="supporting-information.html#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Tachigali_melinonii&quot;</span>,</span>
-<span id="cb4-7"><a href="supporting-information.html#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Virola_surinamensis&quot;</span>, </span>
-<span id="cb4-8"><a href="supporting-information.html#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Bocoa_prouacensis&quot;</span>,</span>
-<span id="cb4-9"><a href="supporting-information.html#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Chrysophyllum_prieurii&quot;</span>,</span>
-<span id="cb4-10"><a href="supporting-information.html#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Conceveiba_guianensis&quot;</span>,</span>
-<span id="cb4-11"><a href="supporting-information.html#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Eschweilera_coriacea&quot;</span>,</span>
-<span id="cb4-12"><a href="supporting-information.html#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Hymenopus_heteromorphus&quot;</span>,</span>
-<span id="cb4-13"><a href="supporting-information.html#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Protium_stevensonii&quot;</span>,</span>
-<span id="cb4-14"><a href="supporting-information.html#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Virola_michelii&quot;</span>, </span>
-<span id="cb4-15"><a href="supporting-information.html#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Carapa_surinamensis&quot;</span>, </span>
-<span id="cb4-16"><a href="supporting-information.html#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Laetia_procera&quot;</span>,</span>
-<span id="cb4-17"><a href="supporting-information.html#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Protium_opacum&quot;</span>, <span class="co">#subsp. rabelianum</span></span>
-<span id="cb4-18"><a href="supporting-information.html#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Dicorynia_guianensis&quot;</span>,</span>
-<span id="cb4-19"><a href="supporting-information.html#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Gustavia_hexapetala&quot;</span>,</span>
-<span id="cb4-20"><a href="supporting-information.html#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Iryanthera_sagotiana&quot;</span>,</span>
-<span id="cb4-21"><a href="supporting-information.html#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Licania_membranacea&quot;</span>,</span>
-<span id="cb4-22"><a href="supporting-information.html#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Poraqueiba_guianensis&quot;</span></span>
-<span id="cb4-23"><a href="supporting-information.html#cb4-23" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb4-24"><a href="supporting-information.html#cb4-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-25"><a href="supporting-information.html#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-26"><a href="supporting-information.html#cb4-26" aria-hidden="true" tabindex="-1"></a>Specialist_SF <span class="ot">&lt;-</span> <span class="fu">left_join</span>(species, Data_SF) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
-<span id="cb4-27"><a href="supporting-information.html#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="supporting-information.html#cb4-28" aria-hidden="true" tabindex="-1"></a>Specialist_TF <span class="ot">&lt;-</span> <span class="fu">left_join</span>(species, Data_TF) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
-<span id="cb4-29"><a href="supporting-information.html#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="supporting-information.html#cb4-30" aria-hidden="true" tabindex="-1"></a>Generalist_high_indval_both_habitats <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(Specialist_SF, Specialist_TF )</span>
-<span id="cb4-31"><a href="supporting-information.html#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-32"><a href="supporting-information.html#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-33"><a href="supporting-information.html#cb4-33" aria-hidden="true" tabindex="-1"></a>Specialist_TF <span class="ot">&lt;-</span> Specialist_TF <span class="sc">%&gt;%</span> </span>
-<span id="cb4-34"><a href="supporting-information.html#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">&quot;Conceveiba_guianensis&quot;</span>) <span class="sc">%&gt;%</span> <span class="co">#con.gui in both, removed it</span></span>
-<span id="cb4-35"><a href="supporting-information.html#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="st">&quot;TF specialist&quot;</span>)</span>
-<span id="cb4-36"><a href="supporting-information.html#cb4-36" aria-hidden="true" tabindex="-1"></a>Specialist_SF <span class="ot">&lt;-</span> Specialist_SF <span class="sc">%&gt;%</span> </span>
-<span id="cb4-37"><a href="supporting-information.html#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">&quot;Conceveiba_guianensis&quot;</span>) <span class="sc">%&gt;%</span><span class="co">#con.gui in both, removed it</span></span>
-<span id="cb4-38"><a href="supporting-information.html#cb4-38" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="st">&quot;SF specialist&quot;</span>)</span>
-<span id="cb4-39"><a href="supporting-information.html#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-40"><a href="supporting-information.html#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="co">#indval graphs</span></span>
-<span id="cb4-41"><a href="supporting-information.html#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-42"><a href="supporting-information.html#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co">#SF specialists</span></span>
-<span id="cb4-43"><a href="supporting-information.html#cb4-43" aria-hidden="true" tabindex="-1"></a>indval_SF_plot <span class="ot">&lt;-</span> Specialist_SF  <span class="sc">%&gt;%</span></span>
-<span id="cb4-44"><a href="supporting-information.html#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">fct_reorder</span>(Species, Indval_SF)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-45"><a href="supporting-information.html#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Indval_SF, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
-<span id="cb4-46"><a href="supporting-information.html#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb4-47"><a href="supporting-information.html#cb4-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;YlGnBu&quot;</span>, <span class="at">direction =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb4-48"><a href="supporting-information.html#cb4-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb4-49"><a href="supporting-information.html#cb4-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x=</span><span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">40</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb4-50"><a href="supporting-information.html#cb4-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>, <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb4-51"><a href="supporting-information.html#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="supporting-information.html#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="co">#TF specialists</span></span>
-<span id="cb4-53"><a href="supporting-information.html#cb4-53" aria-hidden="true" tabindex="-1"></a>indval_TF_plot<span class="ot">&lt;-</span> Specialist_TF  <span class="sc">%&gt;%</span></span>
-<span id="cb4-54"><a href="supporting-information.html#cb4-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="fu">fct_reorder</span>(Species, Indval_TF)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-55"><a href="supporting-information.html#cb4-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Indval_TF, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
-<span id="cb4-56"><a href="supporting-information.html#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb4-57"><a href="supporting-information.html#cb4-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;YlOrRd&quot;</span>, <span class="at">direction =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb4-58"><a href="supporting-information.html#cb4-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb4-59"><a href="supporting-information.html#cb4-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x=</span><span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">40</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb4-60"><a href="supporting-information.html#cb4-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>, <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb4-61"><a href="supporting-information.html#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-62"><a href="supporting-information.html#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co">#Generalists</span></span>
-<span id="cb4-63"><a href="supporting-information.html#cb4-63" aria-hidden="true" tabindex="-1"></a>Generalist <span class="ot">&lt;-</span> <span class="fu">left_join</span>(species, indval_FG) </span>
-<span id="cb4-64"><a href="supporting-information.html#cb4-64" aria-hidden="true" tabindex="-1"></a>Generalist <span class="ot">&lt;-</span> Generalist <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Indval_SF =</span> SF, <span class="at">Indval_TF =</span> TF)</span>
-<span id="cb4-65"><a href="supporting-information.html#cb4-65" aria-hidden="true" tabindex="-1"></a>Generalist <span class="ot">&lt;-</span>  Generalist <span class="sc">%&gt;%</span></span>
-<span id="cb4-66"><a href="supporting-information.html#cb4-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb4-67"><a href="supporting-information.html#cb4-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Indval_TF <span class="sc">&lt;=</span> <span class="fl">0.2598</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-68"><a href="supporting-information.html#cb4-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Indval_SF <span class="sc">&lt;=</span> <span class="fl">0.2</span>)</span>
-<span id="cb4-69"><a href="supporting-information.html#cb4-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-70"><a href="supporting-information.html#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="co">#casearia too high in one habitat to consider it a generalist!</span></span>
-<span id="cb4-71"><a href="supporting-information.html#cb4-71" aria-hidden="true" tabindex="-1"></a>Generalist <span class="ot">&lt;-</span> Generalist <span class="sc">%&gt;%</span> </span>
-<span id="cb4-72"><a href="supporting-information.html#cb4-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Species <span class="sc">!=</span> <span class="st">&quot;Casearia_javitensis&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-73"><a href="supporting-information.html#cb4-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Abund <span class="sc">!=</span> <span class="dv">5</span>) </span>
-<span id="cb4-74"><a href="supporting-information.html#cb4-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-75"><a href="supporting-information.html#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-76"><a href="supporting-information.html#cb4-76" aria-hidden="true" tabindex="-1"></a>Generalist_all  <span class="ot">&lt;-</span><span class="fu">rbind</span>(Generalist, Generalist_high_indval_both_habitats)</span>
-<span id="cb4-77"><a href="supporting-information.html#cb4-77" aria-hidden="true" tabindex="-1"></a>Generalist_all <span class="ot">&lt;-</span> Generalist_all <span class="sc">%&gt;%</span> </span>
-<span id="cb4-78"><a href="supporting-information.html#cb4-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Diff_Indval =</span> <span class="fu">abs</span>(Indval_SF<span class="sc">-</span>Indval_TF)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-79"><a href="supporting-information.html#cb4-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="st">&quot;Generalist&quot;</span>)</span>
-<span id="cb4-80"><a href="supporting-information.html#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-81"><a href="supporting-information.html#cb4-81" aria-hidden="true" tabindex="-1"></a>Generalist_diff_indval<span class="ot">&lt;-</span> <span class="fu">ggplot</span>(Generalist_all) <span class="sc">+</span></span>
-<span id="cb4-82"><a href="supporting-information.html#cb4-82" aria-hidden="true" tabindex="-1"></a>   <span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Diff_Indval, <span class="at">fill =</span> Species) <span class="sc">+</span></span>
-<span id="cb4-83"><a href="supporting-information.html#cb4-83" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb4-84"><a href="supporting-information.html#cb4-84" aria-hidden="true" tabindex="-1"></a>   <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;RdYlBu&quot;</span>, <span class="at">direction =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb4-85"><a href="supporting-information.html#cb4-85" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span><span class="co">#les couleurs en faveur des BF, tacmel proche d&#39;un SF spe donc couleur bleu</span></span>
-<span id="cb4-86"><a href="supporting-information.html#cb4-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x=</span><span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">40</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
-<span id="cb4-87"><a href="supporting-information.html#cb4-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>)</span>
-<span id="cb4-88"><a href="supporting-information.html#cb4-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-89"><a href="supporting-information.html#cb4-89" aria-hidden="true" tabindex="-1"></a>group_figure <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ggarrange</span>(</span>
-<span id="cb4-90"><a href="supporting-information.html#cb4-90" aria-hidden="true" tabindex="-1"></a>  indval_TF_plot <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>),</span>
-<span id="cb4-91"><a href="supporting-information.html#cb4-91" aria-hidden="true" tabindex="-1"></a>  indval_SF_plot <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>),</span>
-<span id="cb4-92"><a href="supporting-information.html#cb4-92" aria-hidden="true" tabindex="-1"></a>  Generalist_diff_indval <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>),</span>
-<span id="cb4-93"><a href="supporting-information.html#cb4-93" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),</span>
-<span id="cb4-94"><a href="supporting-information.html#cb4-94" aria-hidden="true" tabindex="-1"></a>  <span class="at">nrow=</span> <span class="dv">3</span>, <span class="at">ncol=</span><span class="dv">1</span>)</span>
-<span id="cb4-95"><a href="supporting-information.html#cb4-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-96"><a href="supporting-information.html#cb4-96" aria-hidden="true" tabindex="-1"></a>group_figure </span></code></pre></div>
-<p><img src="_main_files/figure-html/Species%20within%20indval%20threshold-1.png" width="672" /></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="supporting-information.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave(file=&quot;indval.svg&quot;, plot=group_figure, width=10, height=12)</span></span>
-<span id="cb5-2"><a href="supporting-information.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave(file=&quot;indval.png&quot;, plot=group_figure, width=10, height=12)</span></span></code></pre></div>
+<p><img src="_main_files/figure-html/Species%20within%20indval%20threshold-1.png" width="768" /></p>
 </div>
-<div id="figure-s4-variation-of-leaf-trait-values-among-species." class="section level2 hasAnchor" number="7.4">
-<h2><span class="header-section-number">7.4</span> Figure S4: Variation of leaf trait values among species.<a href="supporting-information.html#figure-s4-variation-of-leaf-trait-values-among-species." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="figure-s4-variation-of-leaf-trait-values-among-species." class="section level2 hasAnchor" number="13.4">
+<h2><span class="header-section-number">13.4</span> Figure S4: Variation of leaf trait values among species.<a href="supporting-information.html#figure-s4-variation-of-leaf-trait-values-among-species." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>No imputation, not transformed. Visualizing raw trait variation.</p>
-<pre><code>## Joining, by = c(&quot;Name&quot;, &quot;Type&quot;)</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Additional pieces discarded in 621 rows [116, 132,
-## 152, 160, 161, 162, 164, 166, 182, 189, 253, 254, 255, 256, 257, 261, 264, 267,
-## 268, 279, ...].</code></pre>
-<pre><code>## Warning: Removed 232 rows containing non-finite values (`stat_boxplot()`).</code></pre>
-<p><img src="_main_files/figure-html/Figure%20S4-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/Figure%20S4-1.png" width="768" /></p>
 </div>
-<div id="figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits." class="section level2 hasAnchor" number="7.5">
-<h2><span class="header-section-number">7.5</span> Figure S5: Trait contributions to first four principal component axes among leaf traits.<a href="supporting-information.html#figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits." class="section level2 hasAnchor" number="13.5">
+<h2><span class="header-section-number">13.5</span> Figure S5: Trait contributions to first four principal component axes among leaf traits.<a href="supporting-information.html#figure-s5-trait-contributions-to-first-four-principal-component-axes-among-leaf-traits." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>PCA with log-transformed traits, that were imputed but without stomata.</p>
-<pre><code>## Rows: 552 Columns: 19
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (7): Genus, Species, Name, Habitat, Type, Forest, Plot
-## dbl (12): Code, Gmin, TLP, LSWC, MajVLA, N, C, P, K, TWI, DBH, SD
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre><code>##       eigenvalue variance.percent cumulative.variance.percent
 ## Dim.1  2.3455236        29.319046                    29.31905
 ## Dim.2  1.4248905        17.811131                    47.13018
@@ -401,111 +279,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Dim.6  0.5378797         6.723496                    91.33541
 ## Dim.7  0.4387247         5.484059                    96.81947
 ## Dim.8  0.2544426         3.180532                   100.00000</code></pre>
-<p><img src="_main_files/figure-html/Figure%20S5-1.png" width="672" /><img src="_main_files/figure-html/Figure%20S5-2.png" width="672" /><img src="_main_files/figure-html/Figure%20S5-3.png" width="672" /></p>
+<p><img src="_main_files/figure-html/Figure%20S5-1.png" width="768" /><img src="_main_files/figure-html/Figure%20S5-2.png" width="768" /><img src="_main_files/figure-html/Figure%20S5-3.png" width="768" /></p>
 </div>
-<div id="figure-s6-spearman-correlation-coefficients-among-leaf-traits." class="section level2 hasAnchor" number="7.6">
-<h2><span class="header-section-number">7.6</span> Figure S6: Spearman correlation coefficients among leaf traits.<a href="supporting-information.html#figure-s6-spearman-correlation-coefficients-among-leaf-traits." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="supporting-information.html#cb11-1" aria-hidden="true" tabindex="-1"></a>Data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="supporting-information.html#cb11-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Code, <span class="sc">-</span>Genus, <span class="sc">-</span>Species, Habitat, Type, <span class="sc">-</span>SD) <span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href="supporting-information.html#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Potassium =</span> K, </span>
-<span id="cb11-4"><a href="supporting-information.html#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">Phosphorous =</span> P, </span>
-<span id="cb11-5"><a href="supporting-information.html#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Nitrogen =</span> N,</span>
-<span id="cb11-6"><a href="supporting-information.html#cb11-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">Carbon =</span> C) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-7"><a href="supporting-information.html#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">&quot;Gmin&quot;</span>,<span class="st">&quot;TLP&quot;</span>, <span class="st">&quot;LSWC&quot;</span>, <span class="st">&quot;MajVLA&quot;</span>, <span class="st">&quot;Nitrogen&quot;</span>, <span class="st">&quot;Carbon&quot;</span>, <span class="st">&quot;Phosphorous&quot;</span>, <span class="st">&quot;Potassium&quot;</span>), abs) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-8"><a href="supporting-information.html#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">&quot;Gmin&quot;</span>,<span class="st">&quot;TLP&quot;</span>, <span class="st">&quot;LSWC&quot;</span>, <span class="st">&quot;MajVLA&quot;</span>, <span class="st">&quot;Nitrogen&quot;</span>, <span class="st">&quot;Carbon&quot;</span>, <span class="st">&quot;Phosphorous&quot;</span>, <span class="st">&quot;Potassium&quot;</span>), log) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-9"><a href="supporting-information.html#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TLP =</span> <span class="sc">-</span>TLP)</span></code></pre></div>
-<pre><code>## Rows: 552 Columns: 19
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (7): Genus, Species, Name, Habitat, Type, Forest, Plot
-## dbl (12): Code, Gmin, TLP, LSWC, MajVLA, N, C, P, K, TWI, DBH, SD
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="supporting-information.html#cb13-1" aria-hidden="true" tabindex="-1"></a>traits <span class="ot">&lt;-</span> Data <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="supporting-information.html#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">  K</span><span class="st">`</span> <span class="ot">=</span> Potassium, </span>
-<span id="cb13-3"><a href="supporting-information.html#cb13-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">  P</span><span class="st">`</span> <span class="ot">=</span> Phosphorous, </span>
-<span id="cb13-4"><a href="supporting-information.html#cb13-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">  N</span><span class="st">`</span> <span class="ot">=</span> Nitrogen,</span>
-<span id="cb13-5"><a href="supporting-information.html#cb13-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">  C</span><span class="st">`</span> <span class="ot">=</span> Carbon,</span>
-<span id="cb13-6"><a href="supporting-information.html#cb13-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">gmin =</span> Gmin) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-7"><a href="supporting-information.html#cb13-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Name, <span class="sc">-</span>Habitat, <span class="sc">-</span>Type, <span class="sc">-</span>Forest, <span class="sc">-</span>Plot, <span class="sc">-</span>TWI, <span class="sc">-</span>DBH) </span>
-<span id="cb13-8"><a href="supporting-information.html#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="supporting-information.html#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#to add significance</span></span>
-<span id="cb13-10"><a href="supporting-information.html#cb13-10" aria-hidden="true" tabindex="-1"></a>testRes <span class="ot">=</span> <span class="fu">cor.mtest</span>(traits, <span class="at">conf.level =</span> <span class="fl">0.95</span>)</span>
-<span id="cb13-11"><a href="supporting-information.html#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="supporting-information.html#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#image output, have to run until last live dev.off() for it to work.</span></span>
-<span id="cb13-13"><a href="supporting-information.html#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="fu">png</span>(<span class="at">height=</span><span class="dv">500</span>, <span class="at">width=</span><span class="dv">500</span>, <span class="at">file=</span><span class="st">&quot;mycorr_noTWI_noSD_imputed.png&quot;</span>, <span class="at">type =</span> <span class="st">&quot;cairo&quot;</span>)</span>
-<span id="cb13-14"><a href="supporting-information.html#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="supporting-information.html#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#create correlation matrix</span></span>
-<span id="cb13-16"><a href="supporting-information.html#cb13-16" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> traits <span class="sc">%&gt;%</span></span>
-<span id="cb13-17"><a href="supporting-information.html#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-18"><a href="supporting-information.html#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">method =</span> <span class="st">&quot;spearman&quot;</span>)</span>
-<span id="cb13-19"><a href="supporting-information.html#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="supporting-information.html#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#correlation plot with no rows and column labels and without colors in the diagonal</span></span>
-<span id="cb13-21"><a href="supporting-information.html#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_matrix, <span class="at">p.mat =</span> testRes<span class="sc">$</span>p, <span class="at">method =</span> <span class="st">&#39;circle&#39;</span>,  <span class="co">#addCoef.col =&#39;black&#39;, insig=&#39;blank&#39;,</span></span>
-<span id="cb13-22"><a href="supporting-information.html#cb13-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig.level =</span> <span class="fl">0.10</span>, <span class="at">addrect =</span> <span class="dv">2</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>, <span class="at">tl.pos =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb13-23"><a href="supporting-information.html#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-24"><a href="supporting-information.html#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Add labels to the diagonal</span></span>
-<span id="cb13-25"><a href="supporting-information.html#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fu">rev</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(cor_matrix)), <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(cor_matrix), <span class="fu">rev</span>(<span class="fu">colnames</span>(cor_matrix)), </span>
-<span id="cb13-26"><a href="supporting-information.html#cb13-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pos =</span> <span class="dv">4</span>, <span class="at">offset =</span> <span class="sc">-</span><span class="fl">1.5</span>, <span class="at">col=</span> <span class="st">&quot;red&quot;</span>, <span class="fu">ifelse</span>(<span class="fu">is.na</span>(<span class="fu">diag</span>(cor_matrix)), <span class="cn">NA</span>, <span class="dv">1</span>))</span>
-<span id="cb13-27"><a href="supporting-information.html#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-28"><a href="supporting-information.html#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span></code></pre></div>
+<div id="figure-s6-spearman-correlation-coefficients-among-leaf-traits." class="section level2 hasAnchor" number="13.6">
+<h2><span class="header-section-number">13.6</span> Figure S6: Spearman correlation coefficients among leaf traits.<a href="supporting-information.html#figure-s6-spearman-correlation-coefficients-among-leaf-traits." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <pre><code>## png 
 ##   2</code></pre>
 </div>
-<div id="figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance." class="section level2 hasAnchor" number="7.7">
-<h2><span class="header-section-number">7.7</span> Figure S7: Correlation between stomatal density and minimal leaf conductance.<a href="supporting-information.html#figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance." class="section level2 hasAnchor" number="13.7">
+<h2><span class="header-section-number">13.7</span> Figure S7: Correlation between stomatal density and minimal leaf conductance.<a href="supporting-information.html#figure-s7-correlation-between-stomatal-density-and-minimal-leaf-conductance." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Leaf traits are ln-transformed. The adjusted R squared is equal to 0.011.</p>
-<pre><code>## New names:
-## Rows: 552 Columns: 18
-## ── Column specification
-## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
-## (6): Genus, Species, Name, Habitat, Type, Forest dbl (12): ...1, Code, Gmin,
-## TLP, LSWC, MajVLA, N, C, P, K, SD, TWI
-## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-## Specify the column types or set `show_col_types = FALSE` to quiet this message.
-## • `` -&gt; `...1`</code></pre>
-<pre><code>## Warning: package &#39;jtools&#39; was built under R version 4.2.3</code></pre>
-<pre><code>## 
-## Attaching package: &#39;jtools&#39;
-## 
-## The following object is masked from &#39;package:Hmisc&#39;:
-## 
-##     %nin%
-## 
-## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 166 rows containing non-finite values (`stat_smooth()`).</code></pre>
-<pre><code>## Warning: Removed 166 rows containing missing values (`geom_point()`).</code></pre>
-<p><img src="_main_files/figure-html/Figure%20S7-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/Figure%20S7-1.png" width="768" /></p>
 <p>#Tables</p>
 </div>
-<div id="table-s1.-sampling-sites-supplementary-information." class="section level2 hasAnchor" number="7.8">
-<h2><span class="header-section-number">7.8</span> Table S1. Sampling sites supplementary information.<a href="supporting-information.html#table-s1.-sampling-sites-supplementary-information." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## ! Using an auto-discovered, cached token.</code></pre>
-<pre><code>##   To suppress this message, modify your code or options to clearly consent to
-##   the use of a cached token.</code></pre>
-<pre><code>##   See gargle&#39;s &quot;Non-interactive auth&quot; vignette for more details:</code></pre>
-<pre><code>##   &lt;]8;;https://gargle.r-lib.org/articles/non-interactive-auth.htmlhttps://gargle.r-lib.org/articles/non-interactive-auth.html]8;;&gt;</code></pre>
-<pre><code>## ℹ The googlesheets4 package is using a cached token for
-##   &#39;]8;;mailto:marionboisseaux@gmail.commarionboisseaux@gmail.com]8;;&#39;.</code></pre>
-<pre><code>## ✔ Reading from &quot;Supporting information&quot;.</code></pre>
-<pre><code>## ✔ Range &#39;Plot_SI&#39;.</code></pre>
+<div id="table-s1.-sampling-sites-supplementary-information." class="section level2 hasAnchor" number="13.8">
+<h2><span class="header-section-number">13.8</span> Table S1. Sampling sites supplementary information.<a href="supporting-information.html#table-s1.-sampling-sites-supplementary-information." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 </div>
-<div id="table-s2.-individuals-per-species-collected-in-the-three-sampling-sites." class="section level2 hasAnchor" number="7.9">
-<h2><span class="header-section-number">7.9</span> Table S2. Individuals per species collected in the three sampling sites.<a href="supporting-information.html#table-s2.-individuals-per-species-collected-in-the-three-sampling-sites." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## ! Using an auto-discovered, cached token.</code></pre>
-<pre><code>##   To suppress this message, modify your code or options to clearly consent to
-##   the use of a cached token.</code></pre>
-<pre><code>##   See gargle&#39;s &quot;Non-interactive auth&quot; vignette for more details:</code></pre>
-<pre><code>##   &lt;]8;;https://gargle.r-lib.org/articles/non-interactive-auth.htmlhttps://gargle.r-lib.org/articles/non-interactive-auth.html]8;;&gt;</code></pre>
-<pre><code>## ℹ The googlesheets4 package is using a cached token for
-##   &#39;]8;;mailto:marionboisseaux@gmail.commarionboisseaux@gmail.com]8;;&#39;.</code></pre>
-<pre><code>## ✔ Reading from &quot;Supporting information&quot;.</code></pre>
-<pre><code>## ✔ Range &#39;&#39;Species_SI&#39;&#39;.</code></pre>
-<pre><code>## Joining, by = &quot;Name&quot;
-## Joining, by = &quot;Name&quot;
-## Joining, by = &quot;Name&quot;
-## Joining, by = c(&quot;Genus&quot;, &quot;Species&quot;)</code></pre>
+<div id="table-s2.-individuals-per-species-collected-in-the-three-sampling-sites." class="section level2 hasAnchor" number="13.9">
+<h2><span class="header-section-number">13.9</span> Table S2. Individuals per species collected in the three sampling sites.<a href="supporting-information.html#table-s2.-individuals-per-species-collected-in-the-three-sampling-sites." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 (#tab:Table S2)Individuals per species collected on the 3 sites
@@ -1047,34 +838,17 @@ Total
 </ul></li>
 </ul>
 </div>
-<div id="table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana." class="section level2 hasAnchor" number="7.10">
-<h2><span class="header-section-number">7.10</span> Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana.<a href="supporting-information.html#table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## ! Using an auto-discovered, cached token.</code></pre>
-<pre><code>##   To suppress this message, modify your code or options to clearly consent to
-##   the use of a cached token.</code></pre>
-<pre><code>##   See gargle&#39;s &quot;Non-interactive auth&quot; vignette for more details:</code></pre>
-<pre><code>##   &lt;]8;;https://gargle.r-lib.org/articles/non-interactive-auth.htmlhttps://gargle.r-lib.org/articles/non-interactive-auth.html]8;;&gt;</code></pre>
-<pre><code>## ℹ The googlesheets4 package is using a cached token for
-##   &#39;]8;;mailto:marionboisseaux@gmail.commarionboisseaux@gmail.com]8;;&#39;.</code></pre>
-<pre><code>## ✔ Reading from &quot;Supporting information&quot;.</code></pre>
-<pre><code>## ✔ Range &#39;&#39;Species_SI&#39;&#39;.</code></pre>
+<div id="table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana." class="section level2 hasAnchor" number="13.10">
+<h2><span class="header-section-number">13.10</span> Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana.<a href="supporting-information.html#table-s3-species-chosen-for-the-study-according-to-the-indicator-values-indval-within-each-habitat-in-french-guiana." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 </div>
-<div id="table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis." class="section level2 hasAnchor" number="7.11">
-<h2><span class="header-section-number">7.11</span> Table S4: Permutational Manova analysis and post-hoc pairwise analysis.<a href="supporting-information.html#table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis." class="section level2 hasAnchor" number="13.11">
+<h2><span class="header-section-number">13.11</span> Table S4: Permutational Manova analysis and post-hoc pairwise analysis.<a href="supporting-information.html#table-s4-permutational-manova-analysis-and-post-hoc-pairwise-analysis." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.</p>
 <p>Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.</p>
 </div>
-<div id="table-s5-pairwise-tables-for-the-spearman-correlation." class="section level2 hasAnchor" number="7.12">
-<h2><span class="header-section-number">7.12</span> Table S5: Pairwise tables for the spearman correlation.<a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="table-s5-pairwise-tables-for-the-spearman-correlation." class="section level2 hasAnchor" number="13.12">
+<h2><span class="header-section-number">13.12</span> Table S5: Pairwise tables for the spearman correlation.<a href="supporting-information.html#table-s5-pairwise-tables-for-the-spearman-correlation." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Coefficients (A) and associated p-values (B) of leaf traits for the 21 studied species (n=552).</p>
-<pre><code>## Rows: 552 Columns: 19
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (7): Genus, Species, Name, Habitat, Type, Forest, Plot
-## dbl (12): Code, Gmin, TLP, LSWC, MajVLA, N, C, P, K, TWI, DBH, SD
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre><code>## png 
 ##   2</code></pre>
 <pre><code>##         gmin   TLP  LSWC MajVLA    N     C     P     K
@@ -1101,33 +875,8 @@ Total
 ##   P    0.0004 0.0020 0.0000 0.1609 0.0000 0.0522        0.0000
 ##   K    0.0000 0.0183 0.0000 0.0081 0.0002 0.0038 0.0000</code></pre>
 </div>
-<div id="table-s6-model-summary-for-each-trait-from-equation-1." class="section level2 hasAnchor" number="7.13">
-<h2><span class="header-section-number">7.13</span> Table S6: Model summary for each trait from equation 1.<a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1." class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<pre><code>## 
-## Attaching package: &#39;nlme&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggtree&#39;:
-## 
-##     collapse</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     collapse</code></pre>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## 
-## Attaching package: &#39;Matrix&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggtree&#39;:
-## 
-##     expand</code></pre>
-<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
-## 
-##     expand, pack, unpack</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lme4&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:nlme&#39;:
-## 
-##     lmList</code></pre>
-<pre><code>## The following object is masked from &#39;package:rio&#39;:
-## 
-##     factorize</code></pre>
+<div id="table-s6-model-summary-for-each-trait-from-equation-1." class="section level2 hasAnchor" number="13.13">
+<h2><span class="header-section-number">13.13</span> Table S6: Model summary for each trait from equation 1.<a href="supporting-information.html#table-s6-model-summary-for-each-trait-from-equation-1." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 
 </div>
 </div>
@@ -1137,7 +886,7 @@ Total
         </div>
       </div>
 <a href="results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="part-four-discussion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="part-five-notes.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -1191,6 +940,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

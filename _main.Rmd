@@ -1,0 +1,4054 @@
+--- 
+title: "Metradica"
+author: "Marion Boisseaux"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: mbthese/METRADICA
+---
+
+# About
+
+Welcome to the *Metradica* project Github.
+
+This repository supports all code and documentation about the project.
+
+The global objectives of *Metradica* are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent.
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+Part of my PhD project is included in the METRADICA strategic project. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest.**
+
+Have a nice reading !
+
+<!--chapter:end:index.Rmd-->
+
+# (PART) Part one: general introduction {-}
+
+# Project introduction
+
+My thesis is included in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
+
+The global objectives of Metradica are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. 
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+There are 4 tasks : 
+ 
+1. environmental index + species hydrological affinity 
+2. species distribution + functional responses to env’t  
+3. prediction of species distribution from traits using *four-corners* joint species distribution models 
+4. shifts in species distribution through the lens of demographic process: interaction between models 
+
+![Metradica project organisation](./Documents/Pictures/Overall_project.PNG  "Project organisation")
+
+I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
+
+# Hypotheses 
+
+**(1) Importance of local habitat in shaping functional strategies**
+
+* Habitats are widely recognized to control trait variation 
+* Identify species with statistically significant habitat associations
+* Traits syndromes for specialists vs. generalists
+
+*I will focus on topographic-driven variation in the water table, which is hypothesized to explain variation in forest responses to drought (Nobre et al.,2011) and species distribution (Schietti et al., 2014; Lourenço Jr. et al., 2021), where trees with higher hydraulic efficiency and drought sensitivity are mostly found in seasonally flooded habitats (Oliveira et al., 2019), which seems to buffer the impact of short-term droughts on Amazon forest survival and productivity (Esteban et al., 2020; Sousa et al., 2020).*
+
+**(2) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits**
+
+* Metradica data : exploring generalists species ITV (~60 individuals per species)
+* Hypothesis : because species' responses to the environment manifest through functional traits, the higher the ITV of a species is, the more diverse abiotic environments the species may be able to adapt to (Umaña et al., 2015).
+
+
+**(3) Patterns of functional responses to drought along a precipitation and topographic gradient**
+
+* Explore how trait values vary across a precipitation gradient (Bafog “dry” to Kaw “wet”) 
+* Are associations among traits consistent along the gradient in each habitat? Species should converge to a set of trait values that maximize their resource use efficiency. (Vleminckx et al 2021) 
+* Identify species in their limit range regarding drought resistance. 
+
+*shifts in trait variation across environmental gradients can provide powerful insights into the drivers of community assembly* (Junior et al 2021)
+
+<!--chapter:end:01-Introduction.Rmd-->
+
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+```{r , include=FALSE}
+rm(list = ls()) ; invisible(gc()) ; set.seed(42)
+library(knitr)
+library(kableExtra)
+if(knitr:::is_html_output()) options(knitr.table.format = "html") 
+if(knitr:::is_latex_output()) options(knitr.table.format = "latex") 
+library(tidyverse)
+theme_set(bayesplot::theme_default())
+knitr::opts_chunk$set(
+	echo = F,
+	fig.height = 6,
+	fig.width = 8,
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE,
+	cache.lazy = F
+)
+```
+
+# (PART) Part two : Materials & Method {-}
+# Sampling
+
+## Sites
+
+Permanent forest plots of the *Guyafor network* (https://paracou.cirad.fr/website/experimental-design/guyafor-network) monitor since 1970 individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network covers > 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes.
+
+![Guyafor stations for tropical forest monitoring](./Documents/Pictures/Guyafor.png "Guyafor stations")
+
+**Paracou **: The first site is Paracou field station (http://paracou.cirad.fr/), characterized by an average annual rainfall of 3102 mm and a mean air temperature of 25.7°C (Aguillos et al 2019). Sampling was done in six control permanent plots of 6.25 ha each with an elevation between 33-50 m (IGN-F). In total, 226 trees were sampled between 26/10/2020-7/12/2020 and 13/09/2021-17/09/2021.
+
+
+**Bafog**: 5 permanent plots monitored of the ONF institute, characterized by an average annual rainfall of 2357 mm and a mean air temperature of 27.4°C (weather station of MétéoFrance). Sampling was done in 4-ha plots and with an elevation between 7-39 m (IGN-F). In total, 181 trees were sampled in the BAFOG site between 01/03/2021-18/03/2021. 
+
+**Est**: The third site is the Kaw area characterized by an average annual rainfall of 3851 mm and a mean air temperature of 26.3°C (weather station of MétéoFrance). The area groups several plots (see Table. S3) with an elevation between 7-250 m (IGN-F). In total, 145 trees were sampled between 05/10/2021-20/10/2021.
+
+The three sites were chosen in order to sample species along the rainfall gradient. 
+
+![Rainfall gradient in French Guyana](./Documents/Pictures/41597_2019_218_Fig1_HTML.png "Rainfall gradient in French Guyana")
+
+## Habitats
+
+The tropical forest of the Guianan Shield is characterized by heterogeneous meso-topographic conditions with numerous small hills, distinguishing two main contrasting habitats, terra firme (TF) forests and seasonally flooded forests (SF) (Ferry et al. 2010). 
+
+* Terra firme covers 77 % of French Guiana. They are also called *plateau* and are higher areas characterized by a high clay content (47 %, Baraloto et al. 2021) and have a high water drainage. 
+
+* Seasonally flooded habitats are located in the valleys, with a maximum slope of 1% and are characterized by relatively more fertile soils compared to terra firme forests (Baraloto et al. 2011). These soils are sandy (65%, Baraloto et al. 2021) and interestingly richer in phosphorus (Ferry et al. 2010; Baraloto et al. 2021). In SF forest, Tthe water table is never observed to descend below 60 cm depth, remaining at the soil surface for at least two consecutive months each year (Baraloto et al. 2007; Ferry et al. 2010) during the rainy season. The classification for waterlogged habitat may be loose and not as precise as for the *terra firme*, but it does not impact the sampling. *in natura*, we assess if the tree is really in a waterlogged habitat or not.
+
+*How do we define seasonally flooded soils?* On maps, pixels located at an altitude difference of less than 2 m from the altitude of the nearest surface run-off of the same catchment area. **Pixels situés à moins de 2m de dénivelé du plus proche écoulement de surface appartenant au même bassin versant**.  Surface run-off corresponds to pixels receiving the waterflow of at least 75 pixels upstream. Everything is being calculated from the SRTM 30 m (after adjusting the basin area with fillings.) 
+
+Gaelle information: 
+
+* utilisation couche sig onf
+* critere pente (inf 20° = BF, pente moins forte espece de lissage avec bc d’arbres en BF, durcissement des criteres, affiner et bien tomber dans du BF) *comment: SRTM pente 20° à 30m ne correspond pas n’ont plus à la pente sur le terrain, il y a une imprecision. but again in natura we make sure the tree is really in the corresponding habitat.*
+* distance à la crique (inf 50m) (marginale)
+ 
+**Soil nutrient availability** is another important driver of species distribution and plant community assembly in these forests (Quesada et al. 2012; Baldeck et al. 2013; Oliveira et al. 2019; Fortunel et al. 2020; Baraloto et al. 2021). The pre-Cambrian rocks of the Guiana Shield have been exposed to weathering and erosion for over 2 billion years, which has produced highly and therefore originate overall nutrient-poor soils (Flores et al. 2020; Grau et al. 2017; Soong et al. 2020). TF soils are richer in organic matter than SF, while SF soils havewhich distinguishes itself with a higher phosphorus content (Ferry et al. 2010).
+
+The habitat classification of the tree species are based on all the past project achieved and mostly on HABITAT ONF project. 
+
+```{r Soil analyses, echo=FALSE}
+# Soil analyses from excel files given by Gaelle Jaouen 06/2022
+# Compilation in Gentry from DIADEMA, AMALIN & BRIDGE projects led by Christopher Baraloto and Claire Fortunel
+# Paracou data from Vincent Freycon & Bruno Ferry with metadata in Paracou Data dictionary
+# Other data from GUYAFOR database 
+# Soong et al 2022 data as well
+
+#libraries----
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+
+# Paracou -------
+## data----
+
+library(readxl)
+Data1_Paracou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Sol/20220611PedoParacouCompletionSIG.xlsx")
+
+Data2_all <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Sol/202206_DonneesSolSyntheseKawParBaf.xlsx")
+
+## summary-----
+
+Summary_TF <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Plateau") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Terra firme") %>%
+  drop_na()
+  
+Summary_Bottomland <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Bottomland") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Seasonally flooded forest") %>%
+  drop_na()
+
+Summary_Swamp <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Swamp") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Seasonally flooded forest") %>%
+  drop_na()
+
+Soil_Paracou <- bind_rows(Summary_Bottomland, Summary_Swamp, Summary_TF)
+
+
+## graphs-----
+
+yaxis <<- c(expression("Organic Carbon (%)"),
+            expression("Nitrogen (‰)"),
+            expression("C/N ratio"),
+            expression("Phosphorus (mg/kg) extracted \n using Olsen method"),
+            expression("Total Root Length (cm)"),
+            expression("Al exchangeable \n in KCl (cmol+/kg)"),
+            expression("H exchangeable \n in KCl (cmol+/kg)"),
+            expression("Ca exchangeable \n by Metson method (cmol+/kg)"),
+            expression("Mg exchangeable \n by Metson method (cmol+ / kg)"),
+            expression("K exchangeable \n by Metson method (cmol+/ kg)"),
+            expression("Na exchangeable \n by Metson method (cmol+ / kg)"),
+            expression("Organic matter (%)"),
+            expression("cation exchange capacity \n by method Metson (cmol+/ kg)")
+)
+
+count <- 0
+Nbcol <- colnames(Soil_Paracou)[1:12]
+plotlist <- list()
+
+for (i in Soil_Paracou[,Nbcol]){
+  count <- count + 1
+  name <- names(Soil_Paracou[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Soil_Paracou[Nbcol[count]])
+  
+   ggplot(Soil_Paracou) +
+ aes(x = Habitat, y = i, fill = Habitat) +
+ geom_boxplot(adjust = 1L, scale = "area") +
+ scale_fill_manual(values = list(`Seasonally flooded forest`= "#53CBE7", `Terra firme` = "#FFCB61")) +
+ ylab(yaxis[count]) +
+ theme_minimal() +
+ theme(axis.title.x=element_blank(),axis.text.x=element_blank())
+   
+  })
+  
+}
+
+plot_soil_var <- ggarrange(plotlist = plotlist,ncol = 4,nrow=3, common.legend = T, legend = "bottom")
+                       
+print(plot_soil_var)
+```
+
+
+**Topographic** variables are strong proxies for soil hydrology, which correlates with a combination of physico-chemical properties. A new hydrological index that accounts for both variations in climate and soil / topography across sites by combining the concept of MCWD with the one of Relative Extractable Water (e.g. Wagner et al. 2011) or Plant Available Water capacity (Nepstad et al. 2004, Ouédraogo et al. 2016). For Paracou, there is the topography classification established by Allié, Pélissier et al., 2015. *Sylvain*: The topographic wetness index (𝑇𝑊𝐼), identifies water accumulation areas. TWI was derived from 185 a 1-m resolution digital elevation model built based on data from a LiDAR campaign done in 186 2015 using SAGA-GIS (Conrad et al. 2015).
+
+
+## Species
+
+* **Specialist** species are species that have a habitat preference, either for *terra firme* soils or for seasonally flooded soils in French Guiana. 
+
+* **Generalist** species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species. 
+
+**Indicator Species Analysis**
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+Habitat preferences were determined based on (Baraloto et al. 2021) study. The Dufrene and Legendre method (Dufrêne and Legendre 1997) was used as a measure of habitat association for each species in each habitat, while taking into account spatial auto-correlation with the MSR method (Wagner and Dray 2015). This measure, named IndVal for Indicator value, scales from 0 to 1 and integrates both the relative frequency of each species across plots in a given habitat and its relative abundance in each habitat. Out of the 654 species identified from (Baraloto et al. 2021), we only considered the 5 % highest Indval values in each habitat to qualify them as specialists of a habitat. This corresponded to a threshold of IndValSF specialist ≥  0.200 for SF specialists and IndValTF specialist ≥  0.259  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists. 
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word **preference**), but are also a high probability of being sampled in the given habitat.
+
+We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.  
+
+We thus studied 21 tropical tree species, which included 6 generalist species, 9 SF specialist species, and 6 TF specialist species. 
+
+```{r Species phylo, echo=FALSE, message=FALSE, warning=FALSE}
+library(V.PhyloMaker)
+library(ggtree)
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+#  "Carapa_guianensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  #"Vouacapoua_americana"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+print(A)
+```
+
+
+```{r Indval, echo=FALSE}
+#baraloto et al SI
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+#calculating thresholds for habitat specialists
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF specialists
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF specialists
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#concerning our species
+identified_species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", 
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(identified_species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+Generalist_fort_indval_deux_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui species in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui species in both, removed it
+   mutate(Type = "SF specialist")
+
+
+#indval graphs
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(indval_SF_plot)
+
+#ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
+#ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
+
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(indval_TF_plot)
+#ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+#ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
+
+#now for generalists
+Generalist <- left_join(identified_species, indval_FG) 
+
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#cannot consider jas.jav.
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+
+
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal() +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(Generalist_diff_indval)
+#ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
+#ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
+
+```
+
+
+*More details about IndVal* :
+
+IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies. 
+
+*Other indicators* : 
+
+* Contrary to **TWINSPAN**, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies
+* Species richness (sensitive to several factors)
+* Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots. 
+
+## Individuals
+
+The individuals were selected with a DBH value between the 10<sup>th</sup> and the 90<sup>th</sup> percentile of the species' distribution pattern, in order to have a sampling that best reflects the forest structure. In this percentile interval, species were randomly selected for sampling. 
+
+
+*Total individuals collected for the paper.*
+
+```{r Individuals per species collected in the three sampling sites., echo=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(janitor)
+
+Family <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Supporting information - Species_SI.csv") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") 
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  adorn_totals("row") %>%
+  adorn_totals("col") %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) 
+ #save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+## Sampling strategy
+
+* Maps were produced by QGIS software
+* [**Field** protocol](../Metradica_Paracou/Document/Protocol/Field.Rmd)
+* Fill the fieldworksheet [**Fieldworksheet**](../Metradica_Paracou/Document/Protocol/Feuille_terrain_releve.xlsx)
+- [ ] Assess tree and branch height
+- [ ] Assess tree and branch Dawkins : ![**Dawkins**](../Metradica_Paracou/Document/Protocol/Dawkins.png "Dawkins")
+
+<!--chapter:end:02-Sampling.Rmd-->
+
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+# Traits
+
+To guarantee that measurements were carried out on healthy leaves, we assessed chlorophyll fluorescence with a fluorescence meter (Mini-PAM II, WALZ, Effeltrich, Germany), which measures the maximum quantum yield of photosystem II (Fv/Fm). Only leaves with a FvFm value above 0.65 were considered for the study. Knowing that the sampled leaves were healthy, we then measured nine leaf functional traits (Table 1) related to resource investment strategies through light interception and carbon assimilation (Wright et al. 2004) or hydraulic functioning (Rosas et al. 2019) :  
+
+* leaf chemistry (C, N, K, P)
+* leaf saturated water content (LSWC, g.g-1), 
+* leaf water potential at which leaf cells lose turgor (TLP, MPa),
+* leaf minimum conductance (gmin, mmol.m-2.s-1),
+* major vein length density (MajVLA, mm.mm-2)
+* stomatal density (SD, mm-2) 
+
+## Water- and carbon-related traits
+
+* **LSWC** : Leaf-saturated water content (g g−1) was calculated as the mass of leaf water (WT – WD) divided by leaf dry mass (WD).
+* **$TLP$**: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait. 
+* **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait. 
+* **Stomatal characteristics (size, density)**: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Nervation density**: determining the capacity of water supply in leaves. (*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Leaf chemistry** : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
+
+## Additional traits
+
+* **LA**: leaf area $cm^{2}$ : carbo- acquisition related trait which informs on the light capture strategy.
+
+* **$\frac{Fv}{Fm}$**: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency ($\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}$). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (*INSERER BIBLIO Manzi et al 2021*) but decline after other leaf hydraulic traits (*INSERER BIBLIO Trueba et al 2019*).
+
+* **P<sub>midday</sub>**: Water potential at the driest point of the day. 
+
+* **$\delta$ <sup>18</sup> O and $\delta$ <sup>13</sup> C** : Informs patterns of carbon and water use, related to water use efficiency. (*INSERER BIBLIO Farquhar et al 1989*) Measured in Vienna.
+
+*Trait table*
+
+```{r Trait summary intro table, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(janitor)
+#get authorization
+#googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+trait_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1-LBjUas_flNGwAlDGFvGoq6GyqQsBiFmmiJyFtQYkMU/edit#gid=0")
+
+
+trait_table$Unit[trait_table$Abbreviation == 'K'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'P'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'gmin'] <- "mmol.m<sup>-2</sup>.s<sup>-1</sup>"
+
+trait_table$Abbreviation[trait_table$Unit == 'mmol.m<sup>-2</sup>.s<sup>-1</sup>'] <- "<i>gmin</i>"
+
+trait_table$Unit[trait_table$Abbreviation == 'LSWC'] <- "g.g<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'MajVLA'] <- "cm.cm<sup>-2</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
+
+```
+```{r echo=FALSE}
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+trait_table %>%
+  kbl(caption = "Table 1. Leaf functional traits.", escape = FALSE) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+ # save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
+```
+
+
+
+## Protocols
+
+* [**Field** protocol](./Documents/Protocol/Field.Rmd)
+* [**$\pi_{TLP}$** protocol](./Documents/Protocol/Protocole_Ptlp.pdf)
+* [**RWC** protocol](./Documents/Protocol/RWC_Boisseaux.docx)
+* [**Stomata** protocol](./Documents/Protocol/Analyse Stomates_Marion.docx)
+* [**FvFm** protocol](./Documents/Protocol/Fluo_Bellifa.docx)
+* [**gmin** protocol](./Documents/Protocol/Gmin protocol.docx)
+* [**leaf venation** protocol](./Documents/Protocol/ProtocolLeafVeins_MB_2.docx)
+
+## Organisation
+
+* Day 1
+    * Fresh
+        * On field: P<sub>midday</sub>
+        * scan gmin leaves
+        * fresh weight RWC 
+        * **$g_{min}$** weight  
+        * **Stomatal density** nail polish (3 replicates per indivual)
+        * **$\frac{Fv}{Fm}$**
+    
+    * Day 2
+        * saturated weight RWC
+        * **$g_{min}$** finish weights (at least 2 points next day)
+        * **$\pi_{TLP}$**
+    
+    * Day 5 (+72h)
+        * Dry weight RWC
+        
+* Later on :
+    * Stomatal observation and density counts 
+    * Measure of vein densities 
+    * Chemistry of dry-grinded leaves
+
+<!--chapter:end:03-Traits.Rmd-->
+
+---
+title: "Distribution"
+author: "Marion Boisseaux"
+date: "04/05/2022"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: inline
+---
+# (PART) Part three : Analyses {-}
+# Distribution of traits
+
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(readxl)
+library(gridExtra)
+library(rio)
+library(ggplot2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv")
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data #552 indv
+
+
+Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for small sample size (n=30)
+```
+
+## Water traits 
+
+```{r echo=FALSE, warning=FALSE}
+yaxis_water <<- c(expression("TLP"),
+            expression("Gmin"),
+            expression("SD"),
+            expression("LSWC"))
+#water
+
+count <- 0
+Nbcol <- match(yaxis_water,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_water[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_water <- ggarrange(plotlist = plotlist,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_his_water)
+
+
+#shapiro water
+
+
+count <- 0
+Nbcol <- match(yaxis_water,colnames(Subdata_shapiro))
+plotlist <- list()
+
+for (i in Subdata_shapiro[,Nbcol]){
+  count <- count + 1
+  name <- names(Subdata_shapiro[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+   
+   
+  })
+  
+  if (plotlist[[name]]$p.value > 0.05) {
+  
+print("Data is normal")
+} else {  
+    print("data is not normal")
+  
+}
+  
+}
+```
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
+
+##Vein traits
+```{r echo=FALSE, warning=FALSE}
+
+
+yaxis_MajVLA <<- c(expression("midribVLA"),
+            expression("SecondaryVLA"),
+            expression("TertiaryVLA"),
+            expression("MajVLA"))
+
+
+count <- 0
+Nbcol <- match(yaxis_MajVLA,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_MajVLA[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_veins <- ggarrange(plotlist = plotlist,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_his_veins)
+
+
+#shapiro veins
+
+
+count <- 0
+Nbcol <- match(yaxis_MajVLA,colnames(Subdata_shapiro))
+plotlist <- list()
+
+for (i in Subdata_shapiro[,Nbcol]){
+  count <- count + 1
+  name <- names(Subdata_shapiro[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+   
+   
+  })
+  
+  if (plotlist[[name]]$p.value > 0.05) {
+  
+print("Data is normal")
+} else {  
+    print("data is not normal")
+  
+}
+  
+}
+
+#data is not normal for tertiaries, but that's fine. It graphically does look fine pourtant.
+
+```
+
+
+## Chemistry traits
+```{r echo=FALSE, warning=FALSE}
+yaxis_chem <<- c(expression("Nitrogen"),
+            expression("Carbon"),
+            expression("X.S"),
+            expression("Phosphorous"),
+            expression("Fe..g.kg."),
+            expression("Mn..g.kg."),
+            expression("Mg..g.kg."),
+            expression("Al..g.kg."),
+            expression("Ca..g.kg."),
+            expression("Na..g.kg."),
+            expression("Potassium"),
+            expression("Cr..mg.kg."),
+            expression("Cu..mg.kg."),
+            expression("Ni..mg.kg."),
+            expression("Pb..mg.kg."),
+            expression("Rb..mg.kg."),
+            expression("Sr..mg.kg."),
+            expression("Zn..mg.kg."))
+count <- 0
+Nbcol <- match(yaxis_chem,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_chem[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+                       
+print(plot_his_chem)
+
+
+# #shapiro chem
+# 
+# 
+# count <- 0
+# Nbcol <- match(yaxis_chem,colnames(Subdata_shapiro))
+# plotlist <- list()
+# 
+# for (i in Subdata_shapiro[,Nbcol]){
+#   count <- count + 1
+#   name <- names(Subdata_shapiro[Nbcol[count]])
+#   
+#   plotlist[[name]] <- local({
+#    
+#     i <- i
+#     name <- names(Metradica[Nbcol[count]])
+#   
+#    shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+#    
+#    
+#   })
+#   
+#   if (plotlist[[name]]$p.value > 0.05) {
+#   
+# print("Data is normal")
+# } else {  
+#     cat(name,"data is not normal")
+#   
+# }
+#   
+# }
+# # 
+# # 
+
+
+```
+
+Nitrogen data is not normal[1]
+X.S data is not normal[1]
+Mg..g.kg. data is not normal[1]
+Ca..g.kg. data is not normal[1]
+
+## DBH
+```{r DBH, echo=FALSE, warning=FALSE}
+#chem traits
+count <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Metradica))
+Nbcol_water <- match(yaxis_water, colnames(Metradica))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Metradica))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_chem[count])+
+ theme_minimal()
+  })
+  
+}
+for (i in Metradica[,Nbcol_water]){
+  count_water <- count_water + 1
+  name <- names(Metradica[Nbcol_water[count_water]])
+  
+  plotlist_water[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol_water[count_water]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_water[count_water])+
+ theme_minimal()
+  })
+  
+}
+for (i in Metradica[,Nbcol_majvla]){
+  count_majvla <- count_majvla + 1
+  name <- names(Metradica[Nbcol_majvla[count_majvla]])
+  
+  plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol_majvla[count_majvla]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_MajVLA[count_majvla])+
+ theme_minimal()
+  })
+  
+}
+
+plot_DBH_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_DBH_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_DBH_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_DBH_chem)
+print(plot_DBH_water)
+print(plot_DBH_majvla)
+```
+
+
+
+## Crown position 
+```{r echo=FALSE, warning=FALSE}
+Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition)
+
+Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
+Dawkins$BranchDawkins <- as.character(Dawkins$BranchDawkins)
+
+Study_dawkins <- left_join(Metradica, Dawkins, by ="Code")
+
+count <- 0
+count_j <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Study_dawkins))
+Nbcol_water <- match(yaxis_water, colnames(Study_dawkins))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Study_dawkins))
+Nbcol_dawkins <- match(colnames(Dawkins), colnames(Study_dawkins))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+#chem and crownposition
+for (i in Study_dawkins[,Nbcol]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist[[name]] <- local({
+   
+    i <- i
+    j <- j
+    name <- names(Study_dawkins[Nbcol[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_chem[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+
+count <- 0
+#for crownposition and water
+
+for (k in Study_dawkins[,Nbcol_water]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol_water[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist_water[[name]] <- local({
+   
+    k <- k
+    j <- j
+    name <- names(Study_dawkins[Nbcol_water[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(k))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_water[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+
+#crown position and veins
+
+count <- 0
+for (i in Study_dawkins[,Nbcol_majvla]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol_majvla[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    j <- j
+    name <- names(Study_dawkins[Nbcol_majvla[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_MajVLA[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+plot_CP_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_CP_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_CP_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_CP_chem)
+print(plot_CP_water)
+print(plot_CP_majvla)
+
+
+```
+
+
+
+
+
+## TreeDawkins 
+```{r echo=FALSE, warning=FALSE}
+Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins)
+
+Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
+Dawkins$BranchDawkins <- as.character(Dawkins$BranchDawkins)
+
+Study_dawkins <- left_join(Metradica, Dawkins, by ="Code")
+
+count <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Study_dawkins))
+Nbcol_water <- match(yaxis_water, colnames(Study_dawkins))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Study_dawkins))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+#chem and treedawkins
+for (i in Study_dawkins[,Nbcol]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol[count]])
+  
+    plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol[count]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_chem[count])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+#water and treedawkins
+for (i in Study_dawkins[,Nbcol_water]){
+  count_water <- count_water + 1
+  name <- names(Study_dawkins[Nbcol_water[count_water]])
+  
+    plotlist_water[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol_water[count_water]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_water[count_water])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+#veins and treedawkins
+for (i in Study_dawkins[,Nbcol_majvla]){
+  count_majvla <- count_majvla + 1
+  name <- names(Study_dawkins[Nbcol_majvla[count_majvla]])
+  
+    plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol_majvla[count_majvla]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_MajVLA[count_majvla])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+plot_TreeDawkins_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_TreeDawkins_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_TreeDawkins_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_TreeDawkins_chem)
+print(plot_TreeDawkins_water)
+print(plot_TreeDawkins_majvla)
+
+
+```
+
+# Gmin
+
+The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
+
+- gmin (same VLA leaf)
+    + Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with lower minimal cuticular conductance. 
+
+
+```{r gmin-plot, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#gmin with all species- interactive graph
+plot_ly(Metradica, x=~Name, y = ~Gmin, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='Minimal conductance (mmol.m-2.s-1)'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(Gmin ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(Gmin), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "Minimal conductance (mmol.m-2.s-1)"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+
+B <- ggplot(Metradica) +
+ aes(x = Forest, y = Gmin, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
+
+
+```
+
+
+
+*interpretation* Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326,  p-value: < 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m–2 s–1 in Paracou to 3.60 mmol m–2 s–1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic:  50.0139,  p-value: < 2.2204e-16). 
+
+It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
+
+*literature* Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m–2 s–1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
+
+* **compare with stomatal density** 
+* **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
+
+# LSWC
+
+One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
+
+- LSWC 
+    + Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with higher LSWC more water per unit dry weight, that would provide a larger buffering capacity when water supply becomes limiting (higher water storage)
+
+
+```{r LSWC plot1, warning=FALSE}
+plot_ly(Metradica, x=~Name, y = ~LSWC, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='LSWC (g.g-1)'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(LSWC ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(LSWC), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "LSWC"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = LSWC, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = LSWC, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+
+
+``` 
+
+# TLP
+
+* TLP 
+    + hypotheses : Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with more negative values for osmotic potential at at turgor loss point.
+
+
+```{r}
+plot_ly(Metradica, x=~Name, y = ~TLP, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='TLP'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(TLP ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(abs(TLP)), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "TLP"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = TLP, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = TLP, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+
+```
+
+
+Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought. 
+
+
+* The variability in πtlp among species indicates the potential for a 
+range of species responses to drought within Amazonian forest communities. 
+
+* For *Symphonia globulifera* we couldn't exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta & Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative. 
+
+* We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):
+  - *Dicorynia guianensis* (as Maréchaux et al 2015)
+  - *Eschweleira coriacea *  (as Maréchaux et al 2015)
+  - *Hymenopus heteromorphus*
+  - *Iryanthera sagotiana*
+  - *Iryanthera hostmannii*
+  - *Jacaranda copaia subsp. copaia*
+  - *Pterocarpus officinalis*
+
+* We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including *Voucapoua americana* and both *Protium* species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006). 
+
+
+
+*Litterature* 
+* The paper by Zhu et al. (2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China. 
+
+*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al. 2008) and altered nutrient concentrations (Villagra et al. 2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
+
+*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree & Dainty 1975; Abrams, Kubiske & Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni & Sack 2012b; Guyot, Scoffoni & Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance. 
+
+
+
+# MajVLA
+
+The leaf is a critical component in the plant water transport system, accounting for 30% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011). 
+
+- Smaller leaves tend to have a higher major VLA. For SFF specialists, the replacement of water lost to transpiration during photosynthesis would be no problem during the wet season, since water is not a limiting factor. We collected the leaves during the dry season, therefore, SFF specialists would either have an adapted mechanisms to overcome water scarcity or not. 
+- Leaves from the driest habitat, *Terra firme* are smaller and have a higher major VLA than the leaves from seasonally flooded habitats. 
+- Leaves from Bafog (lower precipitation regime) are smaller with a higher major VLA than leaves in Kaw (higher precipitation regime). Paracou leaves major VLA values would range in the middle. 
+
+
+Litterature :
+
+*Smaller leaves tend to have higher major VLA intrinsically as a result of their development. The drought tolerance and protection conferred by higher major VLA in smaller leaves provides an explanation for the greater abundance of smaller leaves in drier and more exposed habitats (Scoffoni et al., 2011).*
+
+*Drought impacts less leaves with higher major vein density because they can provide more numerous water flow pathways around the damaged vein. (Scoffoni et al 2011)*
+
+*Smaller leaves, which generally have higher major vein density, would thus have lower hydraulic vulnerability. Tests using simulations with a spatially explicit model confirmed that smaller leaves with higher major vein density were more tolerant of major vein embolism.(Scoffoni et al 2011)*
+
+From Loundry *et al* 2012:
+
+* SFF : Leaves from SFF have a higher production rates. This result correlates with the higher soil resources found in
+ these habitats and rapid rates of turnover of stems in
+ these forests due to seasonal flooding (Ferry et al. 2010,
+ Baraloto et al. 2011).
+* no herbivory trends differing from SFF and TF 
+* but sapling stage not adult or seedling stage
+* more herbivory found in Peru than in French Guyana
+
+From Scoffoni *et al* 2011:
+
+* Smaller leaves more frequent in dry habitats
+* Smaller leaves have thinner boundary layer: more rapid convective cooling  
+* Direct hydraulic benefit of small leaves, if their greater major vein redundancy protects K  leaf from decline and thus contributes to drought tolerance.
+
+*Why a higher VLA? To confer redundancy and drought tolerance*
+
+
+```{r echo=FALSE}
+plot_ly(Metradica, x=~Name, y = ~MajVLA, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='MajVLA'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(MajVLA ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(abs(MajVLA)), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "MajVLA"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = MajVLA, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = MajVLA, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+```
+
+
+Across species from all habitats
+
+```{r echo=FALSE}
+library(ggplot2)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+B <- ggplot(Metradica) +
+ aes(x = fct_reorder(Name, MajVLA), y = MajVLA, fill = Name) +
+ geom_boxplot(shape = "circle") +
+ theme_minimal() + 
+ facet_grid(vars(Forest), vars()) +
+   scale_y_continuous(trans = "log10") +
+  theme(legend.position = "none") +
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+B
+
+#Stats
+model2<- lm(log(MajVLA)~Name, data=Metradica)
+summary(model2) #il y a clairement un effet espèce
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #the RSS of the model2 (taking into account the factor species) is less (1411) so it is a better model. So there is a link between Species and MajVLA. and p-value est tres  significative *** 
+```
+SFF vs TF habitats
+
+```{r echo=FALSE}
+
+library(ggplot2)
+Metradica %>%
+ filter(!(Forest %in% "NA")) %>%
+ filter(!(Type %in% "NA") | is.na(Type)) %>%
+ filter(Habitat %in% c("BF", "TF") | is.na(Habitat)) %>%
+ filter(!is.na(Name)) %>%
+ ggplot() +
+  aes(x = Habitat, y = MajVLA, fill = Habitat) +
+  labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)",
+    fill = "Habitat collected") +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )
+  ) +
+  theme_minimal() + 
+  facet_wrap(vars(Forest))
+
+#Stats
+model2<- lm(log(MajVLA)~Habitat, data=Metradica)
+summary(model2) 
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #il y a pas d'effet habitat
+```
+Specialists SFF vs Specialists TF vs Generalists
+
+
+```{r echo=FALSE}
+
+library(ggplot2)
+Metradica %>%
+ggplot() +
+ aes(x =Type, y = MajVLA, fill = Type) +
+ geom_boxplot(shape = "circle") +
+  
+ scale_fill_manual(values = list(BF = "#495BE3", Generalist = "#AED3CC", TF = "#F0C323")) +
+   scale_y_continuous(trans = "log10") +
+ theme_minimal() +
+ facet_wrap(vars(Forest))
+
+#Stats
+model2<- lm(log(MajVLA)~Type, data=Metradica)
+summary(model2) 
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #il y a un effet pref-habitat leger 
+```
+
+Bafog vs Kaw vs Paracou
+
+```{r echo=TRUE}
+library(ggplot2)
+library(rstatix)
+library(ggpubr)
+
+Metradica$Forest <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw")) #for ordering the groups on the x.axis
+
+stat.test <- aov(lm(log(MajVLA)~Forest, data=Metradica)) %>% tukey_hsd() 
+
+
+G <- ggboxplot(data = Metradica,x = "Forest", y = "MajVLA", fill = "Forest") +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#F4C71C",
+      Paracou = "#66FF61", 
+      Kaw = "#0051C1"
+    )
+  ) + labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(size = 16L),
+    axis.title.x = element_blank(), 
+    axis.text.x=element_blank(),
+    axis.title.y = element_text(size = 15)) + 
+  stat_pvalue_manual(stat.test, label = "p.adj.signif",
+                       y.position = c(13,14,15))
+
+G
+```
+
+VLA against other variables
+
+* VLA and LA
+
+```{r eval=FALSE, include=FALSE}
+ggplot(Veindata) +
+  aes(x = log(LA), y = log(MajVLA)) +
+  geom_point(shape = "circle", size = 1.5) +
+  labs(
+    x = "log Leaf area (cm²)",
+    y = "log Major vein density (mm.mm-2)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 15),
+    axis.title.x = element_text(size = 15)
+  ) + geom_smooth(method='lm', formula= y~x, se=FALSE)
+
+
+```
+
+Traits that gives us info on the construction cost. For each vein order, we can calculate :
+
+* VC : vein density x π × the vein diameter. the vein cross-sectional surface area per leaf area was estimated by multiplying the vein density by π×the vein diameter. 
+* VP : Vein projected area per leaf area = vein diameter x vein density. The vein-projected area per leaf area *(the proportion of leaf lamina obstructed by vein)* was determined by multiplying the vein diameter by vein density. 
+  + global value :0.00712 for 2° veins (Sack et al 2012)
+* VV : Vein volume per leaf area = vein density x π x (diameter/2)². Vein volume per leaf area was determined by multiplying the vein density by π× the square of half the diameter. 
+
+
+
+# Trait covariation
+
+## Sub data
+
+```{r Subdata_Specialisation_Results}
+
+# matrice with envt variables
+Envt <- Metradica %>% select(Code, Habitat, Type, Forest)
+  
+# matrice with trais
+traits_log <- Metradica %>% 
+  dplyr::select(Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP) 
+  #na.omit() 
+
+# species
+  
+species <- Metradica %>% select(Code, Species, Genus, Name)
+  
+```
+
+
+## Standardize
+```{r}
+library(vegan)
+# the way you are using decostand with 'standardize', it is the same as scale option with rda with scale =TRUE. 
+
+# Scale and center variables; standardize: scale x to zero mean and unit variance (defaultMARGIN = 2)
+traits.z <- vegan::decostand(traits_log, method = "standardize") 
+
+# Variables are now centered around a mean of 0
+round(apply(traits.z, 2, mean), 1)
+
+# and scaled to have a standard deviation of 1
+apply(traits.z, 2, sd)
+```
+
+## Correlation
+
+Summary of variables 
+```{r eval=FALSE, include=FALSE}
+
+plot(log(abs(Metradica[,9:16])))
+
+```
+
+The **correlation coefficient** is a representation of the strength of relationship between one variable and another.
+
+Spearman’s correlation in statistics is a nonparametric alternative to Pearson’s correlation. Use Spearman’s correlation for data that follow curvilinear, **and not linear** (aka monotonic relationships) and for ordinal data. Statisticians also refer to Spearman’s rank order correlation coefficient as Spearman’s ρ (rho).
+
+*Pearson’s is an excellent choice when you have continuous data for a pair of variables and the relationship follows a straight line. If your data do not meet both of those requirements, it’s time to find a different correlation measure!*
+
+Spearman’s correlation is appropriate for more types of relationships, but it too has requirements your data must satisfy to be a valid. Specifically, Spearman’s correlation requires your data to be continuous data that follow a monotonic relationship or ordinal data.
+
+When you have continuous data that do not follow a line, you must determine whether they exhibit a monotonic relationship. In a monotonic relationship, as one variable increases, the other variable tends to either increase or decrease, but not necessarily in a straight line.
+
+When you have continuous data that do not follow a line, you must determine whether they exhibit a monotonic relationship. In a monotonic relationship, as one variable increases, the other variable tends to either increase or decrease, but not necessarily in a straight line.
+
+Multicollinearity occurs when the multiple linear regression analysis includes several variables that are significantly correlated not only with the dependent variable but also to each other. Multicollinearity makes some of the significant variables under study to be statistically insignificant. Primary techniques for detecting the multicollinearity are correlation coefficients.
+ 
+
+```{r spearman, eval=FALSE, include=FALSE}
+library(corrplot)
+library("Hmisc") #function rcorr() [in Hmisc package] can be used to compute the significance levels for pearson and spearman correlations. It returns both the correlation coefficients and the p-value of the correlation for all possible pairs of columns in the data table.
+
+traits_log %>% 
+  na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "spearman") %>% 
+  corrplot::corrplot.mixed()
+
+#autre facon de le faire
+df2 <- cor(traits_log, use = "na.or.complete", method = "spearman")
+corrplot::corrplot(df2, method="shade",shade.col=NA, tl.col="black", tl.srt=45)
+
+## add significant level stars
+testRes = corrplot::cor.mtest(traits_log, conf.level = 0.95,  method = "spearman")
+
+corrplot::corrplot(df2, type = 'lower',
+         order = "alphabet", 
+         p.mat = testRes$p, 
+         sig.level = c(.001, .01, .05), #significant level, with default value 0.05. If the p-value in p-mat is bigger than sig.level, then the corresponding correlation coefficient is regarded as insignificant.
+         pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'grey20',
+         tl.pos="d", #write names of variables in the diagonal
+         outline=FALSE,
+         col = COL2('RdBu', 10)) #la colonne des couleurs a cote
+        
+#test independant between two variables to understand how the test is constructed
+cor.test(traits_log$TLP, traits_log$Gmin,
+         method = "spearman",
+         exact = FALSE) 
+
+res2 <- rcorr(as.matrix(my_data))
+res2
+
+```
+
+pearson 
+```{r pearson, eval=FALSE, include=FALSE}
+traits_log %>% 
+  na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "pearson") %>% 
+  corrplot::corrplot.mixed()
+```
+
+
+<!--chapter:end:04-Distribution.Rmd-->
+
+---
+title: "Paper Analyses"
+author: "Marion Boisseaux"
+date: "2023-04-11"
+output: html_document
+---
+
+# Results
+
+The importance of local habitat in shaping functional tropical tree species’ strategies.
+
+Authors : *Marion Boisseaux*, Daniela  Krebber, Christopher Baraloto, Benoit Burban, Angela Casado-Garcia, Jocelyn Cazal, Jeanne Clément, Géraldine Derroire, Claire Fortunel, Jean-Yves Goret, Jonathan Heras, Gaelle Jaouen, Isabelle Maréchaux, Christine Scoffoni, Ghislain Vieilledent, Jason Vleminckx, Sabrina Coste, Heidy Schimann, Clément Stahl.
+
+## Contribution of the environment to single-trait variation
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#library used
+library(nlme) #to fit the model and do the variance partitioning with ML method
+library(lme4) #for the VarCorr function
+library(dplyr) #to pipe
+library(ggplot2) #to plot
+library(kableExtra) #to build nice tables
+
+#data used (log on all traits)
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Forest <- as.factor(Data$Forest)
+
+#function for variance partitioning
+Var_par <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  #Fit the associated null model with random intercept on species
+  null_model <- nlme::lme(Trait~ 1,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # Extract the variance components 
+  Var_components <-lme4::VarCorr(model)
+  var_sp <- as.numeric(Var_components[1,1]) #for the random effects - species
+  var_indv <- as.numeric(Var_components[2,1]) #model residual, also known as the intraspecific residual variance (linked to the individual but also error measures).
+  
+  # Obtain the variance of the random effect in the null model.
+  random_variance_null <- as.numeric(lme4::VarCorr(null_model)[1,1])
+  
+  # Obtain the residual variance
+  residual_variance_null <- as.numeric(lme4::VarCorr(null_model)[2,1])
+  
+  # Obtain the total variance of the null model
+  v_0 <- random_variance_null + residual_variance_null
+  
+  # Calculate the variance component linked to the env't by substracting the residual variance of the model (var_indv) and the variance explained by the random factor, the species (var_sp), from the variance of the null model
+ 
+  # Variance partitioning
+  var_sp <- round(100 * var_sp / v_0)
+  var_indv <- round(100 * var_indv / v_0)
+  var_envt <- round(100 - (var_sp + var_indv))  # or it works also , var_envt <- v_0 - var_indv - var_sp Marion calcul
+  
+  Traits <- c(Trait, Trait, Trait)
+  Levels <- c("Environment", "Species", "Individual")
+  Variances <- c(var_envt,var_sp,var_indv)
+
+  return(data.frame(Traits, Levels, Variances))
+}
+
+# Loop to calculate the variance partitioning for all traits
+vars <- c()
+Data <- Data %>% filter(Type != "Generalist")
+
+for (i in colnames(Data)[9:17]){
+  
+  vars <- bind_rows(vars, Var_par(Trait = i, Mydata = Data))
+  
+}
+#vars
+
+#plot the results
+
+vars$Levels <- as.factor(vars$Levels)
+
+variance_plot<- vars %>%  
+  mutate(Levels = factor(Levels, levels=c("Environment", "Species", "Individual"))) %>%
+  mutate(Traits = dplyr::recode(Traits, "Gmin" = "g[min]")) %>% #recode gmin
+  ggplot(aes(fill=Levels, y=Variances, x=Traits)) + 
+  geom_bar(position="stack", stat="identity") +
+  theme_minimal(base_size = 22) +
+  ylab("") + xlab("")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+  scale_fill_manual("", values=c("#BBBBBB", "#CCBC44", "#029A88"),
+                    breaks=c("Individual", "Species", "Environment"),
+                    labels=c("Individual", "Species", "Environment"))  +
+  coord_flip() +
+  scale_x_discrete(labels = scales::label_parse())
+
+variance_plot
+
+#save plot
+ggsave(filename = "Variance_partitioning.png", plot = variance_plot, bg = "white", width = 10, height = 8, dpi = 600)
+
+
+##############################################
+#function for plotting residuals distribution 
+##############################################
+
+
+# res_plot <- function(Trait, Mydata){
+#   
+#   #Rename the trait column
+#   colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+#   
+#   
+#   # Fit the linear mixed-effects model
+#   model <- lmer(Trait ~ TWI + Forest + (1 | Name), data = Mydata)
+#   plot <- qqnorm(resid(model), main= Trait)
+#   
+#   
+#   return(plot)
+# }
+# 
+# # Loop to plot residuals of the model for all traits
+# 
+# plotlist <- list()
+# 
+# for (i in colnames(Data)[9:17]){
+#   
+#   
+#   plotlist[[i]] <- local({
+#     
+#     i <- i
+#     
+#     res_plot(i, Data)
+#   })
+#   
+#   
+# }
+
+##############################
+###Build coefficient table ###
+##############################
+
+
+#function for extracting the coefficient of the model
+model_coef_table <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # build coef table 
+  coef_table <- coef(summary(model))
+  coef_table <- as.data.frame(coef_table)
+  
+  return(coef_table)
+}
+
+
+# For all traits call model_coef_table function
+coef_tables <- list()
+
+for (i in colnames(Data)[9:17]){
+
+  coef_tables[[i]] <- model_coef_table(i, Data)
+}
+
+# Combine all coefficient tables into one data frame
+coef_table <- do.call(rbind, coef_tables)
+
+
+# create nice table
+coef_table %>%
+  kbl(caption = "", escape = FALSE, digits = 3) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
+```
+
+
+The variance partitioning showed that single-trait values are largely determined by the species identity, i.e. interspecific variability and the individual level, i.e. intraspecific variability (Figure 1). The species explained between 35% (Potassium) and 69% (SD) of the variation. The residual variance corresponding to the intraspecific variation explained between 25% (SD) and 58% (Potassium). Intraspecific variation was higher than interspecific variation for gmin, carbon, potassium, and phosphorous leaf concentration. The environment explained very little of the variation: it was highest for gmin (11%) and potassium leaf concentration (7%) but even null for carbon leaf concentration. The model summary for each trait is shown in Table S6.
+
+## Traits covariation
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(devtools)
+library(ggfortify)
+library(ggplot2)
+
+
+###########################################
+# Data preparation and log-transformation #
+###########################################
+
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+############################
+#Construction of golbal PCA#
+############################
+Data_PCA <- Metradica_log
+
+Data_PCA$Type <-  dplyr::recode(Data_PCA$Type, BF='SF Specialist', TF= 'TF Specialist')
+Data_PCA$Habitat <- dplyr::recode(Data_PCA$Habitat, BF='Seasonally flooded', TF= 'Terra firme')
+
+PCA_type <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data_PCA, cor = T), #  If TRUE, the data will be centered and scaled before the analysis.
+              data = Data_PCA, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+              loadings = T, loadings.label = T, loadings.label.repel = T, 
+              loadings.label.colour = 'black', loadings.colour = 'black',
+              loadings.label.size = 4) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic(base_size = 10) +
+  # scale_y_reverse() +
+  scale_color_manual("Species' preferences", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Species' preferences") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.2)+
+  guides(color = guide_legend(title = "Species' preferences", 
+                              title.position = "top", 
+                              nrow = 2, 
+                              override.aes = list(size = 3)), 
+         shape = guide_legend(override.aes = list(size = 3))) +
+  theme(legend.position = "bottom")
+
+
+PCA_collect <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data_PCA, cor = T), #  If TRUE, the data will be centered and scaled before the analysis.
+                     data = Data_PCA, colour = "Habitat", alpha = 0.4, size = 2, shape = "Habitat",
+                     loadings = T, loadings.label = T, loadings.label.repel = T, 
+                     loadings.label.colour = 'black', loadings.colour = 'black',
+                     loadings.label.size = 4) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic(base_size = 10) +
+  # scale_y_reverse() +
+  scale_color_manual("Habitat of collect", values = c("#56B4E9", "#E79F02", "")) +
+  scale_shape_discrete("Habitat of collect") +
+  stat_ellipse(aes(col = Habitat), level = 0.85, size = 1.2)+
+  guides(color = guide_legend(title.position = "top", nrow = 3)) +
+  theme(legend.position ="bottom")
+
+
+#arrange plots together
+
+plot_global_pca <- ggpubr::ggarrange(PCA_type, PCA_collect, labels = c("A", "B"), ncol = 2, nrow = 1, common.legend = FALSE, heights = c(4, 4))
+#ggsave(filename = "PCA_full_Habitat_pref_collect_imputed.png", plot = plot_global_pca, bg = "white", width = 7, height = 4, dpi = 600)
+
+plot_global_pca
+```
+
+
+Almost fifty percent of the variance in leaf trait values was explained by the first two axes of the PCA (Figure 2). All leaf chemical traits highly contributed to both axes, explaining most of the total trait variation. For the first axis, leaf chemical traits (phosphorus, nitrogen and potassium) and LSWC, respectively contributed up to 29 %, 20 %, 16 % and 17 % (Figure S5). For the second axis, leaf chemical traits (carbon, potassium) and TLP, respectively contributed up to 34 %, 27 % and 27 % (Figure S5). Interestingly, MajVLA and gmin were not well represented by the first two dimensions but contributed to the third dimension, respectively 49 % and 46 % (Figure S5). The third axis explained 13.5 % of the variation, but did not segregate species preferences nor habitats of collect (Figure S6). The permutational manova on species’ preferences revealed significant groups (Table S4A). We observe larger F-values for the pairwise post-hoc analyses between the SF specialists and generalists, indicating a more pronounced group separation than between TF specialist and generalists. The permutational manova on the habitat of collect, where the individual tree was sampled, revealed significant differences between the two habitats (Table S4B). 
+
+
+## Leaf trait syndrome variation along the TWI gradient
+
+```{r generalist, eval=FALSE, include=FALSE}
+###########################################
+# Dividing the range of TWI into classes#
+###########################################
+
+library(devtools)
+library(ggfortify)
+library(ggplot2)
+
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+#Metradica_log <- Metradica_log %>% filter(Type != "Generalist") for specialists
+Metradica_log <- Metradica_log %>% filter(Type == "Generalist") #for generalists
+nb_class <- 8 #7 for specialists and then merge classes to get enough individuals per class
+class_size <- (max(Metradica_log$TWI)-min(Metradica_log$TWI))/nb_class #each class have the same range of TWI
+data <- as.data.frame(seq(1:nb_class))
+colnames(data)[1] <- "class"
+data$min <- c() #min TWI of the class
+data$max <- c() #max TWI of the class
+data$mean <- c() #mean TWI of the class
+Metradica_log$class_TWI <- as.numeric(NA)
+
+for (i in 1:nb_class){ #attribute the individuals of the dataset to each of the 8 classes
+  
+  data$min[i] <- min(Metradica_log$TWI) + (i-1) * class_size
+  data$max[i] <- min(Metradica_log$TWI) +i * class_size
+  data$mean[i] <- (data$max[i] + data$min[i])/2
+  
+  Metradica_log$class_TWI[which(Metradica_log$TWI <= data$max[i] & Metradica_log$TWI > data$min[i]) ] <- i
+  
+}
+
+#attribute the individuals with the lowest TWI to the first class
+Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
+
+#merge TWI classes together to have approximately the same individuals per class
+
+#Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for specialists
+
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for generalists
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 8)]  <- 6 #for generalists
+
+table(Metradica_log$class_TWI) #number of individuals per class
+table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
+
+#in the data of classes, merge categories
+#data$max[which(data$class == 6 )] <- data$max[which(data$class == 7)] #for specialists
+data$max[which(data$class == 6 )] <- data$max[which(data$class == 8)] #for generalists
+data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
+data <- slice(data, 1:(n() - 2)) 
+data
+
+###################################################################################################
+#Construction of the PCAs for each TWI class level and calculating the observed trait correlation
+###################################################################################################
+
+# Function to calculate the observed index values per community and the standardized index values by the associated null community
+
+TI_index <- function(NbClass, Data, Data_TWI){ 
+  #data that has a column named TWI as calculated before
+  essai <- data.frame(TWI_class = numeric(), range_i = numeric(), sd_i = numeric()) #create an empty dataframe with columns
+
+  for (i in 1:NbClass){  
+    
+    #calculate observed index
+    
+    Data_i <- Data %>% filter(class_TWI == i) #filter the data set for the first class of TWI
+    
+    res.pca_i <- PCA(Data_i %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+    
+    range_i <- res.pca_i$eig[1,1] - res.pca_i$eig[8,1] #observed range of the eigen values
+    
+    sd_i <- sd(res.pca_i$eig[,1]) #observed standard deviation of the eigen values
+    
+    class_i <- c()
+    class_i_sd <- c()
+    indv_rich_i <- length(levels(as.factor(Data_i$Code)))
+    indv_rich_total <- length(levels(as.factor(Data$Code)))
+    for (i in 1:1000){  #sampling 1,000 random communities from the whole individual pool
+      indv_list <- sample(levels(as.factor(Data$Code)), size = indv_rich_i, replace =FALSE) # sampling random individuals from the whole dataset, same number of individuals as the dataset of class TWI 1 
+      Data_i_abon <- c() 
+      for (s in 1:indv_rich_i){
+        
+        Data_i_abon <- rbind(Data_i_abon, 
+                             Data[sample(which(Data$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 1 and getting all the characteristics (i.e. traits) for these individuals
+      }
+      
+      PCA_comm_i <- PCA(Data_i_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+      class_i <- c(class_i, PCA_comm_i$eig[1,1] - PCA_comm_i$eig[8,1])
+      class_i_sd <- c(class_i_sd , sd(PCA_comm_i$eig[,1]))
+    }
+    
+      #Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+    ITI_i <- (range_i - mean(class_i)) / sd(class_i)
+    ITI_i_sd <- (sd_i - mean(class_i_sd))/sd(class_i_sd)
+    
+    essai_i <- data.frame(range_i, sd_i, ITI_i, ITI_i_sd)
+    essai <- rbind(essai, essai_i) 
+    
+   
+  }
+
+  #Plot ranges along TWI
+  Data_TWI <- cbind(Data_TWI, essai)
+  A <- ggplot(Data_TWI) +
+    aes(x = mean, y = range_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("Ranges")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  #Plot SD along TWI
+  B <- ggplot(Data_TWI) +
+    aes(x = mean, y = sd_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("sd")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  
+  #Plot TI (ranges standardized by effect size) along TWI 
+  C <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12) +
+    guides(color = "none") #remove legend
+  
+  
+  #Plot TI_sd along TWI
+  D <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i_sd) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12)+
+    guides(color = "none")
+  
+  
+  #arrange plots together
+  E <- ggpubr::ggarrange(A, B, C, D, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE)
+  plot_publi <- ggpubr::ggarrange(C, D, labels = c("A", "B"), ncol = 2, nrow = 1, common.legend = TRUE)
+  
+  
+  
+  #save plot
+  ggsave(filename = "Multivariate covariation_6_class_generalist.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
+    ggsave(filename = "Multivariate covariation_6_class_4plot_generalist.png", plot = E, bg = "white", width = 7, height = 4, dpi = 600)
+  return(list(essai, A, B, C, D, E, plot_publi))
+  
+ }
+
+
+#1------------
+
+Data_1 <- Metradica_log %>% filter(class_TWI == 1) #filter the data set for the first class of TWI
+res.pca_1 <- PCA(Data_1 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_1$eig #look at the eigen values 
+range_1 <- res.pca_1$eig[1,1] - res.pca_1$eig[8,1] #observed range of the eigen values
+sd_1 <- sd(res.pca_1$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_1, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#########################################################################
+#Construction of the null associated community for each TWI class level 
+#########################################################################
+
+class_1 <- c()
+class_1_sd <- c()
+indv_rich_1 <- length(levels(as.factor(Data_1$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole individual pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_1, replace =FALSE) # sampling random individuals from the whole dataset, same number of individuals as the dataset of class TWI 1 
+  Data_1_abon <- c() 
+  for (s in 1:indv_rich_1){
+      
+      Data_1_abon <- rbind(Data_1_abon, 
+                           Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 1 and getting all the characteristics (i.e. traits) for these individuals
+    }
+
+  PCA_comm_1 <- PCA(Data_1_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_1 <- c(class_1, PCA_comm_1$eig[1,1] - PCA_comm_1$eig[8,1])
+  class_1_sd <- c(class_1_sd , sd(PCA_comm_1$eig[,1]))
+}
+
+plot_1 <- hist(class_1)
+
+#Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+ITI_1 <- (range_1 - mean(class_1)) / sd(class_1)
+ITI_1_sd <- (sd_1 - mean(class_1_sd))/sd(class_1_sd)
+
+#2--------------------------
+
+Data_2 <- Metradica_log %>% filter(class_TWI == 2) #filter the data set for the first class of TWI
+res.pca_2 <- PCA(Data_2 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_2$eig #look at the eigen values 
+range_2 <- res.pca_2$eig[1,1] - res.pca_2$eig[8,1] #observed range of the eigen values
+sd_2 <- sd(res.pca_2$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_2, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_2
+class_2 <- c()
+class_2_sd <- c()
+indv_rich_2 <- length(levels(as.factor(Data_2$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_2, replace =FALSE) # first null community for class TWI 2 sampled from the whole dataset
+  Data_2_abon <- c()
+  for (s in 1:indv_rich_2){
+      
+      Data_2_abon <- rbind(Data_2_abon, 
+                           Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 2 
+    }
+  
+  PCA_comm_2 <- PCA(Data_2_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_2 <- c(class_2, PCA_comm_2$eig[1,1] - PCA_comm_2$eig[8,1])
+  class_2_sd <- c(class_2_sd , sd(PCA_comm_2$eig[,1]))
+}
+
+plot_2 <- hist(class_2)
+
+#Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+ITI_2 <- (range_2 - mean(class_2)) / sd(class_2)
+ITI_2_sd <- (sd_2 - mean(class_2_sd))/sd(class_2_sd)
+
+#3--------------
+
+Data_3 <- Metradica_log %>% filter(class_TWI == 3) #filter the data set for the first class of TWI
+res.pca_3 <- PCA(Data_3 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_3$eig #look at the eigen values 
+range_3 <- res.pca_3$eig[1,1] - res.pca_3$eig[8,1] #observed range of the eigen values
+sd_3 <- sd(res.pca_3$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_3, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_3
+class_3 <- c()
+class_3_sd <- c()
+indv_rich_3 <- length(levels(as.factor(Data_3$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_3, replace =FALSE) # first null community for class TWI 3 sampled from the whole dataset
+  Data_3_abon <- c()
+  for (s in 1:indv_rich_3){
+    
+    Data_3_abon <- rbind(Data_3_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 3 
+  }
+  
+  PCA_comm_3 <- PCA(Data_3_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_3 <- c(class_3, PCA_comm_3$eig[1,1] - PCA_comm_3$eig[8,1])
+  class_3_sd <- c(class_3_sd , sd(PCA_comm_3$eig[,1]))
+}
+
+plot_3 <- hist(class_3)
+
+ITI_3 <- (range_3 - mean(class_3))/sd(class_3)
+ITI_3_sd <- (sd_3 - mean(class_3_sd))/sd(class_3_sd)
+
+#4------------
+Data_4 <- Metradica_log %>% filter(class_TWI == 4) #filter the data set for the first class of TWI
+res.pca_4 <- PCA(Data_4 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_4$eig #look at the eigen values 
+range_4 <- res.pca_4$eig[1,1] - res.pca_4$eig[8,1] #observed range of the eigen values
+sd_4 <- sd(res.pca_4$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_4, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_4
+class_4 <- c()
+class_4_sd <- c()
+indv_rich_4 <- length(levels(as.factor(Data_4$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_4, replace =FALSE) # first null community for class TWI 4 sampled from the whole dataset
+  Data_4_abon <- c()
+  for (s in 1:indv_rich_4){
+    
+    Data_4_abon <- rbind(Data_4_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 4 
+  }
+  
+  PCA_comm_4 <- PCA(Data_4_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_4 <- c(class_4, PCA_comm_4$eig[1,1] - PCA_comm_4$eig[8,1])
+  class_4_sd <- c(class_4_sd , sd(PCA_comm_4$eig[,1]))
+}
+
+plot_4 <- hist(class_4)
+
+ITI_4 <- (range_4 - mean(class_4))/sd(class_4)
+ITI_4_sd <- (sd_4 - mean(class_4_sd))/sd(class_4_sd)
+
+#5----------
+Data_5 <- Metradica_log %>% filter(class_TWI == 5) #filter the data set for the first class of TWI
+res.pca_5 <- PCA(Data_5 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_5$eig #look at the eigen values 
+range_5 <- res.pca_5$eig[1,1] - res.pca_5$eig[8,1] #observed range of the eigen values
+sd_5 <- sd(res.pca_5$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_5, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_5
+class_5 <- c()
+class_5_sd <- c()
+indv_rich_5 <- length(levels(as.factor(Data_5$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_5, replace =FALSE) # first null community for class TWI 5 sampled from the whole dataset
+  Data_5_abon <- c()
+  for (s in 1:indv_rich_5){
+    
+    Data_5_abon <- rbind(Data_5_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 5 
+  }
+  
+  PCA_comm_5 <- PCA(Data_5_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_5 <- c(class_5, PCA_comm_5$eig[1,1] - PCA_comm_5$eig[8,1])
+  class_5_sd <- c(class_5_sd , sd(PCA_comm_5$eig[,1]))
+}
+
+plot_5 <- hist(class_5)
+
+ITI_5 <- (range_5 - mean(class_5))/sd(class_5)
+ITI_5_sd <- (sd_5 - mean(class_5_sd))/sd(class_5_sd)
+#6----------------
+
+Data_6 <- Metradica_log %>% filter(class_TWI == 6) #filter the data set for the first class of TWI
+res.pca_6 <- PCA(Data_6 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_6$eig #look at the eigen values 
+range_6 <- res.pca_6$eig[1,1] - res.pca_6$eig[8,1] #observed range of the eigen values
+sd_6 <- sd(res.pca_6$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_6, addlabels = TRUE, ylim = c(0, 60)) #visualization of the scree plot
+
+#null community associated to the Data_6
+class_6 <- c()
+class_6_sd <- c()
+indv_rich_6 <- length(levels(as.factor(Data_6$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_6, replace =FALSE) # first null community for class TWI 6 sampled from the whole dataset
+  Data_6_abon <- c()
+  for (s in 1:indv_rich_6){
+    
+    Data_6_abon <- rbind(Data_6_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 6 
+  }
+  
+  PCA_comm_6 <- PCA(Data_6_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_6 <- c(class_6, PCA_comm_6$eig[1,1] - PCA_comm_6$eig[8,1])
+  class_6_sd <- c(class_6_sd , sd(PCA_comm_6$eig[,1]))
+}
+
+plot_6 <- hist(class_6)
+
+ITI_6 <- (range_6 - mean(class_6))/sd(class_6)
+ITI_6_sd <- (sd_6 - mean(class_6_sd))/sd(class_6_sd)
+
+#####################
+#Plots
+#####################
+ #data for generalists
+data$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6)
+data$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6)
+data$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6)
+data$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd)
+
+#write.csv(data, "./Results/TI/data_generalist.csv")
+```
+
+```{r generalist plot, message=FALSE, warning=FALSE, include=FALSE}
+###########################################
+library(ggpubr)
+
+#read previously saved file for the generalist
+data <- read.csv("./Results/TI/data_generalist.csv")
+
+#plot generalists
+
+title <- "Generalist"
+
+# Create a text grob
+tgrob <- ggpubr::text_grob(title,size = 16)
+# Draw the text
+plot_0 <- as_ggplot(tgrob) + theme(plot.margin = margin(0,3,0,0, "cm"))
+
+
+#Plot TI (ranges standardized by effect size) along TWI 
+A <- ggplot(data) +
+  aes(x = mean, y = ITI) +
+  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12) +
+  guides(color = "none") #remove legend
+
+
+#Plot TI_sd along TWI
+B <- ggplot(data) +
+  aes(x = mean, y = ITI_sd) +
+  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12)+
+  guides(color = "none")
+
+```
+
+
+```{r specialist, eval=FALSE, include=FALSE}
+###########################################
+# Dividing the range of TWI into classes#
+###########################################
+
+
+library(devtools)
+library(ggfortify)
+library(ggplot2)
+
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+Metradica_log <- Metradica_log %>% filter(Type != "Generalist") #for specialists
+
+nb_class <- 7 # for specialists and then merge classes to get enough individuals per class
+class_size <- (max(Metradica_log$TWI)-min(Metradica_log$TWI))/nb_class #each class have the same range of TWI
+data <- as.data.frame(seq(1:nb_class))
+colnames(data)[1] <- "class"
+data$min <- c() #min TWI of the class
+data$max <- c() #max TWI of the class
+data$mean <- c() #mean TWI of the class
+Metradica_log$class_TWI <- as.numeric(NA)
+
+for (i in 1:nb_class){ #attribute the individuals of the dataset to each of the 8 classes
+  
+  data$min[i] <- min(Metradica_log$TWI) + (i-1) * class_size
+  data$max[i] <- min(Metradica_log$TWI) +i * class_size
+  data$mean[i] <- (data$max[i] + data$min[i])/2
+  
+  Metradica_log$class_TWI[which(Metradica_log$TWI <= data$max[i] & Metradica_log$TWI > data$min[i]) ] <- i
+  
+}
+
+#attribute the individuals with the lowest TWI to the first class
+Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
+
+#merge TWI classes together to have approximately the same individuals per class
+
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for specialists
+
+
+table(Metradica_log$class_TWI) #number of individuals per class
+table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
+
+#in the data of classes, merge categories
+data$max[which(data$class == 6 )] <- data$max[which(data$class == 7)] #for specialists
+data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
+data <- slice(data, 1:(n() - 1)) 
+data
+
+###################################################################################################
+#Construction of the PCAs for each TWI class level and calculating the observed trait correlation
+###################################################################################################
+
+# Function to calculate the observed index values per community and the standardized index values by the associated null community
+
+TI_index <- function(NbClass, Data, Data_TWI){ 
+  #data that has a column named TWI as calculated before
+  essai <- data.frame(TWI_class = numeric(), range_i = numeric(), sd_i = numeric()) #create an empty dataframe with columns
+
+  for (i in 1:NbClass){  
+    
+    #calculate observed index
+    
+    Data_i <- Data %>% filter(class_TWI == i) #filter the data set for the first class of TWI
+    
+    res.pca_i <- PCA(Data_i %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+    
+    range_i <- res.pca_i$eig[1,1] - res.pca_i$eig[8,1] #observed range of the eigen values
+    
+    sd_i <- sd(res.pca_i$eig[,1]) #observed standard deviation of the eigen values
+    
+    class_i <- c()
+    class_i_sd <- c()
+    indv_rich_i <- length(levels(as.factor(Data_i$Code)))
+    indv_rich_total <- length(levels(as.factor(Data$Code)))
+    for (i in 1:1000){  #sampling 1,000 random communities from the whole individual pool
+      indv_list <- sample(levels(as.factor(Data$Code)), size = indv_rich_i, replace =FALSE) # sampling random individuals from the whole dataset, same number of individuals as the dataset of class TWI 1 
+      Data_i_abon <- c() 
+      for (s in 1:indv_rich_i){
+        
+        Data_i_abon <- rbind(Data_i_abon, 
+                             Data[sample(which(Data$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 1 and getting all the characteristics (i.e. traits) for these individuals
+      }
+      
+      PCA_comm_i <- PCA(Data_i_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+      class_i <- c(class_i, PCA_comm_i$eig[1,1] - PCA_comm_i$eig[8,1])
+      class_i_sd <- c(class_i_sd , sd(PCA_comm_i$eig[,1]))
+    }
+    
+      #Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+    ITI_i <- (range_i - mean(class_i)) / sd(class_i)
+    ITI_i_sd <- (sd_i - mean(class_i_sd))/sd(class_i_sd)
+    
+    essai_i <- data.frame(range_i, sd_i, ITI_i, ITI_i_sd)
+    essai <- rbind(essai, essai_i) 
+    
+   
+  }
+
+  #Plot ranges along TWI
+  Data_TWI <- cbind(Data_TWI, essai)
+  A <- ggplot(Data_TWI) +
+    aes(x = mean, y = range_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("Ranges")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  #Plot SD along TWI
+  B <- ggplot(Data_TWI) +
+    aes(x = mean, y = sd_i) +
+    geom_point(shape = "circle", size = 4, colour = "#112446") +
+    theme_minimal()+
+    ylab("sd")+
+    xlab("")+
+    theme(axis.text = element_text(size = 14),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_text(size = 16))
+  
+  
+  #Plot TI (ranges standardized by effect size) along TWI 
+  C <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12) +
+    guides(color = "none") #remove legend
+  
+  
+  #Plot TI_sd along TWI
+  D <- ggplot(Data_TWI) +
+    aes(x = mean, y = ITI_i_sd) +
+    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+    geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+    ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+    xlab("Topographic wetness index") +
+    theme(axis.text = element_text(size = 12),
+          axis.title.y = element_text(size = 12),
+          axis.title.x = element_text(size = 12)) +
+    theme_minimal(base_size = 12)+
+    guides(color = "none")
+  
+  
+  #arrange plots together
+  E <- ggpubr::ggarrange(A, B, C, D, labels = c("A", "B", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE)
+  plot_publi <- ggpubr::ggarrange(C, D, labels = c("A", "B"), ncol = 2, nrow = 1, common.legend = TRUE)
+  
+  
+  
+  #save plot
+  ggsave(filename = "Multivariate covariation_6_class_specialist.png", plot = plot_publi, bg = "white", width = 7, height = 4, dpi = 600)
+    ggsave(filename = "Multivariate covariation_6_class_4plot_specialist.png", plot = E, bg = "white", width = 7, height = 4, dpi = 600)
+  return(list(essai, A, B, C, D, E, plot_publi))
+  
+ }
+
+
+#1------------
+
+Data_1 <- Metradica_log %>% filter(class_TWI == 1) #filter the data set for the first class of TWI
+res.pca_1 <- PCA(Data_1 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_1$eig #look at the eigen values 
+range_1 <- res.pca_1$eig[1,1] - res.pca_1$eig[8,1] #observed range of the eigen values
+sd_1 <- sd(res.pca_1$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_1, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#########################################################################
+#Construction of the null associated community for each TWI class level 
+#########################################################################
+
+class_1 <- c()
+class_1_sd <- c()
+indv_rich_1 <- length(levels(as.factor(Data_1$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole individual pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_1, replace =FALSE) # sampling random individuals from the whole dataset, same number of individuals as the dataset of class TWI 1 
+  Data_1_abon <- c() 
+  for (s in 1:indv_rich_1){
+      
+      Data_1_abon <- rbind(Data_1_abon, 
+                           Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 1 and getting all the characteristics (i.e. traits) for these individuals
+    }
+
+  PCA_comm_1 <- PCA(Data_1_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_1 <- c(class_1, PCA_comm_1$eig[1,1] - PCA_comm_1$eig[8,1])
+  class_1_sd <- c(class_1_sd , sd(PCA_comm_1$eig[,1]))
+}
+
+plot_1 <- hist(class_1)
+
+#Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+ITI_1 <- (range_1 - mean(class_1)) / sd(class_1)
+ITI_1_sd <- (sd_1 - mean(class_1_sd))/sd(class_1_sd)
+
+#2--------------------------
+
+Data_2 <- Metradica_log %>% filter(class_TWI == 2) #filter the data set for the first class of TWI
+res.pca_2 <- PCA(Data_2 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_2$eig #look at the eigen values 
+range_2 <- res.pca_2$eig[1,1] - res.pca_2$eig[8,1] #observed range of the eigen values
+sd_2 <- sd(res.pca_2$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_2, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_2
+class_2 <- c()
+class_2_sd <- c()
+indv_rich_2 <- length(levels(as.factor(Data_2$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_2, replace =FALSE) # first null community for class TWI 2 sampled from the whole dataset
+  Data_2_abon <- c()
+  for (s in 1:indv_rich_2){
+      
+      Data_2_abon <- rbind(Data_2_abon, 
+                           Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 2 
+    }
+  
+  PCA_comm_2 <- PCA(Data_2_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_2 <- c(class_2, PCA_comm_2$eig[1,1] - PCA_comm_2$eig[8,1])
+  class_2_sd <- c(class_2_sd , sd(PCA_comm_2$eig[,1]))
+}
+
+plot_2 <- hist(class_2)
+
+#Calculating the multivariate covariation  between traits index, standardized by the effect size since the comparison between groups is likely to be biased by the number of individuals used. 
+ITI_2 <- (range_2 - mean(class_2)) / sd(class_2)
+ITI_2_sd <- (sd_2 - mean(class_2_sd))/sd(class_2_sd)
+
+#3--------------
+
+Data_3 <- Metradica_log %>% filter(class_TWI == 3) #filter the data set for the first class of TWI
+res.pca_3 <- PCA(Data_3 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_3$eig #look at the eigen values 
+range_3 <- res.pca_3$eig[1,1] - res.pca_3$eig[8,1] #observed range of the eigen values
+sd_3 <- sd(res.pca_3$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_3, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_3
+class_3 <- c()
+class_3_sd <- c()
+indv_rich_3 <- length(levels(as.factor(Data_3$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_3, replace =FALSE) # first null community for class TWI 3 sampled from the whole dataset
+  Data_3_abon <- c()
+  for (s in 1:indv_rich_3){
+    
+    Data_3_abon <- rbind(Data_3_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 3 
+  }
+  
+  PCA_comm_3 <- PCA(Data_3_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_3 <- c(class_3, PCA_comm_3$eig[1,1] - PCA_comm_3$eig[8,1])
+  class_3_sd <- c(class_3_sd , sd(PCA_comm_3$eig[,1]))
+}
+
+plot_3 <- hist(class_3)
+
+ITI_3 <- (range_3 - mean(class_3))/sd(class_3)
+ITI_3_sd <- (sd_3 - mean(class_3_sd))/sd(class_3_sd)
+
+#4------------
+Data_4 <- Metradica_log %>% filter(class_TWI == 4) #filter the data set for the first class of TWI
+res.pca_4 <- PCA(Data_4 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_4$eig #look at the eigen values 
+range_4 <- res.pca_4$eig[1,1] - res.pca_4$eig[8,1] #observed range of the eigen values
+sd_4 <- sd(res.pca_4$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_4, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_4
+class_4 <- c()
+class_4_sd <- c()
+indv_rich_4 <- length(levels(as.factor(Data_4$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_4, replace =FALSE) # first null community for class TWI 4 sampled from the whole dataset
+  Data_4_abon <- c()
+  for (s in 1:indv_rich_4){
+    
+    Data_4_abon <- rbind(Data_4_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 4 
+  }
+  
+  PCA_comm_4 <- PCA(Data_4_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_4 <- c(class_4, PCA_comm_4$eig[1,1] - PCA_comm_4$eig[8,1])
+  class_4_sd <- c(class_4_sd , sd(PCA_comm_4$eig[,1]))
+}
+
+plot_4 <- hist(class_4)
+
+ITI_4 <- (range_4 - mean(class_4))/sd(class_4)
+ITI_4_sd <- (sd_4 - mean(class_4_sd))/sd(class_4_sd)
+
+#5----------
+Data_5 <- Metradica_log %>% filter(class_TWI == 5) #filter the data set for the first class of TWI
+res.pca_5 <- PCA(Data_5 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_5$eig #look at the eigen values 
+range_5 <- res.pca_5$eig[1,1] - res.pca_5$eig[8,1] #observed range of the eigen values
+sd_5 <- sd(res.pca_5$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_5, addlabels = TRUE, ylim = c(0, 50)) #visualization of the scree plot
+
+#null community associated to the Data_5
+class_5 <- c()
+class_5_sd <- c()
+indv_rich_5 <- length(levels(as.factor(Data_5$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_5, replace =FALSE) # first null community for class TWI 5 sampled from the whole dataset
+  Data_5_abon <- c()
+  for (s in 1:indv_rich_5){
+    
+    Data_5_abon <- rbind(Data_5_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 5 
+  }
+  
+  PCA_comm_5 <- PCA(Data_5_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_5 <- c(class_5, PCA_comm_5$eig[1,1] - PCA_comm_5$eig[8,1])
+  class_5_sd <- c(class_5_sd , sd(PCA_comm_5$eig[,1]))
+}
+
+plot_5 <- hist(class_5)
+
+ITI_5 <- (range_5 - mean(class_5))/sd(class_5)
+ITI_5_sd <- (sd_5 - mean(class_5_sd))/sd(class_5_sd)
+#6----------------
+
+Data_6 <- Metradica_log %>% filter(class_TWI == 6) #filter the data set for the first class of TWI
+res.pca_6 <- PCA(Data_6 %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE) #PCA on trait values except SD, that are scaled to unit variance
+res.pca_6$eig #look at the eigen values 
+range_6 <- res.pca_6$eig[1,1] - res.pca_6$eig[8,1] #observed range of the eigen values
+sd_6 <- sd(res.pca_6$eig[,1]) #observed standard deviation of the eigen values
+fviz_eig(res.pca_6, addlabels = TRUE, ylim = c(0, 60)) #visualization of the scree plot
+
+#null community associated to the Data_6
+class_6 <- c()
+class_6_sd <- c()
+indv_rich_6 <- length(levels(as.factor(Data_6$Code)))
+indv_rich_total <- length(levels(as.factor(Metradica_log$Code)))
+for (i in 1:1000){  #sampling 1,000 random communities from the whole indivudal pool
+  indv_list <- sample(levels(as.factor(Metradica_log$Code)), size = indv_rich_6, replace =FALSE) # first null community for class TWI 6 sampled from the whole dataset
+  Data_6_abon <- c()
+  for (s in 1:indv_rich_6){
+    
+    Data_6_abon <- rbind(Data_6_abon, 
+                         Metradica_log[sample(which(Metradica_log$Code == indv_list[s]), 1),]) #constraining the null community to have the same abundance/same number of individuals as the community of class 6 
+  }
+  
+  PCA_comm_6 <- PCA(Data_6_abon %>% dplyr::select(-Plot, -Forest,-Genus, -Species, -Name, -Type, -Habitat, -TWI, -DBH, -SD), scale.unit = TRUE, graph = FALSE)
+  class_6 <- c(class_6, PCA_comm_6$eig[1,1] - PCA_comm_6$eig[8,1])
+  class_6_sd <- c(class_6_sd , sd(PCA_comm_6$eig[,1]))
+}
+
+plot_6 <- hist(class_6)
+
+ITI_6 <- (range_6 - mean(class_6))/sd(class_6)
+ITI_6_sd <- (sd_6 - mean(class_6_sd))/sd(class_6_sd)
+
+#####################
+#Plots
+#####################
+
+#data for specialists
+data_s <- data
+data_s$ranges <- c(range_1, range_2, range_3, range_4, range_5, range_6)
+data_s$sd <- c(sd_1, sd_2, sd_3, sd_4, sd_5, sd_6)
+data_s$ITI <- c(ITI_1, ITI_2, ITI_3, ITI_4, ITI_5, ITI_6)
+data_s$ITI_sd <- c(ITI_1_sd, ITI_2_sd, ITI_3_sd, ITI_4_sd, ITI_5_sd, ITI_6_sd)
+
+#save data for specialists
+write.csv(data_s, "./Results/TI/data_specialist.csv")
+
+```
+
+```{r specialist plot, message=FALSE, warning=FALSE, include=FALSE}
+library(ggpubr)
+#read previously saved file for specialists
+data_s <- read.csv("./Results/TI/data_specialist.csv")
+
+#plot specialist
+title_s <- "Specialist"
+
+# Create a text grob
+tgrob_s <- ggpubr::text_grob(title_s,size = 16)
+# Draw the text
+plot_s <- as_ggplot(tgrob_s) + theme(plot.margin = margin(0,3,0,0, "cm"))
+
+
+#Plot TI (ranges standardized by effect size) along TWI 
+C <- ggplot(data_s) +
+  aes(x = mean, y = ITI) +
+  geom_point(shape = "circle", size = 5, aes(color = mean)) +
+  scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12) +
+  guides(color = "none") #remove legend
+
+
+#Plot TI_sd along TWI
+D <- ggplot(data_s) +
+  aes(x = mean, y = ITI_sd) +
+  geom_point(shape = "circle", size = 5, aes(color = mean)) +
+  scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
+  geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
+  ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
+  xlab("Topographic wetness index") +
+  theme(axis.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 12)) +
+  theme_minimal(base_size = 12)+
+  guides(color = "none")
+```
+
+```{r both, echo=FALSE}
+
+#arrange plots specialist and generalist together
+plot_generalists <- ggpubr::ggarrange(plot_0, NULL, A, B, labels = c("", "", "A", "B"), ncol = 2, nrow = 2, common.legend = TRUE, heights = c(1,5))
+
+
+plot_specialists <- ggpubr::ggarrange(plot_s, NULL, C, D, labels = c("", "", "C", "D"), ncol = 2, nrow = 2, common.legend = TRUE, heights = c(1,5))
+
+plot_publi <- ggpubr::ggarrange(plot_generalists, plot_specialists, ncol = 1, nrow = 2)
+plot_publi
+
+#save plot
+#ggsave(filename = "Multivariate covariation_6 class.png", plot = plot_publi, bg = "white", width = 8, height = 7, dpi = 600)
+```
+
+
+Both multivariate indices (the range and standard deviation) show a strong increase towards the end of the TWI gradient, seasonally flooded soils (Figure 4). For generalist species, we observe a higher degree of trait association in both extreme ends of the TWI gradient (Figure 4A, 4B). For specialist species, trait integration is highest for individuals sampled in seasonally flooded soils (i.e. SF specialists) than for individuals sampled in terra firme soils (i.e. TF specialists) (Figure 4C, 4D). Seasonally flooded habitats act as a stronger environmental constraint than terra firme habitats on leaf trait syndromes linked to nutrient and water resources.
+
+## Intraspecific trait variability
+
+**(H3) Generalist species express a higher intraspecific trait variability than specialist species.**
+
+CV to quantify ITV : absolute variation of the intraspecific trait with respect to the interspecific mean. 
+
+CV is defined as the ratio of the standard deviation \sigma to the mean , expressed as a percentage. CV is convenient to compare variation of traits among species as it requires no ad hoc assumptions and is unitless. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+## CV
+
+
+cv_eff <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(list(cv= re, eff = N))
+} 
+
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+}
+
+
+
+#data ----------
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
+
+# For generalists ----------
+
+cv_G <- Metradica %>% filter(Type =="Generalist") %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                  ungroup(cv_G) %>%
+                  summarise_all(mean) %>%
+                  mutate(Name = "mean"))
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G$Type <- c("Generalist")
+
+# For TF specialist -------------
+
+cv_TF <- Metradica %>% filter(Type =="TF") %>%
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
+
+
+cv_TF <- bind_rows(cv_TF,
+                   ungroup(cv_TF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean"))
+
+cv_TF$SD[7] <- (cv_TF$SD[1]+cv_TF$SD[2]+cv_TF$SD[3]+cv_TF$SD[5]+cv_TF$SD[6])/5
+
+cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_TF$Type <- c("TF")
+
+# For BF specialist-----------
+
+cv_BF <-  Metradica %>% filter(Type =="BF") %>% 
+   rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
+
+cv_BF <- bind_rows(cv_BF,
+                ungroup(cv_BF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_BF$SD[10] <- (cv_BF$SD[2]+cv_BF$SD[3]+cv_BF$SD[4]+cv_BF$SD[5]+cv_BF$SD[6]+cv_BF$SD[7]+cv_BF$SD[8]+cv_BF$SD[9])/8
+
+cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") 
+
+cv_long_BF$Type <- c("BF")
+
+cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G) 
+
+# plot all 
+#option 1
+cv_plot <- cv_tot %>% 
+  mutate(CV =CV*100) %>%
+  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = Type, y = CV, fill = Type)) +
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Species'\npreference", 
+                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  scale_shape_discrete("Species'\npreference") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("Coefficient of variation (%)") + xlab("")+
+    theme_minimal(base_size = 22) +
+  facet_wrap(~trait, scales ="free_y") +
+  theme(legend.position = "bottom")
+
+#option 2
+cv_tot$Type <- dplyr::recode(cv_tot$Type, "TF" = "TF specialist", "BF" = "SF specialist")
+
+cv_plot <- cv_tot %>% 
+  # mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "TLP", "C"= "C", "N" = "N", "K"= "K", "LSWC" = "LSWC", "MajVLA" = "MajVLA", "P" = "P", "SD" = "SD")) %>%
+   mutate(trait = dplyr::recode(trait, 
+                                "Gmin" = "g[min]", 
+                                "TLP" = "TLP", 
+                                "Carbon"= "Carbon", 
+                                "Nitrogen" = "Nitrogen", 
+                                "Potassium"= "Potassium", 
+                                "LSWC" = "LSWC", 
+                                "MajVLA" = "MajVLA", 
+                                "Phosphorous" = "Phosphorous", 
+                                "SD" = "SD")) %>%
+  mutate(CV =CV*100) %>%
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = Type, y = CV, color = Type)) +
+  #geom_point()+
+  geom_jitter(size = 2) +
+  scale_color_manual(
+    values = c(Generalist = "#009E72",
+    `SF specialist` = "#56B4E9",
+    `TF specialist` = "#E79F02")
+  ) +
+  scale_shape_discrete("Species'\npreference") +
+  theme_minimal(base_size = 12) +
+   theme(axis.text.x = element_blank())+
+    theme(plot.title = element_text(size=12, face="bold")) +
+  facet_wrap(~trait, scales ="free_y", labeller = label_parsed) +
+  labs(x = "", y = "Coefficient of variation (%)", color = "Species' preference") +
+  theme(legend.position = "bottom")
+ 
+
+cv_plot
+
+#ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 7, height = 5, dpi = 600)
+
+```
+
+
+Leaf traits showed non-negligeable CV within species for all preferences (Figure 5). The lowest CVs are observed for leaf carbon concentration (0.9 % for SF specialists ; 1.1 % for TF specialists and 1.3 % for generalists), but also LSWC and SD. Moderate CVs are observed for TLP, MajVLA and leaf potassium concentration. The highest CV are observed for gmin, with 68% for SF specialists, and 60 % for TF specialists. Generalist species do not necessarily exhibit a higher CV compared to specialist species (Figure 5), but this was the case for leaf potassium concentration (6 generalist species), LSWC (3 generalist species), leaf nitrogen concentration (2 generalist species), P (1 generalist species).
+
+<!--chapter:end:05-Analyses.Rmd-->
+
+---
+title: "SupplementaryMaterials"
+author: "Marion Boisseaux"
+date: "2023-03-31"
+output: html_document
+---
+# (PART) Part four : Annexes {-}
+
+# Supporting Information
+
+Article title: The importance of local habitat in shaping functional tropical tree species’ strategies.
+
+Authors: Marion Boisseaux1*, Daniela  Krebber1,2, Christopher Baraloto7, Benoit Burban1, Angela Casado-Garcia3, Jocelyn Cazal1, Jeanne Clément2, Géraldine Derroire1, Claire Fortunel2 Jean-Yves Goret1, Jonathan Heras3, Gaelle JaouenORCID=0000-0002-5655-904411, Isabelle Maréchaux2, Christine Scoffoni4, Ghislain Vieilledent2, Jason Vleminckx5, Sabrina Coste1, Heidy Schimann6, Clément Stahl1.
+
+
+```{r libraries_SI, include=FALSE}
+library(tidyverse)
+library(ggfortify)
+library(factoextra)
+library(FactoMineR) #for PCAs
+library(kableExtra) #for tables
+library(V.PhyloMaker) #phylogeny
+library(ggtree) #tree vizualisation and annotation
+library(readxl)
+library(gridExtra)
+library(rio)
+library(dplyr)
+library(tidyr)
+library(janitor)
+library(forcats)
+library(ggpubr)
+library(ggplot2)
+library(corrplot) #correlation
+library("Hmisc") #for the significance for the correlation
+library(magick) #for images
+library(vegan) #for permanova
+library(pairwiseAdonis) #for pairwise comparaison after permanova
+```
+
+
+#Figures
+
+## Figure S1: The 21 selected species’ phylogeny.
+
+```{r Figure S1, echo=FALSE, message=FALSE, warning=FALSE}
+
+#select focal species
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+#Use paracou database 30/08/2021 as the backbone phylogeny
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+#This function makes phylogenetic hypotheses for the focal species under three scenarios based on paracou database 30/08/2021. I use the default senario.
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#remove "#" for the next two lines when running for the first time, to save and reload the phylogeny.
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+#build tree and visualize it
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+A
+
+#save and choose saving format
+#ggsave(file="phylo_subset.svg", plot=A, width=15, height=10)
+#ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
+```
+
+## Figure S2: Discrimination of the habitats using the topographic wetness index.
+
+```{r Figure S2}
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+Data$Forest <- as.factor(Data$Forest)
+Data$Habitat <- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra Firme')
+
+TWI_plot <- Data %>%
+mutate(Forest = fct_relevel(Forest, 
+            "Bafog", "Paracou", "Kaw")) %>%
+ggplot() +
+aes(x = Forest, y = log(TWI), fill = Habitat) +
+geom_boxplot() +
+scale_fill_manual(
+    values = c(`Seasonally flooded` = "#56B4E9",
+    `Terra Firme` = "#E79F02")
+                  ) +
+ylab("Topographic wetness index")+
+theme_minimal()+
+theme(text = element_text(size = 16))     
+
+TWI_plot
+
+ggsave(filename = "TWI in habitats.png", plot = TWI_plot, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+## Figure S3. Indval values for the studied species. 
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+*Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists and IndVal ≥  0.2598  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any preference and therefore called generalists.*
+
+```{r Indval data, include=FALSE}
+#Supplementary data from the Baraloto et al 2021.
+
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF data 
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF data
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+```
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r Species within indval threshold, message=FALSE, warning=FALSE}
+
+species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia", # subsp. copaia
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", #subsp. rabelianum
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(species, Data_TF) %>% na.omit()
+
+Generalist_high_indval_both_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui in both, removed it
+   mutate(Type = "SF specialist")
+
+#indval graphs
+
+#SF specialists
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#TF specialists
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#Generalists
+Generalist <- left_join(species, indval_FG) 
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#casearia too high in one habitat to consider it a generalist!
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_high_indval_both_habitats)
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal(base_size = 12) +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none")
+
+group_figure <- ggpubr::ggarrange(
+  indval_TF_plot + theme(legend.position="none"),
+  indval_SF_plot + theme(legend.position="none"),
+  Generalist_diff_indval + theme(legend.position="none"),
+  labels = c("A", "B", "C"),
+  nrow= 3, ncol=1)
+
+group_figure 
+
+#ggsave(file="indval.svg", plot=group_figure, width=10, height=12)
+#ggsave(file="indval.png", plot=group_figure, width=10, height=12)
+
+```
+
+## Figure S4: Variation of leaf trait values among species. 
+
+No imputation, not transformed. Visualizing raw trait variation.
+
+```{r Figure S4, echo=FALSE}
+
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data
+
+data <- Metradica %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+
+data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
+
+p <-  data %>%
+  mutate(Trait = as.character(Trait)) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]~(mmol%.%m^{-2}%.%s^{-1})", "TLP" = "pi[tlp]~(MPa)", "C"= "C~('%')", "N" = "N~('%')", "K"= "K~(g%.%kg^{-1})", "LSWC" = "LSWC~('%')", "MajVLA" = "MajVLA~(mm%.%mm^{-2})", "P" = "P~(g%.%kg^{-1})", "SD" = "SD~(mm^{-2})")) %>% 
+  left_join(dplyr::select(data, Type, Name) %>%
+              unique() %>%
+              arrange(Type, Name) %>%
+              mutate(order_graph = 1:n())) %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x = reorder(Name, order_graph), y= value)) +
+  geom_boxplot(aes(fill = Type),
+  #              alpha = 0.5, col = "lightgrey") +
+  #geom_violin(aes(fill = Type),
+               alpha = 0.5, col = "lightgrey") +
+  scale_fill_manual(name = "Species preference", 
+                    values = c("TF" = "#E79F02", #orange for TF
+                                "BF" =  "#56B4E9", #blue for SF
+                                "Generalist" = "#009E72"),  #green for Generalists
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  facet_wrap(~ Trait, scales = "free_x", label = label_parsed) +
+  theme_minimal() +
+  coord_flip() +
+  theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
+p
+
+#ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+## Figure S5: Trait contributions to first four principal component axes among leaf traits. 
+
+PCA with log-transformed traits, that were imputed but without stomata.
+
+```{r Figure S5, echo=FALSE}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+Data$Habitat<- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra firme')
+Data <- Data %>% na.omit()
+
+#PCA without stomata
+res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+
+#Eigenvalues
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+#Contributions of variables to PC1
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+
+#Contributions of variables to PC2
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+
+#Contributions of variables to PC3
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+
+#fviz_pca_var(res.pca, axes = c(1, 3)) #variables 
+#fviz_pca_ind(res.pca, axes = c(1, 3), col.ind = Data$Type, geom = "point") #individuals
+
+A <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Type,  
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+B <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Type,
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+E <- ggarrange(A, B, ncol = 2, nrow = 1, labels = c("A", "B"), common.legend = T, legend = "right")
+
+C <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+D <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+G <- ggarrange(C, D, ncol = 2, nrow = 1, labels = c("C", "D"), common.legend = T, legend = "right")
+H <- ggarrange(E, G, ncol = 1, nrow = 2)
+H
+ggsave(filename = "Dimension3.png", plot = H, bg = "white", width = 10, height = 10, dpi = 600)
+
+#Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+axes_constribution 
+ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+## Figure S6: Spearman correlation coefficients among leaf traits. 
+
+```{r Figure S6}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+traits <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+testRes = cor.mtest(traits, conf.level = 0.95)
+
+#image output, have to run until last live dev.off() for it to work.
+png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+
+#create correlation matrix
+cor_matrix <- traits %>%
+  na.omit() %>%
+  cor(method = "spearman")
+
+#correlation plot with no rows and column labels and without colors in the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
+
+# Add labels to the diagonal
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+dev.off()
+
+```
+
+## Figure S7: Correlation between stomatal density and minimal leaf conductance. 
+
+Leaf traits are ln-transformed. The adjusted R squared is equal to 0.011. 
+
+```{r Figure S7, echo=FALSE}
+
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv")
+#SD and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(SD), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+library(jtools)
+model <- lm(log(SD) ~ log(Gmin), data = Data)
+A <- get_formula(model)
+p
+```
+
+#Tables
+
+## Table S1. Sampling sites supplementary information. 
+
+```{r Table S1, echo=FALSE}
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#googlesheet
+Plot_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=0")
+
+Plot_table <- Plot_table %>% 
+  dplyr::select(-PlotName, -Xutm, -Yutm, -Localization)
+  
+Plot_table %>%
+  kbl(caption = "Summary of sampling site information", escape = FALSE, digits = 2) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Plot_info_summary.png", zoom = 5)
+```
+
+## Table S2. Individuals per species collected in the three sampling sites. 
+
+```{r Table S2, echo=FALSE}
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Family <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") %>%
+  adorn_totals("row")
+
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) #%>%
+#save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+## Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. 
+
+```{r Table S3, echo=FALSE}
+
+#get authorization
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#indval data 
+Indval <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(-Paracou, -Bafog, -Kaw)
+
+Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Indval %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1:2, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
+
+```
+
+
+## Table S4: Permutational Manova analysis and post-hoc pairwise analysis.
+
+PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.
+
+Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.
+
+```{r Table S4, echo=FALSE}
+#Data
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+
+data_PCA <- Data[, c(1:17)][,-c(1,2,3,4,5,6,7,8,13)]
+
+adonis_type<-adonis2(data_PCA~Data$Type, permutations = 999, method = "euclidean") 
+adonis_habitat<-adonis2(data_PCA~Data$Habitat, permutations = 999, method = "euclidean") 
+
+permanova <-adonis_type %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
+
+permanova <-adonis_habitat %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
+
+#P-value (0.001) *** is significant so our group types have different means.
+
+#Process a pairwise analyse to detect which treatments are different from each other.
+pairwise_adonis_type <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+pairwise_adonis_type$pairs[1] <- "TF specialist vs SF specialist"
+pairwise_adonis_type$pairs[2] <- "TF specialist vs generalist"
+pairwise_adonis_type$pairs[3] <- "SF specialist vs generalist"
+pairwise_adonis_habitat <- pairwise.adonis(data_PCA,Data$Habitat, sim.method = "euclidean") 
+pairwise_adonis_habitat$pairs[1] <- "TF habitat vs SF habitat"
+
+#Species preference
+pairwise_adonis_type_table <- pairwise_adonis_type %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "A. Species' preferences",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "A. Species' preferences.png", zoom = 5)
+
+#Habitat of collect
+pairwise_adonis_habitat_table <- pairwise_adonis_habitat %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "B. Habitat of collect",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "B. Habitat of collect.png", zoom = 5)
+```
+
+
+## Table S5: Pairwise tables for the spearman correlation.
+
+Coefficients (A) and associated p-values (B) of leaf traits for the 21 studied species (n=552).
+
+```{r Table S5, echo=FALSE}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+traits <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+testRes = cor.mtest(traits, conf.level = 0.95)
+
+#image output, have to run until last live dev.off() for it to work.
+png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+
+#create correlation matrix
+cor_matrix <- traits %>%
+  na.omit() %>%
+  cor(method = "spearman")
+
+#correlation plot with no rows and column labels and without colors in the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
+
+# Add labels to the diagonal
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+dev.off()
+
+#significance
+res <- rcorr(as.matrix(traits), type = "spearman")
+res
+# Extract the correlation coefficients
+
+
+res$r %>%
+  kbl(caption ="", digits =2)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria")  %>%
+  save_kable("corr_coef.png")
+  
+img <- image_read("corr_coef.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_coef_resized.png")
+
+
+# Extract p-values associated to the correlation coefficients
+res$P%>%
+  kbl(caption ="", digits =3)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the associated p-values</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable("corr_pvalue.png")
+
+img <- image_read("corr_pvalue.png")
+img_resized <- image_scale(img, "800x600")
+
+# Save the resized image
+image_write(img_resized, "corr_pvalue_resized.png")
+
+
+```
+
+## Table S6: Model summary for each trait from equation 1.
+
+```{r Table 6, echo=FALSE}
+#library used
+library(nlme) #to fit the model and do the variance partitioning with ML method
+library(lme4) #for the VarCorr function
+library(dplyr) #to pipe
+library(ggplot2) #to plot
+library(kableExtra) #to build nice tables
+
+#data used (log on all traits)
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Forest <- as.factor(Data$Forest)
+
+#function for extracting the coefficient of the model
+model_coef_table <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # build coef table 
+  coef_table <- coef(summary(model))
+  coef_table <- as.data.frame(coef_table)
+  
+  return(coef_table)
+}
+
+
+# For all traits call model_coef_table function
+coef_tables <- list()
+
+for (i in colnames(Data)[9:17]){
+
+  coef_tables[[i]] <- model_coef_table(i, Data)
+}
+
+# Combine all coefficient tables into one data frame
+coef_table <- do.call(rbind, coef_tables)
+
+
+# create nice table
+coef_table %>%
+  kbl(caption = "", escape = FALSE, digits = 3) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
+```
+
+
+<!--chapter:end:06-SupplementaryMaterials.Rmd-->
+
+---
+title: "Literature"
+author: "Marion Boisseaux"
+date: "08/03/2022"
+output: html_document
+---
+
+# Part five : Notes {-}
+
+# Waterlogging
+
+- From **Abiotic Stress Physiology of Horticultural Crops** *edited by N.K. Srinivasa Rao, K.S. Shivashankara, R.H. Laxman*
+
+Section 1.3 : one of the earliest responses to soil flooding is a reduction in stomatal conductance, inhibition of stomatal aperture. Low O2 level may also reduce hydraulic conductivity and csqtly decrease root permeability. This descrease in hydraulic permeability may b liked to aqaporins [...] limiting water uptake and this leading to internal water deficit. Oxygen deficiency generally induces a rapid reduction in the rate of photoS which is generally considered as the result of reduced stomatal aperture, decrease in leaf chloro content + early leaf senescence and a reduction in LA. Waterlogged soils reduce the translocation of photoS product from 'source' to 'sink' root. As a result, the maintenance of photoS acitivity and accumulation of soluble sugar in roots are clearly important adaptations to flooding. 
+
+Plant responses to waterlogging include low stomatal conductance, decrease in leaf, root, and shoot dev't, changes in osmotic potential and nu uptake, reduced chloro content and photoS.
+
+The oxygen diffusion is 10,000 times slower in waterlogged soils as compared to aerated soil. 
+
+The decrease in Oxygen level in soils affects the bioavailability of nutrients and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reduced leaf concentrations of N, P, K, Ca, Mg in avocado + pea. 
+
+with waterlogging: i should find a decrease of stomatal conductance corrolated with an increase of leaf water potential.
+
+<!--chapter:end:80-Literature.Rmd-->
+
+---
+title: "Meeting Notes"
+author: "Marion Boisseaux"
+date: "31/01/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+# Meeting 26/01/2022
+
+Metradica meeting 
+
+Presents: 
+ 
+* Ghislain 
+* Clément  
+* Sabrina 
+* Damien  
+* Jeanne 
+* Marion 
+
+Objectives: 
+ 
+1- les données 13C  
+2- les modèles joints 
+
+**Notes:**
+
+(1) 
+
+L'estimation de l'efficience d'utilisation de l'eau intrinsèque peut être obtenue à l'aide de msures directes des échanges gazeux entre feuille et atm. Farquar 1982 propose un modèle simple reliant WUE (water use efficiency) à la discrimination isotopique du C au cours de la photosynthèse. 
+
+Relation WUE et $\delta$ 13C positive.
+
+Drivers de la compo iso: 
+
+* Lumière (feuille d'ombre valeurs 13C nettement plus négatives) 
+* génétique 
+* sécheresse atm + sol 
+* VPD 
+* teneur en mx du sol 
+* ontogénie de l'individu 
+* conductance hydraulique 
+
+Attention: la compo iso n'est pas un trait lié à la sécheresse. Il caractérise *l'acclimation* à la sécheresse. Il est utile pour une expé en serre de comparer le $\delta$ 13C  entre le groupe controle et le groupe dry. Une espèce sensible: on trouvera une forte différence vs. une espèce peu sensible, une faible différence. Et le *delta* ser aun trait de réponse à la sécheresse.
+
+Travaux de Damien:
+ 
+* 16 parcelles à travers la Guyane 
+* 9-10 sites  
+* ~100 arbres / parcelles 
+* ~1600 valeurs de compo iso de feuille d'arbres dominant 
+* 70 espèces différentes avec qq indet. par site; total de 392 espèces  identifiées
+* Moyenne valeur $\delta$ 13C ~ -30 %0 pour les forêts en Guyane 
+* Lorsque le climat est le même, on observe le même fonctionnement 
+
+(2) 
+ 
+Avant nous procédions par espèces, le but des modèles joints: faire avec plusieurs espèces en même temps.Les modèles joints de distribution des espèces permettent d’estimer la niche des espèces, de prédire leur distribution, tout en prenant en compte les intéractions entre espèces. Ils peuvent être utilisés pour déterminer les communautés ou assemblages d’espèces et comment ces assemblages changent spatialement, selon des gradients environnementaux. 
+
+Prendre en compte: la co-occurence des espèces + relation trait-env't pour déterminer la présence d'une espèce sur 1 site.
+
+![Modèle joint](./Documents/Pictures/ModeleJoint.png "Modele Joint")
+
+Si l'on inclu les données 13C dans les modèles joints: on s'attend à une abscence de réponse.
+
+
+<!--chapter:end:99-MeetingNotes.Rmd-->
+
