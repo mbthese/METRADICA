@@ -41,6 +41,32 @@ Permanent forest plots of the *Guyafor network* (https://paracou.cirad.fr/websit
 The three sites were chosen in order to sample species along the rainfall gradient. 
 
 ![Rainfall gradient in French Guyana](./Documents/Pictures/41597_2019_218_Fig1_HTML.png "Rainfall gradient in French Guyana")
+### 
+```{r}
+#correct plot names after checked by Gaelle Jaouen.
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Data_verified_gaelle <- readxl::read_xlsx("Dataset/OUTPUT_cleaning/ALL/20221130_MetradicaFinal_GJ.xlsx") %>%
+  dplyr::select(Code, PlotCorr)
+
+Data2 <- left_join(Data, Data_verified_gaelle, by = "Code")
+
+Data2$PlotCorr <- gsub(pattern = "Kaw_",replacement = "",x = Data2$PlotCorr )
+Data2$PlotCorr <- gsub(pattern = "Bafog_",replacement = "",x = Data2$PlotCorr )
+Data2$PlotCorr <- gsub(pattern = "Paracou_",replacement = "",x = Data2$PlotCorr )
+
+#count number of trees per plot to update SI table.
+Data2 <- Data2 %>%
+  dplyr::select(-Plot) %>%
+  rename(Plot = PlotCorr) %>%
+  relocate(Plot, .after = Forest) 
+
+Data2 %>%
+  group_by(Forest, Plot) %>%
+  summarise(total_count = n(), .groups = 'drop')
+
+write.csv(Data2, "Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv")
+```
 
 ## Habitats
 
@@ -456,6 +482,7 @@ Totaux_table %>%
  #save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
 
 ```
+
 
 ## Sampling strategy
 

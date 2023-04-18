@@ -11,6 +11,7 @@ The importance of local habitat in shaping functional tropical tree species’ s
 
 Authors : *Marion Boisseaux*, Daniela  Krebber, Christopher Baraloto, Benoit Burban, Angela Casado-Garcia, Jocelyn Cazal, Jeanne Clément, Géraldine Derroire, Claire Fortunel, Jean-Yves Goret, Jonathan Heras, Gaelle Jaouen, Isabelle Maréchaux, Christine Scoffoni, Ghislain Vieilledent, Jason Vleminckx, Sabrina Coste, Heidy Schimann, Clément Stahl.
 
+
 ## Contribution of the environment to single-trait variation
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -22,7 +23,7 @@ library(ggplot2) #to plot
 library(kableExtra) #to build nice tables
 
 #data used (log on all traits)
-Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
   rename(Carbon = C,
          Nitrogen = N,
          Potassium = K, 
@@ -76,7 +77,7 @@ Var_par <- function(Trait, Mydata){
 
 # Loop to calculate the variance partitioning for all traits
 vars <- c()
-Data <- Data %>% filter(Type != "Generalist")
+#here we do for all species preferences but if interested for generalists only: Data <- Data %>% filter(Type != "Generalist")
 
 for (i in colnames(Data)[9:17]){
   
@@ -203,7 +204,7 @@ library(ggplot2)
 # Data preparation and log-transformation #
 ###########################################
 
-Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
   rename(Potassium = K, 
          Phosphorous = P, 
          Nitrogen = N,
@@ -280,7 +281,7 @@ library(devtools)
 library(ggfortify)
 library(ggplot2)
 
-Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
   rename(Potassium = K, 
          Phosphorous = P, 
          Nitrogen = N,
@@ -718,7 +719,7 @@ library(devtools)
 library(ggfortify)
 library(ggplot2)
 
-Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
   rename(Potassium = K, 
          Phosphorous = P, 
          Nitrogen = N,
@@ -1216,7 +1217,7 @@ cv <- function(traits){
 
 
 #data ----------
-Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") 
 
 Metradica$Type <- as.character(Metradica$Type)
 Metradica$Name <- as.character(Metradica$Name)
