@@ -60,10 +60,10 @@ trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
 options(knitr.kable.NA = '') #replace NA by blank spaces in table
 
 trait_table %>%
-  kbl(caption = "Table 1. Leaf functional traits.", escape = FALSE) %>%
+  kbl(caption = "Table 1. Leaf functional traits and linked mechanisms.", escape = FALSE) %>%
   row_spec(0, bold = TRUE) %>% 
-  kable_classic(full_width = F, html_font = "Cambria") #%>%
- # save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
 ```
 
 
