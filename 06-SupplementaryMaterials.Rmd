@@ -35,6 +35,7 @@ library("Hmisc") #for the significance for the correlation
 library(magick) #for images
 library(vegan) #for permanova
 library(pairwiseAdonis) #for pairwise comparaison after permanova
+library(multcompView)
 ```
 
 
@@ -443,35 +444,84 @@ Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
   mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
   mutate(TLP = -TLP)
 
-traits <- Data %>% 
+
+#Spearman correlation for specialist SF
+traits_spe_SF <- Data %>% 
   rename(`  K` = Potassium, 
          `  P` = Phosphorous, 
          `  N` = Nitrogen,
          `  C` = Carbon,
          gmin = Gmin) %>% 
+  filter(Type == "BF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Spearman correlation for specialist TF
+traits_spe_TF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "TF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Spearman correlation for generalist
+traits_generalist <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
   dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
 
 #to add significance
-testRes = cor.mtest(traits, conf.level = 0.95)
+testRes = cor.mtest(traits_generalist, conf.level = 0.95, exact= FALSE,  method= "spearman")
+testRes_SF = cor.mtest(traits_spe_SF, conf.level = 0.95, exact= FALSE, method= "spearman")
+testRes_TF = cor.mtest(traits_spe_TF, conf.level = 0.95, exact= FALSE,  method= "spearman")
 
-#image output, have to run until last live dev.off() for it to work.
-png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+#combine
+# Create a new empty plot with appropriate dimensions
+png(height=700, width=1800, file="combined_corr_plots.png", type = "cairo")
 
-#create correlation matrix
-cor_matrix <- traits %>%
+# Divide the plotting area into a 1x2 grid
+par(mfrow=c(1,3))
+
+# Plot generalists
+cor_matrix <- traits_generalist %>%
   na.omit() %>%
   cor(method = "spearman")
-
-#correlation plot with no rows and column labels and without colors in the diagonal
-corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
-         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
-
-# Add labels to the diagonal
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', 
+        # insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE,  cl.cex = 3)
+title(main = "Generalist", adj= 0.2, line = -5, cex.main = 5, col.main= "#009E72")  
 text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
-     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+# Plot spé SF
+cor_matrix <- traits_spe_SF %>%
+  na.omit() %>%
+  cor(method = "spearman")
+corrplot(cor_matrix, p.mat = testRes_SF$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE,  cl.cex = 3)
+title(main = "SF specialist", adj= 0.2, line = -5, cex.main = 5, col.main= "#56B4E9")  
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+
+# Plot spé TF
+cor_matrix <- traits_spe_TF %>%
+  na.omit() %>%
+  cor(method = "spearman")
+corrplot(cor_matrix, p.mat = testRes_TF$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE, cl.cex = 3)
+title(main = "TF specialist", adj= 0.2, line = -5, cex.main = 5, col.main= "#E79F02")  
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
 
 dev.off()
-
 ```
 
 ## Figure S7: Correlation between stomatal density and minimal leaf conductance. 
@@ -493,6 +543,251 @@ model <- lm(log(SD) ~ log(Gmin), data = Data)
 A <- get_formula(model)
 p
 ```
+
+##Figure S8:  Crown position and dawkins 
+```{r}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Genus, -Species) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP)
+
+#Dawkins, height and DBH and crown information
+complementary_info <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition) #already have DBH
+
+complementary_info
+
+data_with_complementary_info <- left_join(Data, complementary_info, by = "Code") %>%
+  mutate(Dawkins = paste0(TreeDawkins, ".", BranchDawkins))
+
+#plot
+with(data_with_complementary_info, boxplot(Gmin ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(TLP ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(LSWC ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(MajVLA ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Nitrogen ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Carbon ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Phosphorous ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Potassium ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(SD ~ TreeDawkins))
+
+#analysis of variance
+gmin.aov <- aov(Gmin~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(gmin.aov)
+#plot(gmin.aov)
+
+
+TLP.aov <- aov(TLP ~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(TLP.aov)
+#plot(TLP.aov)
+
+LSWC.aov <- aov(LSWC~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(LSWC.aov)
+#plot(LSWC.aov)
+
+MajVLA.aov <- aov(MajVLA~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(MajVLA.aov)
+#plot(MajVLA.aov)
+
+Nitrogen.aov <- aov(Nitrogen~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Nitrogen.aov)
+#plot(Nitrogen.aov)
+
+Carbon.aov <- aov(Carbon~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Carbon.aov)
+#plot(Carbon.aov)
+
+Phosphorous.aov <- aov(Phosphorous~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Phosphorous.aov)
+#plot(Phosphorous.aov)
+
+Potassium.aov <- aov(Potassium~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Potassium.aov)
+#plot(Potassium.aov)
+
+SD.aov <- aov(SD~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(SD.aov)
+#plot(SD.aov)
+
+#tuckey post hoc test
+gmin.tukey <- TukeyHSD(gmin.aov)
+#TLP.tukey <- TukeyHSD(TLP.aov)
+#LSWC.tukey <- TukeyHSD(LSWC.aov)
+MajVLA.tukey <- TukeyHSD(MajVLA.aov)
+N.tukey <- TukeyHSD(Nitrogen.aov)
+C.tukey <- TukeyHSD(Carbon.aov)
+Phos.tukey <- TukeyHSD(Phosphorous.aov)
+#Pota.tukey <- TukeyHSD(Potassium.aov)
+SD.tukey <- TukeyHSD(SD.aov)
+
+# compact letter display
+cld.gmin <- multcompLetters4(gmin.aov, gmin.tukey)
+cld.MajVLA <- multcompLetters4(MajVLA.aov, MajVLA.tukey)
+cld.N <- multcompLetters4(Nitrogen.aov, N.tukey)
+cld.C <- multcompLetters4(Carbon.aov, C.tukey)
+cld.Phos <- multcompLetters4(Phosphorous.aov, Phos.tukey)
+cld.SD <- multcompLetters4(SD.aov, SD.tukey)
+
+# table with factors and 3rd quantile
+Tk.gmin <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Gmin), quant = quantile(Gmin, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.MajVLA <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(MajVLA), quant = quantile(MajVLA, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.N <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Nitrogen), quant = quantile(Nitrogen, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.C <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Carbon), quant = quantile(Carbon, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.Phos <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Phosphorous), quant = quantile(Phosphorous, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.SD <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(SD, na.rm = TRUE), quant = quantile(SD, probs = 0.75, na.rm =TRUE)) %>%
+  arrange(desc(mean)) %>% na.omit()
+
+# extracting the compact letter display and adding to the Tk table
+cld.gmin <- as.data.frame.list(cld.gmin$`as.factor(TreeDawkins)`) 
+Tk.gmin$cld <- cld.gmin$Letters
+print(Tk.gmin)
+
+cld.MajVLA <- as.data.frame.list(cld.MajVLA$`as.factor(TreeDawkins)`) 
+Tk.MajVLA$cld <- cld.MajVLA$Letters
+print(Tk.MajVLA)
+
+cld.N <- as.data.frame.list(cld.N$`as.factor(TreeDawkins)`) 
+Tk.N$cld <- cld.N$Letters
+print(Tk.N)
+
+cld.C <- as.data.frame.list(cld.C$`as.factor(TreeDawkins)`) 
+Tk.C$cld <- cld.C$Letters
+print(Tk.C)
+
+cld.Phos <- as.data.frame.list(cld.Phos$`as.factor(TreeDawkins)`) 
+Tk.Phos$cld <- cld.Phos$Letters
+print(Tk.Phos)
+
+cld.SD <- as.data.frame.list(cld.SD$`as.factor(TreeDawkins)`) 
+Tk.SD$cld <- cld.SD$Letters
+print(Tk.SD)
+
+#boxplots
+gmin.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Gmin)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Gmin") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.gmin, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+TLP.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), TLP)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="TLP") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=-0.25, label="Anova, pvalue = 0.4", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+LSWC.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), LSWC)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="LSWC") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=6, label="Anova, pvalue = 0.07", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+MajVLA.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), MajVLA)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="MajVLA") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.MajVLA, aes(x = TreeDawkins, y = quant, label = cld), size =6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+N.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Nitrogen)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Nitrogen") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.N, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+C.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Carbon)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Carbon") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.C, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+Phos.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Phosphorous)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Phosphorous") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.Phos, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+SD.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), SD)) + 
+  geom_jitter(alpha=0.2)+
+ geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+    labs(x="Tree Dawkins", y="Stomatal density") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.SD, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
+  scale_fill_brewer(palette = "Blues")
+
+
+Pot.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Potassium)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Potassium") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=4, label="Anova, pvalue = 0.08", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+#arrange all
+
+Dawkins <- ggarrange(gmin.plot, TLP.plot, LSWC.plot, MajVLA.plot, SD.plot, N.plot, C.plot, Pot.plot, Phos.plot)
+
+
+ggsave(filename = "Dawkins.jpeg", plot = Dawkins, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+
 
 #Tables
 
@@ -681,67 +976,100 @@ Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
   mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
   mutate(TLP = -TLP)
 
-traits <- Data %>% 
+#Spearman correlation for generalist
+traits_generalist <- Data %>% 
   rename(`  K` = Potassium, 
          `  P` = Phosphorous, 
          `  N` = Nitrogen,
          `  C` = Carbon,
          gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
   dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
 
 #to add significance
-testRes = cor.mtest(traits, conf.level = 0.95)
+res <- round(cor(traits_generalist, method = "spearman"), digits = 2)
+testRes = cor.mtest(traits_generalist, conf.level = 0.95, exact= FALSE, method = "spearman")
 
-#image output, have to run until last live dev.off() for it to work.
-png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
-
-#create correlation matrix
-cor_matrix <- traits %>%
-  na.omit() %>%
-  cor(method = "spearman")
-
-#correlation plot with no rows and column labels and without colors in the diagonal
-corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', insig='blank',
-         sig.level = 0.10, addrect = 2, diag = FALSE, tl.pos = FALSE)
-
-# Add labels to the diagonal
-text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
-     cex = 1.5, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
-
-dev.off()
-
-#significance
-res <- rcorr(as.matrix(traits), type = "spearman")
-res
-# Extract the correlation coefficients
-
-
-res$r %>%
+res %>% # Extract the correlation coefficients
   kbl(caption ="", digits =2)  %>%
-  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients</span>" = 9), escape = FALSE) %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients for generalists </span>" = 9), escape = FALSE) %>%
   kable_classic(full_width = F, html_font = "Cambria")  %>%
-  save_kable("corr_coef.png")
-  
-img <- image_read("corr_coef.png")
+  save_kable("corr_coef_generalist.png")
+img <- image_read("corr_coef_generalist.png")
 img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_generalist.png")
 
-# Save the resized image
-image_write(img_resized, "corr_coef_resized.png")
-
-
-# Extract p-values associated to the correlation coefficients
-res$P%>%
+testRes$p%>% # Extract p-values associated to the correlation coefficients
   kbl(caption ="", digits =3)  %>%
-  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the associated p-values</span>" = 9), escape = FALSE) %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the associated p-values for generalist</span>" = 9), escape = FALSE) %>%
   kable_classic(full_width = F, html_font = "Cambria") %>%
-  save_kable("corr_pvalue.png")
-
-img <- image_read("corr_pvalue.png")
+  save_kable("corr_pvalue_generalist.png")
+img <- image_read("corr_pvalue_generalist.png")
 img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_pvalue_resized_generalist.png")
 
-# Save the resized image
-image_write(img_resized, "corr_pvalue_resized.png")
+#Spearman correlation for specialist SF
+traits_spe_SF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "BF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
 
+res_SF <- round(cor(traits_spe_SF, method = "spearman"), digits = 2)
+testRes_SF = cor.mtest(traits_spe_SF, conf.level = 0.95, exact= FALSE)
+
+res_SF %>% 
+  kbl(caption ="", digits =2)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>C. Pairwise table of the correlation coefficients for SF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria")  %>%
+  save_kable("corr_coef_SF_specialists.png")
+img <- image_read("corr_coef_SF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_SF_specialists.png")
+
+testRes_SF$p %>% 
+  kbl(caption ="", digits =3)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>D. Pairwise table of the associated p-values for SF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable("corr_pvalue_SF_specialists.png")
+img <- image_read("corr_pvalue_SF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_pvalue_resized_SF_specialists.png")
+
+
+#Spearman correlation for specialist TF
+traits_spe_TF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "TF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+res_TF <- round(cor(traits_spe_TF, method = "spearman"), digits = 2)
+testRes_TF = cor.mtest(traits_spe_TF, conf.level = 0.95, exact= FALSE)
+
+res_TF %>% 
+  kbl(caption ="", digits =2)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>E. Pairwise table of the correlation coefficients for TF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria")  %>%
+  save_kable("corr_coef_TF_specialists.png")
+img <- image_read("corr_coef_TF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_TF_specialists.png")
+
+testRes_TF$p %>% 
+  kbl(caption ="", digits =3)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>F. Pairwise table of the associated p-values for TF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable("corr_pvalue_TF_specialists.png")
+img <- image_read("corr_pvalue_TF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_pvalue_resized_TF_specialists.png")
 
 ```
 
@@ -803,5 +1131,50 @@ coef_table %>%
   row_spec(0, bold = TRUE) %>% 
   kable_classic(full_width = F, html_font = "Cambria") %>%
   save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
+```
+
+##Table S7 : DBH, height
+
+```{r}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$DBH[which(Data$Code == "323")] <- NA #not 0
+
+#Dawkins, height and DBH and crown information
+complementary_info <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/Metradica_all_fieldsheet.csv") %>% select(Code, TreeHeight, TreeDawkins, CrownPosition) #already have DBH
+
+complementary_info
+
+data_with_complementary_info <- left_join(Data, complementary_info, by = "Code")
+
+data_with_complementary_info <- data_with_complementary_info %>%
+  group_by(Name) %>%
+  summarise(min_DBH = round(min(DBH, na.rm = TRUE), digits = 1),
+            max_DBH = round(max(DBH,  na.rm = TRUE), digits = 1),
+            range_DBH = paste0("[",min_DBH,";",max_DBH, "]" ),
+            min_TreeHeight = min(TreeHeight, na.rm = TRUE),
+            max_TreeHeight = max(TreeHeight, na.rm = TRUE),
+            range_TreeHeight = paste0("[",min_TreeHeight,";",max_TreeHeight, "]" ),
+            min_TreeDawkins = min(TreeDawkins, na.rm = TRUE),
+            max_TreeDawkins = max(TreeDawkins, na.rm = TRUE),
+            range_TreeDawkins = paste0("[",min_TreeDawkins,";",max_TreeDawkins, "]" )) %>%
+  select(Name, range_DBH, range_TreeHeight)
+
+#table for height
+data_with_complementary_info%>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/ComplementaryInfo_subset.png", zoom = 10)
+
 ```
 

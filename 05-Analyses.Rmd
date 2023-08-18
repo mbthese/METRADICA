@@ -89,6 +89,12 @@ for (i in colnames(Data)[9:17]){
 #plot the results
 
 vars$Levels <- as.factor(vars$Levels)
+ordered_traits <- vars %>%
+  filter(Levels == "Environment") %>%
+  arrange(Variances) %>%
+  pull(Traits)
+
+vars$Traits <- factor(vars$Traits, levels = ordered_traits)
 
 variance_plot<- vars %>%  
   mutate(Levels = factor(Levels, levels=c("Environment", "Species", "Individual"))) %>%
@@ -681,8 +687,8 @@ plot_0 <- as_ggplot(tgrob) + theme(plot.margin = margin(0,3,0,0, "cm"))
 
 #Plot TI (ranges standardized by effect size) along TWI 
 A <- ggplot(data) +
-  aes(x = mean, y = ITI) +
-  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  aes(x = mean, y = ITI, ymax= ITI, ymin= 0) +
+  geom_pointrange(shape = "circle", size = 1, color = "#009E72") +
   geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
   ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
   xlab("Topographic wetness index") +
@@ -690,13 +696,15 @@ A <- ggplot(data) +
         axis.title.y = element_text(size = 12),
         axis.title.x = element_text(size = 12)) +
   theme_minimal(base_size = 12) +
-  guides(color = "none") #remove legend
-
+  guides(color = "none") +#remove legend
+ylim(-4, 6)+
+  xlim(1.7, 2.6)
+A
 
 #Plot TI_sd along TWI
 B <- ggplot(data) +
-  aes(x = mean, y = ITI_sd) +
-  geom_point(shape = "circle", size = 5, color = "#009E72") +
+  aes(x = mean, y = ITI_sd, ymax= ITI_sd, ymin=0) +
+  geom_pointrange(shape = "circle", size = 1, color = "#009E72") +
   geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
   ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
   xlab("Topographic wetness index") +
@@ -704,8 +712,10 @@ B <- ggplot(data) +
         axis.title.y = element_text(size = 12),
         axis.title.x = element_text(size = 12)) +
   theme_minimal(base_size = 12)+
-  guides(color = "none")
-
+  guides(color = "none")+
+  ylim(-4, 6)+
+  xlim(1.7, 2.6)
+B
 ```
 
 
@@ -844,7 +854,7 @@ TI_index <- function(NbClass, Data, Data_TWI){
   #Plot TI (ranges standardized by effect size) along TWI 
   C <- ggplot(Data_TWI) +
     aes(x = mean, y = ITI_i) +
-    geom_point(shape = "circle", size = 5, aes(color = mean)) +
+    geom_pointrange(shape = "circle", size = 2, aes(color = mean)) +
     scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
     geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
     ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
@@ -1114,11 +1124,13 @@ tgrob_s <- ggpubr::text_grob(title_s,size = 16)
 # Draw the text
 plot_s <- as_ggplot(tgrob_s) + theme(plot.margin = margin(0,3,0,0, "cm"))
 
+plot_df = data.frame(x = 1:20, y = rnorm(20))
+
 
 #Plot TI (ranges standardized by effect size) along TWI 
 C <- ggplot(data_s) +
-  aes(x = mean, y = ITI) +
-  geom_point(shape = "circle", size = 5, aes(color = mean)) +
+  aes(x = mean, y = ITI,  ymax = ITI, ymin = 0) +
+  geom_pointrange(shape = "circle", size = 1, aes(color = mean)) +
   scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
   geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
   ylab(expression(atop("Trait integration index", italic("range")))) + #atop creates a line break
@@ -1127,13 +1139,14 @@ C <- ggplot(data_s) +
         axis.title.y = element_text(size = 12),
         axis.title.x = element_text(size = 12)) +
   theme_minimal(base_size = 12) +
-  guides(color = "none") #remove legend
-
-
+  guides(color = "none") +#remove legend
+  ylim(-4,6)+
+  xlim(1.7, 2.6)
+C
 #Plot TI_sd along TWI
 D <- ggplot(data_s) +
-  aes(x = mean, y = ITI_sd) +
-  geom_point(shape = "circle", size = 5, aes(color = mean)) +
+  aes(x = mean, y = ITI_sd, ymax= ITI_sd, ymin=0) +
+  geom_pointrange(shape = "circle", size = 1, aes(color = mean)) +
   scale_color_gradient(low = "#E79F02", high = "#56B4E9") +
   geom_hline(yintercept = 0, col = "gray", linetype = "dashed") +
   ylab(expression(atop("Trait integration index", italic("standard deviation")))) +
@@ -1142,7 +1155,10 @@ D <- ggplot(data_s) +
         axis.title.y = element_text(size = 12),
         axis.title.x = element_text(size = 12)) +
   theme_minimal(base_size = 12)+
-  guides(color = "none")
+  guides(color = "none")+
+  ylim(-4, 6)+
+  xlim(1.7, 2.6)
+D
 ```
 
 ```{r both, echo=FALSE}
@@ -1157,7 +1173,7 @@ plot_publi <- ggpubr::ggarrange(plot_generalists, plot_specialists, ncol = 1, nr
 plot_publi
 
 #save plot
-#ggsave(filename = "Multivariate covariation_6 class.png", plot = plot_publi, bg = "white", width = 8, height = 7, dpi = 600)
+ggsave(filename = "Multivariate covariation_6 class.png", plot = plot_publi, bg = "white", width = 8, height = 7, dpi = 600)
 ```
 
 
@@ -1223,7 +1239,6 @@ Metradica$Type <- as.character(Metradica$Type)
 Metradica$Name <- as.character(Metradica$Name)
 
 # For generalists ----------
-
 cv_G <- Metradica %>% filter(Type =="Generalist") %>% 
   rename(Carbon = C,
          Nitrogen = N,
@@ -1243,6 +1258,54 @@ cv_G <- bind_rows(cv_G,
 cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
 
 cv_long_G$Type <- c("Generalist")
+
+#for generalists collected in SF
+
+cv_G_SF <- Metradica %>% filter(Type =="Generalist") %>% 
+  filter(Habitat == "BF") %>%
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
+
+cv_G_SF <- bind_rows(cv_G_SF,
+                  ungroup(cv_G_SF) %>%
+                  summarise_all(mean) %>%
+                  mutate(Name = "mean"))
+
+cv_long_G_SF <- reshape2::melt(cv_G_SF, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G_SF$Type <- c("Generalist")
+cv_long_G_SF$Habitat <- c("BF")
+
+#for generalists collected in TF
+cv_G_TF <- Metradica %>% filter(Type =="Generalist") %>% 
+  filter(Habitat == "TF") %>%
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorous = P) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorous", "Potassium"), funs(cv))
+
+cv_G_TF <- bind_rows(cv_G_TF,
+                  ungroup(cv_G_TF) %>%
+                  summarise_all(mean) %>%
+                  mutate(Name = "mean"))
+
+cv_long_G_TF <- reshape2::melt(cv_G_TF, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G_TF$Type <- c("Generalist")
+cv_long_G_TF$Habitat <- c("TF")
+
 
 # For TF specialist -------------
 
@@ -1268,6 +1331,7 @@ cv_TF$SD[7] <- (cv_TF$SD[1]+cv_TF$SD[2]+cv_TF$SD[3]+cv_TF$SD[5]+cv_TF$SD[6])/5
 cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
 
 cv_long_TF$Type <- c("TF")
+cv_long_TF$Habitat <- c("TF")
 
 # For BF specialist-----------
 
@@ -1292,8 +1356,9 @@ cv_BF$SD[10] <- (cv_BF$SD[2]+cv_BF$SD[3]+cv_BF$SD[4]+cv_BF$SD[5]+cv_BF$SD[6]+cv_
 cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") 
 
 cv_long_BF$Type <- c("BF")
+cv_long_BF$Habitat <- c("BF")
 
-cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G) 
+cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G_SF, cv_long_G_TF) 
 
 # plot all 
 #option 1
@@ -1353,8 +1418,70 @@ cv_plot <- cv_tot %>%
 
 cv_plot
 
-#ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 7, height = 5, dpi = 600)
+#option 3
+#add habitat of collect information for better plotting
 
+cv_tot$Type <- dplyr::recode(cv_tot$Type,"TF"= "TF specialist", "BF" = "SF specialist")
+cv_tot$Habitat <- dplyr::recode(cv_tot$Habitat,"TF"="Terra firme", "BF"="Seasonally flooded")
+
+
+cv_plot <- cv_tot %>%
+ mutate(CV =CV*100) %>%
+  filter(Name != "mean") %>% 
+ggplot()+
+  aes(x = Habitat, y = CV, color = Type) +
+  #geom_point()+
+  geom_jitter(size = 2, width = 0.2) +
+  scale_color_manual(
+    values = c(Generalist = "#009E72",
+    `SF specialist` = "#56B4E9",
+    `TF specialist` = "#E79F02")
+  ) +
+  scale_shape_discrete("Habitat of collect") +
+  theme_minimal(base_size = 12) +
+  # theme(axis.text.x = element_blank())+
+    theme(plot.title = element_text(size=12, face="bold")) +
+  facet_wrap(~trait, scales ="free_y", labeller = label_parsed) +
+  labs(x = "", y = "Coefficient of variation (%)", color = "Species' preference") +
+  theme(legend.position = "bottom")+
+  ylim(0, max_y)
+
+max_y <- max(cv_tot$CV * 100, na.rm = TRUE)
+
+
+ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 8, height = 6, dpi = 600)
+
+
+#option 4
+
+cv_plot <- cv_tot %>%
+   filter(Name != "mean") %>% 
+  separate(Name, c("Genus", "Species"), sep = "_", remove = F) %>%
+    mutate(Taxa = paste0(substr(Genus, start=1, stop=1), ". ", Species)) %>%
+ mutate(CV =CV*100) %>%
+ ggplot()+
+  aes(x = Habitat, y = CV, shape = Taxa, color = Type ) +
+  #geom_point()+
+  geom_jitter(size = 2.3, width = 0.2) +
+   scale_color_manual(values = c(Generalist = "#009E72",
+                                 `SF specialist` = "#56B4E9",
+                                 `TF specialist` = "#E79F02")) +
+   scale_shape_manual(values = c("C. surinamensis" = 0, "E. falcata" = 1, "E. coriacea" = 2, "I. hostmannii" = 3, "L. procera" = 4, "P. opacum subsp. rabelianum" = 5, "P. officinalis" = 6, "S. globulifera"  = 7, "V. surinamensis" = 8, "D. guianensis" =9, "G. hexapetala" =10, "I. sagotiana" =11, "L. membranacea" =12,  "P. guianensis" =13, "V. michelii" =14, "B. prouacensis" =15,  "Conceveiba_guianensis" =16, "H. heteromorphus" =17, "J. copaia subsp. copaia"  =18, "P. stevensonii" =19,  "T. melinonii" = 20)) +
+  theme_minimal(base_size = 12) +
+  # theme(axis.text.x = element_blank())+
+    theme(plot.title = element_text(size=12, face="bold")) +
+  facet_wrap(~trait, scales ="free_y", labeller = label_parsed) +
+  labs(x = "", y = "Coefficient of variation (%)", color = "Species' preference", shape = "Species") +
+ 
+   guides(
+    color = guide_legend(order = 1),  # Color legend on top
+    shape = guide_legend(order = 2, ncol = 5, byrow = TRUE, title.position = "top")  # Shape legend underneath
+  ) +
+    theme(legend.box="vertical", legend.position = "bottom") +
+   ylim(0, max_y)
+
+cv_plot
+ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 9, height = 8, dpi = 600)
 ```
 
 
