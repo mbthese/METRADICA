@@ -113,6 +113,9 @@ Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_excep
 Data$Forest <- as.factor(Data$Forest)
 Data$Habitat <- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra Firme')
 
+tibble_stat <- compare_means(TWI ~ Habitat, data = Data, 
+               group.by = "Forest", method = "t.test", paired = F)
+
 TWI_plot <- Data %>%
 mutate(Forest = fct_relevel(Forest, 
             "Bafog", "Paracou", "Kaw")) %>%
@@ -125,7 +128,8 @@ scale_fill_manual(
                   ) +
 ylab("Topographic wetness index")+
 theme_minimal()+
-theme(text = element_text(size = 16))     
+theme(text = element_text(size = 16))+
+stat_compare_means(method = "t.test", paired = F, label.x = c(1,2,3), label = "p.format")
 
 TWI_plot
 
@@ -315,9 +319,13 @@ data <- Metradica %>%
 
 data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
 
-p <-  data %>%
+trait_levels <- c("g[min]", "TLP", "LSWC", "MajVLA", "SD", "Nitrogen", "Carbon", "Potassium", "Phosphorus")
+
+data <- data %>%
   mutate(Trait = as.character(Trait)) %>% 
-  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]~(mmol%.%m^{-2}%.%s^{-1})", "TLP" = "pi[tlp]~(MPa)", "C"= "C~('%')", "N" = "N~('%')", "K"= "K~(g%.%kg^{-1})", "LSWC" = "LSWC~('%')", "MajVLA" = "MajVLA~(mm%.%mm^{-2})", "P" = "P~(g%.%kg^{-1})", "SD" = "SD~(mm^{-2})")) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "TLP", "C"= "Carbon", "N" = "Nitrogen", "K"= "Potassium", "LSWC" = "LSWC", "MajVLA" = "MajVLA", "P" = "Phosphorus", "SD" = "SD")) 
+
+p <- data%>% 
   left_join(dplyr::select(data, Type, Name) %>%
               unique() %>%
               arrange(Type, Name) %>%
@@ -329,7 +337,7 @@ p <-  data %>%
   geom_boxplot(aes(fill = Type),
   #              alpha = 0.5, col = "lightgrey") +
   #geom_violin(aes(fill = Type),
-               alpha = 0.5, col = "lightgrey") +
+               alpha = 0.5, col = "black") +
   scale_fill_manual(name = "Species preference", 
                     values = c("TF" = "#E79F02", #orange for TF
                                 "BF" =  "#56B4E9", #blue for SF
@@ -337,16 +345,21 @@ p <-  data %>%
                     labels = c("TF" = "TF specialist",
                                "Generalist" = "Generalist", 
                                "BF" = "SF specialist")) +
-  facet_wrap(~ Trait, scales = "free_x", label = label_parsed) +
-  theme_minimal() +
+  facet_wrap(~ factor(data$Trait, levels =trait_levels), scales = "free_x", label = label_parsed) +
+  theme_minimal(base_size = 12) +
   coord_flip() +
   theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
 p
 
-#ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
 ```
 
-## Figure S5: Trait contributions to first four principal component axes among leaf traits. 
+##Figure S5: PCA
+
+See Analysis script: trait covariation section.
+
+
+## Figure S6: Trait contributions to first four principal component axes among leaf traits. 
 
 PCA with log-transformed traits, that were imputed but without stomata.
 
@@ -431,7 +444,12 @@ axes_constribution
 ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
 ```
 
-## Figure S6: Spearman correlation coefficients among leaf traits. 
+
+##Figure S7: PCA with the third axis.
+
+See Analysis script: trait covariation section.
+
+## Figure S8: Spearman correlation coefficients among leaf traits. 
 
 ```{r Figure S6}
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
@@ -524,7 +542,8 @@ text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)),
 dev.off()
 ```
 
-## Figure S7: Correlation between stomatal density and minimal leaf conductance. 
+
+## Figure S9: Correlation between stomatal density and minimal leaf conductance. 
 
 Leaf traits are ln-transformed. The adjusted R squared is equal to 0.011. 
 
@@ -544,7 +563,11 @@ A <- get_formula(model)
 p
 ```
 
-##Figure S8:  Crown position and dawkins 
+##Figure S10: Dawkins index
+
+It's an image from Alder et al 1992.
+
+##Figure S11:  Crown position and dawkins 
 ```{r}
 #same beginning of script as for the Figure S6: Spearman corerlation.
 Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
@@ -558,7 +581,7 @@ Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/
   mutate(TLP = -TLP)
 
 #Dawkins, height and DBH and crown information
-complementary_info <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition) #already have DBH
+complementary_info <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/Metradica_all_fieldsheet.csv") %>% dplyr::select(Code, TreeDawkins, BranchDawkins, CrownPosition) #already have DBH
 
 complementary_info
 
@@ -684,7 +707,7 @@ gmin.plot <- data_with_complementary_info %>%
   ggplot(aes(as.factor(TreeDawkins), Gmin)) + 
    geom_jitter(alpha=0.2)+
   geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
-  labs(x="Tree Dawkins", y="Gmin") +
+  labs(x="Tree Dawkins", y=expression(paste("g"[min]))) +
   theme_bw() + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   geom_text(data = Tk.gmin, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
@@ -750,7 +773,7 @@ Phos.plot <- data_with_complementary_info %>%
   ggplot(aes(as.factor(TreeDawkins), Phosphorous)) + 
    geom_jitter(alpha=0.2)+
   geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
-  labs(x="Tree Dawkins", y="Phosphorous") +
+  labs(x="Tree Dawkins", y="Phosphorus") +
   theme_bw() + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   geom_text(data = Tk.Phos, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
@@ -761,7 +784,7 @@ SD.plot <- data_with_complementary_info %>%
   ggplot(aes(as.factor(TreeDawkins), SD)) + 
   geom_jitter(alpha=0.2)+
  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
-    labs(x="Tree Dawkins", y="Stomatal density") +
+    labs(x="Tree Dawkins", y="SD") +
   theme_bw() + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   geom_text(data = Tk.SD, aes(x = TreeDawkins, y = quant, label = cld), size = 6, vjust=-1, hjust =-1) +
@@ -786,7 +809,6 @@ Dawkins <- ggarrange(gmin.plot, TLP.plot, LSWC.plot, MajVLA.plot, SD.plot, N.plo
 
 ggsave(filename = "Dawkins.jpeg", plot = Dawkins, bg = "white", width = 10, height = 8, dpi = 600)
 ```
-
 
 
 #Tables
@@ -892,7 +914,7 @@ options(knitr.kable.NA = '') #replace NA by blank spaces in table
 Indval %>%
   kbl() %>%
   row_spec(0, bold = TRUE) %>% 
-  column_spec(1:2, italic = TRUE) %>%
+  column_spec(2:3, italic = TRUE) %>%
   kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
 
 ```

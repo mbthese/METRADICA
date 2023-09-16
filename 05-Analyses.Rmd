@@ -1455,6 +1455,7 @@ ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 8, height
 #option 4
 
 cv_plot <- cv_tot %>%
+   mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]")) %>%
    filter(Name != "mean") %>% 
   separate(Name, c("Genus", "Species"), sep = "_", remove = F) %>%
     mutate(Taxa = paste0(substr(Genus, start=1, stop=1), ". ", Species)) %>%
@@ -1466,7 +1467,7 @@ cv_plot <- cv_tot %>%
    scale_color_manual(values = c(Generalist = "#009E72",
                                  `SF specialist` = "#56B4E9",
                                  `TF specialist` = "#E79F02")) +
-   scale_shape_manual(values = c("C. surinamensis" = 0, "E. falcata" = 1, "E. coriacea" = 2, "I. hostmannii" = 3, "L. procera" = 4, "P. opacum subsp. rabelianum" = 5, "P. officinalis" = 6, "S. globulifera"  = 7, "V. surinamensis" = 8, "D. guianensis" =9, "G. hexapetala" =10, "I. sagotiana" =11, "L. membranacea" =12,  "P. guianensis" =13, "V. michelii" =14, "B. prouacensis" =15,  "Conceveiba_guianensis" =16, "H. heteromorphus" =17, "J. copaia subsp. copaia"  =18, "P. stevensonii" =19,  "T. melinonii" = 20)) +
+   scale_shape_manual(values = c("C. surinamensis" = 0, "E. falcata" = 1, "E. coriacea" = 2, "I. hostmannii" = 3, "L. procera" = 4, "P. opacum subsp. rabelianum" = 5, "P. officinalis" = 6, "S. globulifera"  = 7, "V. surinamensis" = 8, "D. guianensis" =9, "G. hexapetala" =10, "I. sagotiana" =11, "L. membranacea" =12,  "P. guianensis" =13, "V. michelii" =14, "B. prouacensis" =15,  "C. guianensis" =16, "H. heteromorphus" =17, "J. copaia subsp. copaia"  =18, "P. stevensonii" =19,  "T. melinonii" = 20)) +
   theme_minimal(base_size = 12) +
   # theme(axis.text.x = element_blank())+
     theme(plot.title = element_text(size=12, face="bold")) +
@@ -1477,7 +1478,7 @@ cv_plot <- cv_tot %>%
     color = guide_legend(order = 1),  # Color legend on top
     shape = guide_legend(order = 2, ncol = 5, byrow = TRUE, title.position = "top")  # Shape legend underneath
   ) +
-    theme(legend.box="vertical", legend.position = "bottom") +
+    theme(legend.box="vertical", legend.position = "bottom", legend.text = element_text(face = "italic")) +
    ylim(0, max_y)
 
 cv_plot
