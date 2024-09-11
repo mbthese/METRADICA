@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+_bookdown_*
+Clean_data/
+
+
+*.pdf
+*.png
+*.svg
+*.xlsx
+*.csv

@@ -1,0 +1,103 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+# Traits
+
+To guarantee that measurements were carried out on healthy leaves, we assessed chlorophyll fluorescence with a fluorescence meter (Mini-PAM II, WALZ, Effeltrich, Germany), which measures the maximum quantum yield of photosystem II (Fv/Fm). Only leaves with a FvFm value above 0.65 were considered for the study. Knowing that the sampled leaves were healthy, we then measured nine leaf functional traits (Table 1) related to resource investment strategies through light interception and carbon assimilation (Wright et al. 2004) or hydraulic functioning (Rosas et al. 2019) :  
+
+* leaf chemistry (C, N, K, P)
+* leaf saturated water content (LSWC, g.g-1), 
+* leaf water potential at which leaf cells lose turgor (TLP, MPa),
+* leaf minimum conductance (gmin, mmol.m-2.s-1),
+* major vein length density (MajVLA, mm.mm-2)
+* stomatal density (SD, mm-2) 
+
+## Water- and carbon-related traits
+
+* **LSWC** : Leaf-saturated water content (g g−1) was calculated as the mass of leaf water (WT – WD) divided by leaf dry mass (WD).
+* **$TLP$**: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait. 
+* **$g_{min}$**: leaf minimum conductance $mmol.m^{-2}.s^{-1}$ taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait. 
+* **Stomatal characteristics (size, density)**: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Nervation density**: determining the capacity of water supply in leaves. (*INSERER BIBLIO Julio V. Schneider 2016*)
+* **Leaf chemistry** : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
+
+## Additional traits
+
+* **LA**: leaf area $cm^{2}$ : carbo- acquisition related trait which informs on the light capture strategy.
+
+* **$\frac{Fv}{Fm}$**: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency ($\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}$). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (*INSERER BIBLIO Manzi et al 2021*) but decline after other leaf hydraulic traits (*INSERER BIBLIO Trueba et al 2019*).
+
+* **P<sub>midday</sub>**: Water potential at the driest point of the day. 
+
+* **$\delta$ <sup>18</sup> O and $\delta$ <sup>13</sup> C** : Informs patterns of carbon and water use, related to water use efficiency. (*INSERER BIBLIO Farquhar et al 1989*) Measured in Vienna.
+
+*Trait table*
+
+```{r Trait summary intro table, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(janitor)
+#get authorization
+#googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+trait_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1-LBjUas_flNGwAlDGFvGoq6GyqQsBiFmmiJyFtQYkMU/edit#gid=0")
+
+
+trait_table$Unit[trait_table$Abbreviation == 'K'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'P'] <- "g.kg<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'gmin'] <- "mmol.m<sup>-2</sup>.s<sup>-1</sup>"
+
+trait_table$Abbreviation[trait_table$Unit == 'mmol.m<sup>-2</sup>.s<sup>-1</sup>'] <- "<i>gmin</i>"
+
+trait_table$Unit[trait_table$Abbreviation == 'LSWC'] <- "g.g<sup>-1</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'MajVLA'] <- "cm.cm<sup>-2</sup>"
+trait_table$Unit[trait_table$Abbreviation == 'SD'] <- "mm<sup>-2</sup>"
+
+```
+```{r echo=FALSE}
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+trait_table %>%
+  kbl(caption = "Table 1. Leaf functional traits and linked mechanisms.", escape = FALSE) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Trait_summary.png", zoom = 5)
+```
+
+
+
+## Protocols
+
+* [**Field** protocol](./Documents/Protocol/Field.Rmd)
+* [**$\pi_{TLP}$** protocol](./Documents/Protocol/Protocole_Ptlp.pdf)
+* [**RWC** protocol](./Documents/Protocol/RWC_Boisseaux.docx)
+* [**Stomata** protocol](./Documents/Protocol/Analyse Stomates_Marion.docx)
+* [**FvFm** protocol](./Documents/Protocol/Fluo_Bellifa.docx)
+* [**gmin** protocol](./Documents/Protocol/Gmin protocol.docx)
+* [**leaf venation** protocol](./Documents/Protocol/ProtocolLeafVeins_MB_2.docx)
+
+## Organisation
+
+* Day 1
+    * Fresh
+        * On field: P<sub>midday</sub>
+        * scan gmin leaves
+        * fresh weight RWC 
+        * **$g_{min}$** weight  
+        * **Stomatal density** nail polish (3 replicates per indivual)
+        * **$\frac{Fv}{Fm}$**
+    
+    * Day 2
+        * saturated weight RWC
+        * **$g_{min}$** finish weights (at least 2 points next day)
+        * **$\pi_{TLP}$**
+    
+    * Day 5 (+72h)
+        * Dry weight RWC
+        
+* Later on :
+    * Stomatal observation and density counts 
+    * Measure of vein densities 
+    * Chemistry of dry-grinded leaves

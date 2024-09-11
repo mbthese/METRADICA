@@ -1,0 +1,2798 @@
+---
+title: "SupplementaryMaterials"
+author: "Marion Boisseaux"
+date: "2023-03-31"
+output: html_document
+---
+# (PART) Part four : Annexes {-}
+
+# Supporting Information
+
+Article title: The importance of local habitat in shaping functional tropical tree species’ strategies.
+
+Authors: Marion Boisseaux1*, Daniela  Krebber1,2, Christopher Baraloto7, Benoit Burban1, Angela Casado-Garcia3, Jocelyn Cazal1, Jeanne Clément2, Géraldine Derroire1, Claire Fortunel2 Jean-Yves Goret1, Jonathan Heras3, Gaelle JaouenORCID=0000-0002-5655-904411, Isabelle Maréchaux2, Christine Scoffoni4, Ghislain Vieilledent2, Jason Vleminckx5, Sabrina Coste1, Heidy Schimann6, Clément Stahl1.
+
+
+```{r libraries_SI, include=FALSE}
+library(tidyverse)
+library(ggfortify)
+library(factoextra)
+library(FactoMineR) #for PCAs
+library(kableExtra) #for tables
+library(V.PhyloMaker) #phylogeny
+library(ggtree) #tree vizualisation and annotation
+library(readxl)
+library(gridExtra)
+library(rio)
+library(dplyr)
+library(tidyr)
+library(janitor)
+library(forcats)
+library(ggpubr)
+library(ggplot2)
+library(corrplot) #correlation
+library("Hmisc") #for the significance for the correlation
+library(magick) #for images
+library(vegan) #for permanova
+library(pairwiseAdonis) #for pairwise comparaison after permanova
+library(multcompView)
+```
+
+
+#Figures
+
+## Figure S1: Discrimination of the habitats using the topographic wetness index.
+
+```{r Figure S1}
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+Data$Forest <- as.factor(Data$Forest)
+Data$Habitat <- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra Firme')
+
+tibble_stat <- compare_means(TWI ~ Habitat, data = Data, 
+               group.by = "Forest", method = "t.test", paired = F)
+
+TWI_plot <- Data %>%
+mutate(Forest = fct_relevel(Forest, 
+            "Bafog", "Paracou", "Kaw")) %>%
+ggplot() +
+aes(x = Forest, y = log(TWI), fill = Habitat) +
+geom_boxplot() +
+scale_fill_manual(
+    values = c(`Seasonally flooded` = "#56B4E9",
+    `Terra Firme` = "#E79F02")
+                  ) +
+ylab("Topographic wetness index")+
+theme_minimal()+
+theme(text = element_text(size = 16))+
+stat_compare_means(method = "t.test", paired = F, label.x = c(1,2,3), label = "p.format")
+
+TWI_plot
+
+ggsave(filename = "TWI in habitats.png", plot = TWI_plot, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+## Figure S2: The 21 selected species’ phylogeny.
+
+```{r Figure S2, echo=FALSE, message=FALSE, warning=FALSE}
+
+#select focal species
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+#Use paracou database 30/08/2021 as the backbone phylogeny
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+#This function makes phylogenetic hypotheses for the focal species under three scenarios based on paracou database 30/08/2021. I use the default senario.
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#remove "#" for the next two lines when running for the first time, to save and reload the phylogeny.
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+#build tree and visualize it
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+A
+
+#save and choose saving format
+#ggsave(file="phylo_subset.svg", plot=A, width=15, height=10)
+#ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
+```
+
+
+## Figure S3. Indval values for the studied species. 
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+*Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists and IndVal ≥  0.2598  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any preference and therefore called generalists.*
+
+```{r Indval data, include=FALSE}
+#Supplementary data from the Baraloto et al 2021.
+
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF data 
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF data
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+```
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r Species within indval threshold, message=FALSE, warning=FALSE}
+
+species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia", # subsp. copaia
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", #subsp. rabelianum
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(species, Data_TF) %>% na.omit()
+
+Generalist_high_indval_both_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui in both, removed it
+   mutate(Type = "SF specialist")
+
+#indval graphs
+
+#SF specialists
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#TF specialists
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#Generalists
+Generalist <- left_join(species, indval_FG) 
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#casearia too high in one habitat to consider it a generalist!
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_high_indval_both_habitats)
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal(base_size = 12) +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none")
+
+group_figure <- ggpubr::ggarrange(
+  indval_TF_plot + theme(legend.position="none"),
+  indval_SF_plot + theme(legend.position="none"),
+  Generalist_diff_indval + theme(legend.position="none"),
+  labels = c("A", "B", "C"),
+  nrow= 3, ncol=1)
+
+group_figure 
+
+#ggsave(file="indval.svg", plot=group_figure, width=10, height=12)
+#ggsave(file="indval.png", plot=group_figure, width=10, height=12)
+
+```
+
+## Figure S4: Variation of leaf trait values among species. 
+
+No imputation, not transformed. Visualizing raw trait variation.
+
+```{r Figure S4, echo=FALSE}
+
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data
+
+data <- Metradica %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+
+data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
+
+trait_levels <- c("g[min]", "TLP", "LSWC", "MajVLA", "SD", "Nitrogen", "Carbon", "Potassium", "Phosphorus")
+
+data <- data %>%
+  mutate(Trait = as.character(Trait)) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "TLP", "C"= "Carbon", "N" = "Nitrogen", "K"= "Potassium", "LSWC" = "LSWC", "MajVLA" = "MajVLA", "P" = "Phosphorus", "SD" = "SD")) 
+
+p <- data%>% 
+  left_join(dplyr::select(data, Type, Name) %>%
+              unique() %>%
+              arrange(Type, Name) %>%
+              mutate(order_graph = 1:n())) %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x = reorder(Name, order_graph), y= value)) +
+  geom_boxplot(aes(fill = Type),
+  #              alpha = 0.5, col = "lightgrey") +
+  #geom_violin(aes(fill = Type),
+               alpha = 0.5, col = "black") +
+  scale_fill_manual(name = "Species preference", 
+                    values = c("TF" = "#E79F02", #orange for TF
+                                "BF" =  "#56B4E9", #blue for SF
+                                "Generalist" = "#009E72"),  #green for Generalists
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  facet_wrap(~ factor(data$Trait, levels =trait_levels), scales = "free_x", label = label_parsed) +
+  theme_minimal(base_size = 12) +
+  coord_flip() +
+  theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
+p
+
+ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+
+##Figure S5 : Scatter plots showing the relationship between DBH and leaf traits for 21 species.
+
+```{r Figure S5}
+
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
+  dplyr::select(-Genus, -Species) %>%
+  rename(Potassium = K, 
+         Phosphorus = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  filter(DBH != 0) %>%#one individual NA 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorus", "Potassium", "SD", "DBH"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorus", "Potassium", "SD", "DBH"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  rename(Species = Name)
+
+
+# Fit linear models
+# Fit mixed-effect models using nlme::lme
+model_gmin <- nlme::lme(Gmin ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_gmin <- predict(model_gmin)   #Add model fits to dataframe
+model_tlp <- nlme::lme(TLP ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_tlp <- predict(model_tlp)  
+model_lswc <- nlme::lme(LSWC ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_lswc <- predict(model_lswc)  
+model_majvla <- nlme::lme(MajVLA ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_majvla <- predict(model_majvla)  
+model_N <- nlme::lme(Nitrogen ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_N <- predict(model_N)  
+model_C <- nlme::lme(Carbon ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_C <- predict(model_C)  
+model_P <- nlme::lme(Phosphorus ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_P <- predict(model_P)  
+model_K <- nlme::lme(Potassium ~ DBH, random = ~ 1 | Species, data = Data, na.action = na.omit, method = "ML")
+Data$fit_K <- predict(model_K)  
+# Handle NAs in SD before fitting the model
+Data_SD <- Data %>% filter(!is.na(SD))
+model_sd <- nlme::lme(SD ~ DBH, random = ~ 1 | Species, data = Data_SD, na.action = na.omit, method = "ML")
+Data_SD$fit_sd <- predict(model_sd)
+
+# Print summaries
+summary(model_gmin)
+summary(model_tlp) #yes, there is statistically significant negative relationship between DBH and TLP, but the relationship is weak. The very low R-squared value indicates that DBH explains only a very small fraction of the variance in TLP: 0.01465
+summary(model_lswc)
+summary(model_majvla) #yes, there a strong evidence that DBH affects MajVLA. However, the R-squared value of 11.85% indicates that it only explains a modest proportion of the variance in MajVLA: Adjusted R-squared:  0.1169 
+summary(model_N)
+summary(model_C)
+summary(model_P) #yes, but very low R-squared value indicating that DBH explains only a very small fraction of the variance in P : Adjusted R-squared:  0.009545
+summary(model_K) #same here: Adjusted R-squared:  0.0385 
+summary(model_sd) #same here: 	Adjusted R-squared:  0.06477 
+
+
+# Plotting with mixed-effect model lines
+gmin.plot <- ggplot(Data, aes(x = DBH, y = Gmin, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "Gmin") +
+  theme_minimal() +
+  geom_line(aes(y=fit_gmin, color=Species), size=0.8) 
+
+TLP.plot <- ggplot(Data, aes(x = DBH, y = TLP, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "TLP") +
+  theme_minimal() +
+  geom_line(aes(y=fit_tlp, color=Species), size=0.8) 
+
+LSWC.plot <- ggplot(Data, aes(x = DBH, y = LSWC, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "LSWC") +
+  theme_minimal() +
+  geom_line(aes(y=fit_lswc, color=Species), size=0.8) 
+
+MajVLA.plot <- ggplot(Data, aes(x = DBH, y = MajVLA, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "MajVLA") +
+  theme_minimal() +
+  geom_line(aes(y=fit_majvla, color=Species), size=0.8) 
+
+N.plot <- ggplot(Data, aes(x = DBH, y = Nitrogen, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "Nitrogen") +
+  theme_minimal() +
+  geom_line(aes(y=fit_N, color=Species), size=0.8) 
+
+C.plot <- ggplot(Data, aes(x = DBH, y = Carbon, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "Carbon") +
+  theme_minimal() +
+  geom_line(aes(y=fit_C, color=Species), size=0.8) 
+
+Phos.plot <- ggplot(Data, aes(x = DBH, y = Phosphorus, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "Phosphorus") +
+  theme_minimal() +
+  geom_line(aes(y=fit_P, color=Species), size=0.8) 
+
+Pot.plot <- ggplot(Data, aes(x = DBH, y = Potassium, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "Potassium") +
+  theme_minimal() +
+  geom_line(aes(y=fit_K, color=Species), size=0.8) 
+
+SD.plot <- ggplot(Data_SD, aes(x = DBH, y = SD, color = Species)) +
+  geom_point() +
+  labs(x = "DBH", y = "SD") +
+  theme_minimal() +
+  geom_line(aes(y=fit_sd, color=Species), size=0.8) 
+
+
+
+#arrange all
+
+DBH_plot <- ggarrange(gmin.plot, TLP.plot, LSWC.plot, MajVLA.plot, SD.plot, N.plot, C.plot, Pot.plot, Phos.plot, common.legend = T, legend = "bottom")
+
+DBH_plot
+
+ggsave(filename = "DBH.jpeg", plot = DBH_plot, bg = "white", width = 10, height = 8, dpi = 600)
+  
+```
+
+
+##Figure S6: Dawkins index
+
+It's an image from Alder et al 1992.
+
+
+
+##Figure S7:  Crown position and dawkins 
+```{r Figure S7}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
+  dplyr::select(-Genus, -Species) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP)
+
+#Dawkins, height and DBH and crown information
+complementary_info <- read.csv("Dataset/Metradica_all_fieldsheet.csv") %>% dplyr::select(Code, TreeDawkins, BranchDawkins, CrownPosition) #already have DBH
+
+complementary_info
+
+data_with_complementary_info <- left_join(Data, complementary_info, by = "Code") %>%
+  mutate(Dawkins = paste0(TreeDawkins, ".", BranchDawkins))
+
+#plot
+with(data_with_complementary_info, boxplot(Gmin ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(TLP ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(LSWC ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(MajVLA ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Nitrogen ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Carbon ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Phosphorous ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(Potassium ~ TreeDawkins))
+with(data_with_complementary_info, boxplot(SD ~ TreeDawkins))
+
+#analysis of variance
+gmin.aov <- aov(Gmin~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(gmin.aov)
+#plot(gmin.aov)
+
+
+TLP.aov <- aov(TLP ~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(TLP.aov)
+#plot(TLP.aov)
+
+LSWC.aov <- aov(LSWC~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(LSWC.aov)
+#plot(LSWC.aov)
+
+MajVLA.aov <- aov(MajVLA~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(MajVLA.aov)
+#plot(MajVLA.aov)
+
+Nitrogen.aov <- aov(Nitrogen~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Nitrogen.aov)
+#plot(Nitrogen.aov)
+
+Carbon.aov <- aov(Carbon~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Carbon.aov)
+#plot(Carbon.aov)
+
+Phosphorous.aov <- aov(Phosphorous~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Phosphorous.aov)
+#plot(Phosphorous.aov)
+
+Potassium.aov <- aov(Potassium~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(Potassium.aov)
+#plot(Potassium.aov)
+
+SD.aov <- aov(SD~ as.factor(TreeDawkins), data= data_with_complementary_info) 
+summary(SD.aov)
+#plot(SD.aov)
+
+#tuckey post hoc test
+gmin.tukey <- TukeyHSD(gmin.aov)
+#TLP.tukey <- TukeyHSD(TLP.aov)
+#LSWC.tukey <- TukeyHSD(LSWC.aov)
+MajVLA.tukey <- TukeyHSD(MajVLA.aov)
+N.tukey <- TukeyHSD(Nitrogen.aov)
+C.tukey <- TukeyHSD(Carbon.aov)
+Phos.tukey <- TukeyHSD(Phosphorous.aov)
+#Pota.tukey <- TukeyHSD(Potassium.aov)
+SD.tukey <- TukeyHSD(SD.aov)
+
+# compact letter display
+cld.gmin <- multcompLetters4(gmin.aov, gmin.tukey)
+cld.MajVLA <- multcompLetters4(MajVLA.aov, MajVLA.tukey)
+cld.N <- multcompLetters4(Nitrogen.aov, N.tukey)
+cld.C <- multcompLetters4(Carbon.aov, C.tukey)
+cld.Phos <- multcompLetters4(Phosphorous.aov, Phos.tukey)
+cld.SD <- multcompLetters4(SD.aov, SD.tukey)
+
+# table with factors and 3rd quantile
+Tk.gmin <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Gmin), quant = quantile(Gmin, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.MajVLA <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(MajVLA), quant = quantile(MajVLA, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.N <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Nitrogen), quant = quantile(Nitrogen, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.C <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Carbon), quant = quantile(Carbon, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.Phos <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(Phosphorous), quant = quantile(Phosphorous, probs = 0.75)) %>%
+  arrange(desc(mean)) %>% na.omit()
+Tk.SD <- group_by(data_with_complementary_info, TreeDawkins) %>%
+  summarise(mean=mean(SD, na.rm = TRUE), quant = quantile(SD, probs = 0.75, na.rm =TRUE)) %>%
+  arrange(desc(mean)) %>% na.omit()
+
+# extracting the compact letter display and adding to the Tk table
+cld.gmin <- as.data.frame.list(cld.gmin$`as.factor(TreeDawkins)`) 
+Tk.gmin$cld <- cld.gmin$Letters
+print(Tk.gmin)
+
+cld.MajVLA <- as.data.frame.list(cld.MajVLA$`as.factor(TreeDawkins)`) 
+Tk.MajVLA$cld <- cld.MajVLA$Letters
+print(Tk.MajVLA)
+
+cld.N <- as.data.frame.list(cld.N$`as.factor(TreeDawkins)`) 
+Tk.N$cld <- cld.N$Letters
+print(Tk.N)
+
+cld.C <- as.data.frame.list(cld.C$`as.factor(TreeDawkins)`) 
+Tk.C$cld <- cld.C$Letters
+print(Tk.C)
+
+cld.Phos <- as.data.frame.list(cld.Phos$`as.factor(TreeDawkins)`) 
+Tk.Phos$cld <- cld.Phos$Letters
+print(Tk.Phos)
+
+cld.SD <- as.data.frame.list(cld.SD$`as.factor(TreeDawkins)`) 
+Tk.SD$cld <- cld.SD$Letters
+print(Tk.SD)
+
+#boxplots
+gmin.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Gmin)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y=expression(paste("g"[min]))) +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.gmin, aes(x = TreeDawkins, y = 2.6, label = cld), size = 4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+TLP.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), TLP)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="TLP") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=-0.19, label="Anova, pvalue = 0.4", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+LSWC.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), LSWC)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="LSWC") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=6, label="Anova, pvalue = 0.07", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+MajVLA.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), MajVLA)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="MajVLA") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.MajVLA, aes(x = TreeDawkins, y = 2.5, label = cld), size =4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+N.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Nitrogen)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Nitrogen") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.N, aes(x = TreeDawkins, y = 1.2, label = cld), size = 4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+C.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Carbon)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Carbon") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.C, aes(x = TreeDawkins, y = 4.1, label = cld), size = 4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+Phos.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Phosphorous)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Phosphorus") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.Phos, aes(x = TreeDawkins, y = 0.4, label = cld), size = 4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+SD.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), SD)) + 
+  geom_jitter(alpha=0.2)+
+ geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+    labs(x="Tree Dawkins", y="SD") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk.SD, aes(x = TreeDawkins, y = 7.1, label = cld), size = 4, vjust=0, hjust =0) +
+  scale_fill_brewer(palette = "Blues")
+
+
+Pot.plot <- data_with_complementary_info %>%
+  na.omit() %>%
+  ggplot(aes(as.factor(TreeDawkins), Potassium)) + 
+   geom_jitter(alpha=0.2)+
+  geom_boxplot(aes(fill = factor(..middle..)), show.legend = FALSE, alpha=0.6) +
+  labs(x="Tree Dawkins", y="Potassium") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  annotate(geom="text", x= 2, y=4, label="Anova, pvalue = 0.08", size = 4) +
+  scale_fill_brewer(palette = "Blues")
+
+#arrange all
+
+Dawkins <- ggarrange(gmin.plot, TLP.plot, LSWC.plot, MajVLA.plot, SD.plot, N.plot, C.plot, Pot.plot, Phos.plot)
+
+
+ggsave(filename = "Dawkins.jpeg", plot = Dawkins, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+
+##Figure S8: PCA
+
+See Analysis script: trait covariation section.
+
+
+## Figure S9: Trait contributions to first four principal component axes among leaf traits. 
+
+PCA with log-transformed traits, that were imputed but without stomata.
+
+```{r Figure S9, echo=FALSE}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorus = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorus", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorus", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+Data$Habitat<- dplyr::recode(Data$Habitat, BF='Seasonally flooded', TF= 'Terra firme')
+Data <- Data %>% na.omit()
+
+#PCA without stomata
+res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+
+#Eigenvalues
+eig.val <- get_eigenvalue(res.pca)
+eig.val
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+#Contributions of variables to PC1
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+
+#Contributions of variables to PC2
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+
+#Contributions of variables to PC3
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+
+#fviz_pca_var(res.pca, axes = c(1, 3)) #variables 
+#fviz_pca_ind(res.pca, axes = c(1, 3), col.ind = Data$Type, geom = "point") #individuals
+
+A <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Type,  
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+B <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Type,
+                palette = c("#009E72", "#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+E <- ggarrange(A, B, ncol = 2, nrow = 1, labels = c("A", "B"), common.legend = T, legend = "right")
+
+C <- fviz_pca_biplot(res.pca, axes = c(1, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+D <- fviz_pca_biplot(res.pca, axes = c(2, 3),
+                col.ind = Data$Habitat, palette =  c("#56B4E9", "#E79F02"), 
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE) 
+
+G <- ggarrange(C, D, ncol = 2, nrow = 1, labels = c("C", "D"), common.legend = T, legend = "right")
+H <- ggarrange(E, G, ncol = 1, nrow = 2)
+H
+ggsave(filename = "Dimension3.png", plot = H, bg = "white", width = 10, height = 10, dpi = 600)
+
+#Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+axes_constribution 
+ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+
+##Figure S10: PCA with the third axis.
+
+See Analysis script: trait covariation section.
+
+## Figure S11: Spearman correlation coefficients among leaf traits. 
+
+```{r Figure S11}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+
+#Spearman correlation for specialist SF
+traits_spe_SF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "BF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Spearman correlation for specialist TF
+traits_spe_TF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "TF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Spearman correlation for generalist
+traits_generalist <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+testRes = cor.mtest(traits_generalist, conf.level = 0.95, exact= FALSE,  method= "spearman")
+testRes_SF = cor.mtest(traits_spe_SF, conf.level = 0.95, exact= FALSE, method= "spearman")
+testRes_TF = cor.mtest(traits_spe_TF, conf.level = 0.95, exact= FALSE,  method= "spearman")
+
+#combine
+# Create a new empty plot with appropriate dimensions
+png(height=700, width=1800, file="combined_corr_plots.png", type = "cairo")
+
+# Divide the plotting area into a 1x2 grid
+par(mfrow=c(1,3), oma = c(0, 0, 0, 0), mar = c(1, 1, 1, 1))
+
+# Plot generalists
+cor_matrix <- traits_generalist %>%
+  na.omit() %>%
+  cor(method = "spearman")
+corrplot(cor_matrix, p.mat = testRes$p, method = 'circle',  #addCoef.col ='black', 
+        # insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE,  cl.cex = 3)
+title(main = "Generalist", adj= 0.2, line = -5, cex.main = 5, col.main= "#009E72")  
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+# Plot spé SF
+cor_matrix <- traits_spe_SF %>%
+  na.omit() %>%
+  cor(method = "spearman")
+corrplot(cor_matrix, p.mat = testRes_SF$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE,  cl.cex = 3)
+title(main = "SF specialist", adj= 0.2, line = -5, cex.main = 5, col.main= "#56B4E9")  
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+
+# Plot spé TF
+cor_matrix <- traits_spe_TF %>%
+  na.omit() %>%
+  cor(method = "spearman")
+corrplot(cor_matrix, p.mat = testRes_TF$p, method = 'circle',  #addCoef.col ='black', insig='blank',
+         sig.level = 0.05, addrect = 2, diag = FALSE, tl.pos = FALSE, cl.cex = 3)
+title(main = "TF specialist", adj= 0.2, line = -5, cex.main = 5, col.main= "#E79F02")  
+text(rev(1:nrow(cor_matrix)), 1:nrow(cor_matrix), rev(colnames(cor_matrix)), 
+     cex = 2, pos = 4, offset = -1.5, col= "red", ifelse(is.na(diag(cor_matrix)), NA, 1))
+
+dev.off()
+```
+
+
+
+
+
+
+#Tables
+
+## Table S1. Sampling sites supplementary information. 
+
+```{r Table S1, echo=FALSE}
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#googlesheet
+Plot_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=0")
+
+Plot_table <- Plot_table %>% 
+  dplyr::select(-PlotName, -Xutm, -Yutm, -Localization)
+  
+Plot_table %>%
+  kbl(caption = "Summary of sampling site information", escape = FALSE, digits = 2) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Plot_info_summary.png", zoom = 5)
+```
+
+## Table S2. Individuals per species collected in the three sampling sites. 
+
+```{r Table S2, echo=FALSE}
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Family <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") %>%
+  adorn_totals("row")
+
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) #%>%
+#save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+## Table S3: Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. 
+
+```{r Table S3, echo=FALSE}
+
+#get authorization
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#indval data 
+Indval <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(-Paracou, -Bafog, -Kaw)
+
+Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Indval %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(2:3, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
+
+```
+
+
+## Table S4: Permutational Manova analysis and post-hoc pairwise analysis.
+
+PERMANOVA, (permutational multivariate ANOVA), is a non-parametric alternative to MANOVA, or multivariate ANOVA test. It is appropriate with multiple sets of variables that do not meet the assumptions of MANOVA, namely multivariate normality.
+
+Null hypothesis: Groups do not differ/ are equivalent in spread or position multivariate space.
+
+```{r Table S4, echo=FALSE}
+#Data
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+
+data_PCA <- Data[, c(1:17)][,-c(1,2,3,4,5,6,7,8,13)]
+
+adonis_type<-adonis2(data_PCA~Data$Type, permutations = 999, method = "euclidean") 
+adonis_habitat<-adonis2(data_PCA~Data$Habitat, permutations = 999, method = "euclidean") 
+
+permanova <-adonis_type %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
+
+permanova <-adonis_habitat %>%
+  kbl(caption="Permutational Multivariate Analysis of Variance (PERMANOVA)", digits = 3, booktabs=TRUE) %>% 
+  kable_styling(latex_options="scale_down", full_width = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") #%>%
+#save_kable(file = "Permanova_type.png")
+
+#P-value (0.001) *** is significant so our group types have different means.
+
+#Process a pairwise analyse to detect which treatments are different from each other.
+pairwise_adonis_type <- pairwise.adonis(data_PCA,Data$Type, sim.method = "euclidean")
+pairwise_adonis_type$pairs[1] <- "TF specialist vs SF specialist"
+pairwise_adonis_type$pairs[2] <- "TF specialist vs generalist"
+pairwise_adonis_type$pairs[3] <- "SF specialist vs generalist"
+pairwise_adonis_habitat <- pairwise.adonis(data_PCA,Data$Habitat, sim.method = "euclidean") 
+pairwise_adonis_habitat$pairs[1] <- "TF habitat vs SF habitat"
+
+#Species preference
+pairwise_adonis_type_table <- pairwise_adonis_type %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "A. Species' preferences",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "A. Species' preferences.png", zoom = 5)
+
+#Habitat of collect
+pairwise_adonis_habitat_table <- pairwise_adonis_habitat %>%
+  relocate(pairs, .after = sig) %>%
+  kbl(caption = "B. Habitat of collect",digits =3) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "B. Habitat of collect.png", zoom = 5)
+```
+
+
+## Table S5: Pairwise tables for the spearman correlation.
+
+Coefficients (A) and associated p-values (B) of leaf traits for the 21 studied species (n=552).
+
+```{r Table S5, echo=FALSE}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+#Spearman correlation for generalist
+traits_generalist <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+#to add significance
+res <- round(cor(traits_generalist, method = "spearman"), digits = 2)
+testRes = cor.mtest(traits_generalist, conf.level = 0.95, exact= FALSE, method = "spearman")
+
+testRes$p%>% # Extract p-values associated to the correlation coefficients
+  kbl(caption ="", digits =3)  %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+#make bold those with pvalue <0.05
+res[1, 1] <- cell_spec(res[1, 1], "html", bold = TRUE)
+res[2, 2] <- cell_spec(res[2, 2], "html", bold = TRUE)
+res[3, 3] <- cell_spec(res[3, 3], "html", bold = TRUE)
+res[4, 4] <- cell_spec(res[4, 4], "html", bold = TRUE)
+res[5, 5] <- cell_spec(res[5, 5], "html", bold = TRUE)
+res[6, 6] <- cell_spec(res[6, 6], "html", bold = TRUE)
+res[7, 7] <- cell_spec(res[7, 7], "html", bold = TRUE)
+res[8, 8] <- cell_spec(res[8, 8], "html", bold = TRUE)
+
+#gmin
+res[5, 1] <- cell_spec(res[5, 1], "html", bold = TRUE)
+res[7, 1] <- cell_spec(res[7, 1], "html", bold = TRUE)
+res[8, 1] <- cell_spec(res[8, 1], "html", bold = TRUE)
+
+#TLP
+res[3, 2] <- cell_spec(res[3, 2], "html", bold = TRUE)
+res[6, 2] <- cell_spec(res[6, 2], "html", bold = TRUE)
+res[8, 2] <- cell_spec(res[8, 2], "html", bold = TRUE)
+
+#LSWC
+res[2, 3] <- cell_spec(res[2, 3], "html", bold = TRUE)
+res[5, 3] <- cell_spec(res[5, 3], "html", bold = TRUE)
+res[7, 3] <- cell_spec(res[7, 3], "html", bold = TRUE)
+
+#MajVLA
+res[5, 4] <- cell_spec(res[5, 4], "html", bold = TRUE)
+res[6, 4] <- cell_spec(res[6, 4], "html", bold = TRUE)
+
+#N
+res[1, 5] <- cell_spec(res[1, 5], "html", bold = TRUE)
+res[3, 5] <- cell_spec(res[3, 5], "html", bold = TRUE)
+res[4, 5] <- cell_spec(res[4, 5], "html", bold = TRUE)
+res[6, 5] <- cell_spec(res[6, 5], "html", bold = TRUE)
+res[7, 5] <- cell_spec(res[7, 5], "html", bold = TRUE)
+res[8, 5] <- cell_spec(res[8, 5], "html", bold = TRUE)
+
+#C
+res[2, 6] <- cell_spec(res[2, 6], "html", bold = TRUE)
+res[4, 6] <- cell_spec(res[4, 6], "html", bold = TRUE)
+res[5, 6] <- cell_spec(res[5, 6], "html", bold = TRUE)
+res[8, 6] <- cell_spec(res[8, 6], "html", bold = TRUE)
+
+#P
+res[1, 7] <- cell_spec(res[1, 7], "html", bold = TRUE)
+res[3, 7] <- cell_spec(res[3, 7], "html", bold = TRUE)
+res[5, 7] <- cell_spec(res[5, 7], "html", bold = TRUE)
+res[8, 7] <- cell_spec(res[8, 7], "html", bold = TRUE)
+
+#K
+res[1, 8] <- cell_spec(res[1, 8], "html", bold = TRUE)
+res[2, 8] <- cell_spec(res[2, 8], "html", bold = TRUE)
+res[5, 8] <- cell_spec(res[5, 8], "html", bold = TRUE)
+res[6, 8] <- cell_spec(res[6, 8], "html", bold = TRUE)
+res[7, 8] <- cell_spec(res[7, 8], "html", bold = TRUE)
+
+res %>% # Extract the correlation coefficients
+  kbl(caption ="", digits =2, escape = F)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>A. Pairwise table of the correlation coefficients for generalists </span>" = 9), escape = FALSE) %>%
+    kable_classic(full_width = F, html_font = "Cambria")  %>%
+save_kable("corr_coef_generalist.png")
+img <- image_read("corr_coef_generalist.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_generalist.png")
+
+
+#Spearman correlation for specialist SF
+traits_spe_SF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "BF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+res_SF <- round(cor(traits_spe_SF, method = "spearman"), digits = 2)
+testRes_SF = cor.mtest(traits_spe_SF, conf.level = 0.95, exact= FALSE, method= "spearman")
+
+testRes_SF$p %>% 
+  kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") 
+
+#make bold those with pvalue <0.05
+res_SF[1, 1] <- cell_spec(res_SF[1, 1], "html", bold = TRUE)
+res_SF[2, 2] <- cell_spec(res_SF[2, 2], "html", bold = TRUE)
+res_SF[3, 3] <- cell_spec(res_SF[3, 3], "html", bold = TRUE)
+res_SF[4, 4] <- cell_spec(res_SF[4, 4], "html", bold = TRUE)
+res_SF[5, 5] <- cell_spec(res_SF[5, 5], "html", bold = TRUE)
+res_SF[6, 6] <- cell_spec(res_SF[6, 6], "html", bold = TRUE)
+res_SF[7, 7] <- cell_spec(res_SF[7, 7], "html", bold = TRUE)
+res_SF[8, 8] <- cell_spec(res_SF[8, 8], "html", bold = TRUE)
+
+#gmin
+res_SF[2, 1] <- cell_spec(res_SF[2, 1], "html", bold = TRUE)
+res_SF[4, 1] <- cell_spec(res_SF[4, 1], "html", bold = TRUE)
+res_SF[6, 1] <- cell_spec(res_SF[6, 1], "html", bold = TRUE)
+
+#TLP
+res_SF[1, 2] <- cell_spec(res_SF[1, 2], "html", bold = TRUE)
+res_SF[3, 2] <- cell_spec(res_SF[3, 2], "html", bold = TRUE)
+res_SF[5, 2] <- cell_spec(res_SF[5, 2], "html", bold = TRUE)
+res_SF[6, 2] <- cell_spec(res_SF[6, 2], "html", bold = TRUE)
+res_SF[7, 2] <- cell_spec(res_SF[7, 2], "html", bold = TRUE)
+res_SF[8, 2] <- cell_spec(res_SF[8, 2], "html", bold = TRUE)
+
+#LSWC
+res_SF[2, 3] <- cell_spec(res_SF[2, 3], "html", bold = TRUE)
+res_SF[4, 3] <- cell_spec(res_SF[4, 3], "html", bold = TRUE)
+res_SF[8, 3] <- cell_spec(res_SF[8, 3], "html", bold = TRUE)
+
+#MajVLA
+res_SF[1, 4] <- cell_spec(res_SF[1, 4], "html", bold = TRUE)
+res_SF[3, 4] <- cell_spec(res_SF[3, 4], "html", bold = TRUE)
+res_SF[6, 4] <- cell_spec(res_SF[6, 4], "html", bold = TRUE)
+res_SF[7, 4] <- cell_spec(res_SF[7, 4], "html", bold = TRUE)
+res_SF[8, 4] <- cell_spec(res_SF[8, 4], "html", bold = TRUE)
+
+#N
+res_SF[2, 5] <- cell_spec(res_SF[2, 5], "html", bold = TRUE)
+res_SF[6, 5] <- cell_spec(res_SF[6, 5], "html", bold = TRUE)
+res_SF[7, 5] <- cell_spec(res_SF[7, 5], "html", bold = TRUE)
+res_SF[8, 5] <- cell_spec(res_SF[8, 5], "html", bold = TRUE)
+
+#C
+res_SF[1, 6] <- cell_spec(res_SF[1, 6], "html", bold = TRUE)
+res_SF[2, 6] <- cell_spec(res_SF[2, 6], "html", bold = TRUE)
+res_SF[4, 6] <- cell_spec(res_SF[4, 6], "html", bold = TRUE)
+res_SF[5, 6] <- cell_spec(res_SF[5, 6], "html", bold = TRUE)
+res_SF[7, 6] <- cell_spec(res_SF[7, 6], "html", bold = TRUE)
+
+#P
+res_SF[2, 7] <- cell_spec(res_SF[2, 7], "html", bold = TRUE)
+res_SF[4, 7] <- cell_spec(res_SF[4, 7], "html", bold = TRUE)
+res_SF[5, 7] <- cell_spec(res_SF[5, 7], "html", bold = TRUE)
+res_SF[6, 7] <- cell_spec(res_SF[6, 7], "html", bold = TRUE)
+res_SF[8, 7] <- cell_spec(res_SF[8, 7], "html", bold = TRUE)
+
+#K
+res_SF[2, 8] <- cell_spec(res_SF[2, 8], "html", bold = TRUE)
+res_SF[3, 8] <- cell_spec(res_SF[3, 8], "html", bold = TRUE)
+res_SF[4, 8] <- cell_spec(res_SF[4, 8], "html", bold = TRUE)
+res_SF[5, 8] <- cell_spec(res_SF[5, 8], "html", bold = TRUE)
+res_SF[7, 8] <- cell_spec(res_SF[7, 8], "html", bold = TRUE)
+
+
+res_SF %>% 
+  kbl(caption ="", digits =2, escape = F)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>B. Pairwise table of the correlation coefficients for SF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable("corr_coef_SF_specialists.png")
+img <- image_read("corr_coef_SF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_SF_specialists.png")
+
+
+#Spearman correlation for specialist TF
+traits_spe_TF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "TF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+res_TF <- round(cor(traits_spe_TF, method = "spearman"), digits = 2)
+testRes_TF = cor.mtest(traits_spe_TF, conf.level = 0.95, exact= FALSE, method= "spearman")
+
+testRes_TF$p %>% 
+  kbl(caption ="", digits =3)  %>%
+  kable_classic(full_width = F, html_font = "Cambria") 
+
+#make bold those with pvalue <0.05
+res_TF[1, 1] <- cell_spec(res_TF[1, 1], "html", bold = TRUE)
+res_TF[2, 2] <- cell_spec(res_TF[2, 2], "html", bold = TRUE)
+res_TF[3, 3] <- cell_spec(res_TF[3, 3], "html", bold = TRUE)
+res_TF[4, 4] <- cell_spec(res_TF[4, 4], "html", bold = TRUE)
+res_TF[5, 5] <- cell_spec(res_TF[5, 5], "html", bold = TRUE)
+res_TF[6, 6] <- cell_spec(res_TF[6, 6], "html", bold = TRUE)
+res_TF[7, 7] <- cell_spec(res_TF[7, 7], "html", bold = TRUE)
+res_TF[8, 8] <- cell_spec(res_TF[8, 8], "html", bold = TRUE)
+
+#gmin
+res_TF[5, 1] <- cell_spec(res_TF[5, 1], "html", bold = TRUE)
+
+#TLP
+res_TF[3, 2] <- cell_spec(res_TF[3, 2], "html", bold = TRUE)
+res_TF[5, 2] <- cell_spec(res_TF[5, 2], "html", bold = TRUE)
+res_TF[6, 2] <- cell_spec(res_TF[6, 2], "html", bold = TRUE)
+res_TF[7, 2] <- cell_spec(res_TF[7, 2], "html", bold = TRUE)
+
+#LSWC
+res_TF[2, 3] <- cell_spec(res_TF[2, 3], "html", bold = TRUE)
+res_TF[5, 3] <- cell_spec(res_TF[5, 3], "html", bold = TRUE)
+res_TF[7, 3] <- cell_spec(res_TF[7, 3], "html", bold = TRUE)
+res_TF[8, 3] <- cell_spec(res_TF[8, 3], "html", bold = TRUE)
+
+#MajVLA
+res_TF[6, 4] <- cell_spec(res_TF[6, 4], "html", bold = TRUE)
+
+#N
+res_TF[1, 5] <- cell_spec(res_TF[1, 5], "html", bold = TRUE)
+res_TF[2, 5] <- cell_spec(res_TF[2, 5], "html", bold = TRUE)
+res_TF[3, 5] <- cell_spec(res_TF[3, 5], "html", bold = TRUE)
+res_TF[7, 5] <- cell_spec(res_TF[7, 5], "html", bold = TRUE)
+res_TF[8, 5] <- cell_spec(res_TF[8, 5], "html", bold = TRUE)
+
+#C
+res_TF[2, 6] <- cell_spec(res_TF[2, 6], "html", bold = TRUE)
+res_TF[4, 6] <- cell_spec(res_TF[4, 6], "html", bold = TRUE)
+res_TF[7, 6] <- cell_spec(res_TF[7, 6], "html", bold = TRUE)
+res_TF[8, 6] <- cell_spec(res_TF[8, 6], "html", bold = TRUE)
+
+#P
+res_TF[2, 7] <- cell_spec(res_TF[2, 7], "html", bold = TRUE)
+res_TF[3, 7] <- cell_spec(res_TF[3, 7], "html", bold = TRUE)
+res_TF[5, 7] <- cell_spec(res_TF[5, 7], "html", bold = TRUE)
+res_TF[6, 7] <- cell_spec(res_TF[6, 7], "html", bold = TRUE)
+res_TF[8, 7] <- cell_spec(res_TF[8, 7], "html", bold = TRUE)
+
+#K
+res_TF[3, 8] <- cell_spec(res_TF[3, 8], "html", bold = TRUE)
+res_TF[5, 8] <- cell_spec(res_TF[5, 8], "html", bold = TRUE)
+res_TF[6, 8] <- cell_spec(res_TF[6, 8], "html", bold = TRUE)
+res_TF[7, 8] <- cell_spec(res_TF[7, 8], "html", bold = TRUE)
+
+res_TF %>% 
+  kbl(caption ="", digits =2, escape=F)  %>%
+  add_header_above(c("<span style='font-size: 20px; font-weight: bold;'>C. Pairwise table of the correlation coefficients for TF specialists</span>" = 9), escape = FALSE) %>%
+  kable_classic(full_width = F, html_font = "Cambria")  
+
+  save_kable("corr_coef_TF_specialists.png")
+img <- image_read("corr_coef_TF_specialists.png")
+img_resized <- image_scale(img, "800x600")
+image_write(img_resized, "corr_coef_resized_TF_specialists.png")
+
+```
+
+## Table S6: Model summary for each trait from equation 1.
+
+```{r Table 6, echo=FALSE}
+#library used
+library(nlme) #to fit the model and do the variance partitioning with ML method
+library(lme4) #for the VarCorr function
+library(dplyr) #to pipe
+library(ggplot2) #to plot
+library(kableExtra) #to build nice tables
+
+#data used (log on all traits)
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  rename(Carbon = C,
+         Nitrogen = N,
+         Potassium = K, 
+         Phosphorus = P) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Carbon", "Nitrogen", "Phosphorus", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD",  "Carbon", "Nitrogen", "Phosphorus", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Forest <- as.factor(Data$Forest)
+
+#function for extracting the coefficient of the model
+model_coef_table <- function(Trait, Mydata){
+
+  #Rename the trait column
+  colnames(Mydata)[which(colnames(Mydata) == Trait)] <- "Trait"  
+  
+  # Fit the linear mixed-effects model
+  model <- nlme::lme(Trait ~ TWI + Forest,  random=~1|Name, data = Mydata, na.action = na.omit, method = "ML")
+  
+  # build coef table 
+  coef_table <- coef(summary(model))
+  coef_table <- as.data.frame(coef_table)
+  
+  return(coef_table)
+}
+
+
+# For all traits call model_coef_table function
+coef_tables <- list()
+
+for (i in colnames(Data)[9:17]){
+
+  coef_tables[[i]] <- model_coef_table(i, Data)
+}
+
+# Combine all coefficient tables into one data frame
+coef_table <- do.call(rbind, coef_tables)
+
+
+# create nice table
+coef_table %>%
+  kbl(caption = "", escape = FALSE, digits = 3) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Model_summaries.png", zoom = 5)
+```
+
+##Table S7 : DBH, height
+
+```{r}
+#same beginning of script as for the Figure S6: Spearman corerlation.
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$DBH[which(Data$Code == "323")] <- NA #not 0
+
+#Dawkins, height and DBH and crown information
+complementary_info <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/Metradica_all_fieldsheet.csv") %>% select(Code, TreeHeight, DBH, CrownPosition) #already have DBH
+
+complementary_info
+
+data_with_complementary_info <- left_join(Data, complementary_info, by = "Code")
+
+data_with_complementary_info <- data_with_complementary_info %>%
+  group_by(Name) %>%
+  summarise(min_DBH = round(min(DBH, na.rm = TRUE), digits = 1),
+            max_DBH = round(max(DBH,  na.rm = TRUE), digits = 1),
+            range_DBH = paste0("[",min_DBH,";",max_DBH, "]" ),
+            min_TreeHeight = min(TreeHeight, na.rm = TRUE),
+            max_TreeHeight = max(TreeHeight, na.rm = TRUE),
+            range_TreeHeight = paste0("[",min_TreeHeight,";",max_TreeHeight, "]" ),
+            min_TreeDawkins = min(TreeDawkins, na.rm = TRUE),
+            max_TreeDawkins = max(TreeDawkins, na.rm = TRUE),
+            range_TreeDawkins = paste0("[",min_TreeDawkins,";",max_TreeDawkins, "]" )) %>%
+  select(Name, range_DBH, range_TreeHeight)
+
+#table for height
+data_with_complementary_info%>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/ComplementaryInfo_subset.png", zoom = 10)
+
+```
+
+#Appendix
+
+##Appendix S1 : Network analysis
+
+```{r Appendix S1}
+
+#Network analysis general ----
+
+#From Rosas et al., 2018: to characterize trait coordination within and between species, statistically significant correlations among traits were graphically represented using trait covariation networks with the IGRAPH package (Csardi & Nepusz, 2006). Traits were represented as nodes and their correlation as the edges linking them. Two indicators of network centrality were calculated for each trait: the degree (D), defined as the number of edges of a node and the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node (Table S5). In these latter analyses, all traits were loge-transformed to improve the linearity of relationships.
+
+set.seed(123) # for reproducibility
+
+library(here)
+library(tidyverse)
+library(igraph)
+library(corrplot)
+
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+#Spearman correlation for generalist
+traits_generalist <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res <- round(cor(traits_generalist, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+P2 <- graph_from_adjacency_matrix(abs(res), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(P2)
+
+# Extract edges and weights
+E(P2)$weight <- E(P2)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(P2))
+edges$correlation <- mapply(function(x, y) res[x, y], edges$V1, edges$V2)
+E(P2)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(P2)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(P2)$size <- 20
+V(P2)$color <- "white"
+V(P2)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(P2, 
+    edge.width = E(P2)$weight, 
+    edge.color = E(P2)$color, 
+    edge.lty = E(P2)$lty, 
+    vertex.size = V(P2)$size, 
+    vertex.color = V(P2)$color, 
+    vertex.label.color = V(P2)$label.color,
+    vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist <- degree(P2)
+D_generalist <- as.data.frame(D_generalist)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist <- as_adjacency_matrix(P2, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist <- as.data.frame(Dw_generalist)
+
+
+#SF specialists
+
+#Spearman correlation for generalist
+traits_spe_SF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "BF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_SF <- round(cor(traits_spe_SF, method = "spearman"), digits = 2)
+p_values_SF <- cor.mtest(traits_spe_SF, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values_SF <- p_values_SF$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values_SF < significance_threshold
+res_SF[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+P_SF <- graph_from_adjacency_matrix(abs(res_SF), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(P_SF)
+
+# Extract edges and weights
+E(P_SF)$weight <- E(P_SF)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(P_SF))
+edges$correlation <- mapply(function(x, y) res_SF[x, y], edges$V1, edges$V2)
+E(P_SF)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(P_SF)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(P_SF)$size <- 20
+V(P_SF)$color <- "white"
+V(P_SF)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(P_SF, 
+     edge.width = E(P_SF)$weight, 
+     edge.color = E(P_SF)$color, 
+     edge.lty = E(P_SF)$lty, 
+     vertex.size = V(P_SF)$size, 
+     vertex.color = V(P_SF)$color, 
+     vertex.label.color = V(P_SF)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("SF specialists")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_SF <- degree(P_SF)
+D_spe_SF <- as.data.frame(D_spe_SF)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_SF <- as_adjacency_matrix(P_SF, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_SF <- as.data.frame(Dw_spe_SF)
+
+#TF specialists
+
+#Spearman correlation 
+traits_spe_TF <- Data %>% 
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "TF") %>%
+  dplyr::select(-Name, -Habitat, -Type, -Forest, -Plot, -TWI, -DBH) 
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_TF <- round(cor(traits_spe_TF, method = "spearman"), digits = 2)
+p_values_TF <- cor.mtest(traits_spe_TF, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values_TF <- p_values_TF$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values_TF < significance_threshold
+res_TF[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+P_TF <- graph_from_adjacency_matrix(abs(res_TF), mode = "undirected", weighted = T,
+                                    diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(P_TF)
+
+# Extract edges and weights
+E(P_TF)$weight <- E(P_TF)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(P_TF))
+edges$correlation <- mapply(function(x, y) res_TF[x, y], edges$V1, edges$V2)
+E(P_TF)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(P_TF)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(P_TF)$size <- 20
+V(P_TF)$color <- "white"
+V(P_TF)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(P_TF, 
+     edge.width = E(P_TF)$weight, 
+     edge.color = E(P_TF)$color, 
+     edge.lty = E(P_TF)$lty, 
+     vertex.size = V(P_TF)$size, 
+     vertex.color = V(P_TF)$color, 
+     vertex.label.color = V(P_TF)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("TF specialists")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_TF <- degree(P_TF)
+D_spe_TF <- as.data.frame(D_spe_TF)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_TF <- as_adjacency_matrix(P_TF, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TF <- as.data.frame(Dw_spe_TF)
+
+#Combine
+
+D_table <- cbind(D_generalist, D_spe_SF, D_spe_TF) 
+Dw_table <- cbind(Dw_generalist, Dw_spe_SF, Dw_spe_TF)
+
+# Calculate column sums
+total_row <- colSums(D_table)
+total_row_w <- colSums(Dw_table)
+
+# Append the total row to the original data frame
+D_table_with_total <-  rbind(D_table, Total = total_row)
+Dw_table_with_total <-  rbind(Dw_table, Total = total_row_w)
+
+
+D_table_with_total %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+Dw_table_with_total  %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+
+#Along TWI----
+
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+#Metradica_log <- Metradica_log %>% filter(Type != "Generalist") for specialists
+Metradica_log <- Metradica_log %>% filter(Type == "Generalist") #for generalists
+nb_class <- 8 #7 for specialists and then merge classes to get enough individuals per class
+class_size <- (max(Metradica_log$TWI)-min(Metradica_log$TWI))/nb_class #each class have the same range of TWI
+data <- as.data.frame(seq(1:nb_class))
+colnames(data)[1] <- "class"
+data$min <- c() #min TWI of the class
+data$max <- c() #max TWI of the class
+data$mean <- c() #mean TWI of the class
+Metradica_log$class_TWI <- as.numeric(NA)
+
+for (i in 1:nb_class){ #attribute the individuals of the dataset to each of the 8 classes
+  
+  data$min[i] <- min(Metradica_log$TWI) + (i-1) * class_size
+  data$max[i] <- min(Metradica_log$TWI) +i * class_size
+  data$mean[i] <- (data$max[i] + data$min[i])/2
+  
+  Metradica_log$class_TWI[which(Metradica_log$TWI <= data$max[i] & Metradica_log$TWI > data$min[i]) ] <- i
+  
+}
+
+#attribute the individuals with the lowest TWI to the first class
+Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
+
+#merge TWI classes together to have approximately the same individuals per class
+
+#Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for specialists
+
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for generalists
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 8)]  <- 6 #for generalists
+
+table(Metradica_log$class_TWI) #number of individuals per class
+table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
+
+#in the data of classes, merge categories
+#data$max[which(data$class == 6 )] <- data$max[which(data$class == 7)] #for specialists
+data$max[which(data$class == 6 )] <- data$max[which(data$class == 8)] #for generalists
+data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
+data <- slice(data, 1:(n() - 2)) 
+data
+
+#Generalist ----
+#TWI class 1 
+traits_generalist_TWI_class_1 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==1) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_1 <- round(cor(traits_generalist_TWI_class_1, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_1, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_1[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G1 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_1), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G1)
+
+# Extract edges and weights
+E(G1)$weight <- E(G1)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G1))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_1[x, y], edges$V1, edges$V2)
+E(G1)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G1)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G1)$size <- 20
+V(G1)$color <- "white"
+V(G1)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G1, 
+     edge.width = E(G1)$weight, 
+     edge.color = E(G1)$color, 
+     edge.lty = E(G1)$lty, 
+     vertex.size = V(G1)$size, 
+     vertex.color = V(G1)$color, 
+     vertex.label.color = V(G1)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 1")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_1 <- degree(G1)
+D_generalist_TWI_class_1 <- as.data.frame(D_generalist_TWI_class_1)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_1 <- as_adjacency_matrix(G1, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_1 <- as.data.frame(Dw_generalist_TWI_class_1)
+
+#calculate other centrality measures
+
+closeness_generalist_TWI_class_1<- as.data.frame(closeness(G1)) #the greater the value the better, higher value meaning better centrality. If the graph has a weight edge attribute, then this is used by default. Weights are used for calculating weighted shortest paths, so they are interpreted as distances.
+
+#betweenness centrality : how many times a node is a bridge (in the shortest path)
+betweenness_generalist_TWI_class_1<- as.data.frame(betweenness(G1))  #the flow of information goes through the one with the highest betweenness "people that like gossip"; transduce signals in proteins. In this sense betweenness is more precise than stress giving also information on how the node is fundamental in the network. If we remove the node with the highest betweeness value, the network will be completely disconnected. 
+
+#TWI class 2 -to change
+traits_generalist_TWI_class_2 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==2) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_2 <- round(cor(traits_generalist_TWI_class_2, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_2, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_2[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G2 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_2), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G2)
+
+# Extract edges and weights
+E(G2)$weight <- E(G2)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G2))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_2[x, y], edges$V1, edges$V2)
+E(G2)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G2)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G2)$size <- 20
+V(G2)$color <- "white"
+V(G2)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G2, 
+     edge.width = E(G2)$weight, 
+     edge.color = E(G2)$color, 
+     edge.lty = E(G2)$lty, 
+     vertex.size = V(G2)$size, 
+     vertex.color = V(G2)$color, 
+     vertex.label.color = V(G2)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 2")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_2 <- degree(G2)
+D_generalist_TWI_class_2 <- as.data.frame(D_generalist_TWI_class_2)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_2 <- as_adjacency_matrix(G2, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_2 <- as.data.frame(Dw_generalist_TWI_class_2)
+
+
+#Generalist TWI =3
+
+traits_generalist_TWI_class_3 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==3) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_3 <- round(cor(traits_generalist_TWI_class_3, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_3, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_3[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G3 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_3), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G3)
+
+# Extract edges and weights
+E(G3)$weight <- E(G3)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G3))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_3[x, y], edges$V1, edges$V2)
+E(G3)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G3)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G3)$size <- 20
+V(G3)$color <- "white"
+V(G3)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G3, 
+     edge.width = E(G3)$weight, 
+     edge.color = E(G3)$color, 
+     edge.lty = E(G3)$lty, 
+     vertex.size = V(G3)$size, 
+     vertex.color = V(G3)$color, 
+     vertex.label.color = V(G3)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 3")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_3 <- degree(G3)
+D_generalist_TWI_class_3 <- as.data.frame(D_generalist_TWI_class_3)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_3 <- as_adjacency_matrix(G3, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_3 <- as.data.frame(Dw_generalist_TWI_class_3)
+
+#Generalist class 4
+
+traits_generalist_TWI_class_4 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==4) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_4 <- round(cor(traits_generalist_TWI_class_4, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_4, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_4[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G4 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_4), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G4)
+
+# Extract edges and weights
+E(G4)$weight <- E(G4)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G4))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_4[x, y], edges$V1, edges$V2)
+E(G4)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G4)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G4)$size <- 20
+V(G4)$color <- "white"
+V(G4)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G4, 
+     edge.width = E(G4)$weight, 
+     edge.color = E(G4)$color, 
+     edge.lty = E(G4)$lty, 
+     vertex.size = V(G4)$size, 
+     vertex.color = V(G4)$color, 
+     vertex.label.color = V(G4)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 4")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_4 <- degree(G4)
+D_generalist_TWI_class_4 <- as.data.frame(D_generalist_TWI_class_4)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_4 <- as_adjacency_matrix(G4, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_4 <- as.data.frame(Dw_generalist_TWI_class_4)
+
+#Generalist class 5
+
+traits_generalist_TWI_class_5 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==5) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_5 <- round(cor(traits_generalist_TWI_class_5, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_5, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_5[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G5 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_5), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G5)
+
+# Extract edges and weights
+E(G5)$weight <- E(G5)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G5))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_5[x, y], edges$V1, edges$V2)
+E(G5)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G5)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G5)$size <- 20
+V(G5)$color <- "white"
+V(G5)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G5, 
+     edge.width = E(G5)$weight, 
+     edge.color = E(G5)$color, 
+     edge.lty = E(G5)$lty, 
+     vertex.size = V(G5)$size, 
+     vertex.color = V(G5)$color, 
+     vertex.label.color = V(G5)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 5")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_5 <- degree(G5)
+D_generalist_TWI_class_5 <- as.data.frame(D_generalist_TWI_class_5)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_5 <- as_adjacency_matrix(G5, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_5 <- as.data.frame(Dw_generalist_TWI_class_5)
+
+#Generalist class 6
+
+traits_generalist_TWI_class_6 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(Type == "Generalist") %>%
+  filter(class_TWI==6) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_G_TWI_class_6 <- round(cor(traits_generalist_TWI_class_6, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_generalist_TWI_class_6, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_G_TWI_class_6[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+G6 <- graph_from_adjacency_matrix(abs(res_G_TWI_class_6), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(G6)
+
+# Extract edges and weights
+E(G6)$weight <- E(G6)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(G6))
+edges$correlation <- mapply(function(x, y) res_G_TWI_class_6[x, y], edges$V1, edges$V2)
+E(G6)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(G6)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(G6)$size <- 20
+V(G6)$color <- "white"
+V(G6)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(G6, 
+     edge.width = E(G6)$weight, 
+     edge.color = E(G6)$color, 
+     edge.lty = E(G6)$lty, 
+     vertex.size = V(G6)$size, 
+     vertex.color = V(G6)$color, 
+     vertex.label.color = V(G6)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Generalists TWI class 6")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_generalist_TWI_class_6 <- degree(G6)
+D_generalist_TWI_class_6 <- as.data.frame(D_generalist_TWI_class_6)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_generalist_TWI_class_6 <- as_adjacency_matrix(G6, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_generalist_TWI_class_6 <- as.data.frame(Dw_generalist_TWI_class_6)
+
+#Combine
+
+D_table <- cbind(D_generalist_TWI_class_1, D_generalist_TWI_class_2, D_generalist_TWI_class_3, D_generalist_TWI_class_4, D_generalist_TWI_class_5, D_generalist_TWI_class_6) 
+Dw_table <-cbind(Dw_generalist_TWI_class_1, Dw_generalist_TWI_class_2, Dw_generalist_TWI_class_3, Dw_generalist_TWI_class_4, Dw_generalist_TWI_class_5, Dw_generalist_TWI_class_6) 
+
+# Calculate column sums
+total_row <- colSums(D_table)
+total_row_w <- colSums(Dw_table)
+
+# Append the total row to the original data frame
+D_table_with_total <-  rbind(D_table, Total = total_row)
+Dw_table_with_total <-  rbind(Dw_table, Total = total_row_w)
+
+
+D_table_with_total %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+Dw_table_with_total  %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+#Specialist SF + TF----
+Metradica_log <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv") %>% 
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  relocate(SD, .after = MajVLA) %>%
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "SD", "Phosphorous","Carbon", "Nitrogen", "Potassium", "TWI"), log) %>% 
+  mutate(TLP = -TLP) 
+
+Metradica_log <- Metradica_log %>% filter(Type != "Generalist") #for specialists
+
+nb_class <- 7 # for specialists and then merge classes to get enough individuals per class
+class_size <- (max(Metradica_log$TWI)-min(Metradica_log$TWI))/nb_class #each class have the same range of TWI
+data <- as.data.frame(seq(1:nb_class))
+colnames(data)[1] <- "class"
+data$min <- c() #min TWI of the class
+data$max <- c() #max TWI of the class
+data$mean <- c() #mean TWI of the class
+Metradica_log$class_TWI <- as.numeric(NA)
+
+for (i in 1:nb_class){ #attribute the individuals of the dataset to each of the 8 classes
+  
+  data$min[i] <- min(Metradica_log$TWI) + (i-1) * class_size
+  data$max[i] <- min(Metradica_log$TWI) +i * class_size
+  data$mean[i] <- (data$max[i] + data$min[i])/2
+  
+  Metradica_log$class_TWI[which(Metradica_log$TWI <= data$max[i] & Metradica_log$TWI > data$min[i]) ] <- i
+  
+}
+
+#attribute the individuals with the lowest TWI to the first class
+Metradica_log$class_TWI[which(Metradica_log$TWI == data$min[1])]  <- 1
+
+#merge TWI classes together to have approximately the same individuals per class
+
+Metradica_log$class_TWI[which(Metradica_log$class_TWI == 7)]  <- 6 #for specialists
+
+
+table(Metradica_log$class_TWI) #number of individuals per class
+table(is.na(Metradica_log$class_TWI)) #verify all individuals have a class
+
+#in the data of classes, merge categories
+data$max[which(data$class == 6 )] <- data$max[which(data$class == 7)] #for specialists
+data$mean[which(data$class == 6 )] <- (data$max[6] + data$min[6])/2
+data <- slice(data, 1:(n() - 1)) 
+data
+
+#TWI class 1 
+traits_spe_TWI_class_1 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==1) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_1 <- round(cor(traits_spe_TWI_class_1, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_1, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_1[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S1 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_1), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S1)
+
+# Extract edges and weights
+E(S1)$weight <- E(S1)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S1))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_1[x, y], edges$V1, edges$V2)
+E(S1)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S1)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S1)$size <- 20
+V(S1)$color <- "white"
+V(S1)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S1, 
+     edge.width = E(S1)$weight, 
+     edge.color = E(S1)$color, 
+     edge.lty = E(S1)$lty, 
+     vertex.size = V(S1)$size, 
+     vertex.color = V(S1)$color, 
+     vertex.label.color = V(S1)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 1")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_TWI_class_1 <- degree(S1)
+D_spe_TWI_class_1 <- as.data.frame(D_spe_TWI_class_1)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_TWI_class_1 <- as_adjacency_matrix(S1, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_1 <- as.data.frame(Dw_spe_TWI_class_1)
+
+#TWI class 2 
+traits_spe_TWI_class_2 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==2) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_2 <- round(cor(traits_spe_TWI_class_2, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_2, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_2[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S2 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_2), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S2)
+
+# Extract edges and weights
+E(S2)$weight <- E(S2)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S2))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_2[x, y], edges$V1, edges$V2)
+E(S2)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S2)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S2)$size <- 20
+V(S2)$color <- "white"
+V(S2)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S2, 
+     edge.width = E(S2)$weight, 
+     edge.color = E(S2)$color, 
+     edge.lty = E(S2)$lty, 
+     vertex.size = V(S2)$size, 
+     vertex.color = V(S2)$color, 
+     vertex.label.color = V(S2)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 2")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_TWI_class_2 <- degree(S2)
+D_spe_TWI_class_2 <- as.data.frame(D_spe_TWI_class_2)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_TWI_class_2 <- as_adjacency_matrix(S2, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_2 <- as.data.frame(Dw_spe_TWI_class_2)
+
+#TWI class 3
+
+traits_spe_TWI_class_3 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==3) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_3 <- round(cor(traits_spe_TWI_class_3, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_3, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_3[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S3 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_3), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S3)
+
+# Extract edges and weights
+E(S3)$weight <- E(S3)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S3))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_3[x, y], edges$V1, edges$V2)
+E(S3)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S3)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S3)$size <- 20
+V(S3)$color <- "white"
+V(S3)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S3, 
+     edge.width = E(S3)$weight, 
+     edge.color = E(S3)$color, 
+     edge.lty = E(S3)$lty, 
+     vertex.size = V(S3)$size, 
+     vertex.color = V(S3)$color, 
+     vertex.label.color = V(S3)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 3")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_TWI_class_3 <- degree(S3)
+D_spe_TWI_class_3 <- as.data.frame(D_spe_TWI_class_3)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_TWI_class_3 <- as_adjacency_matrix(S3, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_3 <- as.data.frame(Dw_spe_TWI_class_3)
+
+#TWI class 4
+
+traits_spe_TWI_class_4 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==4) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_4 <- round(cor(traits_spe_TWI_class_4, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_4, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_4[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S4 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_4), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S4)
+
+# Extract edges and weights
+E(S4)$weight <- E(S4)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S4))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_4[x, y], edges$V1, edges$V2)
+E(S4)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S4)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S4)$size <- 20
+V(S4)$color <- "white"
+V(S4)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S4, 
+     edge.width = E(S4)$weight, 
+     edge.color = E(S4)$color, 
+     edge.lty = E(S4)$lty, 
+     vertex.size = V(S4)$size, 
+     vertex.color = V(S4)$color, 
+     vertex.label.color = V(S4)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 4")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+D_spe_TWI_class_4 <- degree(S4)
+D_spe_TWI_class_4 <- as.data.frame(D_spe_TWI_class_4)
+
+#weighted degree (Dw)
+
+Dw_spe_TWI_class_4 <- as_adjacency_matrix(S4, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_4 <- as.data.frame(Dw_spe_TWI_class_4)
+
+#TWI class 5
+
+traits_spe_TWI_class_5 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==5) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_5 <- round(cor(traits_spe_TWI_class_5, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_5, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_5[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S5 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_5), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S5)
+
+# Extract edges and weights
+E(S5)$weight <- E(S5)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S5))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_5[x, y], edges$V1, edges$V2)
+E(S5)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S5)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S5)$size <- 20
+V(S5)$color <- "white"
+V(S5)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S5, 
+     edge.width = E(S5)$weight, 
+     edge.color = E(S5)$color, 
+     edge.lty = E(S5)$lty, 
+     vertex.size = V(S5)$size, 
+     vertex.color = V(S5)$color, 
+     vertex.label.color = V(S5)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 5")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+D_spe_TWI_class_5 <- degree(S5)
+D_spe_TWI_class_5 <- as.data.frame(D_spe_TWI_class_5)
+
+#weighted degree (Dw)
+
+Dw_spe_TWI_class_5 <- as_adjacency_matrix(S5, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_5 <- as.data.frame(Dw_spe_TWI_class_5)
+
+#TWI class 6
+
+traits_spe_TWI_class_6 <- Metradica_log %>%  
+  rename(`  K` = Potassium, 
+         `  P` = Phosphorous, 
+         `  N` = Nitrogen,
+         `  C` = Carbon,
+         gmin = Gmin) %>% 
+  filter(class_TWI==6) %>%
+  dplyr::select(-Name, -Code, -Genus, -Species, -Habitat, -Type, -Forest, -Plot, -class_TWI, -DBH, -SD, -TWI) #results in 50 obs
+
+
+#Use this correlation matrix to create an undirected weighted graph.
+
+res_S_TWI_class_6 <- round(cor(traits_spe_TWI_class_6, method = "spearman"), digits = 2)
+p_values <- cor.mtest(traits_spe_TWI_class_6, conf.level = 0.95, exact= FALSE, method = "spearman")
+p_values <- p_values$p
+
+significance_threshold <- 0.05
+significant_mask <- p_values < significance_threshold
+res_S_TWI_class_6[!significant_mask] <- 0  # Set non-significant correlations to zero
+
+#create graph
+
+S6 <- graph_from_adjacency_matrix(abs(res_S_TWI_class_6), mode = "undirected", weighted = T,
+                                  diag= F) #don't plot the diagonal because it's a correlation matrix so 1:1
+
+plot(S6)
+
+# Extract edges and weights
+E(S6)$weight <- E(S6)$weight * 5  # Adjust weight for better visualization
+
+# Set edge colors and linetypes based on the sign of the correlation
+edges <- as.data.frame(get.edgelist(S6))
+edges$correlation <- mapply(function(x, y) res_S_TWI_class_6[x, y], edges$V1, edges$V2)
+E(S6)$color <- ifelse(edges$correlation > 0, "black", "grey")
+E(S6)$lty <- ifelse(edges$correlation > 0, 1, 2)
+
+# Set node attributes for size, color, and label color
+V(S6)$size <- 20
+V(S6)$color <- "white"
+V(S6)$label.color <- "black"
+
+# Plot the graph with specified attributes
+plot(S6, 
+     edge.width = E(S6)$weight, 
+     edge.color = E(S6)$color, 
+     edge.lty = E(S6)$lty, 
+     vertex.size = V(S6)$size, 
+     vertex.color = V(S6)$color, 
+     vertex.label.color = V(S6)$label.color,
+     vertex.label.cex = 0.8)  # Adjust label size if needed
+
+title("Specialist TWI class 6")
+
+#calculate the degree (D), defined as the number of edges of a node, 
+#centrality measure indicating which node is more important
+
+
+D_spe_TWI_class_6 <- degree(S6)
+D_spe_TWI_class_6 <- as.data.frame(D_spe_TWI_class_6)
+
+#problem 1: weight attributes
+#don't count the edges but sum the edges if it's a weighted graph!!!
+#therefore calculate the weighted degree (Dw), defined as the sum of all significant coefficients of correlation of a node
+
+
+Dw_spe_TWI_class_6 <- as_adjacency_matrix(S6, attr = "weight") %>%#takes igraph object and turns it into adj matrix
+  #degree of node 1, sum all the nodes in row 1, etc. 
+  as.matrix() %>%
+  rowSums()
+
+Dw_spe_TWI_class_6 <- as.data.frame(Dw_spe_TWI_class_6)
+
+
+#Combine
+
+D_table_Specialist <- cbind(D_spe_TWI_class_1, D_spe_TWI_class_2, D_spe_TWI_class_3, D_spe_TWI_class_4, D_spe_TWI_class_5, D_spe_TWI_class_6) 
+Dw_table_Specialist <-cbind(Dw_spe_TWI_class_1, Dw_spe_TWI_class_2, Dw_spe_TWI_class_3, Dw_spe_TWI_class_4, Dw_spe_TWI_class_5, Dw_spe_TWI_class_6) 
+
+# Calculate column sums
+total_row <- colSums(D_table_Specialist)
+total_row_w <- colSums(Dw_table_Specialist)
+
+# Append the total row to the original data frame
+D_table_with_total_Specialist <-  rbind(D_table_Specialist, Total = total_row)
+Dw_table_with_total_Specialist <-  rbind(Dw_table_Specialist, Total = total_row_w)
+
+
+D_table_with_total_Specialist %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+Dw_table_with_total_Specialist  %>% kbl(caption ="", digits =3) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+# Format 
+
+Dw_table_formatted_G <- Dw_table_with_total %>%
+  as.data.frame() %>%
+  mutate_all(round, digits = 3) %>%
+  rownames_to_column(var = "Trait") %>%
+  kbl(caption = "A. Generalist",
+      col.names = c("Trait", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6"),
+      digits = 10) %>%
+  kable_classic(full_width = FALSE, html_font = "Cambria") 
+
+Dw_table_formatted_S <- Dw_table_with_total_Specialist %>%
+  as.data.frame() %>%
+  mutate_all(round, digits = 3) %>%
+  rownames_to_column(var = "Trait") %>%
+  kbl(caption = "B. Specialist",
+      col.names = c("Trait", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6"),
+      digits = 10) %>%
+  kable_classic(full_width = FALSE, html_font = "Cambria") 
+```
+

@@ -1,0 +1,44 @@
+# (PART) Part one: general introduction {-}
+
+# Project introduction
+
+My thesis is included in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest**. 
+
+The global objectives of Metradica are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. 
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+There are 4 tasks : 
+ 
+1. environmental index + species hydrological affinity 
+2. species distribution + functional responses to env’t  
+3. prediction of species distribution from traits using *four-corners* joint species distribution models 
+4. shifts in species distribution through the lens of demographic process: interaction between models 
+
+![Metradica project organisation](./Documents/Pictures/Overall_project.PNG  "Project organisation")
+
+I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
+
+# Hypotheses 
+
+**(1) Importance of local habitat in shaping functional strategies**
+
+* Habitats are widely recognized to control trait variation 
+* Identify species with statistically significant habitat associations
+* Traits syndromes for specialists vs. generalists
+
+*I will focus on topographic-driven variation in the water table, which is hypothesized to explain variation in forest responses to drought (Nobre et al.,2011) and species distribution (Schietti et al., 2014; Lourenço Jr. et al., 2021), where trees with higher hydraulic efficiency and drought sensitivity are mostly found in seasonally flooded habitats (Oliveira et al., 2019), which seems to buffer the impact of short-term droughts on Amazon forest survival and productivity (Esteban et al., 2020; Sousa et al., 2020).*
+
+**(2) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits**
+
+* Metradica data : exploring generalists species ITV (~60 individuals per species)
+* Hypothesis : because species' responses to the environment manifest through functional traits, the higher the ITV of a species is, the more diverse abiotic environments the species may be able to adapt to (Umaña et al., 2015).
+
+
+**(3) Patterns of functional responses to drought along a precipitation and topographic gradient**
+
+* Explore how trait values vary across a precipitation gradient (Bafog “dry” to Kaw “wet”) 
+* Are associations among traits consistent along the gradient in each habitat? Species should converge to a set of trait values that maximize their resource use efficiency. (Vleminckx et al 2021) 
+* Identify species in their limit range regarding drought resistance. 
+
+*shifts in trait variation across environmental gradients can provide powerful insights into the drivers of community assembly* (Junior et al 2021)

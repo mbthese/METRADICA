@@ -1,0 +1,493 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+```{r , include=FALSE}
+rm(list = ls()) ; invisible(gc()) ; set.seed(42)
+library(knitr)
+library(kableExtra)
+if(knitr:::is_html_output()) options(knitr.table.format = "html") 
+if(knitr:::is_latex_output()) options(knitr.table.format = "latex") 
+library(tidyverse)
+theme_set(bayesplot::theme_default())
+knitr::opts_chunk$set(
+	echo = F,
+	fig.height = 6,
+	fig.width = 8,
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE,
+	cache.lazy = F
+)
+```
+
+# (PART) Part two : Materials & Method {-}
+# Sampling
+
+## Sites
+
+Permanent forest plots of the *Guyafor network* (https://paracou.cirad.fr/website/experimental-design/guyafor-network) monitor since 1970 individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network covers > 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes.
+
+![Guyafor stations for tropical forest monitoring](./Documents/Pictures/Guyafor.png "Guyafor stations")
+
+**Paracou **: The first site is Paracou field station (http://paracou.cirad.fr/), characterized by an average annual rainfall of 3102 mm and a mean air temperature of 25.7°C (Aguillos et al 2019). Sampling was done in six control permanent plots of 6.25 ha each with an elevation between 33-50 m (IGN-F). In total, 226 trees were sampled between 26/10/2020-7/12/2020 and 13/09/2021-17/09/2021.
+
+
+**Bafog**: 5 permanent plots monitored of the ONF institute, characterized by an average annual rainfall of 2357 mm and a mean air temperature of 27.4°C (weather station of MétéoFrance). Sampling was done in 4-ha plots and with an elevation between 7-39 m (IGN-F). In total, 181 trees were sampled in the BAFOG site between 01/03/2021-18/03/2021. 
+
+**Est**: The third site is the Kaw area characterized by an average annual rainfall of 3851 mm and a mean air temperature of 26.3°C (weather station of MétéoFrance). The area groups several plots (see Table. S3) with an elevation between 7-250 m (IGN-F). In total, 145 trees were sampled between 05/10/2021-20/10/2021.
+
+The three sites were chosen in order to sample species along the rainfall gradient. 
+
+![Rainfall gradient in French Guyana](./Documents/Pictures/41597_2019_218_Fig1_HTML.png "Rainfall gradient in French Guyana")
+### 
+```{r}
+#correct plot names after checked by Gaelle Jaouen.
+Data <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Data_verified_gaelle <- readxl::read_xlsx("Dataset/OUTPUT_cleaning/ALL/20221130_MetradicaFinal_GJ.xlsx") %>%
+  dplyr::select(Code, PlotCorr)
+
+Data2 <- left_join(Data, Data_verified_gaelle, by = "Code")
+
+Data2$PlotCorr <- gsub(pattern = "Kaw_",replacement = "",x = Data2$PlotCorr )
+Data2$PlotCorr <- gsub(pattern = "Bafog_",replacement = "",x = Data2$PlotCorr )
+Data2$PlotCorr <- gsub(pattern = "Paracou_",replacement = "",x = Data2$PlotCorr )
+
+#count number of trees per plot to update SI table.
+Data2 <- Data2 %>%
+  dplyr::select(-Plot) %>%
+  rename(Plot = PlotCorr) %>%
+  relocate(Plot, .after = Forest) 
+
+Data2 %>%
+  group_by(Forest, Plot) %>%
+  summarise(total_count = n(), .groups = 'drop')
+
+write.csv(Data2, "Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD_18042023.csv")
+```
+
+## Habitats
+
+The tropical forest of the Guianan Shield is characterized by heterogeneous meso-topographic conditions with numerous small hills, distinguishing two main contrasting habitats, terra firme (TF) forests and seasonally flooded forests (SF) (Ferry et al. 2010). 
+
+* Terra firme covers 77 % of French Guiana. They are also called *plateau* and are higher areas characterized by a high clay content (47 %, Baraloto et al. 2021) and have a high water drainage. 
+
+* Seasonally flooded habitats are located in the valleys, with a maximum slope of 1% and are characterized by relatively more fertile soils compared to terra firme forests (Baraloto et al. 2011). These soils are sandy (65%, Baraloto et al. 2021) and interestingly richer in phosphorus (Ferry et al. 2010; Baraloto et al. 2021). In SF forest, Tthe water table is never observed to descend below 60 cm depth, remaining at the soil surface for at least two consecutive months each year (Baraloto et al. 2007; Ferry et al. 2010) during the rainy season. The classification for waterlogged habitat may be loose and not as precise as for the *terra firme*, but it does not impact the sampling. *in natura*, we assess if the tree is really in a waterlogged habitat or not.
+
+*How do we define seasonally flooded soils?* On maps, pixels located at an altitude difference of less than 2 m from the altitude of the nearest surface run-off of the same catchment area. **Pixels situés à moins de 2m de dénivelé du plus proche écoulement de surface appartenant au même bassin versant**.  Surface run-off corresponds to pixels receiving the waterflow of at least 75 pixels upstream. Everything is being calculated from the SRTM 30 m (after adjusting the basin area with fillings.) 
+
+Gaelle information: 
+
+* utilisation couche sig onf
+* critere pente (inf 20° = BF, pente moins forte espece de lissage avec bc d’arbres en BF, durcissement des criteres, affiner et bien tomber dans du BF) *comment: SRTM pente 20° à 30m ne correspond pas n’ont plus à la pente sur le terrain, il y a une imprecision. but again in natura we make sure the tree is really in the corresponding habitat.*
+* distance à la crique (inf 50m) (marginale)
+ 
+**Soil nutrient availability** is another important driver of species distribution and plant community assembly in these forests (Quesada et al. 2012; Baldeck et al. 2013; Oliveira et al. 2019; Fortunel et al. 2020; Baraloto et al. 2021). The pre-Cambrian rocks of the Guiana Shield have been exposed to weathering and erosion for over 2 billion years, which has produced highly and therefore originate overall nutrient-poor soils (Flores et al. 2020; Grau et al. 2017; Soong et al. 2020). TF soils are richer in organic matter than SF, while SF soils havewhich distinguishes itself with a higher phosphorus content (Ferry et al. 2010).
+
+The habitat classification of the tree species are based on all the past project achieved and mostly on HABITAT ONF project. 
+
+```{r Soil analyses, echo=FALSE}
+# Soil analyses from excel files given by Gaelle Jaouen 06/2022
+# Compilation in Gentry from DIADEMA, AMALIN & BRIDGE projects led by Christopher Baraloto and Claire Fortunel
+# Paracou data from Vincent Freycon & Bruno Ferry with metadata in Paracou Data dictionary
+# Other data from GUYAFOR database 
+# Soong et al 2022 data as well
+
+#libraries----
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+
+# Paracou -------
+## data----
+
+library(readxl)
+Data1_Paracou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Sol/20220611PedoParacouCompletionSIG.xlsx")
+
+Data2_all <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Sol/202206_DonneesSolSyntheseKawParBaf.xlsx")
+
+## summary-----
+
+Summary_TF <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Plateau") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Terra firme") %>%
+  drop_na()
+  
+Summary_Bottomland <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Bottomland") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Seasonally flooded forest") %>%
+  drop_na()
+
+Summary_Swamp <- Data1_Paracou %>% 
+  filter(TopoEnSIG =="Swamp") %>%
+  summarise(CARBONEORG, AZOTETOTAL, C_N, P_OLSEN, AL_ÉCH_KCL, H_ÉCH_KCL, CA_ÉCH, MG_ÉCH, K_ÉCH, NA_ÉCH, MO, CEC) %>%
+  mutate(Habitat = "Seasonally flooded forest") %>%
+  drop_na()
+
+Soil_Paracou <- bind_rows(Summary_Bottomland, Summary_Swamp, Summary_TF)
+
+
+## graphs-----
+
+yaxis <<- c(expression("Organic Carbon (%)"),
+            expression("Nitrogen (‰)"),
+            expression("C/N ratio"),
+            expression("Phosphorus (mg/kg) extracted \n using Olsen method"),
+            expression("Total Root Length (cm)"),
+            expression("Al exchangeable \n in KCl (cmol+/kg)"),
+            expression("H exchangeable \n in KCl (cmol+/kg)"),
+            expression("Ca exchangeable \n by Metson method (cmol+/kg)"),
+            expression("Mg exchangeable \n by Metson method (cmol+ / kg)"),
+            expression("K exchangeable \n by Metson method (cmol+/ kg)"),
+            expression("Na exchangeable \n by Metson method (cmol+ / kg)"),
+            expression("Organic matter (%)"),
+            expression("cation exchange capacity \n by method Metson (cmol+/ kg)")
+)
+
+count <- 0
+Nbcol <- colnames(Soil_Paracou)[1:12]
+plotlist <- list()
+
+for (i in Soil_Paracou[,Nbcol]){
+  count <- count + 1
+  name <- names(Soil_Paracou[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Soil_Paracou[Nbcol[count]])
+  
+   ggplot(Soil_Paracou) +
+ aes(x = Habitat, y = i, fill = Habitat) +
+ geom_boxplot(adjust = 1L, scale = "area") +
+ scale_fill_manual(values = list(`Seasonally flooded forest`= "#53CBE7", `Terra firme` = "#FFCB61")) +
+ ylab(yaxis[count]) +
+ theme_minimal() +
+ theme(axis.title.x=element_blank(),axis.text.x=element_blank())
+   
+  })
+  
+}
+
+plot_soil_var <- ggarrange(plotlist = plotlist,ncol = 4,nrow=3, common.legend = T, legend = "bottom")
+                       
+print(plot_soil_var)
+```
+
+
+**Topographic** variables are strong proxies for soil hydrology, which correlates with a combination of physico-chemical properties. A new hydrological index that accounts for both variations in climate and soil / topography across sites by combining the concept of MCWD with the one of Relative Extractable Water (e.g. Wagner et al. 2011) or Plant Available Water capacity (Nepstad et al. 2004, Ouédraogo et al. 2016). For Paracou, there is the topography classification established by Allié, Pélissier et al., 2015. *Sylvain*: The topographic wetness index (𝑇𝑊𝐼), identifies water accumulation areas. TWI was derived from 185 a 1-m resolution digital elevation model built based on data from a LiDAR campaign done in 186 2015 using SAGA-GIS (Conrad et al. 2015).
+
+
+## Species
+
+* **Specialist** species are species that have a habitat preference, either for *terra firme* soils or for seasonally flooded soils in French Guiana. 
+
+* **Generalist** species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species. 
+
+**Indicator Species Analysis**
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+Habitat preferences were determined based on (Baraloto et al. 2021) study. The Dufrene and Legendre method (Dufrêne and Legendre 1997) was used as a measure of habitat association for each species in each habitat, while taking into account spatial auto-correlation with the MSR method (Wagner and Dray 2015). This measure, named IndVal for Indicator value, scales from 0 to 1 and integrates both the relative frequency of each species across plots in a given habitat and its relative abundance in each habitat. Out of the 654 species identified from (Baraloto et al. 2021), we only considered the 5 % highest Indval values in each habitat to qualify them as specialists of a habitat. This corresponded to a threshold of IndValSF specialist ≥  0.200 for SF specialists and IndValTF specialist ≥  0.259  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists. 
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word **preference**), but are also a high probability of being sampled in the given habitat.
+
+We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.  
+
+We thus studied 21 tropical tree species, which included 6 generalist species, 9 SF specialist species, and 6 TF specialist species. 
+
+```{r Species phylo, echo=FALSE, message=FALSE, warning=FALSE}
+library(V.PhyloMaker)
+library(ggtree)
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+#  "Carapa_guianensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  #"Vouacapoua_americana"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+print(A)
+```
+
+
+```{r Indval, echo=FALSE}
+#baraloto et al SI
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+#calculating thresholds for habitat specialists
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF specialists
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF specialists
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#concerning our species
+identified_species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", 
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(identified_species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+Generalist_fort_indval_deux_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui species in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui species in both, removed it
+   mutate(Type = "SF specialist")
+
+
+#indval graphs
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(indval_SF_plot)
+
+#ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
+#ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
+
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(indval_TF_plot)
+#ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+#ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
+
+#now for generalists
+Generalist <- left_join(identified_species, indval_FG) 
+
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#cannot consider jas.jav.
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+
+
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal() +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+print(Generalist_diff_indval)
+#ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
+#ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
+
+```
+
+
+*More details about IndVal* :
+
+IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies. 
+
+*Other indicators* : 
+
+* Contrary to **TWINSPAN**, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies
+* Species richness (sensitive to several factors)
+* Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots. 
+
+## Individuals
+
+The individuals were selected with a DBH value between the 10<sup>th</sup> and the 90<sup>th</sup> percentile of the species' distribution pattern, in order to have a sampling that best reflects the forest structure. In this percentile interval, species were randomly selected for sampling. 
+
+
+*Total individuals collected for the paper.*
+
+```{r Individuals per species collected in the three sampling sites., echo=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(janitor)
+
+Family <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Supporting information - Species_SI.csv") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") 
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  adorn_totals("row") %>%
+  adorn_totals("col") %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) 
+ #save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+
+## Sampling strategy
+
+* Maps were produced by QGIS software
+* [**Field** protocol](../Metradica_Paracou/Document/Protocol/Field.Rmd)
+* Fill the fieldworksheet [**Fieldworksheet**](../Metradica_Paracou/Document/Protocol/Feuille_terrain_releve.xlsx)
+- [ ] Assess tree and branch height
+- [ ] Assess tree and branch Dawkins : ![**Dawkins**](../Metradica_Paracou/Document/Protocol/Dawkins.png "Dawkins")

@@ -1,0 +1,1127 @@
+---
+title: "Distribution"
+author: "Marion Boisseaux"
+date: "04/05/2022"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: inline
+---
+# (PART) Part three : Analyses {-}
+# Distribution of traits
+
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(readxl)
+library(gridExtra)
+library(rio)
+library(ggplot2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv")
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data #552 indv
+
+
+Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for small sample size (n=30)
+```
+
+## Water traits 
+
+```{r echo=FALSE, warning=FALSE}
+yaxis_water <<- c(expression("TLP"),
+            expression("Gmin"),
+            expression("SD"),
+            expression("LSWC"))
+#water
+
+count <- 0
+Nbcol <- match(yaxis_water,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_water[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_water <- ggarrange(plotlist = plotlist,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_his_water)
+
+
+#shapiro water
+
+
+count <- 0
+Nbcol <- match(yaxis_water,colnames(Subdata_shapiro))
+plotlist <- list()
+
+for (i in Subdata_shapiro[,Nbcol]){
+  count <- count + 1
+  name <- names(Subdata_shapiro[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+   
+   
+  })
+  
+  if (plotlist[[name]]$p.value > 0.05) {
+  
+print("Data is normal")
+} else {  
+    print("data is not normal")
+  
+}
+  
+}
+```
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
+
+##Vein traits
+```{r echo=FALSE, warning=FALSE}
+
+
+yaxis_MajVLA <<- c(expression("midribVLA"),
+            expression("SecondaryVLA"),
+            expression("TertiaryVLA"),
+            expression("MajVLA"))
+
+
+count <- 0
+Nbcol <- match(yaxis_MajVLA,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_MajVLA[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_veins <- ggarrange(plotlist = plotlist,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_his_veins)
+
+
+#shapiro veins
+
+
+count <- 0
+Nbcol <- match(yaxis_MajVLA,colnames(Subdata_shapiro))
+plotlist <- list()
+
+for (i in Subdata_shapiro[,Nbcol]){
+  count <- count + 1
+  name <- names(Subdata_shapiro[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+   
+   
+  })
+  
+  if (plotlist[[name]]$p.value > 0.05) {
+  
+print("Data is normal")
+} else {  
+    print("data is not normal")
+  
+}
+  
+}
+
+#data is not normal for tertiaries, but that's fine. It graphically does look fine pourtant.
+
+```
+
+
+## Chemistry traits
+```{r echo=FALSE, warning=FALSE}
+yaxis_chem <<- c(expression("Nitrogen"),
+            expression("Carbon"),
+            expression("X.S"),
+            expression("Phosphorous"),
+            expression("Fe..g.kg."),
+            expression("Mn..g.kg."),
+            expression("Mg..g.kg."),
+            expression("Al..g.kg."),
+            expression("Ca..g.kg."),
+            expression("Na..g.kg."),
+            expression("Potassium"),
+            expression("Cr..mg.kg."),
+            expression("Cu..mg.kg."),
+            expression("Ni..mg.kg."),
+            expression("Pb..mg.kg."),
+            expression("Rb..mg.kg."),
+            expression("Sr..mg.kg."),
+            expression("Zn..mg.kg."))
+count <- 0
+Nbcol <- match(yaxis_chem,colnames(Metradica))
+plotlist <- list()
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x = log(abs(i))) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ xlab(yaxis_chem[count])+
+ theme_minimal()
+  })
+  
+}
+
+plot_his_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+                       
+print(plot_his_chem)
+
+
+# #shapiro chem
+# 
+# 
+# count <- 0
+# Nbcol <- match(yaxis_chem,colnames(Subdata_shapiro))
+# plotlist <- list()
+# 
+# for (i in Subdata_shapiro[,Nbcol]){
+#   count <- count + 1
+#   name <- names(Subdata_shapiro[Nbcol[count]])
+#   
+#   plotlist[[name]] <- local({
+#    
+#     i <- i
+#     name <- names(Metradica[Nbcol[count]])
+#   
+#    shapiro.test(log(abs(Subdata_shapiro[[Nbcol[count]]])))
+#    
+#    
+#   })
+#   
+#   if (plotlist[[name]]$p.value > 0.05) {
+#   
+# print("Data is normal")
+# } else {  
+#     cat(name,"data is not normal")
+#   
+# }
+#   
+# }
+# # 
+# # 
+
+
+```
+
+Nitrogen data is not normal[1]
+X.S data is not normal[1]
+Mg..g.kg. data is not normal[1]
+Ca..g.kg. data is not normal[1]
+
+## DBH
+```{r DBH, echo=FALSE, warning=FALSE}
+#chem traits
+count <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Metradica))
+Nbcol_water <- match(yaxis_water, colnames(Metradica))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Metradica))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+
+for (i in Metradica[,Nbcol]){
+  count <- count + 1
+  name <- names(Metradica[Nbcol[count]])
+  
+  plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol[count]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_chem[count])+
+ theme_minimal()
+  })
+  
+}
+for (i in Metradica[,Nbcol_water]){
+  count_water <- count_water + 1
+  name <- names(Metradica[Nbcol_water[count_water]])
+  
+  plotlist_water[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol_water[count_water]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_water[count_water])+
+ theme_minimal()
+  })
+  
+}
+for (i in Metradica[,Nbcol_majvla]){
+  count_majvla <- count_majvla + 1
+  name <- names(Metradica[Nbcol_majvla[count_majvla]])
+  
+  plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    name <- names(Metradica[Nbcol_majvla[count_majvla]])
+  
+   ggplot(Metradica) +
+ aes(x= DBH,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_MajVLA[count_majvla])+
+ theme_minimal()
+  })
+  
+}
+
+plot_DBH_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_DBH_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_DBH_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_DBH_chem)
+print(plot_DBH_water)
+print(plot_DBH_majvla)
+```
+
+
+
+## Crown position 
+```{r echo=FALSE, warning=FALSE}
+Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins, CrownPosition)
+
+Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
+Dawkins$BranchDawkins <- as.character(Dawkins$BranchDawkins)
+
+Study_dawkins <- left_join(Metradica, Dawkins, by ="Code")
+
+count <- 0
+count_j <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Study_dawkins))
+Nbcol_water <- match(yaxis_water, colnames(Study_dawkins))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Study_dawkins))
+Nbcol_dawkins <- match(colnames(Dawkins), colnames(Study_dawkins))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+#chem and crownposition
+for (i in Study_dawkins[,Nbcol]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist[[name]] <- local({
+   
+    i <- i
+    j <- j
+    name <- names(Study_dawkins[Nbcol[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_chem[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+
+count <- 0
+#for crownposition and water
+
+for (k in Study_dawkins[,Nbcol_water]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol_water[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist_water[[name]] <- local({
+   
+    k <- k
+    j <- j
+    name <- names(Study_dawkins[Nbcol_water[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(k))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_water[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+
+#crown position and veins
+
+count <- 0
+for (i in Study_dawkins[,Nbcol_majvla]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol_majvla[count]])
+  
+  for (j in Study_dawkins[,Nbcol_dawkins]){
+    
+    plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    j <- j
+    name <- names(Study_dawkins[Nbcol_majvla[count]])
+     ggplot(Study_dawkins) +
+ aes(x= j,y = log(abs(i))) +
+ geom_point(bins = 30L, fill = "#112446") +
+ ylab(yaxis_MajVLA[count])+
+ theme_minimal()
+   })
+    
+  }
+    
+}
+plot_CP_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_CP_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_CP_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_CP_chem)
+print(plot_CP_water)
+print(plot_CP_majvla)
+
+
+```
+
+
+
+
+
+## TreeDawkins 
+```{r echo=FALSE, warning=FALSE}
+Dawkins <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/output/Metradica_all_fieldsheet.csv") %>% select(Code, TreeDawkins, BranchDawkins)
+
+Dawkins$TreeDawkins <- as.character(Dawkins$TreeDawkins)
+Dawkins$BranchDawkins <- as.character(Dawkins$BranchDawkins)
+
+Study_dawkins <- left_join(Metradica, Dawkins, by ="Code")
+
+count <- 0
+count_water <- 0
+count_majvla <- 0
+
+Nbcol <- match(yaxis_chem,colnames(Study_dawkins))
+Nbcol_water <- match(yaxis_water, colnames(Study_dawkins))
+Nbcol_majvla <- match(yaxis_MajVLA, colnames(Study_dawkins))
+
+plotlist <- list()
+plotlist_water <- list()
+plotlist_majvla <- list()
+
+#chem and treedawkins
+for (i in Study_dawkins[,Nbcol]){
+  count <- count + 1
+  name <- names(Study_dawkins[Nbcol[count]])
+  
+    plotlist[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol[count]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_chem[count])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+#water and treedawkins
+for (i in Study_dawkins[,Nbcol_water]){
+  count_water <- count_water + 1
+  name <- names(Study_dawkins[Nbcol_water[count_water]])
+  
+    plotlist_water[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol_water[count_water]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_water[count_water])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+#veins and treedawkins
+for (i in Study_dawkins[,Nbcol_majvla]){
+  count_majvla <- count_majvla + 1
+  name <- names(Study_dawkins[Nbcol_majvla[count_majvla]])
+  
+    plotlist_majvla[[name]] <- local({
+   
+    i <- i
+    name <- names(Study_dawkins[Nbcol_majvla[count_majvla]])
+     ggplot(Study_dawkins) +
+  aes(y = log(abs(i)), fill = TreeDawkins) +
+  geom_boxplot() +
+  ylab(yaxis_MajVLA[count_majvla])+
+  scale_fill_brewer(palette = "Pastel2", direction = 1) +
+  theme_minimal()
+   })
+    
+}
+
+plot_TreeDawkins_chem <- ggarrange(plotlist = plotlist,ncol = 3,nrow=6, common.legend = T, legend = "bottom")
+plot_TreeDawkins_water <- ggarrange(plotlist = plotlist_water,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+plot_TreeDawkins_majvla <- ggarrange(plotlist = plotlist_majvla,ncol = 4,nrow=1, common.legend = T, legend = "bottom")
+                       
+print(plot_TreeDawkins_chem)
+print(plot_TreeDawkins_water)
+print(plot_TreeDawkins_majvla)
+
+
+```
+
+# Gmin
+
+The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
+
+- gmin (same VLA leaf)
+    + Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with lower minimal cuticular conductance. 
+
+
+```{r gmin-plot, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+library(ggplot2)
+library(cowplot)
+
+#gmin with all species- interactive graph
+plot_ly(Metradica, x=~Name, y = ~Gmin, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='Minimal conductance (mmol.m-2.s-1)'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(Gmin ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(Gmin), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "Minimal conductance (mmol.m-2.s-1)"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+
+B <- ggplot(Metradica) +
+ aes(x = Forest, y = Gmin, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A, B), nrow = 2)
+
+
+```
+
+
+
+*interpretation* Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326,  p-value: < 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m–2 s–1 in Paracou to 3.60 mmol m–2 s–1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic:  50.0139,  p-value: < 2.2204e-16). 
+
+It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
+
+*literature* Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m–2 s–1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
+
+* **compare with stomatal density** 
+* **see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?**
+
+# LSWC
+
+One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
+
+- LSWC 
+    + Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with higher LSWC more water per unit dry weight, that would provide a larger buffering capacity when water supply becomes limiting (higher water storage)
+
+
+```{r LSWC plot1, warning=FALSE}
+plot_ly(Metradica, x=~Name, y = ~LSWC, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='LSWC (g.g-1)'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(LSWC ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(LSWC), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "LSWC"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = LSWC, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = LSWC, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+
+
+``` 
+
+# TLP
+
+* TLP 
+    + hypotheses : Species of TF habitat would exhibit greater expression of leaf drought tolerance traits than species from SFF habitat i.e. small leaves with high VLA associated with more negative values for osmotic potential at at turgor loss point.
+
+
+```{r}
+plot_ly(Metradica, x=~Name, y = ~TLP, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='TLP'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(TLP ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(abs(TLP)), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "TLP"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = TLP, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = TLP, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+
+```
+
+
+Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought. 
+
+
+* The variability in πtlp among species indicates the potential for a 
+range of species responses to drought within Amazonian forest communities. 
+
+* For *Symphonia globulifera* we couldn't exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta & Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative. 
+
+* We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):
+  - *Dicorynia guianensis* (as Maréchaux et al 2015)
+  - *Eschweleira coriacea *  (as Maréchaux et al 2015)
+  - *Hymenopus heteromorphus*
+  - *Iryanthera sagotiana*
+  - *Iryanthera hostmannii*
+  - *Jacaranda copaia subsp. copaia*
+  - *Pterocarpus officinalis*
+
+* We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including *Voucapoua americana* and both *Protium* species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006). 
+
+
+
+*Litterature* 
+* The paper by Zhu et al. (2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China. 
+
+*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al. 2008) and altered nutrient concentrations (Villagra et al. 2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
+
+*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree & Dainty 1975; Abrams, Kubiske & Steiner 1990; Brodribb et al. 2003; Bartlett, Scoffoni & Sack 2012b; Guyot, Scoffoni & Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance. 
+
+
+
+# MajVLA
+
+The leaf is a critical component in the plant water transport system, accounting for 30% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011). 
+
+- Smaller leaves tend to have a higher major VLA. For SFF specialists, the replacement of water lost to transpiration during photosynthesis would be no problem during the wet season, since water is not a limiting factor. We collected the leaves during the dry season, therefore, SFF specialists would either have an adapted mechanisms to overcome water scarcity or not. 
+- Leaves from the driest habitat, *Terra firme* are smaller and have a higher major VLA than the leaves from seasonally flooded habitats. 
+- Leaves from Bafog (lower precipitation regime) are smaller with a higher major VLA than leaves in Kaw (higher precipitation regime). Paracou leaves major VLA values would range in the middle. 
+
+
+Litterature :
+
+*Smaller leaves tend to have higher major VLA intrinsically as a result of their development. The drought tolerance and protection conferred by higher major VLA in smaller leaves provides an explanation for the greater abundance of smaller leaves in drier and more exposed habitats (Scoffoni et al., 2011).*
+
+*Drought impacts less leaves with higher major vein density because they can provide more numerous water flow pathways around the damaged vein. (Scoffoni et al 2011)*
+
+*Smaller leaves, which generally have higher major vein density, would thus have lower hydraulic vulnerability. Tests using simulations with a spatially explicit model confirmed that smaller leaves with higher major vein density were more tolerant of major vein embolism.(Scoffoni et al 2011)*
+
+From Loundry *et al* 2012:
+
+* SFF : Leaves from SFF have a higher production rates. This result correlates with the higher soil resources found in
+ these habitats and rapid rates of turnover of stems in
+ these forests due to seasonal flooding (Ferry et al. 2010,
+ Baraloto et al. 2011).
+* no herbivory trends differing from SFF and TF 
+* but sapling stage not adult or seedling stage
+* more herbivory found in Peru than in French Guyana
+
+From Scoffoni *et al* 2011:
+
+* Smaller leaves more frequent in dry habitats
+* Smaller leaves have thinner boundary layer: more rapid convective cooling  
+* Direct hydraulic benefit of small leaves, if their greater major vein redundancy protects K  leaf from decline and thus contributes to drought tolerance.
+
+*Why a higher VLA? To confer redundancy and drought tolerance*
+
+
+```{r echo=FALSE}
+plot_ly(Metradica, x=~Name, y = ~MajVLA, color = ~Name, type = "box", showlegend = FALSE) %>% layout(yaxis = list(title ='MajVLA'),  xaxis = list(categoryorder = "total ascending")) %>% layout(xaxis=list(showticklabels = TRUE)) %>% layout(xaxis = list(title =FALSE))
+
+#forest
+options(digits = 10)
+means <- aggregate(MajVLA ~Forest, Metradica, mean)
+Metradica$Forest  <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw"))
+
+A<-  ggplot(Metradica) +
+  aes(x = Forest, y = log(abs(MajVLA)), fill = Forest, group = Forest) +
+ geom_boxplot(shape = "circle") +
+ scale_fill_manual(values = list(Bafog = "#ED9210", Kaw = "#0C8FCD", Paracou = "#10C65B")) +
+  labs(
+    x = "",
+    y = "MajVLA"
+  ) +
+  stat_summary(fun.y="mean", colour = "red", geom="point") +
+ theme_minimal() +
+  stat_compare_means(method = "anova", label = "p.signif")
+
+B <- ggplot(Metradica) +
+  aes(x = "", y = MajVLA, fill = Type) +
+  geom_boxplot() +
+  scale_fill_manual(
+    values = c(BF = "#6274A5",
+    Generalist = "#00C19F",
+    TF = "#BEB41F")
+  ) +
+  theme_minimal()
+
+
+C <- ggplot(Metradica) +
+ aes(x = Forest, y = MajVLA, colour = Name) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+  labs(
+    x = "Forest sites",
+    y = ""
+  ) +
+ scale_color_hue(direction = 1) +
+ theme_minimal() +
+  theme(legend.position="bottom")
+
+
+ggarrange(ncol = 1, plotlist = list(A,C), nrow = 2)
+print(B)
+```
+
+
+Across species from all habitats
+
+```{r echo=FALSE}
+library(ggplot2)
+library(forcats)
+library(dplyr)
+library(tidyverse)
+
+B <- ggplot(Metradica) +
+ aes(x = fct_reorder(Name, MajVLA), y = MajVLA, fill = Name) +
+ geom_boxplot(shape = "circle") +
+ theme_minimal() + 
+ facet_grid(vars(Forest), vars()) +
+   scale_y_continuous(trans = "log10") +
+  theme(legend.position = "none") +
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+B
+
+#Stats
+model2<- lm(log(MajVLA)~Name, data=Metradica)
+summary(model2) #il y a clairement un effet espèce
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #the RSS of the model2 (taking into account the factor species) is less (1411) so it is a better model. So there is a link between Species and MajVLA. and p-value est tres  significative *** 
+```
+SFF vs TF habitats
+
+```{r echo=FALSE}
+
+library(ggplot2)
+Metradica %>%
+ filter(!(Forest %in% "NA")) %>%
+ filter(!(Type %in% "NA") | is.na(Type)) %>%
+ filter(Habitat %in% c("BF", "TF") | is.na(Habitat)) %>%
+ filter(!is.na(Name)) %>%
+ ggplot() +
+  aes(x = Habitat, y = MajVLA, fill = Habitat) +
+  labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)",
+    fill = "Habitat collected") +
+  geom_boxplot(shape = "circle") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#FFD361"
+    )
+  ) +
+  theme_minimal() + 
+  facet_wrap(vars(Forest))
+
+#Stats
+model2<- lm(log(MajVLA)~Habitat, data=Metradica)
+summary(model2) 
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #il y a pas d'effet habitat
+```
+Specialists SFF vs Specialists TF vs Generalists
+
+
+```{r echo=FALSE}
+
+library(ggplot2)
+Metradica %>%
+ggplot() +
+ aes(x =Type, y = MajVLA, fill = Type) +
+ geom_boxplot(shape = "circle") +
+  
+ scale_fill_manual(values = list(BF = "#495BE3", Generalist = "#AED3CC", TF = "#F0C323")) +
+   scale_y_continuous(trans = "log10") +
+ theme_minimal() +
+ facet_wrap(vars(Forest))
+
+#Stats
+model2<- lm(log(MajVLA)~Type, data=Metradica)
+summary(model2) 
+
+model1 <-lm(log(MajVLA)~1, data=Metradica)
+summary(model1)
+
+anova(model1, model2) #il y a un effet pref-habitat leger 
+```
+
+Bafog vs Kaw vs Paracou
+
+```{r echo=TRUE}
+library(ggplot2)
+library(rstatix)
+library(ggpubr)
+
+Metradica$Forest <- factor(Metradica$Forest, levels=c("Bafog", "Paracou", "Kaw")) #for ordering the groups on the x.axis
+
+stat.test <- aov(lm(log(MajVLA)~Forest, data=Metradica)) %>% tukey_hsd() 
+
+
+G <- ggboxplot(data = Metradica,x = "Forest", y = "MajVLA", fill = "Forest") +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#F4C71C",
+      Paracou = "#66FF61", 
+      Kaw = "#0051C1"
+    )
+  ) + labs(
+    x = "",
+    y = "Major vein density (mm.mm-2)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(size = 16L),
+    axis.title.x = element_blank(), 
+    axis.text.x=element_blank(),
+    axis.title.y = element_text(size = 15)) + 
+  stat_pvalue_manual(stat.test, label = "p.adj.signif",
+                       y.position = c(13,14,15))
+
+G
+```
+
+VLA against other variables
+
+* VLA and LA
+
+```{r eval=FALSE, include=FALSE}
+ggplot(Veindata) +
+  aes(x = log(LA), y = log(MajVLA)) +
+  geom_point(shape = "circle", size = 1.5) +
+  labs(
+    x = "log Leaf area (cm²)",
+    y = "log Major vein density (mm.mm-2)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.y = element_text(size = 15),
+    axis.title.x = element_text(size = 15)
+  ) + geom_smooth(method='lm', formula= y~x, se=FALSE)
+
+
+```
+
+Traits that gives us info on the construction cost. For each vein order, we can calculate :
+
+* VC : vein density x π × the vein diameter. the vein cross-sectional surface area per leaf area was estimated by multiplying the vein density by π×the vein diameter. 
+* VP : Vein projected area per leaf area = vein diameter x vein density. The vein-projected area per leaf area *(the proportion of leaf lamina obstructed by vein)* was determined by multiplying the vein diameter by vein density. 
+  + global value :0.00712 for 2° veins (Sack et al 2012)
+* VV : Vein volume per leaf area = vein density x π x (diameter/2)². Vein volume per leaf area was determined by multiplying the vein density by π× the square of half the diameter. 
+
+
+
+# Trait covariation
+
+## Sub data
+
+```{r Subdata_Specialisation_Results}
+
+# matrice with envt variables
+Envt <- Metradica %>% select(Code, Habitat, Type, Forest)
+  
+# matrice with trais
+traits_log <- Metradica %>% 
+  dplyr::select(Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP) 
+  #na.omit() 
+
+# species
+  
+species <- Metradica %>% select(Code, Species, Genus, Name)
+  
+```
+
+
+## Standardize
+```{r}
+library(vegan)
+# the way you are using decostand with 'standardize', it is the same as scale option with rda with scale =TRUE. 
+
+# Scale and center variables; standardize: scale x to zero mean and unit variance (defaultMARGIN = 2)
+traits.z <- vegan::decostand(traits_log, method = "standardize") 
+
+# Variables are now centered around a mean of 0
+round(apply(traits.z, 2, mean), 1)
+
+# and scaled to have a standard deviation of 1
+apply(traits.z, 2, sd)
+```
+
+## Correlation
+
+Summary of variables 
+```{r eval=FALSE, include=FALSE}
+
+plot(log(abs(Metradica[,9:16])))
+
+```
+
+The **correlation coefficient** is a representation of the strength of relationship between one variable and another.
+
+Spearman’s correlation in statistics is a nonparametric alternative to Pearson’s correlation. Use Spearman’s correlation for data that follow curvilinear, **and not linear** (aka monotonic relationships) and for ordinal data. Statisticians also refer to Spearman’s rank order correlation coefficient as Spearman’s ρ (rho).
+
+*Pearson’s is an excellent choice when you have continuous data for a pair of variables and the relationship follows a straight line. If your data do not meet both of those requirements, it’s time to find a different correlation measure!*
+
+Spearman’s correlation is appropriate for more types of relationships, but it too has requirements your data must satisfy to be a valid. Specifically, Spearman’s correlation requires your data to be continuous data that follow a monotonic relationship or ordinal data.
+
+When you have continuous data that do not follow a line, you must determine whether they exhibit a monotonic relationship. In a monotonic relationship, as one variable increases, the other variable tends to either increase or decrease, but not necessarily in a straight line.
+
+When you have continuous data that do not follow a line, you must determine whether they exhibit a monotonic relationship. In a monotonic relationship, as one variable increases, the other variable tends to either increase or decrease, but not necessarily in a straight line.
+
+Multicollinearity occurs when the multiple linear regression analysis includes several variables that are significantly correlated not only with the dependent variable but also to each other. Multicollinearity makes some of the significant variables under study to be statistically insignificant. Primary techniques for detecting the multicollinearity are correlation coefficients.
+ 
+
+```{r spearman, eval=FALSE, include=FALSE}
+library(corrplot)
+library("Hmisc") #function rcorr() [in Hmisc package] can be used to compute the significance levels for pearson and spearman correlations. It returns both the correlation coefficients and the p-value of the correlation for all possible pairs of columns in the data table.
+
+traits_log %>% 
+  na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "spearman") %>% 
+  corrplot::corrplot.mixed()
+
+#autre facon de le faire
+df2 <- cor(traits_log, use = "na.or.complete", method = "spearman")
+corrplot::corrplot(df2, method="shade",shade.col=NA, tl.col="black", tl.srt=45)
+
+## add significant level stars
+testRes = corrplot::cor.mtest(traits_log, conf.level = 0.95,  method = "spearman")
+
+corrplot::corrplot(df2, type = 'lower',
+         order = "alphabet", 
+         p.mat = testRes$p, 
+         sig.level = c(.001, .01, .05), #significant level, with default value 0.05. If the p-value in p-mat is bigger than sig.level, then the corresponding correlation coefficient is regarded as insignificant.
+         pch.cex = 1.5,
+         insig = 'label_sig', pch.col = 'grey20',
+         tl.pos="d", #write names of variables in the diagonal
+         outline=FALSE,
+         col = COL2('RdBu', 10)) #la colonne des couleurs a cote
+        
+#test independant between two variables to understand how the test is constructed
+cor.test(traits_log$TLP, traits_log$Gmin,
+         method = "spearman",
+         exact = FALSE) 
+
+res2 <- rcorr(as.matrix(my_data))
+res2
+
+```
+
+pearson 
+```{r pearson, eval=FALSE, include=FALSE}
+traits_log %>% 
+  na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "pearson") %>% 
+  corrplot::corrplot.mixed()
+```
+
