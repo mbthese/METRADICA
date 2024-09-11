@@ -1,0 +1,374 @@
+---
+title: "PCA_MFA"
+author: "Marion Boisseaux"
+date: "08/09/2022"
+output: html_document
+---
+# Libraries
+
+```{r librairies_results}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(vegan)
+```
+
+# Data
+
+```{r Data_results, message=FALSE, warning=FALSE}
+
+#not log
+
+Data <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=738111573", range = "Metradica") %>% 
+  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth, StomatalDensity, K, P, C, N, TreeHeight, BranchHeight, TreeDawkins, BranchDawkins, DBH, TWI) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight), BranchHeight = as.numeric(BranchHeight)) 
+
+#log
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% dplyr::select(Code, Genus, Species, Name, Habitat, Type, HabitatType, Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+```
+
+# MFA 
+
+I log-transformed the data to reduce the skewness but checking the normality using shapiro's test was significative (not following normality).
+
+I have variables from different groups:
+
+-Categorical groups : Name of species *Name*; Habitat of collect *habitat*; specialist or generalist behavior *Type*; specifying which type of specialist and where it was collected for the geenralists *HabitatType*; the forest where is was sampled *Forest*
+
+-water related traits: *Gmin*, *TLP*, *LSWC*, *MajVLA*
+-morphological leaf traits: *LA*, *SLA*, *MidribWidth*, *SecundaryWidth*, *StomatalDensity*
+-Chemistry: *K*, *P*, *C*, *N*
+-Tree characteristics: *DBH* , **Dawkins** ?
+-Habitat characterization : *TWI*, **CWD**?
+
+```{r}
+
+Data <- Metradica_log %>% dplyr::select(-Code, -Genus, -Species, -Habitat, -Type, -TWI) %>% relocate(LSWC, .after = TLP) %>% relocate(MidribWidth, .after = MajVLA) %>% relocate(SecundaryWidth, .after = MidribWidth)%>% relocate(MajVLA, .after = LSWC)
+
+
+Data <- Data %>% dplyr::select(-Code, -Genus, -Species, -Habitat, -Type, -TWI) %>% relocate(LSWC, .after = TLP) %>% relocate(MidribWidth, .after = MajVLA) %>% relocate(SecundaryWidth, .after = MidribWidth) %>% relocate(MajVLA, .after = LSWC)
+
+res = MFA(Data, group=c(3,4,4,4,1), type=c("n",rep("s",4)), name.group=c("Identity","Water_related","Carbon_related","Leaf_chemistry", "DBH"), num.group.sup=c(1,5))
+
+fviz_screeplot(res)
+fviz_mfa_var(res, "group")
+
+#Metradica_log: the data set used
+#group: a vector indicating the number of variables in each group
+#type: the type of the variables in each group. "s" for scaled continuous variables, "c" for centered (unscaled) continuous variables and "n" for categorical variables
+#ncp: number of dimensions kept in the result
+#name.group: names of the groups
+#num.group.sup: indexes of the supplementary groups
+
+#red color = active groups of variables
+#green color = supplementary groups of variables
+
+# Contribution to the first dimension
+fviz_contrib(res, "group", axes = 1)
+# Contribution to the second dimension
+fviz_contrib(res, "group", axes = 2)
+
+quanti.var <- get_mfa_var(res, "quanti.var")
+quanti.var 
+
+fviz_mfa_var(res, "quanti.var", palette = "jco", 
+             col.var.sup = "violet", repel = TRUE)
+
+# Coordinates
+head(quanti.var$coord)
+# Cos2: quality on the factore map
+head(quanti.var$cos2)
+# Contributions to the dimensions
+head(quanti.var$contrib)
+
+# Contributions to dimension 1
+fviz_contrib(res, choice = "quanti.var", axes = 1, top = 20, col.var= "group", color= "white" ) +  scale_fill_manual("Groups", values = c("#dec33c", "#5bb349", "#1e81b0"))
+
+# Contributions to dimension 2
+fviz_contrib(res, choice = "quanti.var", axes = 2, top = 20, col.var= "group", color= "white" ) +  scale_fill_manual("Groups", values = c("#dec33c", "#5bb349", "#1e81b0"))
+
+# Color by cos2 values: quality on the factor map
+fviz_mfa_var(res, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             col.var.sup = "violet", repel = TRUE)
+
+#create a bar plot of variables cos2
+fviz_cos2(res, choice = "quanti.var", axes = 1)
+
+#for individuals
+ind <- get_mfa_ind(res)
+ind
+
+fviz_mfa_ind(res, quali.var="Name", label="non", #remove points labelling
+             palette = "jco",
+             repel = TRUE)
+
+fviz_mfa_ind(res, 
+             habillage = "HabitatType", # color by groups 
+             palette = c("#00AFBB", #BFBF
+                         "#03fc56",#GBF
+                         "#fcba03", #GTF
+                         "#fc4e03"), #TFTF
+             addEllipses = TRUE, ellipse.type = "confidence", 
+             repel = TRUE, # Avoid text overlapping
+             label="none") 
+
+fviz_ellipses(res, c("Name", "HabitatType"), repel = TRUE, label= "none")
+
+#to remove individuals add : invisible = c("ind","ind.sup")
+
+#ellipses
+#"Character specifying frame type. Possible values are "convex", "confidence" or types supported by stat_ellipse() including one of c("t", "norm", "euclid") for plotting concentration ellipses.
+
+#"convex": plot convex hull of a set o points.
+
+#"confidence": plot confidence ellipses arround group mean points as coord.ellipse()[in FactoMineR].
+
+#"t": assumes a multivariate t-distribution.
+
+#"norm": assumes a multivariate normal distribution.
+
+#"euclid": draws a circle with the radius equal to level, representing the euclidean distance from the center. This ellipse probably won't appear circular unless coord_fixed() is applied.#
+```
+
+#PCA
+
+```{r}
+Data <- Metradica_log %>% select(-Code, -Genus, -Species, Habitat, Type, -TWI) %>% relocate(LSWC, .after = TLP) %>% relocate(MidribWidth, .after = MajVLA) %>% relocate(SecundaryWidth, .after = MidribWidth)
+
+
+# data
+data <- Data
+
+data$Type <- recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+# v0
+res.PCA <- FactoMineR::PCA(data[, c(1:18)][,-c(1,2,4,5)], quali.sup = 1, graph = F)
+factoextra::fviz_pca_biplot(res.PCA, axes = c(1,2), label = "var", habillage = 1, repel = T,
+                            addEllipses = T, ellipse.level = 0.8)  +
+  scale_color_manual(values=c("#6DB4EE", "#34e042", "#b58404")) +
+  theme_classic()
+
+# v2
+ 
+autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+# v3
+g <- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+
+# v4
+g0 <- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042", "#6DB4EE", "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(legend.position = c(0.85,0.2))
+
+g1 <- g0 + stat_ellipse(aes(col = Type, alpha = Type), level = 0.85, size = 1.5) + scale_alpha_manual(guide = "none", values = c(0, 1, 1))
+
+g3 <- g0 + stat_ellipse(aes(col = Type, alpha = Type), level = 0.85, size = 1.5) + scale_alpha_manual(guide = "none", values = c(1, 0, 0))
+
+g2 <- g0 + stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)
+cowplot::plot_grid(g0,g1, g2)
+
+ggsave(filename = "PCA_0.png", plot = g0, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_1.png", plot = g1, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_2.png", plot = g2, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "PCA_3.png", plot = g3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# v5
+data$Habitat <- recode(data$Habitat, BF='SF soils', TF= 'TF soils')
+
+g5<- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = data, cor = T),
+         data = data, alpha = "Type", size = 2, col = "Habitat",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         loadings.label.colour = 'black', loadings.colour = 'black') +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse()+
+  scale_alpha_manual(guide = "none", values = c(0, 0.4, 0.4)) +
+  scale_color_manual("Habitat of\ncollect", values = c("#6DB4EE", "#b58404")) 
+
+ggsave(filename = "PCA_5.png", plot = g5, bg = "white", width = 8, height = 8, dpi = 600)
+```
+
+## Permutational MANOVA
+
+PERMANOVA assumes no distribution, allows for differences in between-group variation, is insensitive to multicollinearity, allows for multiple variables and is insensitive to many zeros.
+
+```{r}
+
+data_PCA <- data[, c(1:18)][,-c(1,2,3,4,5)]
+
+res.PCA <- FactoMineR::PCA(data_PCA, quali.sup = 1, graph = F)
+
+```
+
+
+```{r}
+dis <- vegdist(data_PCA,method="euclidean")
+mod <- betadisper(dis,data$Type)
+anova(mod)
+```
+the null hypothesis of no differences between types is strongly rejected (pvalue 0.0003)
+
+H0 = means are not different
+
+P-value = 0.0003 so we reject H0 : our group dispersions are different between types.
+
+Check if our treatments have different means. Use a permuting method to check if the difference is really due to the treatments.
+
+```{r}
+adonis2(data_PCA~data$Type, permutations = 999)
+```
+
+P-value (0.001) *** is always significant so our group types have different means.
+
+Process a pairwise analyse to detect which treatments are different from each other.
+
+install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")`
+
+```{r}
+library(pairwiseAdonis)
+pairwise_adonis <- pairwise.adonis(data_PCA,data$Type)
+
+
+pairwise_adonis %>%
+  gt() %>%
+  tab_header(title = md("*Permutational MANOVA on habitat preference*"))
+
+```
+
+SF specialists are different from the two other groups.
+
+## PCA per Type
+
+
+```{r}
+
+subdata_G <- data %>% subset(Type=="Generalist")
+
+# generalist
+generalist <- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = subdata_G, cor = T),
+         data = subdata_G, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#34e042")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(legend.position = c(0.85,0.2))
+
+subdata_SP_SF <- data %>% subset(Type=="SF Specialist")
+
+# Specialist_BF
+Specialist_SF <- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = subdata_SP_SF , cor = T),
+         data = subdata_SP_SF , colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#6db4ee")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(legend.position = c(0.85,0.2))
+
+subdata_SP_TF <- data %>% subset(Type=="TF Specialist")
+
+# Specialist_TF
+Specialist_TF <- autoplot(princomp(~ Gmin + TLP + LA + SLA + LSWC + MajVLA + MidribWidth + SecundaryWidth + K + P + C + N, data = subdata_SP_TF , cor = T),
+         data = subdata_SP_TF , colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "generalist.png", plot = generalist, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "Specialist_SF.png", plot = Specialist_SF, bg = "white", width = 8, height = 8, dpi = 600)
+ggsave(filename = "Specialist_TF.png", plot = Specialist_TF, bg = "white", width = 8, height = 8, dpi = 600)
+```
+
+
+
+

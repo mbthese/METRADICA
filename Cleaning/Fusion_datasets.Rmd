@@ -1,0 +1,100 @@
+---
+title: "Cleaning_Fusion"
+author: "Marion Boisseaux"
+date: "03/05/2022"
+output: html_document
+---
+
+# Objective
+
+The point here is to merge my 3 global data sets to one global data googlesheet
+
+# Data sets
+
+```{r Bafog}
+
+Bafog <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/14E9RjSB4dq8epcDBqMtRi1HOGddbhLOWA8g6TF1bDWM/edit#gid=21187810", range = "traits")
+
+Paracou <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1sLs02kNSBbNmDsepvAU38YdwKZPpcZwiAFM_TRw0y04/edit#gid=21187810", range = "traits")
+
+Kaw <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1ywbd6_6DWfqCguahhEvs0qt0d3jAtsbt94xydm-maqI/edit#gid=21187810", range = "traits")
+
+```
+
+# Merge datasets
+
+```{r}
+
+library(dplyr)
+
+#Bafog conversion
+
+Bafog$Gmin <- as.numeric(unlist(Bafog$Gmin))
+Bafog$FvFm <- as.numeric(unlist(Bafog$FvFm))
+Bafog$Ptlp <- as.numeric(unlist(Bafog$Ptlp))
+Bafog$LA <- as.numeric(unlist(Bafog$LA))
+Bafog$SLA <- as.numeric(unlist(Bafog$SLA))
+Bafog$LSWC <- as.numeric(unlist(Bafog$LSWC))
+Bafog$FW <- as.numeric(unlist(Bafog$FW))
+Bafog$SW <- as.numeric(unlist(Bafog$SW))
+Bafog$DW <- as.numeric(unlist(Bafog$DW))
+Bafog$`Midrib VLA` <- as.numeric(unlist(Bafog$`Midrib VLA`))
+Bafog$`2VLA` <- as.numeric(unlist(Bafog$`2VLA`))
+Bafog$`3VLA` <- as.numeric(unlist(Bafog$`3VLA`))
+Bafog$MajVLA <- as.numeric(unlist(Bafog$MajVLA))
+Bafog$MidribWidth <- as.numeric(unlist(Bafog$MidribWidth))
+Bafog$SecundaryWidth <- as.numeric(unlist(Bafog$SecundaryWidth))
+
+#Paracou conversion
+
+Paracou$Gmin <- as.numeric(unlist(Paracou$Gmin))
+Paracou$FvFm <- as.numeric(unlist(Paracou$FvFm))
+Paracou$Ptlp <- as.numeric(unlist(Paracou$Ptlp))
+Paracou$LA <- as.numeric(unlist(Paracou$LA))
+Paracou$SLA <- as.numeric(unlist(Paracou$SLA))
+Paracou$LSWC <- as.numeric(unlist(Paracou$LSWC))
+Paracou$FW <- as.numeric(unlist(Paracou$FW))
+Paracou$SW <- as.numeric(unlist(Paracou$SW))
+Paracou$DW <- as.numeric(unlist(Paracou$DW))
+Paracou$`Midrib VLA` <- as.numeric(unlist(Paracou$`Midrib VLA`))
+Paracou$`2VLA` <- as.numeric(unlist(Paracou$`2VLA`))
+Paracou$`3VLA` <- as.numeric(unlist(Paracou$`3VLA`))
+Paracou$MajVLA <- as.numeric(unlist(Paracou$MajVLA))
+Paracou$MidribWidth <- as.numeric(unlist(Paracou$MidribWidth))
+Paracou$SecundaryWidth <- as.numeric(unlist(Paracou$SecundaryWidth))
+Paracou$TreeHeight <- as.character(Paracou$TreeHeight)
+Paracou$TreeDawkins <- as.character(Paracou$TreeDawkins)
+Paracou$BranchHeight <- as.character(Paracou$BranchHeight)
+Paracou$BranchDawkins <- as.character(Paracou$BranchDawkins)
+
+#Kaw
+
+Kaw$Gmin <- as.numeric(unlist(Kaw$Gmin))
+Kaw$FvFm <- as.numeric(unlist(Kaw$FvFm))
+Kaw$Ptlp <- as.numeric(unlist(Kaw$Ptlp))
+Kaw$LA <- as.numeric(unlist(Kaw$LA))
+Kaw$SLA <- as.numeric(unlist(Kaw$SLA))
+Kaw$LSWC <- as.numeric(unlist(Kaw$LSWC))
+Kaw$FW <- as.numeric(unlist(Kaw$FW))
+Kaw$SW <- as.numeric(unlist(Kaw$SW))
+Kaw$DW <- as.numeric(unlist(Kaw$DW))
+Kaw$`Midrib VLA` <- as.numeric(unlist(Kaw$`Midrib VLA`))
+Kaw$`2VLA` <- as.numeric(unlist(Kaw$`2VLA`))
+Kaw$`3VLA` <- as.numeric(unlist(Kaw$`3VLA`))
+Kaw$MajVLA <- as.numeric(unlist(Kaw$MajVLA))
+Kaw$MidribWidth <- as.numeric(unlist(Kaw$MidribWidth))
+Kaw$SecundaryWidth <- as.numeric(unlist(Kaw$SecundaryWidth))
+
+Metradica <- bind_rows(Bafog, Paracou, Kaw)
+```
+
+# Export to google sheets
+
+```{r}
+#IMPORTING THE LIBRARY
+library(googlesheets4)
+
+#(ss <- gs4_create("Metradica", sheets = Metradica))
+
+```
+

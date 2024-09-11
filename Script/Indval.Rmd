@@ -1,0 +1,407 @@
+---
+title: "Indval"
+author: "Marion Boisseaux"
+date: "2022-11-18"
+output: html_document
+---
+## Species
+
+Specialist species are species that have a habitat preference, either for *terra firme* soils or for seasonally flooded soils in French Guiana. Generalist species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species. 
+
+We **hypothesize** that they should display large ITV since they inhabit a large ecological spectrum. We are interested to see how ITV of functional traits is structured for these generalist species. 
+
+### Indicator Species Analysis
+
+We explored the degree of habitat preference using **Indicator Species Analysis** (Dufrene & Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+**FAUX**
+*Generalist:  IndVal ≠ 0 in the habitats (pVal>0.08 )*
+*Specialists:  IndVal > 0.24 in one habitat (pVal<0.08)*
+
+**Now**
+*Out of the 654 species identified from Baraloto et al 2021, we only considered 5 % highest IndVals to qualify them as specialists of a habitat. This corresponded to a threshold of IndVal ≥  0.2 for SF specialists and IndVal ≥  0.2598  for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists.*
+
+```{r indval to consider}
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+```
+
+
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word **preference**), but are also a high probability of being sampled in the given habitat.
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r paracou species with indval threshold}
+identified_species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia", #en vrai subsp. copaia
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", #devient un spe TF
+  "Carapa_surinamensis", 
+  #"Carapa_guianensis",#on enleve
+  "Laetia_procera",
+  "Protium_opacum", #en vrai  subsp. rabelianum
+  "Casearia_javitensis", #ne passe pas le threshold TF
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis", 
+  "Vouacapoua_americana" #ne passe pas le threshold TF
+  ))
+  
+
+Specialist_SF <- left_join(identified_species, Data_SF) %>% na.omit()
+#carapa surinamensis on enleve car on a un melange de deux espèce dans notre echantillonage avec guianensis
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+
+Generalist_fort_indval_deux_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui in both, removed it
+   mutate(Type = "SF specialist")
+
+
+
+#indval graphs
+
+library(forcats)
+library(ggplot2)
+
+
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal(base_size = 12) +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
+#ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
+
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal(base_size = 12) +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none", axis.title.x = element_blank())
+
+#ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+#ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
+#now for generalists
+
+
+Generalist <- left_join(identified_species, indval_FG) 
+
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#casearia trop fort dans un habitat pour le considérer un generalist!
+
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+
+
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+library(ggplot2)
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal(base_size = 12) +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=40, hjust = 1))+
+  theme(legend.position="none")
+
+#ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
+#ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
+#même ordre de grandeur entre les indval TF et BF sauf pour le tachigali plutot plus SF. mais en meme temps abondance faible.
+
+
+group_figure <- ggpubr::ggarrange(
+  indval_TF_plot + theme(legend.position="none"),
+  indval_SF_plot + theme(legend.position="none"),
+  Generalist_diff_indval + theme(legend.position="none"),
+  labels = c("A", "B", "C"),
+  nrow= 3, ncol=1)
+
+
+ggsave(file="indval.svg", plot=group_figure, width=10, height=12)
+ggsave(file="indval.png", plot=group_figure, width=10, height=12)
+
+```
+
+
+### Final taxa choice
+```{r final taxa}
+Metradica_species <-full_join(Generalist_all, Specialist_SF)
+
+Metradica_species <- full_join(Metradica_species, Specialist_TF)
+
+#mise en forme
+Metradica_species <- Metradica_species %>%
+    separate(Species, c("Genus", "Species"), "_")
+
+
+Metradica_species$Species[Metradica_species$Species == "opacum"] <- "opacum subsp. rabelianum"
+
+Metradica_species$Species[Metradica_species$Species == "copaia"] <- "copaia subsp. copaia"
+
+write.csv(Metradica_species,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species.csv")
+```
+
+
+### Chosen species 
+
+Our analysis identified 6 generalist taxa, 8 SFF specialist taxa and 6 terra firme specialist taxa.
+
+### More details about IndVal
+
+IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies. 
+
+Other indicators: 
+
+* Contrary to **TWINSPAN**, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies
+* Species richness (sensitive to several factors)
+* Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots. 
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(readxl)
+species <- read_excel("../Metradica_Paracou/Document/Totaux.xlsx", 
+    sheet = "Feuil3")
+library(kableExtra)
+kable(species)
+
+	
+species$Species[species$Species == "copaia subs. copaia"] <- "copaia subsp. copaia"
+species <- species %>% select(-Type)
+  
+  
+Metradica_species <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species.csv")
+
+Metradica_species <- Metradica_species %>% select(-X, -Abund, -Diff_Indval)
+
+species2 <- right_join(species, Metradica_species, by = c("Genus", "Species"))
+
+
+table <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+#  "Carapa_guianensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  #"Vouacapoua_americana"
+)) %>% 
+  separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+kable(select(table, Genus, Species), caption = "Studied species.")
+
+write.csv(species2, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv")
+
+```
+
+
+Un espèce : bc mortlité chez les jeunes donc parti pris de les considerer dans le choix des habitats. (percentile 10-90). 
+For *Eperua falcata*: BF?? see Laurens porter 2007 (are species adapted ...)
+
+### Relative abundance
+
+Par ailleurs, certains des co-auteurs pensent que le paramètre de la fréquence d'occurrence de l'espèce pourrait brouiller le message, en particulier pour les espèces rares et les non-spécialistes. Ex. Vouacapoua americana est une espèce rare dans le jeu de données (n=5) et elle ne ressort pas comme une espèce spécialiste de Terra firme. 
+*Mais* Je pense plutôt que le terme de fidélité est nécessaire car il traduit le degré de présence de l'espèce dans tous les sites d'un habitat. Une espèce n'a pas a etre abondante, tant qu'elle est présente dans tous les sites d'un groupe, cela la rend quand meme specialiste de ce groupe!
+
+
+Attention, for each level, taxonomic dissimilarity was calculated using Euclidean distance on Hellinger-transformed abundances  (the square root of the relative abundance among species within a sample) (Legendre and Gallagher 2001). The latter transformation prevented the floristic composition variation from being overly weighted by the most abundant species. Hellinger transformation is meant to solve the issue of double absences when computing Euclidean-based ordination techniques (PCA, RDA). Thus, it is not appropriate for CCA. In Baraloto et al 2021 they did you that for NMDS.
+
+**But, disclaimer by Jaime Pinzon ** Now, the indicator value of one species is independent from the value of the other species in the assemblage, thus transforming for the purpose of accounting for large differences in abundance has little use. If you apply Hellinger (the square root of the relative abundance among species within a sample) and then compute the indicator value (highest value among sites of the product of the relative abundance and relative frequency of a species within a site) you are no longer values independent among species. **https://www.researchgate.net/post/Hellinger-transformation-for-Indval**
+
+```{r}
+Env <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Env (1).txt", row.names=NULL, sep="") %>%  rename(Plot = row.names) %>% select(Plot, Site, Hab)
+
+Indv <- read.delim("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/List_Ind (1).txt") %>% 
+  filter(Country == "FG") %>%
+  rename(Name = species) 
+
+Indv$Name[Indv$Name == "Jacaranda_copaia"] <- "Jacaranda_copaia subsp. copaia"
+
+Indv$Name[Indv$Name == "Protium_opacum"] <- "Protium_opacum subsp. rabelianum"
+
+Indv_Env<- left_join(Indv, Env, by="Plot")
+
+Metradica_species <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Metradica_species.csv") %>%
+  select(Genus, Species) %>%
+  mutate(Name = paste0(Genus, "_", Species))
+
+
+
+Focal_species <- left_join(Metradica_species, Indv_Env, by= "Name") %>% 
+  group_by(Name, Plot, Hab) %>%
+  summarise(n=n()) %>%
+  na.omit() #on obtient bien les abondances du papier baraloto et al 2021
+
+#les abondances ont été hellinger transformed.
+
+Counts <- Focal_species %>% 
+  group_by(Name, Hab, Plot) 
+
+Site <- Counts %>%
+  group_by(Hab, Plot) %>%
+  summarise(n_site=n()) 
+
+
+```
+
+#exemple avec Bocoa_prouacensis
+
+*design*
+3 cluster (SF/TF/WS)
+Cluster SF: 20 sites de recoltes (ex. PMT10)
+Cluster TF: 35 sites de recoltes (ex.CSG66)
+Cluster WS: 4 sites de récoltes (ex. PMT12)
+
+Bocoa_proucensis a été echantilloné :
+
+**1** individu sur *1* site sur les 20 en *SF* (PMT10)
+**14** individus sur *7* sites sur les 35 en *TF* (CSG66;LAU04;NOU32; NOU34; PMT14; TRIN42; TRIN43)
+**15** individus sur *1* site sur les 4 en *WS* (PMT12)
+
+Abondance totale : *30* individus
+
+**Hellinger transformation of abundances**
+
+**0.06274558** abundance PMT10 *SF*
+
+**0.11227218** CSG66 *TF*
+**0.10425721** LAU04 *TF*
+**0.07832604** NOU32 *TF*
+**0.10943513** NOU34 *TF*
+**0.06468462** PMT14 *TF*
+**0.05986843** TRIN42 *TF*
+**0.12239801** TRIN43 *TF*
+
+La somme étant : **0.6512416** pour *TF_tot* 
+
+**0.25482360** PMT12 *WS*
+
+Calcul Indval:
+
+*Indval_SF*
+ 
+Specificity x fidelity  #Quantities A and B must be combined by multiplication because they represent independent information (i.e., specificity and fidelity) about the
+distribution of species j.
+
+La specificité étant l'abondance relative de l'espèce corrigée par transformation d'hellinger.
+
+Specificity :  
+(0.06274558/20) / [ (0.06274558/20) + (0.6512416/35) +(0.25482360/4) ] = 
+0.03671476
+
+La fidélité étant la fréquence d'occurence de l'espèce. En *SF*, 1 fois dans les 20 sites *SF*.
+
+indval_SF = 0.03671476 * (1/20) =  0.001835738 #0.001 jason
+
+*Indval_TF*
+
+Specificity x fidelity 
+
+Specificity :  
+(0.6512416/35) / [ (0.06274558/20) + (0.6512416/35) +(0.25482360/4) ] = 0.2177517
+
+
+La fidélité étant la fréquence d'occurence de l'espèce. En *TF*, 7 fois dans les 35 sites *TF*.
+
+indval_TF = 0.2177517 * (7/35) =  0.04355034 #0.041 Jason
+
+indval_WS = 0.7455335 * (1/4) = 0.1863834 #0.077 Jason je comprends plus!
+
+Je pense qu'avec les arrondis, on obtient pas exact-exactement comme Jason.
+
+the p-values indicates whether the higher indval value among habitats is greater than 99.9% of values generated by the MSR method performed before the indval calculation. Donc: 
+
+Bocoa_prouacensis *Abund*	30	*SF* 0.001	*TF* 0.041	*WS* 0.077	 p.value = 0.0056
+
+Cela veut dire que pour Bocoa proucensis, indval_WS *0.077* is greater than 99.9% of values generated by the MSR. 
+
+IndValj  = max[IndValkj] # The index is maximum (its value is 1) when the individuals of species j are observed at all sites belonging to a single cluster. A random permutation procedure of the sites among the site groups is used to test the significance of IndValj. A correction
+for multiple testing is necessary before reporting the results when multiple tests (for several species) have been conducted. *c'est pourquoi 0.7455335 n'est pas l'indval directement reporté pour le WS* il y a eu une correction???
+

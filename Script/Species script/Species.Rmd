@@ -1,0 +1,117 @@
+---
+title: "Species habitat preferences"
+author: "Marion Boisseaux"
+date: "20/02/2022"
+output: html_document
+---
+Habitat associations
+In this study, I have categorised each species as associated with *terra firme*, seasonnally flooded habitat, or neither based on the density of stems per hectare in each habitat (abundance data from the 2020 Paracou regeneration survey). These simple 
+categorisations broadly agree with previous studies of habitat associations for these 
+species and these habitats in Paracou (Baraloto et al. 2007, Allie et al. 2015). 
+
+# Caluclating species abundances in each habitat
+
+
+
+Abundance: dividing the number of species from one group by the total number of species from all groups.  
+
+```{r}
+
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyverse)
+
+# import paracou database 20210830
+
+Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Document/Paracou_database20210830.csv")
+Paracou <- Paracou %>% unite("GS", Genus:Species)
+
+# import my species
+
+
+MySpecies <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Species.xlsx")
+
+MySpecies <- MySpecies %>% unite("GS", Genus:Species)
+
+
+```
+
+# import shapefiles
+
+```{r}
+library(rgdal)
+library(ggplot2)
+library(sf)
+library(leaflet)
+library(RColorBrewer) #for colors
+library(tidyverse)
+library(dplyr)
+
+#import shapefile - plots
+
+Plots <- readOGR(dsn = "./SIG",layer = "OverallPlots")
+Plots <- spTransform(Plots, CRS("+proj=longlat +datum=WGS84")) 
+
+
+# Subset only Paracou parcelles object
+Plots_sub <- Plots[Plots$Project %in% c("ParacouCIRAD"), ]
+
+Plots_sub2 = subset(Plots_sub, Plot=="1" & Plot=="2")
+
+Plots_sub[Plots_sub$Plot >= "1" & Plots_sub$Plot <= "16", ]
+
+plot(Plots_sub)
+
+#import shapefile - topography
+
+Topo <- readOGR(dsn = "./SIG",layer = "TopographicLevels")
+Topo <- spTransform(Topo, CRS("+proj=longlat +datum=WGS84")) 
+
+
+plot(Topo)
+
+palSp <- colorFactor("viridis", MySpecies$GS)
+limits <- st_read("./SIG/OverallPlots.shp", quiet = T)
+leaflet(data = st_transform(MySpecies, crs = crs)) %>%
+  addTiles() %>% 
+  addPolylines(data = st_transform(limits, crs = crs), col = "grey") %>% 
+  addCircles(color = ~palSp(GS), opacity = 1,
+             label = ~ GS, radius = ~ DBH/5) %>% 
+  addLegend(pal = palSp, values = ~ GS)
+
+#abandon..
+
+```
+
+# abundance de Christopher Baraloto
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(gt)
+library(glue)
+
+IndValParacou <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice/Species.xlsx", 
+    sheet = "IndVal")
+
+IndValParacou_table <- gt(IndValParacou)
+
+IndValParacou_table <- 
+  IndValParacou_table %>%
+  tab_header(
+    title = "Indicator values for neotropical tree species",
+    subtitle = "Greenhouse and Paracou are composite samples n = 8; 8 different pots and 8 different locations in Paracou. For Paracou, soil was sampled in the 0-10 cm horizon.") %>%
+  cols_label(`Soil Tests` = md("**Soil Tests**"), Greenhouse = md("**Greenhouse**"), Paracou = md("**Paracou**") )%>%
+  tab_source_note(source_note = "Results expressed in relation to the soil prepared according to the NF ISO 11464 standard, Cirad, Montpellier.") %>%
+  tab_footnote(footnote = "For available phosphorous, the Olsen method was used, best method for acid soils.", locations = cells_body(columns = `Soil Tests`, rows =9 ))
+
+IndValParacou_table %>%
+  gtsave(
+    "IndValParacou_table.png", expand = 10,
+    path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/DRYER/Soil/")
+
+View(analyses_sol)
+```
+

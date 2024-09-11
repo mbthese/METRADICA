@@ -1,0 +1,3452 @@
+---
+title: "Boxplots"
+author: "Marion Boisseaux"
+date: "13/09/2022"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# Libraries
+
+```{r libraries}
+library(ape)
+library(tidyverse)
+library(dplyr)
+library(ggfortify)
+library(corrplot) 
+library(ggpubr) #for stats compare means on ggplot
+#devtools::install_github("kassambara/ggpubr")
+library(ggplot2)
+library(ggfortify)
+library(agricolae)
+library(FactoMineR)
+library(factoextra)
+library(Factoshiny)
+library(vegan)
+library(rstatix)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(gridExtra)
+library(rio)
+library(multcomp) #for lmer model to do anovas
+library(lmerTest) #same
+library(emmeans)#same
+library(ggplotify)
+library(car)
+library(kableExtra)
+library(gt)
+library(sjPlot) #for plotting lmer and glmer mods error of thos package
+```
+
+# My functions
+```{r functions}
+log_abs_trans <- function() {
+    scales::trans_new(
+        name = "log_abs", 
+        transform = function(x) log(abs(x)), 
+        inverse = function(x) exp(x));
+}
+
+library("scales")
+reverselog_trans <- function(base = exp(1)) {
+    trans <- function(x) -log(x, base)
+    inv <- function(x) base^(-x)
+    trans_new(paste0("reverselog-", format(base)), trans, inv, 
+              log_breaks(base = base), 
+              domain = c(1e-100, Inf))
+}
+
+library(broom)
+get_formula <- function(model) {
+  
+  broom::tidy(model)[, 1:2] %>%
+    mutate(sign = ifelse(sign(estimate) == 1, ' + ', ' - ')) %>% #coeff signs
+    mutate_if(is.numeric, ~ abs(round(., 2))) %>% #for improving formatting
+    mutate(a = ifelse(term == '(Intercept)', paste0('y ~ ', estimate), paste0(sign, estimate, ' * ', term))) %>%
+    summarise(formula = paste(a, collapse = '')) %>%
+    as.character
+  
+}
+
+cv_eff <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(list(cv= re, eff = N))
+} 
+
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+}
+
+```
+
+# Colors 
+```{r colors}
+#From color blind palette
+library(ggpubfigs)
+#from palette ito_seven
+#E79F02 #orange for TF
+#56B4E9 #blue for SF
+#009E72 #green for Generalists
+```
+
+# Data
+
+*From the original complete dataset, selecting 21 focal species. Transforming data in log.*
+
+```{r Data log subset, message=FALSE, warning=FALSE}
+
+# data
+
+library(dplyr)
+Metradica_log <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD", "DBH", "TWI"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD", "DBH", "TWI"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica_log <- sub_data #552 indv
+
+```
+
+**From the original complete dataset, selecting 21 focal species. No transformation.**
+
+```{r Data not log subset}
+
+# data
+
+library(dplyr)
+Metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/ALL/Final_Metradica_OUT_30112022.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Plot, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD, TWI, DBH) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii")) %>% filter(Habitat == "TF")
+
+sub_data_SF <- Metradica %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis", "Carapa_surinamensis")) %>% filter(Habitat == "BF")
+
+sub_data_G <-  Metradica %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+sub_data <- sub_data %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+Metradica <- sub_data
+
+#write.csv(Metradica, "Subset.csv")
+```
+
+## Exploring na
+
+Exploring where Nas are located in the dataset and imputing traits except SD.
+
+```{r exploring NA}
+
+#check the nas
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(Metradica,2,pMiss)
+
+#we see that SD is almost 30% missing values, the rest is below a threshold of 5%
+library(VIM)
+aggr_plot <- aggr(Metradica, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(Metradica), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+
+#imputing th emissing data for all traits 
+library(mice)
+tempData <- mice(Metradica,m=5,maxit=50,meth='pmm',seed=500)
+summary(tempData)
+completedData <- complete(tempData,1)
+
+#no imputation of SD
+data <- Metradica %>% dplyr::select(-SD)
+tempData_noSD <- mice(data,m=5,maxit=50,meth='pmm',seed=500) #m=5 is 5 datasets
+summary(tempData_noSD)
+completedData <- complete(tempData_noSD,1) #1 is choosing dataset 1 out of the 5
+
+B <- Metradica %>% dplyr::select(Code, SD)
+
+A <- left_join(completedData, B,  c("Code"))
+
+#write.csv(A, "Subset_imputation_exceptSD.csv", col.names = FALSE, row.names = FALSE)
+
+#inspecting data after imputation
+densityplot(tempData_noSD)
+tempData_noSD$imp$K
+
+```
+
+## Field & trait info joined
+
+```{r filed information}
+Data_subset_imputed <- read.csv("Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+
+Bafog_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Bafog/Bafog_individuals.csv") %>% 
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+Kaw_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Kaw/Kaw_individuals.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+Paracou_individuals <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/Paracou.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+individuals_FTH2021 <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/information_sites_and_tree_individuals/FieldSheets/input/Metradica/input/Paracou/individuals_FTH2021.csv") %>%
+  dplyr::select(Code, TreeHeight, TreeDawkins, BranchHeight, BranchDawkins)
+
+c <- rbind(Paracou_individuals, Bafog_individuals, Kaw_individuals, individuals_FTH2021)
+
+#adding Dawkins & height (tree + branch)
+
+D <- Data_subset_imputed %>% left_join(c, by = "Code")
+
+D %>% group_by(TreeDawkins, BranchDawkins) %>% tally()
+D %>% group_by(BranchDawkins) %>% tally()
+
+```
+
+
+## Trait variation - raw data 
+
+No imputation. Vizualizing trait variation.
+
+```{r Trait distribution coord_flip}
+data <- Metradica %>%
+  dplyr::select(Name, Type, Gmin, TLP, LSWC, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Name", "Type"), variable.name = "Trait")
+
+data$Type <- factor(data$Type, levels = c("BF", "TF", "Generalist")) 
+p <-  data %>%
+  mutate(Trait = as.character(Trait)) %>% 
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]~(mmol%.%m^{-2}%.%s^{-1})", "TLP" = "pi[tlp]~(MPa)", "C"= "C~('%')", "N" = "N~('%')", "K"= "K~(g%.%kg^{-1})", "LSWC" = "LSWC~('%')", "MajVLA" = "MajVLA~(mm%.%mm^{-2})", "P" = "P~(g%.%kg^{-1})", "SD" = "SD~(mm^{-2})")) %>% 
+  left_join(dplyr::select(data, Type, Name) %>%
+              unique() %>%
+              arrange(Type, Name) %>%
+              mutate(order_graph = 1:n())) %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x = reorder(Name, order_graph), y= value)) +
+  geom_boxplot(aes(fill = Type),
+  #              alpha = 0.5, col = "lightgrey") +
+  #geom_violin(aes(fill = Type),
+               alpha = 0.5, col = "lightgrey") +
+  scale_fill_manual(name = "Habitat preference", 
+                    values = c("TF" = "#E79F02", #orange for TF
+                                "BF" =  "#56B4E9", #blue for SF
+                                "Generalist" = "#009E72"),  #green for Generalists
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  facet_wrap(~ Trait, scales = "free_x", label = label_parsed) +
+  theme_minimal() +
+  coord_flip() +
+  theme(axis.text.y = element_text(face = "italic"), axis.title = element_blank(),legend.position = "bottom") 
+
+ggsave(filename = "Trait Distribution.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+
+#PCA
+
+##no trait imputation
+
+###PCA without stomata
+
+```{r}
+
+data_withOUTNA_no_stomata <-read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv") %>% dplyr::select(-SD) %>% na.omit() #497 indv
+
+
+data <- data_withOUTNA_no_stomata  %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type)  %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+data$Type <- dplyr::recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+
+g_nostomata <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ #scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_noSD.png", plot = g_nostomata, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+
+
+###PCA with stomata
+
+```{r}
+
+
+data_without_NA <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv") %>% na.omit() #379 indv 
+
+data <- data_without_NA %>%
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type)  %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP)
+
+data$Type <- dplyr::recode(data$Type, BF='SF Specialist', TF= 'TF Specialist')
+ 
+gSD <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen + SD, data = data, cor = T),
+         data = data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_SD.png", plot = gSD, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+##trait imputation for all traits except Stomata
+
+###PCA without stomata
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type, -SD) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+Data <- Data %>% na.omit()
+
+g <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen, data = Data, cor = T),
+         data = Data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+ # scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_imputed.png", plot = g, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+#get contribution of trait in the different dimensions
+
+res.pca <- PCA(Data %>% dplyr::select(-Plot, -Forest, -Name, -Type, -Habitat, -TWI, -DBH), graph = FALSE)
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50))
+
+# Contributions of variables to PC1
+axe1 <- fviz_contrib(res.pca, choice = "var", axes = 1, top = 10)
+ggsave(filename = "PCAaxe1.png", plot = axe1, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC2
+axe2 <- fviz_contrib(res.pca, choice = "var", axes = 2, top = 10)
+ggsave(filename = "PCAaxe2.png", plot = axe2, bg = "white", width = 8, height = 8, dpi = 600)
+# Contributions of variables to PC3
+axe3 <- fviz_contrib(res.pca, choice = "var", axes = 3, top = 10)
+ggsave(filename = "PCAaxe3.png", plot = axe3, bg = "white", width = 8, height = 8, dpi = 600)
+
+# Contributions of variables to PC4
+axe4 <- fviz_contrib(res.pca, choice = "var", axes = 4, top = 10)
+ggsave(filename = "PCAaxe4.png", plot = axe4, bg = "white", width = 8, height = 8, dpi = 600)
+
+#arrange into one figure
+axes_constribution <- ggpubr::ggarrange(
+  axe1,
+  axe2,
+  axe3,
+  axe4,
+  labels = c("A", "B", "C"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 2, ncol=2)
+
+ggsave(filename = "axes_contribution.png", plot = axes_constribution, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+###PCA with stomata
+
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") %>% 
+  dplyr::select(-Code, -Genus, -Species, Habitat, Type) %>%
+  rename(Potassium = K, 
+         Phosphorous = P, 
+         Nitrogen = N,
+         Carbon = C) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP)
+
+Data$Type <- dplyr::recode(Data$Type, BF='SF Specialist', TF= 'TF Specialist')
+#data <- mutate(data, Type = recode(Type, "BF" = "SF specialist")) #other way to do it
+
+Data <- Data %>% na.omit()
+
+g_with_stomata <- autoplot(princomp(~ Gmin + TLP + LSWC + MajVLA + Potassium + Phosphorous + Carbon + Nitrogen + SD, data = Data, cor = T),
+         data = Data, colour = "Type", alpha = 0.4, size = 2, shape = "Type",
+         loadings = T, loadings.label = T, loadings.label.repel = T, 
+         #loadings.label.hjust = c(0, -1,0, 0,0),
+         #loadings.label.vjust = c(0, 0, 0, 0, 0),
+         loadings.label.colour = 'black', loadings.colour = 'black',
+         loadings.label.size = 6) +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_classic() +
+  scale_y_reverse() +
+  scale_color_manual("Habitat\npreference", values = c("#009E72", "#56B4E9", "#E79F02")) +
+  scale_shape_discrete("Habitat\npreference") +
+  stat_ellipse(aes(col = Type), level = 0.85, size = 1.5)+
+    theme(legend.position = c(0.85,0.2))
+
+ggsave(filename = "PCA_full_HabitatPref_SD_imputed.png", plot = g_with_stomata, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+##MANOVA
+
+```{r}
+
+data_PCA <- Data[, c(1:13)][,-c(1,2,3,4,5)]
+
+res.PCA <- FactoMineR::PCA(data_PCA, quali.sup = 1, graph = F)
+
+```
+
+
+```{r}
+dis <- vegdist(data_PCA,method="euclidean")
+mod <- betadisper(dis,data$Type)
+anova(mod)
+```
+the null hypothesis of no differences between types is cannot be rejected (pvalue 0.3816)
+
+H0 = means are not different
+
+P-value = 0.3816 so we cannot reject H0 : our group dispersions are not different between types.
+
+Check if our treatments have different means. Use a permuting method to check if the difference is really due to the treatments.
+
+```{r}
+adonis2(data_PCA~data$Type, permutations = 999)
+```
+
+P-value (0.001) *** is always significant so our group types have different means.
+
+Process a pairwise analyse to detect which treatments are different from each other.
+
+install pairwise : ` install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")`
+
+```{r}
+library(pairwiseAdonis)
+pairwise_adonis <- pairwise.adonis(data_PCA,data$Type)
+
+
+pairwise_adonis %>%
+  kbl(caption = "Permutational MANOVA on habitat preference*") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "Manova.png", zoom = 10)
+
+```
+
+
+##Colinearity
+
+No trait imputation for this section.
+Log or not logged, correlations are going to be the same.
+
+```{r}
+
+library(corrplot)
+
+traits <- Metradica %>% 
+  dplyr::select(Gmin, TLP, LSWC, MajVLA, N, C, P, K) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA",  "N", "C", "P", "K"), log) %>% 
+  mutate(TLP = -TLP)
+
+png(height=500, width=500, file="mycorr_noTWI_noSD_imputed.png", type = "cairo")
+traits %>% na.omit() %>% # attention, la presence de NA bloque le processus pour regarder la colinearité
+  cor(method = "spearman") %>% 
+  corrplot::corrplot.mixed()
+dev.off()
+
+```
+
+##Summary of variables 
+```{r}
+png(height=500, width=500, file="summary_traits.png")
+plot(Metradica[,8:16])
+dev.off()
+
+#logged traits
+png(height=500, width=500, file="summary_traits_log.png")
+plot(Metradica_log[,8:16])
+dev.off()
+
+```
+Interesting variables to look at
+```{r}
+Data <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_not_imputed/Subset.csv")
+#SD and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(SD), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(SD) ~ log(Gmin), data = Data)
+get_formula(model) #"y ~ 5.65 + 0.09 * log(Gmin)"
+
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared # 0.01071759
+summary(model)$r.squared #0.01328716
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 4.5, y = 2.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 4.5, y = 2.5,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "Gmin_SD.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
+#MajVLA and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(MajVLA), y = log(Gmin)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(MajVLA) ~ log(Gmin), data = Data)
+get_formula(model)
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared
+summary(model)$r.squared
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 0.8, y = 2.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 2.5,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "Gmin_MajVLA.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
+#MajVLA and gmin
+
+p <- ggplot(Data) +
+  aes(x = log(MajVLA), y = log(SD)) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal(base_size = 22)
+  
+model <- lm(log(MajVLA) ~ log(SD), data = Data)
+get_formula(model)
+
+#extract adjusted R-squared
+summary(model)$adj.r.squared
+summary(model)$r.squared
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+r_adj_squared <- round(summary(model)$adj.r.squared, 4)
+
+p + geom_text(x = 0.8, y = 7,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 6.9,
+            label = r_adj_squared,
+            color = 'blue')+
+    theme_minimal(base_size = 15) 
+
+ggsave(filename = "SD_MajVLA.png", plot = p, bg = "white", width = 10, height = 8, dpi = 600)
+
+#TLP and LSWC
+p <- ggplot(Metradica_log) +
+  aes(x = TLP, y = LSWC) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(LSWC ~ TLP, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+p + geom_text(x = -0.8, y = 5.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = -0.8, y = 5.4,
+            label = r_squared,
+            color = 'blue')
+
+#TLP and SD
+l <- ggplot(Metradica_log) +
+  aes(x = TLP, y = SD) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(SD ~ TLP, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+l + geom_text(x = -0.8, y = 7.2,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = -0.8, y = 6.8,
+            label = r_squared,
+            color = 'blue')
+
+#LSWC and K
+n <- ggplot(Metradica_log) +
+  aes(x = K, y = LSWC) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(LSWC ~ K, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+n + geom_text(x = 0.8, y = 5.6,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.8, y = 5.4,
+            label = r_squared,
+            color = 'blue')
+
+#SD and P
+m <- ggplot(Metradica) +
+  aes(x = P, y = SD) +
+  geom_point(shape = "circle", size = 1.5, colour = "#112446") +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+  
+model <- lm(SD ~ P, data = Metradica_log)
+get_formula(model)
+
+r_squared <- scales::percent(summary(model)$r.squared, accuracy = 0.01)
+
+m + geom_text(x = 0.5, y = 1500,
+            label = get_formula(model),
+            color = 'red') +
+  geom_text(x = 0.5, y = 1400,
+            label = r_squared,
+            color = 'blue')
+
+```
+
+
+
+
+
+
+
+
+# Question 1
+**Question (H1) Specialist species of contrasting habitats differ in trait values.**
+
+
+$$ M0 : Y_{ik} = \mu + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+$$ M1 : Y_{ik} = \mu + \alpha_i +  E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+Mais je veux prendre en compte que l'echantillonage a ete réalisé dans 3 forets qui chacune a les 2 habitats. je veux accepter les variations de mon site mais pas les etudier forcement.
+
+
+
+$$ M2 : Y_{ijk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} + E_{ijk}, \quad E_{ijk}\sim \mathcal{N} (0,\sigma^2) $$
+
+
+Et prendre en compte que j'ai plein d'espèces differentes. 
+
+Ces espèces ne sont pas très equilibrée en terme d'échantillonage. 
+
+
+$$ M_{comp} : Y_{ijsk} = \mu + \alpha_i +  \beta_j + \gamma_{ij} +  A_{is} +  E_{ijsk}, \quad E_{ijsk}\sim \mathcal{N} (0,\sigma^2), \quad A_{is}\sim \mathcal{N} (0,\sigma^2_S),  $$
+
+
+## Specialist data
+```{r data specialist}
+
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Metradica$Type <- as.factor(Metradica$Type)
+Metradica$Name <- as.factor(Metradica$Name)
+Metradica$Forest <- as.factor(Metradica$Forest)
+data_specialist <- Metradica %>% filter(Type !="Generalist")
+
+
+```
+
+## graphs
+```{r graph specialist}
+
+#basic plot 
+ggplot(data_specialist, aes(x = Type, y = Gmin)) +
+geom_boxplot() +
+geom_jitter(aes(colour= Name)) +
+labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist")) + theme_classic()
+
+#plot2
+
+gmin.summary <- aggregate(Gmin ~ Type, mean, data=data_specialist)
+gmin <- ggplot(data_specialist,aes(x=Type,y=Gmin, col=Name)) +
+   scale_color_manual(values = c("Eperua_falcata" = "#6DB4EE", "Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Virola_michelii"="#b58404"))+ 
+  #geom_jitter() + 
+  geom_boxplot(alpha=0.2) + 
+  geom_crossbar(data=gmin.summary, aes(ymin = Gmin, ymax = Gmin),
+                  size=1,col="red", width = .5)+
+  theme(axis.text.x = element_text(face="bold", 
+                           size=14, angle=0, color = c("#6DB4EE", "#b58404" )))+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +   ylab(expression(gmin~(mmol.m^-2~.s^-1))) + theme(axis.text.y = element_text(face="bold", size=12), axis.title.y = element_text(size = 20)) 
+
+gmin
+
+#plot across forests
+
+ggplot(data_specialist, aes(x = Type, y = Gmin, colour = Type)) +
+      facet_wrap(~Forest, ncol=3) +   # a panel for each mountain range
+      geom_boxplot(alpha = 0.5) +
+      theme_classic() +
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+
+```
+
+
+
+## gmin 
+```{r H1 gmin}
+# Global test
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_gmin <- lm(log(Gmin)~1, data= data_specialist)
+gmin_habitat <- lm(log(Gmin) ~Type, data= data_specialist)
+summary(gmin_habitat)
+anova(M0_gmin,gmin_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(gmin_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+gmin_forest <- lm(log(Gmin) ~Type + Forest, data =  data_specialist)
+anova(gmin_habitat, gmin_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(gmin_forest, gmin_habitat, type ="II") #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_gmin <- lmer(log(Gmin) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_gmin)
+
+#Check normality of residuals 
+
+plot(model_gmin) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+#pour lmer
+str(model_gmin)
+model_gmin #you access the lmer objects through@
+resid(model_gmin)
+hist(resid(model_gmin), main = "Residual Histogram")
+boxplot(resid(model_gmin), main="Residual Box Plot")
+qqnorm(resid(model_gmin)) 
+qqline(resid(model_gmin))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_gmin, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrats <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.479,"ns", "2")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 1
+data_specialist %>%
+  ggplot(aes(x = Type, y = Gmin)) +
+  geom_jitter(width = 0.05, alpha = 0.5) +
+  geom_boxplot(aes(fill = Type, color=Type), alpha = 0.5, col = "lightgrey", show.legend = FALSE) +
+  geom_pointrange(
+     data = means_complex,
+     aes(x = Type, y = response, ymin=lower.CL, ymax= upper.CL), color= 'red', size =1, show.legend = FALSE) +
+  labs(x = "") +
+  ylab(expression(gmin~(mmol.m^-2~.s^-1))) +
+  scale_x_discrete(labels = c("TF" = "TF specialist",
+                              "BF" = "SF specialist"))+
+  scale_fill_manual(values = c("TF" = "#E79F02",
+                                "BF" =  "#56B4E9")) +
+  theme_minimal(base_size = 22) +
+  stat_pvalue_manual(stat.test, y.position = c(10), label = "p.adj.signif", size = 10)
+
+#option graph 2
+Gmin <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=Gmin, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(gmin~(mmol.m^-2~.s^-1))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(10), size= 6) +
+  theme_minimal(base_size = 12) 
+```
+###specialist  essai TWI 
+```{r}
+
+model_gmin_twi <-  lmer(log(N) ~ log(TWI) + Type + (1|Name), data = data_specialist) 
+
+plot(model_gmin_twi) #For the normality assumption to hold, the residuals should spread randomly around 0 and form a horizontal band.If the red trend line is approximately flat and close to zero, then one can assume that the residuals are normally distributed.
+
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_gmin_twi, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrats <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.05,"0.05", "1522")
+
+data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=P, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(P~(X))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(1), size= 10) +
+  theme_minimal(base_size = 12) 
+```
+
+
+
+## TLP
+```{r}
+model_simple_tlp <- lm(log(-TLP) ~ 1, data=data_specialist)
+model_habitat_tlp <-  lm(log(-TLP) ~ Type, data=data_specialist) 
+anova(model_simple_tlp, model_habitat_tlp)
+model_forest_tlp <- lm(log(-TLP) ~ Type + Forest, data=data_specialist) 
+anova(model_habitat_tlp, model_forest_tlp)
+
+#on explique tres peu avec l'habitat et avec la foret par rapport au model null.
+model_TLP <- lmer(log(-TLP) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_TLP)
+
+#Check normality of residuals 
+
+plot(model_TLP) 
+
+#pour lmer
+hist(resid(model_TLP), main = "Residual Histogram")
+qqnorm(resid(model_TLP))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_TLP, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame %>% mutate(responseCorr= -response, lower.CLCorr = -lower.CL, upper.CLCorr = -upper.CL)
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.757,"ns", "2")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#plot tlp
+
+
+TLP <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=TLP, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(TLP~(MPa))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = responseCorr, 
+                      ymin=lower.CLCorr, 
+                      ymax= upper.CLCorr), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(-1.35), size= 6) +
+  theme_minimal(base_size = 12) 
+```
+
+## LSWC 
+
+```{r}
+# Global test
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_LSWC <- lm(log(LSWC)~1, data= data_specialist)
+LSWC_habitat <- lm(log(LSWC) ~Type, data= data_specialist)
+summary(LSWC_habitat)
+anova(M0_LSWC,LSWC_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(LSWC_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+LSWC_forest <- lm(log(LSWC) ~Type + Forest, data =  data_specialist)
+anova(LSWC_habitat, LSWC_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(LSWC_forest, LSWC_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_LSWC <- lmer(log(LSWC) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_LSWC)
+
+#Check normality of residuals
+hist(resid(model_LSWC), main = "Residual Histogram")
+qqnorm(resid(model_LSWC))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_LSWC, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.736,"ns", "150")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+LSWC <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=LSWC, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(LSWC~('%'))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(225), size= 6) +
+  theme_minimal(base_size = 12) 
+  
+```
+
+## MajVLA 
+
+```{r}
+# Global test
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_MajVLA <- lm(log(MajVLA)~1, data= data_specialist)
+MajVLA_habitat <- lm(log(MajVLA) ~Type, data= data_specialist)
+summary(MajVLA_habitat)
+anova(M0_MajVLA,MajVLA_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(MajVLA_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+MajVLA_forest <- lm(log(MajVLA) ~Type + Forest, data =  data_specialist)
+anova(MajVLA_habitat, MajVLA_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(MajVLA_forest, MajVLA_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_MajVLA <- lmer(log(MajVLA) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_MajVLA)
+
+#Check normality of residuals
+hist(resid(model_MajVLA), main = "Residual Histogram")
+qqnorm(resid(model_MajVLA))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_MajVLA, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.765,"ns", "6")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+MajVLA <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=MajVLA, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(MajVLA~(mm.mm~.mm^-2))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(13), size= 6) +
+  theme_minimal(base_size = 12) 
+  
+```
+
+
+## K 
+
+```{r}
+# Global test
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_K <- lm(log(K)~1, data= data_specialist)
+K_habitat <- lm(log(K) ~Type, data= data_specialist)
+summary(K_habitat)
+anova(M0_K,K_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(K_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+K_forest <- lm(log(K) ~Type + Forest, data =  data_specialist)
+anova(K_habitat, K_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(K_forest, K_habitat) #gros effet foret ici
+
+model_K <- lmer(log(K) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_K)
+
+#Check normality of residuals
+hist(resid(model_K), main = "Residual Histogram")
+qqnorm(resid(model_K))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_K, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.0922,"ns", "9")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+K <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=K, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(K~(g%.%kg^{-1}))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(17), size= 6) +
+  theme_minimal(base_size = 12) 
+
+```
+
+## P 
+
+```{r}
+# Global test
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_P <- lm(log(P)~1, data= data_specialist)
+P_habitat <- lm(log(P) ~Type, data= data_specialist)
+summary(P_habitat)
+anova(M0_P,P_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(P_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+P_forest <- lm(log(P) ~Type + Forest, data =  data_specialist)
+anova(P_habitat, P_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(P_forest, P_habitat) #gros effet foret ici
+
+model_P <- lmer(log(P) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_P)
+
+#ChecP normality of residuals
+hist(resid(model_P), main = "Residual Histogram")
+qqnorm(resid(model_P))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_P, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tuPey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.08,"ns", "9")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+P <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=P, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(P~(g%.%kg^{-1}))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(1.5), size= 6) +
+  theme_minimal(base_size = 12) 
+```
+
+## C 
+
+```{r}
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_C <- lm(log(C)~1, data= data_specialist)
+C_habitat <- lm(log(C) ~Type, data= data_specialist)
+summary(C_habitat)
+anova(M0_C,C_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(C_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+C_forest <- lm(log(C) ~Type + Forest, data =  data_specialist)
+anova(C_habitat, C_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(C_forest, C_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_C <- lmer(log(C) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_C)
+
+#Check normality of residuals
+hist(resid(model_C), main = "Residual Histogram")
+qqnorm(resid(model_C))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_C, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.86,"ns", "52")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+C <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=C, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(C~('%'))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(56), size= 6) +
+  theme_minimal(base_size = 12) 
+```
+
+## N 
+
+```{r}
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_N <- lm(log(N)~1, data= data_specialist)
+N_habitat <- lm(log(N) ~Type, data= data_specialist)
+summary(N_habitat)
+anova(M0_N,N_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(N_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+N_forest <- lm(log(N) ~Type + Forest, data =  data_specialist)
+anova(N_habitat, N_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(N_forest, N_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_N <- lmer(log(N) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_N)
+
+#Check normality of residuals
+hist(resid(model_N), main = "Residual Histogram")
+qqnorm(resid(model_N))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_N, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.9,"ns", "150")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+N <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=N, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(N~('%'))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(3.1), size= 6) +
+  theme_minimal(base_size = 12)
+```
+
+
+##SD
+
+```{r}
+data_specialist <- data_specialist %>% mutate(Type = relevel(Type, ref = "BF")) #changer la reference, mieux vaut que la ref soit celle le mieux renseignée avec le plus d'indv
+M0_SD <- lm(log(SD)~1, data= data_specialist)
+SD_habitat <- lm(log(SD) ~Type, data= data_specialist)
+summary(SD_habitat)
+anova(M0_SD,SD_habitat) #2 objets : comparaisons de deux modeles. 
+Anova(SD_habitat, type = "II" ) # attention ici Anova avec grand A pour les types II
+
+#plan d'experience equilibrer, il n'y aura aucune difference entre type 1 et type 2. les patates des facteurs ne seront pas confondus, mais distincts, pas d'ambiguité.
+
+
+SD_forest <- lm(log(SD) ~Type + Forest, data =  data_specialist)
+anova(SD_habitat, SD_forest)  #qu'est ce que l'on gagne a rajouter un effet forest après avoir pris en compte l'habitat
+Anova(SD_forest, SD_habitat) #symetrisation de l'habitat et de la forest. on regarde l'habitat sachant que forest est deja considere.
+
+model_SD <- lmer(log(SD) ~ Type + Forest + (1|Name), data=data_specialist) 
+summary(model_SD)
+
+#Check normality of residuals
+hist(resid(model_SD), main = "Residual Histogram")
+qqnorm(resid(model_SD))
+
+#estimated marginal means to compare TF specialists and SF specialists for each trait. ?
+
+emm1 <- emmeans(model_SD, specs = pairwise ~ Type, type = "response")
+plot(emm1)
+means_complex <- emm1$emmeans %>% as.data.frame
+contrast <- emm1$contrasts %>% #per default it's tukey adjustment
+  as.data.frame
+
+stat.test <- tribble(
+        ~group1, ~group2, ~p.adj, ~p.adj.signif, ~y.position,
+        "BF","TF",0.13,"ns", "150")
+
+
+data_specialist$Type <- factor(data_specialist$Type, levels = c("BF", "TF")) 
+
+#option graph 2
+SD <- data_specialist %>%
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>% 
+  ggplot(aes(x=Type,y=SD, color=Name)) +
+  scale_color_manual(values = c("E. falcata" = "#56B4E9","I. hostmannii"= "#56B4E9", "L. procera"= "#56B4E9", "P. opacum"= "#56B4E9", "E. coriacea"= "#56B4E9", "P. officinalis"= "#56B4E9", "S. globulifera"= "#56B4E9", "V. surinamensis"= "#56B4E9", "C. surinamensis"= "#56B4E9", "D. guianensis"="#E79F02", "I. sagotiana"="#E79F02", "G. hexapetala"="#E79F02", "L. membranacea"="#E79F02", "P. guianensis"="#E79F02", "V. michelii"="#E79F02"))+ 
+  geom_boxplot(alpha=0.2) + 
+  scale_x_discrete(name =c(""), labels = c("BF" = "SF specialist","TF" = "TF specialist")) +  
+  labs(x = "") +
+  ylab(expression(SD~(mm^-2))) +
+  geom_pointrange(data = means_complex,
+                  aes(x = Type, 
+                      y = response, 
+                      ymin=lower.CL, 
+                      ymax= upper.CL), color = 'red', 
+                  size =1,
+                  show.legend = FALSE) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", y.position = c(1225), size= 6) +
+  theme_minimal(base_size = 12) 
+```
+
+## summary plot
+```{r}
+
+prow2 <- ggpubr::ggarrange(
+  TLP + theme(legend.position="none", axis.text.x = element_blank()),
+  Gmin + theme(legend.position="none", axis.text.x = element_blank()),
+  LSWC + theme(legend.position="none", axis.text.x = element_blank()),
+  MajVLA + theme(legend.position="none", axis.text.x = element_blank()),
+  SD + theme(legend.position="none", axis.text.x = element_blank()),
+  K + theme(legend.position="none", axis.text.x = element_blank()),
+  P + theme(legend.position="none"),
+  N + theme(legend.position="none"),
+  C + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'right',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Specialists_plots_H1.png", plot = prow2, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+#Among specialists - intra-habitat variation
+
+```{r SF specialists}
+# ----------Replace for each trait --------------
+#for SD, remove C. surinamensis %>% filter(Name != "Carapa_surinamensis")
+# Compute the analysis of variance
+res.aov <- aov(log(N) ~ Name, data = data_specialist %>%
+ filter(Type %in% "BF"))
+# 1. Homogeneity of variances
+plot(res.aov, 1)
+# 2. Normality
+plot(res.aov, 2)
+# Summary of the analysis
+summary(res.aov)
+
+# Perorm pairwise comparisons
+#compare each of the seven groups against “all” (i.e. base-mean). When the test is significant, then you can conclude that the trait is significantly overexpressed or downexpressed in species xxx compared to all.
+#compare_means(K ~ Name,  data = data_specialist %>%
+ #filter(Type %in% "BF"), ref.group = ".all.", method = "t.test")
+
+#with letters
+library(multcompView)
+#Species followed by the same letter did not differ significantly (Tukey test, p>0.05).
+TUKEY <- HSD.test(res.aov, "Name", console=TRUE)
+tukey <- TukeyHSD(res.aov)
+# compact letter display
+cld <- multcompLetters4(res.aov, tukey)
+print(cld)
+
+# table with factors and 3rd quantile
+Tk <- group_by(data_specialist %>%
+ filter(Type %in% "BF"), Name) %>%
+  summarise(mean=mean(log(N)), quant = quantile(log(N), probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# #for SD
+# Tk <- group_by(data_specialist %>%
+#  filter(Type %in% "BF") %>% filter(Name != "Carapa_surinamensis") %>% na.omit(), Name) %>%
+#   summarise(mean=mean(log(SD)), quant = quantile(log(SD), probs = 0.75)) %>%
+#   arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$Name)
+Tk$cld <- cld$Letters
+
+print(Tk)
+
+Tk <- Tk %>% mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species))
+Tk
+# -------------------------- GRAPHS-------------------
+
+#gmin graph ---------------
+gmin_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(Gmin), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(g[min]~(mmol.m^-2~.s^-1))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        # Add global annova p-value
+ geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# TLP graph --------------
+
+TLP_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(abs(TLP)), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(TLP~(MPa))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.9, label.x = 2)+        
+ geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1)    
+
+#LSWC graph -------------------------
+
+LSWC_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(LSWC), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(LSWC~('%'))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 5.75, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#MajVLA ----------------
+
+MajVLA_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(MajVLA), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(MajVLA~(mm.mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+ 
+     geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+  
+
+#SD ----------------
+
+SD_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(SD), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(SD~(mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 7.8, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#K --------------------
+K_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(K), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(K~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3.2, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# P graph -----------------
+P_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(P), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(P~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1, label.x = 2)+        
+  geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#N graph ------------
+N_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(N), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(N~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#C graph -------------
+C_SF <- data_specialist %>%
+ filter(Type %in% "BF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(C), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#56B4E9")) +
+  ylab(expression(C~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 4.12, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# SF graph, all traits combined --------
+SF <- ggpubr::ggarrange(
+  TLP_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  gmin_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  LSWC_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  MajVLA_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  SD_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  K_SF + theme(legend.position="none", axis.text.x = element_blank()),
+  P_SF + theme(legend.position="none"),
+  N_SF + theme(legend.position="none"),
+  C_SF + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Specialists_SF.png", plot = SF, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+*TF specialists*
+
+```{r TF specialists}
+# ----------Replace for each trait --------------
+#for SD, remove C. surinamensis %>% filter(Name != "Carapa_surinamensis")
+# Compute the analysis of variance
+res.aov <- aov(log(C) ~ Name, data = data_specialist %>%
+ filter(Type %in% "TF"))
+
+#with letters
+library(multcompView)
+#Species followed by the same letter did not differ significantly (Tukey test, p>0.05).
+TUKEY <- HSD.test(res.aov, "Name", console=TRUE)
+tukey <- TukeyHSD(res.aov)
+# compact letter display
+cld <- multcompLetters4(res.aov, tukey)
+print(cld)
+
+# table with factors and 3rd quantile
+Tk <- group_by(data_specialist %>%
+ filter(Type %in% "TF"), Name) %>%
+  summarise(mean=mean(log(C)), quant = quantile(log(C), probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# #for SD
+# Tk <- group_by(data_specialist %>%
+#  filter(Type %in% "TF") %>% filter(Name != "Licania_membranacea") %>% na.omit(), Name) %>%
+#   summarise(mean=mean(log(SD)), quant = quantile(log(SD), probs = 0.75)) %>%
+#   arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$Name)
+Tk$cld <- cld$Letters
+
+print(Tk)
+
+Tk <- Tk %>% mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species))
+Tk
+
+#gmin graph -----------
+gmin_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(Gmin), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+   ylab(expression(g[min]~(mmol.m^-2~.s^-1))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        # Add global annova p-value
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# TLP graph ----------
+
+TLP_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(abs(TLP)), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(TLP~(MPa))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.9, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1)     
+
+#LSWC graph ------------
+
+LSWC_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(LSWC), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(LSWC~('%'))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 5.75, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#MajVLA graph --------------
+
+MajVLA_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(MajVLA), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(MajVLA~(mm.mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 2.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#SD graph ----------------
+
+SD_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(SD), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(SD~(mm^{-2}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 6.9, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#K graph -------------
+K_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(K), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(K~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 3, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#P graph ---------------
+P_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(P), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(P~(g.kg^{-1}))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 0.7, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+# N graph -------------
+N_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(N), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(N~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 1.5, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+
+#C graph -------------
+C_TF <- data_specialist %>%
+ filter(Type %in% "TF") %>%
+ mutate(Name = gsub("_", " ", Name)) %>% 
+ separate(Name, c("genus", "species")) %>% 
+ mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species)) %>%
+ ggplot() +
+  aes(x = Name, y = log(C), color = "Name") +
+  geom_boxplot() +
+  geom_jitter(width = 0.05, alpha = 0.5)+ 
+  theme_minimal(base_size = 12) +
+  rotate_x_text(angle = 45)+
+  scale_color_manual(values = c(Name =  "#E79F02")) +
+  ylab(expression(C~("%"))) +
+  theme(axis.text.x = element_text(face = "italic"), axis.title.x = element_blank(), legend.position = "none") +
+stat_compare_means(method = "anova", label.y = 4.15, label.x = 2)+        
+   geom_text(data = Tk, aes(x = Name, y = quant, label = cld, color = "#000000" ), size = 5, vjust=-1) 
+# TF all trait combined --------------
+TF <- ggpubr::ggarrange(
+  TLP_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  gmin_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  LSWC_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  MajVLA_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  SD_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  K_TF + theme(legend.position="none", axis.text.x = element_blank()),
+  P_TF + theme(legend.position="none"),
+  N_TF + theme(legend.position="none"),
+  C_TF + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'none',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Specialists_TF.png", plot = TF, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+
+
+# Question 2
+
+**(H2) Functional divergence among individuals of generalists between habitats in terms of water usage during the dry season.**
+
+IL y aurait un effet du TWI sur les traits fonctionnels et cela serait propre à chaque espèce.
+
+$$ MComp : Y_{ik} = \mu + \alpha_i + (\beta+ \gamma_{i}) x_{ik} + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+la pente $$\mu$$ commune a tout le monde 
+$$\alpha_i$$ effet diff de l'espèce sur l'ordonnée à l'origine
+$$\beta$$ pente commune a tout le monde
+$$\gamma$$ effet diff sur la pente liée au TWI
+
+H0 : "pas d'effet ni de l'espèce ni du TWI
+
+
+$$ M0 : Y_{ik} = \mu + E_{ik}, \quad E_{ik}\sim \mathcal{N} (0,\sigma^2) $$
+
+
+##generalist data
+```{r data generalist}
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+data_generalist <- Metradica %>% filter(Type =="Generalist")
+
+data_generalist <- data_generalist %>%
+  mutate(Name = paste0(str_sub(Genus, 1, 1), ". ", Species)) 
+```
+
+## graph
+```{r graph generalist, echo=FALSE}
+library(ggplot2)
+ggplot(data_generalist) +
+  aes(x = TWI, y = Gmin, colour = Name) +
+  geom_point(shape = "circle", size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+```
+
+
+## gmin
+```{r}
+MO_generalist <- lm(log(Gmin) ~ 1, data = data_generalist)
+M1_generalist <- lm(log(Gmin) ~Species + log(TWI), data = data_generalist) #meme pente pour tout le monde
+
+anova(MO_generalist, M1_generalist)
+
+#on peut rejetter l'hypothèse H0, il y a au moins un effet du TWI ou de l'espece sur Gmin.
+
+M_complet <- lm(log(Gmin) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+
+anova(M1_generalist, M_complet)
+
+autoplot(M_complet) #tout parait ok, pas trop de structure,
+
+
+Model_a <- lmer(log(Gmin) ~ log(TWI) + (1|Name), data= data_generalist)
+#plot results
+
+```
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit() %>% 
+  mutate(Name = gsub("_", " ", Name)) %>% 
+  separate(Name, c("genus", "species")) %>% 
+  mutate(Name = paste0(str_sub(genus, 1, 1), ". ", species))
+
+fitlm <-  lmer(log(Gmin) ~ log(TWI) + log(TWI)|Name , data = data_generalist) #i want to estimate the effect of TWI on gmin, not the overall mean of the trait. so i need TWI as a fixed effect.And I also take into account the variability between species.
+
+#fitlm <-  lmer(log(Gmin) ~ 1 + (log(TWI)|Name) , data = data_generalist)
+
+#fitlm <-  lmer(log(Gmin) ~ log(TWI)+ Name + (log(TWI)|Name) , data = data_generalist)
+
+summary(fitlm)
+coef(fitlm)$Name
+A<- confint(fitlm, oldNames= FALSE)
+model_coefs <- coef(fitlm)$Name %>% 
+  rename(Intercept = `(Intercept)`, Slope = "log(TWI)") %>% 
+  rownames_to_column("Name")
+
+
+plot_gmin <- left_join(data_generalist, model_coefs, by = "Name")
+
+#trying to get parameters' info
+install.packages("parameters")
+install.packages("parameters", repos = "https://easystats.r-universe.dev")
+remotes::install_github("easystats/parameters")
+
+library(parameters)
+library(easystats)
+standard_error(fitlm, effects = "random")
+
+
+
+
+
+
+#plot
+
+data_generalist$predlm = predict(fitlm)
+
+
+gmin <- plot_gmin %>%
+      ggplot(aes(x = log(TWI), y = log(Gmin), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_abline(aes(intercept = Intercept, 
+                  slope = Slope,
+                  colour = Name
+                  ),
+              size = 0.8
+              )
+      #geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 0.8) +
+      # annotate(geom = 'text', x = 2.5, y = 2.4,
+      #      label = bquote("R^2 == 0.28"), size=5, parse = TRUE)+
+      theme(legend.text = element_text(face = "italic"))
+
+
+gmin
+ggsave(filename = "Generalist_gmin_twi.png", plot = gmin, bg = "white", width = 10, height = 8, dpi = 600)
+
+```
+pr(>|t|) indicates that the probaility of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (Gmin) variables *due to chance.* here, we cannot reject the null hypothesis, and there is no relationships between twi and gmin. Very weak R2, TWI does not explain Gmin.
+
+##gmin bis
+```{r}
+data_generalist2 <- data_generalist %>% dplyr::select(Name, Gmin, TWI) %>% na.omit()
+
+m2 <- lm(log(Gmin) ~ log(TWI) +Name + log(TWI):Name, data = data_generalist)
+
+
+plot(emmeans(m2, ~ log(TWI)*Name)) 
+
+emmip(m2, Name ~log(TWI), cov.reduce=FALSE, CIs = TRUE)
+
+data_generalist2 %>%
+      ggplot(aes(x = log(TWI), y = log(Gmin), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+     geom_line(data = cbind(data_generalist2, pred = predict(m2)), aes(y = pred), size = 0.8)
+      
+```
+
+
+##gmin SMA
+
+SMA alll you need to know : Methods in Ecology and Evolution Warton et al 2012 as well as Wright, Reich & Westoby 2001.
+```{r}
+df <- data_generalist %>% dplyr::select(Name, Gmin, TWI) %>% na.omit()
+
+library(smatr)
+# Fit SMA's separately
+# and test for common slope:
+sm <- sma(Gmin~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+# 
+# H0 : slopes are equal.
+# Likelihood ratio statistic : 12.86 with 5 degrees of freedom
+# P-value : 0.024708 we reject H0, we have different slopes, meaning different generalist strategies.
+
+# get sma summary into a data.frame
+test0_slope_gmin <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_gmin$Trait <- 'gmin'
+
+test0_slope_gmin %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/gmin.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+#test y-intercept differences among the individual slopes. if no differences found, then it allows for a common SMA to be fitted to examie group shifts.
+test_elev <-  sma(Gmin~TWI+Name, log = "xy", data=df)
+test_elev
+
+
+# plot into ggplot
+gmin <- ggplot(df, aes(x=TWI, y=Gmin, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+  geom_abline(data=test0_slope_gmin %>% filter(Species %in% c("B. prouacensis","C. guianensis")),aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+ 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+
+
+
+
+```
+
+
+##TLP
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(-TLP) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+
+data_generalist$predlm = predict(fitlm)
+
+(mm_plot <- ggplot(data_generalist, aes(x = log(TWI), y = log(-TLP), colour = Name)) +
+      facet_wrap(~Forest, nrow=1) +   # a panel for each mountain range
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+)
+
+TLP<-ggplot(data_generalist, aes(x = log(TWI), y = log(-TLP), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) + 
+      annotate(geom = 'text', x = 2.5, y = 0.78, 
+           label = bquote("R^2 == 0.70"), size=5, parse = TRUE) +
+        
+      theme(legend.text = element_text(face = "italic"))
+
+TLP
+ggsave(filename = "Generalist_tlp_twi.png", plot = TLP, bg = "white", width = 10, height = 8, dpi = 600)
+```
+pr(>|t|) indicates that the probability of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (TLP) variables *due to chance.* here, we can reject the null hypothesis concerning some species, and there is a relationship between twi and tlp. We have a relatively strong R2 of 70 %, meaning that 70% of the varaince dounf in the response variable tlp can be explained by the predictor variable (twi). the f stat, larger than 1, also encourages us to reject the null hypothesis. 
+
+##TLP SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, TLP, TWI, Forest, Habitat) %>% na.omit() %>% mutate(negTLP = -TLP)
+
+library(smatr)
+# Fit SMA's separately at each of high and low rainfall sites,
+# and test for common slope:
+sm <- sma(negTLP~TWI*Name, log="xy", slope.test = 0, data=df)
+
+
+# get sma coefficients into a data.frame
+bb <- data.frame(coef(sm))
+bb <- bb %>%
+  rownames_to_column(var = "Name") 
+
+## calculate end coordinates for segment
+bb$min_x <- min(df$negTLP, na.rm = TRUE)
+bb$max_x <- max(df$negTLP, na.rm = TRUE)
+bb <- bb %>%
+  mutate(min_y = (slope*min_x) + elevation) %>%
+  mutate(max_y = (slope*max_x) + elevation) 
+
+bb <- bb %>%
+  mutate(elevation = (-1)*elevation) %>%
+  mutate(slope = (-1)*slope) %>%
+  mutate(min_x = (-1)*min_x) %>%
+  mutate(min_y= (-1)*min_y) %>%
+  mutate(max_x = (-1)*max_x) %>%
+  mutate(max_y = (1)*max_y)
+  
+# get sma summary into a data.frame
+test0_slope_TLP <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_TLP$Trait <- 'TLP'
+
+test0_slope_TLP %>% 
+  mutate(Int = (-1)*Int) %>%
+  mutate(Int_lowCI = (-1)*Int_lowCI) %>%
+  mutate(Int_highCI= (-1)*Int_highCI) %>%
+  mutate(Slope = (-1)*Slope) %>%
+  mutate(Slope_lowCI= (-1)*Slope_lowCI) %>%
+  mutate(Slope_highCI = (-1)*Slope_highCI) %>%
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/TLP.png", zoom = 5)
+
+# plot into ggplot
+tlp <- ggplot(df, aes(x=TWI, y=negTLP, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans= reverselog_trans(10)) +
+  scale_x_continuous(trans = 'log10') +
+  geom_abline(data=bb %>% filter(Name== "B. prouacensis"),aes(intercept=elevation, slope=slope, color = Name))+
+  theme_minimal()+
+  labs(y= "TLP")+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"), legend.position = "bottom")
+
+#add manually the - signs
+
+plot(sm)
+```
+
+
+##LSWC
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(LSWC) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+
+data_generalist$predlm = predict(fitlm)
+
+(mm_plot <- ggplot(data_generalist, aes(x = log(TWI), y = log(LSWC), colour = Name)) +
+      facet_wrap(~Forest, nrow=1) +   # a panel for each mountain range
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+)
+
+LSWC <- ggplot(data_generalist, aes(x = log(TWI), y = log(LSWC), colour = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+      
+
+LSWC
+ggsave(filename = "Generalist_LSWC_twi.png", plot = LSWC, bg = "white", width = 10, height = 8, dpi = 600)
+```
+pr(>|t|) indicates that the probability of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (LSWC) variables *due to chance.* here, we can reject the null hypothesis concerning con.gui, and there is a relationship between twi and lswc. We have a relatively strong R2 of 64 %, meaning that 64% of the variance found in the response variable lswc can be explained by the predictor variable (twi). the f stat, larger than 1, also encourages us to reject the null hypothesis. 
+
+
+##SMA LSWC
+```{r}
+df <- data_generalist %>% dplyr::select(Name, LSWC, TWI) %>% na.omit()
+
+# Fit SMA's separately
+# and test for common slope:
+sm <- sma(LSWC~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+# Results of comparing lines among groups.
+
+# H0 : slopes are equal.
+# Likelihood ratio statistic : 40.12 with 5 degrees of freedom
+# P-value : 1.414e-07 
+
+# get sma summary into a data.frame
+test0_slope_lswc <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_lswc$Trait <- 'LSWC'
+
+test0_slope_lswc %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/LSWC.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+LSWC <- ggplot(df, aes(x=TWI, y=LSWC, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+ # geom_abline(data=test0_slope,aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+ 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+
+```
+
+##MajVLA
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(MajVLA) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+(mm_plot <- ggplot(data_generalist, aes(x = log(TWI), y = log(MajVLA), colour = Name)) +
+      facet_wrap(~Forest, nrow=1) +   # a panel for each mountain range
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+      theme(legend.position = "none",
+            panel.spacing = unit(2, "lines"))  # adding space between panels
+)
+
+MajVLA <- ggplot(data_generalist, aes(x = log(TWI), y = log(MajVLA), colour = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+   
+
+MajVLA
+ggsave(filename = "Generalist_majvla_twi.png", plot = MajVLA, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+pr(>|t|) indicates that the probability of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (majvla) variables *due to chance.* here, we can reject the null hypothesis concerning tac.mel, and there is a relationship between twi and Majvla. We have a relatively strong R2 of 60 %, meaning that 60% of the variance found in the response variable Majvla can be explained by the predictor variable (twi). the f stat, larger than 1, also encourages us to reject the null hypothesis.
+
+##Majval SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, MajVLA, TWI) %>% na.omit()
+
+# Fit SMA
+sm <- sma(MajVLA~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+# Results of comparing lines among groups.
+# H0 : slopes are equal.
+# Likelihood ratio statistic : 40.12 with 5 degrees of freedom
+# P-value : 1.414e-07 
+
+# get sma summary into a data.frame
+test0_slope_majvla <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_majvla$Trait <- 'MajVLA'
+
+test0_slope_majvla %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/MajVLA.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+MajVLA <- ggplot(df, aes(x=TWI, y=MajVLA, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+  geom_abline(data=test0_slope_majvla %>% filter(Species == "T. melinonii"),aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##SD
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(SD) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+SD <- ggplot(data_generalist, aes(x = log(TWI), y = log(SD), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+      scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+   
+
+SD
+ggsave(filename = "Generalist_SD_twi.png", plot = SD, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+pr(>|t|) indicates that the probability of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (SD) variables *due to chance.* here, i'm not sure we that can reject the null hypothesis, and if there is a relationship between twi and SD. We have a R2 of 54 %, meaning that 54% of the variance found in the response variable SD can be explained by the predictor variable (twi). the f stat, larger than 1, also encourages us to reject the null hypothesis. 
+
+##SD SMA 
+
+*au lieu de 225 generalist, we have here 173 indv.*
+```{r}
+df <- data_generalist %>% dplyr::select(Name, SD, TWI, Forest, Habitat) %>% na.omit()
+
+
+# Fit SMA
+sm <- sma(SD~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+# Results of comparing lines among groups.
+# H0 : slopes are equal.
+# Likelihood ratio statistic : 10.01 with 5 degrees of freedom
+# P-value : 0.074985 
+
+#slopes are equal, we can fit a common slope!! But the common slope is different from 0
+
+# H0 : common slope not different from 0 
+# Likelihood ratio statistic = 5598 with 6 degrees of freedom under H0
+# P-value : < 2.22e-16 
+
+# get sma summary into a data.frame
+test0_slope_SD <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_SD$Trait <- 'SD'
+
+test0_slope_SD %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/SD.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+SD <- ggplot(df, aes(x=TWI, y=SD, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+ # geom_abline(data=test0_slope_SD,aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##K
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(K) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+K <- ggplot(data_generalist, aes(x = log(TWI), y = log(K), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+     scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) +  # adding predicted line from mixed model 
+     
+
+K
+ggsave(filename = "Generalist_K_twi.png", plot = K, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+pr(>|t|) indicates that the probability of observing any value larger than t. A small p-value indicates that it is unlikely we will observe a relationship between the predictor (TWI) and response (K) variables *due to chance.* here, we can reject the null hypothesis concerning tac.mel, and there is a relationship between twi and K. We have a relatively strong R2 of 44 %, meaning that 44% of the variance found in the response variable K can be explained by the predictor variable (twi). the f stat, larger than 1, also encourages us to reject the null hypothesis. 
+
+##K SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, K, TWI) %>% na.omit()
+
+
+# Fit SMA
+sm <- sma(K~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+
+
+# get sma summary into a data.frame
+test0_slope_K <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_K$Trait <- 'K'
+
+test0_slope_K %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/K.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+K <- ggplot(df, aes(x=TWI, y=K, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+  geom_abline(data=test0_slope_K %>% filter(Species == "J. copaia subsp. copaia"),aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##P
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(P) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+P <- ggplot(data_generalist, aes(x = log(TWI), y = log(P), colour = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+   scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1)   # adding predicted line from mixed model 
+   
+
+P
+ggsave(filename = "Generalist_P_twi.png", plot = P, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##P SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, P, TWI, Forest, Habitat) %>% na.omit()
+
+
+# Fit SMA
+sm <- sma(P~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+
+# get sma summary into a data.frame
+test0_slope_P <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_P$Trait <- 'P'
+
+test0_slope_P %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/P.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+P <- ggplot(df, aes(x=TWI, y=P, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+ # geom_abline(data=test0_slope_P,aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##N
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(N) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+N <- ggplot(data_generalist, aes(x = log(TWI), y = log(N), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+    scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) # adding predicted line from mixed model 
+   
+
+N
+ggsave(filename = "Generalist_N_twi.png", plot = N, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##N SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, N, TWI, Forest, Habitat) %>% na.omit()
+
+# Fit SMA
+sm <- sma(N~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+
+# get sma summary into a data.frame
+test0_slope_N <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_N$Trait <- 'N'
+
+test0_slope_N %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/N.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+N <- ggplot(df, aes(x=TWI, y=N, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+  geom_abline(data=test0_slope_N %>% filter(Species == "H. heteromorphus"),aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##C
+
+```{r}
+
+# Extract the prediction data frame
+
+# Plot the predictions 
+data_generalist <- data_generalist %>% na.omit()
+fitlm <-  lm(log(C) ~Name + log(TWI) + Name:log(TWI), data = data_generalist)
+summary(fitlm)
+data_generalist$predlm = predict(fitlm)
+
+C <- ggplot(data_generalist, aes(x = log(TWI), y = log(C), color = Name)) +
+      geom_point(alpha = 0.5) +
+      theme_classic() +
+   scale_color_discrete(name ="Species")+
+      theme(legend.position = "bottom")+
+      geom_line(data = cbind(data_generalist, pred = predict(fitlm)), aes(y = pred), size = 1) 
+
+C
+ggsave(filename = "Generalist_C_twi.png", plot = C, bg = "white", width = 10, height = 8, dpi = 600)
+```
+## C SMA
+```{r}
+df <- data_generalist %>% dplyr::select(Name, C, TWI) %>% na.omit()
+
+
+# Fit SMA
+sm <- sma(C~TWI*Name, log="xy", slope.test = 0, data=df)
+
+#get the summary table
+summary(sm)
+# Results of comparing lines among groups.
+# H0 : slopes are equal.
+# Likelihood ratio statistic : 10.01 with 5 degrees of freedom
+# P-value : 0.074985 
+
+#slopes are equal, we can fit a common slope!! But the common slope is different from 0
+
+# H0 : common slope not different from 0 
+# Likelihood ratio statistic = 5598 with 6 degrees of freedom under H0
+# P-value : < 2.22e-16 
+
+# get sma summary into a data.frame
+test0_slope_C <- data.frame(sm[["groupsummary"]]) %>% 
+  rename("Species" = "group") %>%
+  dplyr::select(-Elev_test, -Elev_test_p)
+
+test0_slope_C$Trait <- 'C'
+
+test0_slope_C %>% 
+  relocate("Trait", .before = "Species") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/C.png", zoom = 5)
+
+
+#Checking assumptions :residual plots, to check the critical assumptions of linearity and equal variance at all fitted values (via a residuals vs. fitted values plot)
+
+#Checking assumptions : normally distributed residuals (via a normal quantile plot). 
+
+plot(sm, which= "residual" ) 
+plot(sm, which= "qq" )
+
+# plot into ggplot
+C <- ggplot(df, aes(x=TWI, y=C, color =Name)) + 
+  geom_point(shape=21) +
+  scale_y_continuous(trans = 'log10')+
+  scale_x_continuous(trans = 'log10') +
+ # geom_abline(data=test0_slope_C,aes(intercept=Int, slope=Slope, color = Species))+
+  theme_minimal()+
+  scale_color_discrete(name ="Generalist species")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") 
+
+#this is the plot from the smatr package for comparison
+plot(sm)
+```
+
+
+##Combine
+```{r}
+prow2 <- ggpubr::ggarrange(
+  TLP + theme(legend.position="none", axis.title.x = element_blank()),
+  gmin + theme(legend.position="none", axis.title.x = element_blank()),
+  LSWC + theme(legend.position="none", axis.title.x = element_blank()),
+  MajVLA + theme(legend.position="none", axis.title.x = element_blank()),
+  SD + theme(legend.position="none", axis.title.x = element_blank()),
+  K + theme(legend.position="none", axis.title.x = element_blank()),
+  P + theme(legend.position="none"),
+  N + theme(legend.position="none"),
+  C + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'bottom',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Generalist_plots_H2.png", plot = prow2, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+#combine SMA
+```{r}
+sma <- ggpubr::ggarrange(
+  tlp + theme(legend.position="none", axis.title.x = element_blank()),
+  gmin + theme(legend.position="none", axis.title.x = element_blank()),
+  LSWC + theme(legend.position="none", axis.title.x = element_blank()),
+  MajVLA + theme(legend.position="none", axis.title.x = element_blank()),
+  SD + theme(legend.position="none", axis.title.x = element_blank()),
+  K + theme(legend.position="none", axis.title.x = element_blank()),
+  P + theme(legend.position="none"),
+  N + theme(legend.position="none"),
+  C + theme(legend.position="none"), 
+  labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'bottom',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "Generalist_plots_H2_SMA_significatif.png", plot = sma, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+And combine tables
+```{r}
+table <- rbind(test0_slope_gmin, test0_slope_TLP, test0_slope_lswc, test0_slope_majvla, test0_slope_SD, test0_slope_N, test0_slope_C, test0_slope_P, test0_slope_K)
+
+table$Slope_lowCI <- as.character(table$Slope_lowCI) 
+table$Slope_highCI <- as.character(table$Slope_highCI) 
+table$Slope_lowCI <- substr(table$Slope_lowCI, 1, 5)  
+table$Slope_highCI <- substr(table$Slope_highCI, 1, 5) 
+  
+table <- table %>%
+  mutate(CI = paste0(Slope_lowCI, ";", Slope_highCI )) 
+
+
+table %>% 
+  relocate("Trait", .before = "Species") %>%
+  dplyr::select(-Int_lowCI, -Int_highCI, -Slope_lowCI, -Slope_highCI, -Slope_test, -Slope_test_p) %>%
+  rename(Intercept = Int, 
+         pvalue = pval,
+         `R²` = r2) %>%
+  relocate("Intercept", .before= "Slope") %>%
+  relocate("CI", .after= "Slope") %>%
+  kbl(caption = "Summary of standardised major axis regressions between log-transformed traits with TWI for each generalist species.", digits = 3) %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2, italic = T) %>%
+  collapse_rows(columns = 1, valign = "middle") %>%
+  save_kable(file = "../METRADICAproject/Results/SMA/ALL.png", zoom = 5)
+```
+
+
+# Question 3
+**(H3) Generalist species express a higher intraspecific trait variability than specialist species.**
+
+CV to quantify ITV : absolute variation of the intraspecific trait with respect to the interspecific mean. 
+
+CV is defined as the ratio of the standard deviation \sigma to the mean , expressed as a percentage. CV is convenient to compare variation of traits among species as it requires no ad hoc assumptions and is unitless. 
+
+# CV
+```{r Coefficient of variation calculation}
+#data ----------
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
+
+# For generalists ----------
+
+cv_G <- Metradica %>% filter(Type =="Generalist") %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                  ungroup(cv_G) %>%
+                  summarise_all(mean) %>%
+                  mutate(Name = "mean"))
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_G$Type <- c("Generalist")
+
+# For TF specialist -------------
+
+cv_TF <- Metradica %>% filter(Type =="TF") %>%
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+
+
+cv_TF <- bind_rows(cv_TF,
+                   ungroup(cv_TF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean"))
+
+cv_TF$SD[7] <- (cv_TF$SD[1]+cv_TF$SD[2]+cv_TF$SD[3]+cv_TF$SD[5]+cv_TF$SD[6])/5
+
+cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV")
+
+cv_long_TF$Type <- c("TF")
+
+# For BF specialist-----------
+
+cv_BF <-  Metradica %>% filter(Type =="BF") %>% 
+    mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "N", "C", "P", "K", "SD"), log) %>% 
+  mutate(TLP = -TLP)%>%
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "K", "C", "N", "P", "SD"), funs(cv))
+
+cv_BF <- bind_rows(cv_BF,
+                ungroup(cv_BF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_BF$SD[10] <- (cv_BF$SD[2]+cv_BF$SD[3]+cv_BF$SD[4]+cv_BF$SD[5]+cv_BF$SD[6]+cv_BF$SD[7]+cv_BF$SD[8]+cv_BF$SD[9])/8
+
+cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") 
+
+cv_long_BF$Type <- c("BF")
+
+cv_tot <- bind_rows(cv_long_BF, cv_long_TF, cv_long_G) 
+
+
+```
+
+
+### plot cv
+```{r Plot CV}
+# plot all 
+#option 1
+cv_plot <- cv_tot %>% 
+  mutate(CV =CV*100) %>%
+  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = Type, y = CV, fill = Type)) +
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("Coefficient of variation (%)") + xlab("")+
+    theme_minimal(base_size = 22) +
+  facet_wrap(~trait, scales ="free_y") +
+  theme(legend.position = "bottom")
+
+#option 2
+cv_plot <- cv_tot %>% 
+  mutate(CV =CV*100) %>%
+  mutate(trait = dplyr::recode(trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = Type, y = CV, fill = Type)) +
+  geom_jitter() + 
+ # geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72",  "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "Generalist" = "Generalist", 
+                               "BF" = "SF specialist")) +
+  scale_shape_discrete("Habitat\npreference") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("Coefficient of variation (%)") + xlab("")+
+    theme_minimal(base_size = 22) +
+  facet_wrap(~trait, scales ="free_y") +
+  theme(legend.position = "bottom")
+
+cv_plot
+
+ggsave(filename = "CV_plot.png", plot = cv_plot, bg = "white", width = 12, height = 8, dpi = 600)
+
+```
+
+
+###Anova on cv
+```{r CV anova}
+# Anova on CV
+#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+cv_BF$Type <- c("BF")
+cv_TF$Type <- c("TF")
+cv_G$Type <- c("Generalist")
+
+cv_tot2 <- rbind(cv_BF, cv_TF, cv_G) %>% filter(Name != "mean")
+
+cv_tot2$Type <- as.factor(cv_tot2$Type)
+levels(cv_tot2$Type)
+
+
+#gmin-----------
+# Compute the analysis of variance
+res.aov <- aov(Gmin ~ Type, data = cv_tot2 %>% dplyr::select(Name, Gmin, Type) %>%
+  mutate(Gmin =Gmin*100))
+# 1. Homogeneity of variances
+plot(res.aov, 1)
+# 2. Normality
+plot(res.aov, 2)
+# Summary of the analysis
+summary(res.aov)
+#non parametric test
+kruskal.test(Gmin ~ Type, data = cv_tot2 %>% dplyr::select(Name, Gmin, Type)) #p-value = 0.3252
+
+cv_gmin <- cv_tot2 %>% dplyr::select(Name, Gmin, Type) %>%
+  mutate(Gmin =Gmin*100) %>%
+  ggplot() +
+  aes(x = Type, y = Gmin, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  labs(y = bquote(g[min])) +
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =100) #ns
+
+
+#tlp --------------------------
+res.aov <- aov(TLP ~ Type, data = cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
+  mutate(TLP =TLP*100) )
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(TLP ~ Type, data = cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
+  mutate(TLP =TLP*100) ) #p-value = 0.2233
+
+cv_tlp <- cv_tot2 %>% dplyr::select(Name,TLP, Type) %>%
+  mutate(TLP =TLP*100) %>%
+  ggplot() +
+  aes(x = Type, y = TLP, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() +
+ # labs(y = bquote(pi[tlp])) +
+    scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =29) #ns
+
+#SD --------------
+res.aov <- aov(SD ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(SD ~ Type, data = cv_tot2) #p-value = 0.798
+
+cv_SD <- cv_tot2 %>% dplyr::select(Name,SD, Type) %>%
+  mutate(SD =SD*100) %>%
+  ggplot() +
+  aes(x = Type, y = SD, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() +
+   scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+    stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =8) #ns
+
+#majvla------------------
+res.aov <- aov(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) )
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+kruskal.test(MajVLA ~ Type, data = cv_tot2 %>% dplyr::select(Name,MajVLA, Type) ) # p-value = 0.8236
+
+cv_MajVLA <- cv_tot2 %>% dplyr::select(Name,MajVLA, Type) %>%
+  mutate(MajVLA =MajVLA*100) %>%
+  ggplot() +
+  aes(x = Type, y = MajVLA, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+   scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =30) #ns
+
+#K ---------------
+
+res.aov <- aov(K ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) # p-value = 0.0213 *
+
+compare_means(K ~ Type,  data = cv_tot2, method = "anova", p.adjust.method = "fdr") # p-value = 0.0213
+compare_means(K ~ Type,  data = cv_tot2 %>% dplyr::select(Name,K, Type), method = "t.test") #generalist and BF are different; method = t.test.
+
+my_comparison <- list(c("BF", "Generalist"), c("BF", "TF"), c("Generalist", "TF"))
+
+#graph
+cv_K <- cv_tot2 %>% dplyr::select(Name,K, Type)%>%
+  mutate(K =K*100) %>%
+  ggplot() +
+  aes(x = Type, y = K, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(method ="anova", size= 4, label.x =0.9, label.y =37) + stat_compare_means(comparisons = list(c("BF", "Generalist")), label.y = c(32, 35, 39), method = "t.test")  # Add pairwise comparisons p-value 
+
+#C---------
+cv_C <- cv_tot2 %>% dplyr::select(Name,C, Type) %>%
+  mutate(C =C*100) %>%
+  ggplot() +
+  aes(x = Type, y = C, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =2.2)
+res.aov <- aov(C ~ Type, data = cv_tot2 %>% dplyr::select(Name,C, Type))
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) 
+
+#P --------------
+res.aov <- aov(P ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov) 
+
+cv_P <- cv_tot2 %>% dplyr::select(Name,P, Type)%>% 
+  mutate(P =P*100) %>%
+  ggplot() +
+  aes(x = Type, y = P, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =100)
+
+#N ----------------
+res.aov <- aov(N ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+cv_N <- cv_tot2 %>% dplyr::select(Name,N, Type) %>%
+  mutate(N =N*100) %>%
+  ggplot() +
+  aes(x = Type, y = N, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =80)
+
+
+#LSWC ------------------
+res.aov <- aov(LSWC ~ Type, data = cv_tot2)
+plot(res.aov, 1)
+plot(res.aov, 2)
+summary(res.aov)
+cv_LSWC <- cv_tot2 %>% dplyr::select(Name,LSWC, Type)%>%
+  mutate(LSWC =LSWC*100) %>%
+  ggplot() +
+  aes(x = Type, y = LSWC, fill= Type) +
+  geom_boxplot(alpha =0.7) +
+  geom_jitter() + 
+  scale_fill_manual("Habitat\npreference", 
+                    values = c("#56B4E9", "#009E72", "#E79F02"), 
+                    labels = c("TF" = "TF specialist",
+                               "BF" = "SF specialist", 
+                               "Generalist" = "Generalist")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x=element_blank(),axis.ticks.x=element_blank(), legend.position = "bottom")+
+  stat_compare_means(label = "p.signif", method ="anova", size= 5, label.x =2, label.y =5.5)
+
+
+#combine all graphs -------------------
+prow_cv <- ggpubr::ggarrange(
+  cv_tlp + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_gmin + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_LSWC + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_MajVLA + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_SD + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_K + theme(legend.position="none", axis.title.x = element_blank()),
+  cv_P + theme(legend.position="none"),
+  cv_N + theme(legend.position="none"),
+  cv_C + theme(legend.position="none"), 
+ # labels = c("A", "B", "C", "D", "E", "F", "G", "H", "I"),
+  common.legend = T,
+  legend = 'bottom',
+  nrow= 3, ncol=3)
+
+ggsave(filename = "CV_plots_H3.png", plot = prow_cv, bg = "white", width = 10, height = 10, dpi = 600)
+```
+
+
+#VP - variance partitioning
+
+*Inspiration from Julie Messier's code: https://juliemessier.org/code/*
+
+
+```{r variance partitionning}
+# Take into account only generalists. Variance partitioning 
+
+Metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv")
+sub_data_G <- Metradica %>% filter(Type == 'Generalist')
+
+vars <- sub_data_G %>% 
+  dplyr::select(Forest, Habitat, Name, LSWC, TLP, Gmin, MajVLA, N, C, P, K, SD) %>% 
+  reshape2::melt(c("Forest", "Habitat", "Name"), variable.name = "trait") %>% 
+  na.omit() %>% 
+  group_by(trait, Name) %>%
+  group_by(trait) %>%
+  do(var = nlme::lme(value ~ 1, random=~1|Forest/Habitat/Name, data = .) %>% 
+       ape::varcomp(scale = F, cum = F) %>% 
+       as.vector() %>% 
+       data.frame(level = c("Forest", "Habitat", "Name", "Within"), variance = as.vector(.))) %>% 
+  unnest(var) %>% 
+  group_by(trait) %>% 
+  mutate(pct = variance / sum(variance)*100)
+
+#plot graph, first rough draft version
+ggplot(vars) +
+  aes(x = trait, y = pct, fill = level) +
+  geom_col() +
+   ylab("") + xlab("")+
+  scale_fill_manual("",
+    values =c("#029A88","#C33110", "#CCBC44", "#BBBBBB"), 
+                    labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
+                               "Habitat" = "Habitat\n(SF, TF)", 
+                               "Species" = "Species\n(n=6)",
+                               "Within" = "Individuals")) +
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+  theme_minimal()
+
+#second longer version.
+#variance partitionning for these traits
+
+varcomp.gmin<-varcomp(lme(log(Gmin)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1) 
+
+varcomp.gmin$Trait <- c("Gmin")
+
+varcomp.tlp<-varcomp(lme(log(-TLP)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.tlp$Trait <- c("TLP")
+
+varcomp.LSWC<-varcomp(lme(log(LSWC)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.LSWC$Trait <- c("LSWC")
+
+varcomp.MajVLA<-varcomp(lme(log(MajVLA)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.MajVLA$Trait <- c("MajVLA")
+
+varcomp.SD<-varcomp(lme(log(SD)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.SD$Trait <- c("SD")
+
+varcomp.C<-varcomp(lme(log(C)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.C$Trait <- c("C")
+
+varcomp.K<-varcomp(lme(log(K)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.K$Trait <- c("K")
+
+varcomp.N<-varcomp(lme(log(N)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.N$Trait <- c("N")
+
+varcomp.P<-varcomp(lme(log(P)~1,random=~1|Forest/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.P$Trait <- c("P")
+
+
+vars <- bind_rows(varcomp.gmin, varcomp.tlp, varcomp.MajVLA, varcomp.LSWC, varcomp.SD, varcomp.C, varcomp.N, varcomp.K, varcomp.P) 
+
+
+vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "variance") 
+
+#plot
+
+
+v<- vars %>%  
+  #mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]")) %>%
+  ggplot(aes(fill=level, y=variance, x=Trait)) + 
+  geom_bar(position="stack", stat="identity") +
+  theme_minimal(base_size = 22) +
+  ylab("") + xlab("")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+    scale_fill_manual("", values = c("#029A88","#C33110", "#CCBC44", "#BBBBBB"), 
+                    labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
+                               "Habitat" = "Habitat\n(SF, TF)", 
+                               "Name" = "Species\n(n=6)")) +
+  scale_x_discrete(labels = scales::label_parse())
+  #ggtitle("Portion of total variance (%)")
+v
+ggsave(filename = "Variance_partitioning_v1.png", plot = v, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##v2
+```{r VP - plots}
+#variance partitionning for these traits V2 - with plots as an additional level
+library(ape)
+
+varcomp.gmin<-varcomp(lme(log(Gmin)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1) 
+
+varcomp.gmin$Trait <- c("Gmin")
+
+varcomp.tlp<-varcomp(lme(log(-TLP)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.tlp$Trait <- c("TLP")
+
+varcomp.LSWC<-varcomp(lme(log(LSWC)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.LSWC$Trait <- c("LSWC")
+
+varcomp.MajVLA<-varcomp(lme(log(MajVLA)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.MajVLA$Trait <- c("MajVLA")
+
+varcomp.SD<-varcomp(lme(log(SD)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.SD$Trait <- c("SD")
+
+varcomp.C<-varcomp(lme(log(C)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.C$Trait <- c("C")
+
+varcomp.K<-varcomp(lme(log(K)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.K$Trait <- c("K")
+
+varcomp.N<-varcomp(lme(log(N)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.N$Trait <- c("N")
+
+varcomp.P<-varcomp(lme(log(P)~1,random=~1|Forest/Plot/Habitat/Name, data = sub_data_G, na.action = na.omit),1)
+
+varcomp.P$Trait <- c("P")
+
+
+vars <- bind_rows(varcomp.gmin, varcomp.tlp, varcomp.MajVLA, varcomp.LSWC, varcomp.SD, varcomp.N, varcomp.K, varcomp.C, varcomp.P) 
+
+
+vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "variance") 
+
+#Type
+
+
+v2<- vars %>%  
+  mutate(Trait = dplyr::recode(Trait, "Gmin" = "g[min]", "TLP" = "pi[tlp]")) %>%
+  ggplot(aes(fill=level, y=variance, x=Trait)) + 
+  geom_bar(position="stack", stat="identity") +
+  theme_minimal(base_size = 22) +
+  ylab("") + xlab("")+
+  theme(legend.text = element_text(face = "italic"),legend.position = "bottom") +
+    scale_fill_manual("", values = c("#029A88","#84C3E4", "#C33110", "#CCBC44", "#BBBBBB"), 
+                    labels = c("Forest" = "Forest\n(Paracou, Bafog, Kaw)",
+                               "Plot" = "Plot",
+                               "Habitat" = "Habitat\n(SF, TF)", 
+                               "Species" = "Species\n(n=6)")) +
+  scale_x_discrete(labels = scales::label_parse()) +
+  ggtitle("Portion of total variance (%)")
+
+v2
+ggsave(filename = "Variance_partitioning_v2_with_plots.png", plot = v2, bg = "white", width = 10, height = 8, dpi = 600)
+```
+
+##v3
+
+ m.gmin<-lmer(log(Gmin)~1+(1|Habitat/Name) + (1|Forest/Plot), data = sub_data_G, na.action = na.omit)
+boundary (singular) fit: see help('isSingular') 
+
+*i tried that but i don't have that many sites or plots per sites.*
+
+#**END**

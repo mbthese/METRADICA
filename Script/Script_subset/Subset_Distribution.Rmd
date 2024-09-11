@@ -1,0 +1,397 @@
+---
+title: "Distribution"
+author: "Marion Boisseaux"
+date: "04/05/2022"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+# (PART) Part three : Results {-}
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(olsrr)
+library(ggplot2)
+```
+
+# Data
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# data
+
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  select(Code, Genus, Species, Name, Habitat, Type, HabitatType,Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P,Fe,Mn,Mg,Zn, C,Ca,Sr,Na, N,S,Rb, Cu,Ni, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=738111573", range = "Metradica") %>% 
+  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N,Ca, StomatalDensity, TreeHeight, BranchHeight, TreeDawkins, BranchDawkins) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight), BranchHeight = as.numeric(BranchHeight))  
+
+
+Subdata_shapiro <- slice_sample(Metradica, n=30) # Shapiro test is used for small sample size (n=30)
+```
+
+#Subset
+# Subdata
+
+```{r}
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica <- sub_data
+export(Metradica, "Subset.csv")
+```
+
+# Distribution of major traits 
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the *mean * and the *variance* of the community trait distribution is rooted in the 
+concept of phenotype-environment matching and environmental optimality, where species’ relative abundance is mediated by their traits, that is, “community assembly by trait selection”. To understand how community trait composition is affected by ecological processes. 
+
+
+* use of community-weighted trait metrics CWM
+* variance
+* mean
+* skewness (symmetry)
+* kurtosis (measure of tailness with heavy tail referring to outliers)
+
+
+*before and after log tranform*
+
+## Gmin
+
+
+```{r}
+
+ggplot(Metradica) +
+ aes(x = Gmin) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = log(Gmin)) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#shapiro 
+shapiro.test(Metradica$Gmin)
+shapiro.test(Subdata_shapiro$Gmin)
+
+
+ #produces a normal QQ plot
+qqnorm(Metradica$Gmin, pch = 1, frame = FALSE, main= "log(Gmin)")
+qqline(Metradica$Gmin, col = "steelblue", lwd = 2)
+
+
+
+```
+
+## TLP
+```{r}
+ggplot(Metradica) +
+ aes(x = TLP) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+
+#qqplot
+qqnorm(Metradica$TLP, pch = 1, frame = FALSE, main= "log(abs(TLP))")
+qqline(Metradica$TLP, col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(Metradica$TLP)
+shapiro.test(Subdata_shapiro$TLP)
+
+
+```
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were "wetter" than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al. 1992; Abrams & Kubiske 1994; Cao 2000; Merchant et al. 2007; Zhu & Cao 2009; Bartlett, Scoffoni & Sack 2012b; Bartlett et al. 2014).
+
+
+## LA
+
+```{r}
+ggplot(Metradica) +
+ aes(x = LA) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot
+qqnorm(Metradica$LA, pch = 1, frame = FALSE, main= "log(LA)")
+qqline(Metradica$LA, col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(Metradica$LA)
+shapiro.test(Subdata_shapiro$LA)
+
+
+```
+
+
+## LSWC (pas normal)
+```{r}
+
+ggplot(Metradica) +
+ aes(x = LSWC) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+
+#qqplot
+qqnorm(Metradica$LSWC, pch = 1, frame = FALSE, main= "log(LSWC)")
+qqline(Metradica$LSWC, col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(Metradica$LSWC) #not normal !!
+shapiro.test(Subdata_shapiro$LSWC) # yes
+
+
+```
+
+
+## MajVLA
+```{r}
+ggplot(Metradica) +
+ aes(x = MajVLA) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+
+#qqplot
+qqnorm(Metradica$MajVLA, pch = 1, frame = FALSE, main= "log(MajVLA)")
+qqline(Metradica$MajVLA, col = "steelblue", lwd = 2)
+
+#shapiro 
+shapiro.test(Metradica$MajVLA)
+
+```
+
+
+
+## Chemistry
+
+### K (pas normal)
+```{r}
+
+#Distribution chimie pour le potassium
+ggplot(Metradica) +
+ aes(x = K) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+
+#qqplot pour le potassium
+qqnorm(Metradica$K, pch = 1, frame = FALSE, main= "log(K)")
+qqline(Metradica$K, col = "steelblue", lwd = 2)
+
+#shapiro  pour le potassium
+shapiro.test(Metradica$K) #not normal
+shapiro.test(Subdata_shapiro$K) # yes
+```
+
+### P
+
+```{r}
+#Distribution chimie pour le phosphore
+ggplot(Metradica) +
+ aes(x = P) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot pour le phosphore
+qqnorm(Metradica$P, pch = 1, frame = FALSE, main= "log(P)")
+qqline(Metradica$P, col = "steelblue", lwd = 2)
+
+#shapiro  pour le phosphore
+shapiro.test(Metradica$P)
+```
+
+### C (pas normal)
+
+```{r}
+
+
+ggplot(Metradica) +
+  aes(x = asin(sqrt(Metradica$C/100))) +
+  geom_histogram(bins = 30L, fill = "#112446") +
+  theme_minimal()
+
+ggplot(Metradica) +
+  aes(x =C) +
+  geom_histogram(bins = 30L, fill = "#112446") +
+  theme_minimal()
+
+
+#qqplot pour le carbon
+qqnorm(Metradica$C, pch = 1, frame = FALSE, main= "log(C)")
+qqline(Metradica$C, col = "steelblue", lwd = 2)
+
+qqnorm(asin(sqrt(Metradica$C/100)), pch = 1, frame = FALSE, main= "arcsin(C)")
+qqline(asin(sqrt(Metradica$C/100)), col = "steelblue", lwd = 2)
+
+#shapiro  pour le carbon
+shapiro.test(Metradica$C) # pas normal
+shapiro.test(Subdata_shapiro$C)
+shapiro.test(asin(sqrt(Metradica$C/100)))
+```
+
+
+### N
+```{r}
+
+ 
+ggplot(Metradica) +
+ aes(x = N) +
+ geom_histogram(bins = 30L, fill = "#112446") +
+ theme_minimal()
+
+#qqplot pour l'azote
+qqnorm(Metradica$N, pch = 1, frame = FALSE, main= "log(N)")
+qqline(Metradica$N, col = "steelblue", lwd = 2)
+
+#shapiro  pour l'azote
+shapiro.test(Metradica$N)
+ 
+  
+#rapide analyses par habitat
+library(ggplot2)
+ggplot(Metradica) +
+ aes(x = HabitatType, y = K) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = HabitatType, y = P) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+```
+
+### Other elements
+```{r}
+
+
+########### le reste des elements
+
+Metradica %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+ aes(x = HabitatType, y = K) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+Metradica %>%
+ filter(!is.na(HabitatType)) %>%
+ ggplot() +
+ aes(x = HabitatType, y = P) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+library(ggplot2)
+
+ggplot(Metradica) +
+ aes(x = HabitatType, y = N) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Metradica) +
+ aes(x = HabitatType, y = C) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+Data <- Metradica_log
+
+ggplot(Data) +
+ aes(x = HabitatType, y = S) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Fe) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Mn) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Mg) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Ca) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Na) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Cu) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Ni) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Rb) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Sr) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+ggplot(Data) +
+ aes(x = HabitatType, y = Zn) +
+ geom_boxplot(shape = "circle", fill = "#112446") +
+ theme_minimal()
+
+```
+

@@ -1,0 +1,547 @@
+---
+title: "Subset_Boxplot_Forest"
+author: "Marion Boisseaux"
+date: "20/09/2022"
+output: html_document
+---
+# Libraries
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(multcomp) #for lmer model to do anovas
+library(lmerTest) #same
+library(emmeans)#same
+library(multcompView)
+
+```
+
+# Data
+
+```{r Data_results, message=FALSE, warning=FALSE}
+
+# data
+
+library(dplyr)
+Metradica_log <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Metradica_trait_OUT.csv") %>% 
+  dplyr::select(Code, Genus, Species, Name, Habitat, Type, Forest, Gmin, TLP, LSWC, MajVLA, Nitrogen, Carbon, Phosphorous, Potassium, SD) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), abs) %>% 
+  mutate_at(c("Gmin","TLP", "LSWC", "MajVLA", "Nitrogen", "Carbon", "Phosphorous", "Potassium", "SD"), log) %>% 
+  mutate(TLP = -TLP) %>%
+  rename(K= Potassium,
+         P = Phosphorous,
+         C = Carbon, 
+         N= Nitrogen)
+
+sub_data_TF <- Metradica_log %>%
+  filter(Name %in% c("Dicorynia_guianensis", "Iryanthera_sagotiana", "Gustavia_hexapetala", "Licania_membranacea", "Poraqueiba_guianensis", "Virola_michelii"))
+
+sub_data_SF <- Metradica_log %>%
+  filter(Name %in% c("Eschweilera_coriacea","Eperua_falcata", "Iryanthera_hostmannii", "Laetia_procera", "Protium_opacum subsp. rabelianum", "Pterocarpus_officinalis", "Symphonia_globulifera", "Virola_surinamensis"))
+
+sub_data_G <-  Metradica_log %>%
+  filter(Name %in% c("Bocoa_prouacensis", "Conceveiba_guianensis", "Jacaranda_copaia subsp. copaia", "Hymenopus_heteromorphus", "Protium_stevensonii", "Tachigali_melinonii"))
+
+sub_data <- bind_rows(sub_data_TF, sub_data_SF, sub_data_G)
+
+Metradica <- sub_data
+
+```
+
+## Specialist data
+```{r}
+Metradica$Type <- as.character(Metradica$Type)
+Metradica$Name <- as.character(Metradica$Name)
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Virola_michelii','TF',Type))
+
+Metradica <- Metradica %>% mutate(Type= ifelse(Name == 'Eschweilera_coriacea','BF',Type))
+
+data <- Metradica %>% filter(Type !="Generalist")
+
+```
+
+## Gmin 
+```{r}
+#data <- data_Paracou
+
+res.aov2 <- aov(Gmin ~ Habitat , data = data)
+summary(res.aov2)
+
+group_by(data, Habitat, Forest) %>%
+  summarise(
+    count = n(),
+    mean = mean(Gmin, na.rm = TRUE),
+    sd = sd(Gmin, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(Gmin ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(Gmin), sd=sd(Gmin)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+Gmin <- ggplot(data, aes(x = Habitat, y = Gmin)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust =3, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(Gmin)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+ggsave(path = "./Results/Boxplot/Subset/", filename = "Gmin_Paracou_HabitatPref.png", plot = Gmin, bg = "white", width = 8, height = 8, dpi = 600)
+
+Gmin
+
+
+
+```
+
+## TLP
+```{r}
+
+res.aov2 <- aov(TLP ~ Habitat, data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(TLP, na.rm = TRUE),
+    sd = sd(TLP, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(TLP ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(TLP), sd=sd(TLP)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+TLP <- ggplot(data, aes(x = Habitat, y = TLP)) +
+  geom_boxplot()+
+  geom_jitter(aes(colour= Name)) +
+  facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust =4, size = 10)+
+  labs(x = "Habitat Preference", y = "Log(TLP)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+
+TLP
+ggsave(path = "./Results/Boxplot/Subset/", filename = "TLP_Paracou_HabitatPref.png", plot = TLP, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+
+
+
+```
+
+## LSWC 
+
+```{r}
+
+res.aov2 <- aov(LSWC ~ Habitat, data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(LSWC, na.rm = TRUE),
+    sd = sd(LSWC, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(LSWC ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(LSWC), sd=sd(LSWC)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+LSWC <- ggplot(data, aes(x = Habitat, y = LSWC)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = -6, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(LSWC)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+ggsave(path = "./Results/Boxplot/Subset/", filename = "LSWC_Paracou_HabitatPref.png", plot = LSWC, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+
+  
+```
+
+## MajVLA 
+
+```{r}
+
+res.aov2 <- aov(MajVLA ~ Habitat, data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(MajVLA, na.rm = TRUE),
+    sd = sd(MajVLA, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(MajVLA ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(MajVLA), sd=sd(MajVLA)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+MajVLA <- ggplot(data, aes(x = Habitat, y = MajVLA)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = -6, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(MajVLA)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+ggsave(path = "./Results/Boxplot/Subset/", filename = "MajVLA_Paracou_HabitatPref.png", plot = MajVLA, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+MajVLA
+```
+
+## SD 
+
+```{r}
+
+res.aov2 <- aov(SD ~ Habitat, data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(SD, na.rm = TRUE),
+    sd = sd(SD, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(SD ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(SD), sd=sd(SD)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+SD <- ggplot(data, aes(x = Habitat, y = SD)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = -6, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(SD)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+SD
+ggsave(path = "./Results/Boxplot/Subset/", filename = "SD_HabitatPref.png", plot = SD, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+
+```
+
+
+## K 
+
+```{r}
+
+
+res.aov2 <- aov(K ~ Habitat, data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(K, na.rm = TRUE),
+    sd = sd(K, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(K ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data,Habitat) %>%
+  summarise(mean=mean(K), sd=sd(K)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+K <- ggplot(data, aes(x = Habitat, y = K)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = -6, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(K)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+  
+ggsave(path = "./Results/Boxplot/Subset/", filename = "K_Paracou_HabitatPref.png", plot = K, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+K
+```
+
+## P 
+
+```{r}
+
+res.aov2 <- aov(P ~ Habitat , data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(P, na.rm = TRUE),
+    sd = sd(P, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(P ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(P), sd=sd(P)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+P <- ggplot(data, aes(x = Habitat, y = P)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = 3, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(P)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+
+P
+ggsave(path = "./Results/Boxplot/Subset/", filename = "P_Paracou_HabitatPref.png", plot = P, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+
+```
+
+## C 
+
+```{r}
+
+res.aov2 <- aov(C ~ Habitat , data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(C, na.rm = TRUE),
+    sd = sd(C, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(C ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(C), sd=sd(C)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+C <- ggplot(data, aes(x = Habitat, y = C)) +
+  geom_boxplot()+
+#stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
+ # stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
+ # geom_point(data=data_summary, aes(x=Habitat, y=mean))+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust = -3, size = 8)+
+  labs(x = "Habitat Preference", y = "Log(C)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist")) + ylim(c(3.5,4.5))
+  
+
+C
+ggsave(path = "./Results/Boxplot/Subset/", filename = "C_Paracou_HabitatPref.png", plot = C, bg = "white", width = 8, height = 8, dpi = 600)
+
+
+C
+```
+
+## N 
+
+```{r}
+
+
+res.aov2 <- aov(N ~ Habitat , data = data)
+summary(res.aov2)
+
+group_by(data, Habitat) %>%
+  summarise(
+    count = n(),
+    mean = mean(N, na.rm = TRUE),
+    sd = sd(N, na.rm = TRUE)
+  )
+
+TukeyHSD(res.aov2, which = "Habitat")
+plot(res.aov2, 1)
+library(car)
+leveneTest(N ~ Habitat * Forest, data = data)
+
+data_summary <- group_by(data, Habitat) %>%
+  summarise(mean=mean(N), sd=sd(N)) %>%
+  arrange(desc(mean))
+print(data_summary)
+
+tukey <- TukeyHSD(res.aov2)
+tukey.cld <- multcompLetters4(res.aov2 , tukey)
+print(tukey.cld)
+
+# adding the compact letter display to the table with means and sd
+cld <- as.data.frame.list(tukey.cld$`Habitat`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+
+N <- ggplot(data, aes(x = Habitat, y = N)) +
+  geom_boxplot()+
+  geom_jitter(aes(colour= Name)) +
+    facet_wrap(~Forest) +
+  geom_text(data = data_summary, aes(x = Habitat, y = sd, label = Tukey), vjust =4, size = 10)+
+  labs(x = "Habitat Preference", y = "Log(N)")+ scale_x_discrete("Habitat Preference", labels = c("BF" = "SF specialist","TF" = "TF specialist"))
+
+N
+ggsave(path = "./Results/Boxplot/Subset/", filename = "N_Paracou_HabitatPref.png", plot = N, bg = "white", width = 8, height = 8, dpi = 600)
+
+```
+
+# Summary
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("thomasp85/patchwork")
+library(ggplot2)
+library(patchwork)
+
+Sum <- (SD |TLP | LSWC)/(Gmin | MajVLA)/(K | P | C | N ) + plot_layout(guides = "collect")
+Sum
+ggsave(path = "./Results/Boxplot/Subset/", filename = "Summary_subset.png", plot = Sum, bg = "white", width = 15, height = 8, dpi = 600)
+
+
+
+
+
+```
+

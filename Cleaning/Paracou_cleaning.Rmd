@@ -1,0 +1,320 @@
+---
+title: "Paracou_cleaning"
+author: "Marion Boisseaux"
+date: "29/03/2022"
+output: html_document
+---
+# Paracou data 
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(rio)
+
+Daniela <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/FieldSheet_Clean_OUT_Metradica.csv")
+
+# drop the M in the codeand change column names
+
+Daniela$RWCnr_original<-gsub("M","",as.character(Daniela$RWCnr_original))
+
+Daniela <- Daniela %>% rename(Code = RWCnr_original, Species = Species_CorrBota, Genus = Genus_CorrBota, Family = Family_CorrBota) %>% select(-SpecCode_CorrBota, -spName_CorrBota) %>%
+  mutate(Name = paste(Genus, Species)) %>%
+  relocate(Name, .after = Species)
+
+
+Traits_Paracou <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Traits_Paracou.csv", 
+    col_types = cols(`Delta_Weight_SW-FW(g)` = col_skip(), 
+        `delta_en_%_real` = col_skip(), `delta_en_%_clean` = col_skip(), 
+        RWC = col_skip(), `1st_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `2nd_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `3rd_Order_Vein_Density (mm/mm^2)` = col_skip(), 
+        `Major_Vein_Density (mm/mm^2)` = col_skip(), 
+        `Stomata_Density (nb/mm^2)` = col_skip(), 
+        `Stomata_Size (um^2)` = col_skip()))
+
+Daniela$Genus
+Daniela$Species
+Daniela$Family 
+
+Paracou <- cbind(Paracou, Daniela[c("Genus", "Species", "Name", "Family")])
+
+Paracou <- Paracou %>% relocate("Genus", "Species", "Name", "Family", .after = "FieldNr") %>% rename(Spcode = spName)
+
+export(Paracou, "Paracou.csv")
+```
+
+# FTH data
+```{r}
+library(readxl)
+library(readr)
+
+#only partial info
+Scoffoni_FTHdata <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Scoffoni_FTHdata.xlsx", 
+    sheet = "Summary_FTH")
+
+Scoffoni_FTHdata <- Scoffoni_FTHdata %>% select(CodeFTH, Habitat)
+
+#completing info
+Completing <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/19eULgGa02RS6hwn2ngeEu4akF2YdaQGHS5xSac2hIYI/edit#gid=1299058287", range = "traits")
+
+Completing <- filter(Completing, Completing$StudyLevel == "tree")
+
+Completing <- Completing %>% select(-StudyLevel, -Sample, -Leaf)%>% rename(CodeFTH = Tree)
+
+Gmin_94 <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/Enseignement/FTH2021/GroupeMarion/Data/gmin/Calculgmin/Gmin_FTHwithLA94.csv")
+
+Gmin_94 <- Gmin_94 %>% select(Code, gmin.slope_function) %>% rename(CodeFTH = Code, gmin = gmin.slope_function)
+
+#fill missing gmin values 
+Completing$gmin[is.na(Completing$gmin)] <- Gmin_94$gmin[match(Completing$CodeFTH,Gmin_94$CodeFTH)][which(is.na(Completing$gmin))]
+
+FTH <- left_join(Scoffoni_FTHdata, Completing, by = "CodeFTH")
+
+FTH <- FTH %>% select(-DateField)
+
+export(FTH, "FTH.csv")
+```
+
+# Merge Paracou + FTH Data
+
+```{r}
+Paracou <-  read_csv("Clean_data/Paracou.csv")
+Paracou <- Paracou %>% mutate(Forest = "Paracou") %>% rename(TreeHeight = Height_Tree, TreeDawkins = Dawkin_Tree, BranchHeight = Height_Branch, BranchDawkins = Dawkin_Branch, SubPlot =Subplot, TreeFieldNum = FieldNr)
+
+FTH <- read_csv("Clean_data/FTH.csv")
+
+#Change FTH code from single numbers to adding FTH 
+
+FTH <- FTH %>% mutate(Name = paste(Genus, Species))
+
+#merge
+Paracou_FTH <- full_join(Paracou,FTH)
+
+export(Paracou_FTH, "Paracou_FTH.csv")
+```
+
+
+
+#LA
+
+Check resolution of images.
+```{r}
+library(dplyr)
+library(tidyverse)
+
+path1 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Bocoa_prouacensis")
+
+path2 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Carapa_surinamensis")
+
+path3 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Casearia_javitensis")
+
+path4 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Chrysophyllum_prieurii")
+
+path5 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Conceveiba_guianensis")
+
+path6 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Dicorynia_guianensis")
+
+path7 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Eperua_falcata")
+
+path8 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Eschweilera_coriacea")
+
+path9<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Gustavia_hexapetala")
+
+path10<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Hymenopus_heteromorphus")
+
+path11<- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Iryanthera_hostmanii")
+
+
+###
+
+resolution1 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Bocoa_prouacensis/",path1),tags = "XResolution")
+ResolutionProblems1 <- resolution1 %>% filter(XResolution!=1328)
+
+resolution2 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Carapa_surinamensis/",path2),tags = "XResolution")
+ResolutionProblems2 <- resolution2 %>% filter(XResolution!=1328)
+
+resolution3 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Casearia_javitensis/",path3),tags = "XResolution")
+ResolutionProblems3 <- resolution3 %>% filter(XResolution!=1328)
+
+
+resolution4 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Chrysophyllum_prieurii/",path4),tags = "XResolution")
+ResolutionProblems4 <- resolution4 %>% filter(XResolution!=1328)
+
+resolution5 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Conceveiba_guianensis/",path5),tags = "XResolution")
+ResolutionProblems5 <- resolution5 %>% filter(XResolution!=1328)
+
+resolution6 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Dicorynia_guianensis/",path6),tags = "XResolution")
+ResolutionProblems6 <- resolution6 %>% filter(XResolution!=1328)
+
+resolution7 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Eperua_falcata/",path7),tags = "XResolution")
+ResolutionProblems7 <- resolution7 %>% filter(XResolution!=1328)
+
+resolution8 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Eschweilera_coriacea/",path8),tags = "XResolution")
+ResolutionProblems8 <- resolution8 %>% filter(XResolution!=1328)
+
+resolution9 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Gustavia_hexapetala/",path9),tags = "XResolution")
+ResolutionProblems9 <- resolution9 %>% filter(XResolution!=1328)
+
+resolution10 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Hymenopus_heteromorphus/",path10),tags = "XResolution")
+ResolutionProblems10 <- resolution10 %>% filter(XResolution!=1328)
+
+resolution11 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Iryanthera_hostmanii/",path11),tags = "XResolution")
+ResolutionProblems11 <- resolution11 %>% filter(XResolution!=1328)
+
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+
+path12 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Iryanthera_sagotiana")
+
+resolution12 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Iryanthera_sagotiana/",path12),tags = "XResolution")
+ResolutionProblems12 <- resolution12 %>% filter(XResolution!=1328)
+
+path13 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Jacaranda_copaia")
+
+resolution13 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Jacaranda_copaia/",path13),tags = "XResolution")
+ResolutionProblems13 <- resolution13 %>% filter(XResolution!=1328)
+
+
+path14 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Laetia_procera")
+
+resolution14 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Laetia_procera/",path14),tags = "XResolution")
+ResolutionProblems14 <- resolution14 %>% filter(XResolution!=1328)
+
+path15 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Licania_membranacea")
+
+resolution15 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Licania_membranacea/",path15),tags = "XResolution")
+ResolutionProblems15 <- resolution15 %>% filter(XResolution!=1328)
+```
+
+```{r}
+path16 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Poraqueiba_guianensis")
+
+resolution16 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Poraqueiba_guianensis/",path16),tags = "XResolution")
+ResolutionProblems16 <- resolution16 %>% filter(XResolution!=1328)
+
+path17 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Protium_opacum")
+
+resolution17 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Protium_opacum/",path17),tags = "XResolution")
+ResolutionProblems17 <- resolution17 %>% filter(XResolution!=1328)
+
+path18 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Protium_stevensonii")
+
+resolution18 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Protium_stevensonii/",path18),tags = "XResolution")
+ResolutionProblems18 <- resolution18 %>% filter(XResolution!=1328)
+
+path19 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Pterocarpus_officinalis")
+
+resolution19 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Pterocarpus_officinalis/",path19),tags = "XResolution")
+ResolutionProblems19 <- resolution19 %>% filter(XResolution!=1328)
+
+
+
+```
+
+```{r}
+
+path20 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Symphonia_globulifera")
+
+resolution20 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Symphonia_globulifera/",path20),tags = "XResolution")
+ResolutionProblems20 <- resolution20 %>% filter(XResolution!=1328)
+
+path21 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Tachigali_melinonii")
+
+resolution21 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Tachigali_melinonii/",path21),tags = "XResolution")
+ResolutionProblems21 <- resolution21 %>% filter(XResolution!=1328)
+
+path22 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Virola_michelii")
+
+resolution22 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Virola_michelii/",path22),tags = "XResolution")
+ResolutionProblems22 <- resolution22 %>% filter(XResolution!=1328)
+
+path23 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Vouacapoua_americana")
+
+resolution23 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Vouacapoua_americana/",path23),tags = "XResolution")
+ResolutionProblems23 <- resolution23 %>% filter(XResolution!=1328)
+```
+
+#Export excel of resolution
+```{r}
+library(rio)
+export(ResolutionProblems1, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Bocoa_prouacensis/Bocpro.csv")
+
+
+export(ResolutionProblems2,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Carapa_surinamensis/carsur.csv")
+
+export(ResolutionProblems8,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Eschweilera_coriacea/esccor.csv")
+
+export(ResolutionProblems10,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Hymenopus_heteromorphus/hymhet.csv")
+
+
+export(ResolutionProblems13,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Jacaranda_copaia/Jaccop.csv")
+
+
+export(ResolutionProblems16,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Poraqueiba_guianensis/Porgui.csv")
+
+
+export(ResolutionProblems17,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Protium_opacum/Proopa.csv")
+
+
+export(ResolutionProblems19,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Pterocarpus_officinalis/Pteoff.csv")
+
+```
+
+```{r}
+export(ResolutionProblems20,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Symphonia_globulifera/symglo.csv")
+
+export(ResolutionProblems21,"C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Tachigali_melinonii/tacmel.csv")
+
+```
+
+
+
+#Summary resolution
+
+```{r}
+library(readxl)
+
+resolutionParacou <- read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Paracou/Rawdata/Donnees_clean/Metradica_scan_Paracou/Resolution.xlsx")
+
+resolution1200 <- resolutionParacou %>% filter(XResolution== 1200)
+resolution394 <- resolutionParacou %>% filter(XResolution== 394)
+resolution395 <- resolutionParacou %>% filter(XResolution== 395)
+resolution2653 <- resolutionParacou %>% filter(XResolution== 2653)
+resolution96<- resolutionParacou %>% filter(XResolution== 96)
+resolution303<- resolutionParacou %>% filter(XResolution== 303)
+resolution393<- resolutionParacou %>% filter(XResolution== 393)
+resolution356<- resolutionParacou %>% filter(XResolution== 356)
+```
+
+# FTH check resolution
+
+```{r}
+path24 <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Scoffoni_FTH")
+
+resolution24 <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Scoffoni_FTH/",path24),tags = "XResolution")
+ResolutionProblems24 <- resolution24 %>% filter(XResolution!=1328)
+```
+
+# Calcultating LA once and for all!!
+
+## Paracou
+
+1 cm with the line is 600 pixel. So you just divide by pixel area with 600^2.
+
+Except for some scans at 1200 dpi (1-sided lamp)
+
+
+
+
+
+
+
+
+
+
+
+

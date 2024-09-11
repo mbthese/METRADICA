@@ -1,0 +1,340 @@
+---
+title: "SI_Paper_Metradica"
+author: "Marion Boisseaux"
+date: "13/09/2022"
+output: html_document
+---
+
+# Libraries
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(factoextra) 
+library(ggfortify)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggtree)
+library(readxl)
+library(gridExtra)
+library(rio)
+library(dplyr)
+library(tidyr)
+library(janitor)
+library(forcats)
+library(ggplot2)
+```
+
+# Species phylogeny
+
+```{r Phylogeny, echo=FALSE, message=FALSE, warning=FALSE}
+
+species <- data.frame(taxon = c(
+  "Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia subsp. copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+#  "Chrysophyllum_prieurii",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii",
+  "Carapa_surinamensis",
+#  "Carapa_guianensis",
+  "Laetia_procera",
+  "Protium_opacum subsp. rabelianum",
+ # "Casearia_javitensis",
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  #"Vouacapoua_americana"
+))%>% separate(taxon, c("Genus", "Species"), sep = "_", remove = F)
+
+species <- dplyr::select(species, taxon , Genus, Species)
+
+paracou <- read_excel("../Metradica_Paracou/Document/Paracou_database20210830.xlsx") %>% 
+  dplyr::select(Family, Genus, Species) %>% 
+  unique() %>% 
+  full_join(species) %>% 
+  mutate(species = paste(Genus, Species), genus = Genus, family = Family) %>% 
+  dplyr::select(species, genus, family, taxon) %>% 
+  mutate(taxon = as.character(taxon))
+
+tree <- phylo.maker(sp.list = paracou, tree = GBOTB.extended, nodes = nodes.info.1, scenarios = "S3")
+
+#remove # when running for the first time.
+
+#save(tree, file = "./Results/phylogeny_subset.Rdata")
+#load("./Results/phylogeny_subset.Rdata")
+
+A<- fortify(tree$scenario.3) %>% 
+  mutate(species = gsub("_", " ", label)) %>% 
+  left_join(paracou) %>% 
+  ggtree(aes(col = taxon), layout="circular") + 
+  geom_tiplab2(aes(alpha = !is.na(taxon), size = !is.na(taxon))) +
+  theme_tree(legend.position='bottom', legend.text = element_text(face = "italic")) +
+  scale_alpha_manual("taxon", values = c(0.2, 4)) +
+  scale_size_manual("taxon", values = c(1, 4))
+
+#choose saving format
+ggsave(file="phylo_subset.svg", plot=A, width=15, height=10)
+ggsave(file="phylo_subset.jpg", plot=A, width=15, height=10)
+```
+
+
+# Table sampling 
+
+*Total individuals collected for the paper.*
+
+```{r Subset - Individuals per species collected in the three sampling sites. }
+
+#get authorization 
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Family <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(Family, Genus, Species)
+
+#Marion's computer path METRADICA/Divers/Species_choice_Indval/Metradica_species_subset_total.csv
+
+#campaign subset data
+#data added to drive for co-authors
+Data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT_cleaning/Subset_imputed/Subset_imputation_exceptSD.csv") 
+
+Paracou <- Data %>% 
+  filter(Forest == "Paracou") %>%
+  group_by(Name) %>%
+  summarise(Paracou = n())
+
+Bafog <- Data %>% 
+  filter(Forest == "Bafog") %>%
+  group_by(Name) %>%
+  summarise(Bafog = n())
+
+Kaw <- Data %>% 
+  filter(Forest == "Kaw") %>%
+  group_by(Name) %>%
+  summarise(Kaw = n())
+
+Paracou <- left_join(Paracou, Bafog)
+
+Totaux_table <- left_join(Paracou, Kaw)
+
+Data <- Data %>% dplyr::select(Genus, Species, Name) %>%unique()
+
+Data <-   left_join(Totaux_table, Data)%>%
+  relocate(Genus, .before =Name) %>%
+  relocate(Species, .after = Genus)
+
+Totaux_table <- left_join(Data, Family)
+
+Totaux_table <- Totaux_table %>%
+  select(-Name) %>%
+  relocate(Family, .before="Genus") %>%
+  adorn_totals("row")
+
+
+Totaux_table <- Totaux_table %>%
+  replace(is.na(.), 0) %>%
+  mutate(Total = rowSums(select(., -Family, -Genus, -Species)))
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+Totaux_table %>%
+  kbl(caption = "Individuals per species collected on the 3 sites") %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  column_spec(2:3, italic = T) %>%
+  row_spec(0, bold= T) %>%
+  row_spec(22, background = "#666;", color = "white") %>%
+  column_spec(7,  background = "#666;", color = "white" ) %>%
+save_kable(file = "../METRADICAproject/Results/Tables_SI/Sampling_subset.png")
+
+```
+
+
+# Table Indvals
+
+```{r Species chosen for the study according to the Indicator values (Indval) within each habitat in French Guiana. }
+
+#get authorization
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+#indval data 
+Indval <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=122243583", sheet = "Species_SI") %>% select(-Paracou, -Bafog, -Kaw)
+
+Indval <- with(Indval, Indval[order(Type) , ]) #ordering per type
+
+options(knitr.kable.NA = '') #replace NA by blank spaces in table
+
+
+Indval %>%
+  kbl() %>%
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1:2, italic = TRUE) %>%
+  kable_classic_2(full_width = F) %>% save_kable(file = "../METRADICAproject/Results/Tables_SI/IndVal_subset.png", zoom = 10)
+
+```
+
+# Graph Indvals
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word **preference**), but are also a high probability of being sampled in the given habitat.
+
+Our analysis identified 9 generalist taxa, 8 SFF specialist taxa and 7 terra firme specialist taxa.
+
+```{r Indval boxplots per habitat preferences}
+#baraloto et al SI
+indval_baraloto <- readxl::read_xlsx("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Species_choice_Indval/Indval_Peru_&_FG.xlsx")
+
+indval_baraloto <- indval_baraloto %>% select(...8, ...9, ...10, ...11, ...12, ...13)
+
+indval_FG <- indval_baraloto[-(1:4),-5]
+
+indval_FG <- janitor::row_to_names(indval_FG, 1)
+
+#calculating thresholds for habitat specialists
+probs <- c(0.95)
+quantiles_SF <- quantile(as.numeric(indval_FG$SF), prob=probs) # Top 5% highest values for SF specialists : indval >= 0.2 
+#95% 
+#0.2 
+quantiles_TF <- quantile(as.numeric(indval_FG$TF), prob=probs) 
+#   95% 
+# 0.2598 
+
+indval_FG$SF<- as.numeric(indval_FG$SF)
+indval_FG$TF<- as.numeric(indval_FG$TF)
+
+#SF specialists
+Data_SF<- indval_FG %>%
+  select(Species, Abund, SF, TF, `P-value`) %>%
+  filter(SF >= 0.2) %>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#TF specialists
+Data_TF<- indval_FG %>%
+  select(Species, Abund,SF, TF, `P-value`) %>%
+  filter(TF >= 0.2598)%>%
+  rename(Indval_SF =SF, Indval_TF =TF)
+
+#concerning our species
+identified_species <- data.frame(Species = c("Eperua_falcata", 
+  "Iryanthera_hostmannii", 
+  "Jacaranda_copaia",
+  "Pterocarpus_officinalis",
+  "Symphonia_globulifera",
+  "Tachigali_melinonii",
+  "Virola_surinamensis", 
+  "Bocoa_prouacensis",
+  "Conceveiba_guianensis",
+  "Eschweilera_coriacea",
+  "Hymenopus_heteromorphus",
+  "Protium_stevensonii",
+  "Virola_michelii", 
+  "Carapa_surinamensis", 
+  "Laetia_procera",
+  "Protium_opacum", 
+  "Dicorynia_guianensis",
+  "Gustavia_hexapetala",
+  "Iryanthera_sagotiana",
+  "Licania_membranacea",
+  "Poraqueiba_guianensis"
+  ))
+  
+
+Specialist_SF <- left_join(identified_species, Data_SF) %>% na.omit()
+
+Specialist_TF <- left_join(identified_species, Data_TF) %>% na.omit()
+
+Generalist_fort_indval_deux_habitats <- inner_join(Specialist_SF, Specialist_TF )
+
+
+Specialist_TF <- Specialist_TF %>% 
+  filter(Species != "Conceveiba_guianensis") %>% #con.gui species in both, removed it
+  mutate(Type = "TF specialist")
+Specialist_SF <- Specialist_SF %>% 
+  filter(Species != "Conceveiba_guianensis") %>%#con.gui species in both, removed it
+   mutate(Type = "SF specialist")
+
+
+#indval graphs
+indval_SF_plot <- Specialist_SF  %>%
+  mutate(Species = fct_reorder(Species, Indval_SF)) %>% 
+  ggplot(aes(x = Species, y = Indval_SF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlGnBu", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+ggsave(file="indval_SF_plot.svg", plot=indval_SF_plot, width=10, height=8)
+ggsave(file="indval_SF_plot.png", plot=indval_SF_plot, width=10, height=8) 
+
+indval_TF_plot<- Specialist_TF  %>%
+  mutate(Species = fct_reorder(Species, Indval_TF)) %>% 
+  ggplot(aes(x = Species, y = Indval_TF, fill = Species)) +
+  geom_col() +
+  scale_fill_brewer(palette = "YlOrRd", direction = 1) +
+  theme_minimal() +
+  # theme(palette = "Tol") #color blind palette
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+ggsave(file="indval_TF_plot.svg", plot=indval_TF_plot, width=10, height=8)
+ggsave(file="indval_TF_plot.png", plot=indval_TF_plot, width=10, height=8)
+
+#now for generalists
+Generalist <- left_join(identified_species, indval_FG) 
+
+Generalist <- Generalist %>% rename(Indval_SF = SF, Indval_TF = TF)
+
+Generalist <-  Generalist %>%
+  na.omit() %>%
+  filter(Indval_TF <= 0.2598) %>%
+  filter(Indval_SF <= 0.2)
+
+#cannot consider jas.jav.
+Generalist <- Generalist %>% 
+  filter(Species != "Casearia_javitensis") %>%
+  filter(Abund != 5) 
+
+
+Generalist_all  <-rbind(Generalist, Generalist_fort_indval_deux_habitats)
+
+
+Generalist_all <- Generalist_all %>% 
+  mutate(Diff_Indval = abs(Indval_SF-Indval_TF)) %>%
+  mutate(Type = "Generalist")
+
+Generalist_diff_indval<- ggplot(Generalist_all) +
+   aes(x = Species, y = Diff_Indval, fill = Species) +
+   geom_col() +
+   scale_fill_brewer(palette = "RdYlBu", direction = 1) +
+   theme_minimal() +#les couleurs en faveur des BF, tacmel proche d'un SF spe donc couleur bleu
+  theme(axis.text.x=element_text(angle=50, hjust = 1))+
+  theme(legend.position="none")
+
+ggsave(file="indval_generalist_diff_indval_plot.svg", plot=Generalist_diff_indval, width=10, height=8)
+ggsave(file="indval_generalist_diff_indval_plot.png", plot=Generalist_diff_indval, width=10, height=8)
+
+```
+
+# Plot table
+```{r Plot information }
+Plot_table <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1XoQH2pg5bcuvFzSdmY4v_lC-D_u9LMye4RTiJU4XRmg/edit#gid=0")
+googlesheets4::gs4_auth(scopes = "https://www.googleapis.com/auth/spreadsheets.readonly" )
+
+Plot_table <- Plot_table %>% 
+  dplyr::select(-PlotName, -Xutm, -Yutm, -Localization)
+  
+Plot_table %>%
+  kbl(caption = "Summary of sampling site information", escape = FALSE, digits = 2) %>%
+  row_spec(0, bold = TRUE) %>% 
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  save_kable(file = "../Tables_SI/Plot_info_summary.png", zoom = 5)
+
+```
+

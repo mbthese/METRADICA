@@ -1,0 +1,904 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{book}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{booktabs}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Meeting Notes},
+  pdfauthor={Marion Boisseaux},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Meeting Notes}
+\author{Marion Boisseaux}
+\date{31/01/2022}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+\hypertarget{about}{%
+\chapter{About}\label{about}}
+
+Welcome to the \emph{Metradica} project Github.
+
+This repository supports all code and documentation about the project.
+
+The global objectives of \emph{Metradica} are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent.
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+Part of my PhD project is included in the METRADICA strategic project. \textbf{Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest.}
+
+Have a nice reading !
+
+\hypertarget{part-part-one-general-introduction}{%
+\part{Part one: general introduction}\label{part-part-one-general-introduction}}
+
+\hypertarget{project-introduction}{%
+\chapter{Project introduction}\label{project-introduction}}
+
+My thesis is included in the METRADICA strategic project lead by Clement Stahl and Ghislain Vieilledent. \textbf{Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest}.
+
+The global objectives of Metradica are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits.
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+There are 4 tasks :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  environmental index + species hydrological affinity
+\item
+  species distribution + functional responses to env't\\
+\item
+  prediction of species distribution from traits using \emph{four-corners} joint species distribution models
+\item
+  shifts in species distribution through the lens of demographic process: interaction between models
+\end{enumerate}
+
+\begin{figure}
+\centering
+\includegraphics{./Documents/Pictures/Overall_project.PNG}
+\caption{Metradica project organisation}
+\end{figure}
+
+I am involved in task 2 : to acquire additional traits information in order to have an understanding of the environmental effect on intra- and inter- specific trait variability for morpho-anatomic and mechanistic traits at regional and local scales.
+
+\hypertarget{hypotheses}{%
+\chapter{Hypotheses}\label{hypotheses}}
+
+\textbf{(1) Importance of local habitat in shaping functional strategies}
+
+\begin{itemize}
+\tightlist
+\item
+  Habitats are widely recognized to control trait variation
+\item
+  Identify species with statistically significant habitat associations
+\item
+  Traits syndromes for specialists vs.~generalists
+\end{itemize}
+
+\emph{I will focus on topographic-driven variation in the water table, which is hypothesized to explain variation in forest responses to drought (Nobre et al.,2011) and species distribution (Schietti et al., 2014; Lourenço Jr.~et al., 2021), where trees with higher hydraulic efficiency and drought sensitivity are mostly found in seasonally flooded habitats (Oliveira et al., 2019), which seems to buffer the impact of short-term droughts on Amazon forest survival and productivity (Esteban et al., 2020; Sousa et al., 2020).}
+
+\textbf{(2) Evaluating the inter- and intra-specific variation of hydraulic and leaf traits}
+
+\begin{itemize}
+\tightlist
+\item
+  Metradica data : exploring generalists species ITV (\textasciitilde60 individuals per species)
+\item
+  Hypothesis : because species' responses to the environment manifest through functional traits, the higher the ITV of a species is, the more diverse abiotic environments the species may be able to adapt to (Umaña et al., 2015).
+\end{itemize}
+
+\textbf{(3) Patterns of functional responses to drought along a precipitation and topographic gradient}
+
+\begin{itemize}
+\tightlist
+\item
+  Explore how trait values vary across a precipitation gradient (Bafog ``dry'' to Kaw ``wet'')
+\item
+  Are associations among traits consistent along the gradient in each habitat? Species should converge to a set of trait values that maximize their resource use efficiency. (Vleminckx et al 2021)
+\item
+  Identify species in their limit range regarding drought resistance.
+\end{itemize}
+
+\emph{shifts in trait variation across environmental gradients can provide powerful insights into the drivers of community assembly} (Junior et al 2021)
+
+\hypertarget{part-part-two-materials-method}{%
+\part{Part two : Materials \& Method}\label{part-part-two-materials-method}}
+
+\hypertarget{sampling}{%
+\chapter{Sampling}\label{sampling}}
+
+\hypertarget{sites}{%
+\section{Sites}\label{sites}}
+
+Permanent forest plots of the \emph{Guyafor network} (\url{https://paracou.cirad.fr/website/experimental-design/guyafor-network}) monitor since 1970 individual tree growth and mortality in order to understand the different drivers of forest dynamics, including climate and disturbance. The network covers \textgreater{} 235 ha of tropical forest on 12 experimental sites. They are co-managed by the Cirad, CNRS and ONF institutes.
+
+\begin{figure}
+\centering
+\includegraphics{./Documents/Pictures/Guyafor.png}
+\caption{Guyafor stations for tropical forest monitoring}
+\end{figure}
+
+\textbf{Paracou }: The first site is Paracou field station (\url{http://paracou.cirad.fr/}), characterized by an average annual rainfall of 3102 mm and a mean air temperature of 25.7°C (Aguillos et al 2019). Sampling was done in six control permanent plots of 6.25 ha each with an elevation between 33-50 m (IGN-F). In total, 226 trees were sampled between 26/10/2020-7/12/2020 and 13/09/2021-17/09/2021.
+
+\textbf{Bafog}: 5 permanent plots monitored of the ONF institute, characterized by an average annual rainfall of 2357 mm and a mean air temperature of 27.4°C (weather station of MétéoFrance). Sampling was done in 4-ha plots and with an elevation between 7-39 m (IGN-F). In total, 181 trees were sampled in the BAFOG site between 01/03/2021-18/03/2021.
+
+\textbf{Est}: The third site is the Kaw area characterized by an average annual rainfall of 3851 mm and a mean air temperature of 26.3°C (weather station of MétéoFrance). The area groups several plots (see Table. S3) with an elevation between 7-250 m (IGN-F). In total, 145 trees were sampled between 05/10/2021-20/10/2021.
+
+The three sites were chosen in order to sample species along the rainfall gradient.
+
+\begin{figure}
+\centering
+\includegraphics{./Documents/Pictures/41597_2019_218_Fig1_HTML.png}
+\caption{Rainfall gradient in French Guyana}
+\end{figure}
+
+\hypertarget{habitats}{%
+\section{Habitats}\label{habitats}}
+
+The tropical forest of the Guianan Shield is characterized by heterogeneous meso-topographic conditions with numerous small hills, distinguishing two main contrasting habitats, terra firme (TF) forests and seasonally flooded forests (SF) (Ferry et al.~2010).
+
+\begin{itemize}
+\item
+  Terra firme covers 77 \% of French Guiana. They are also called \emph{plateau} and are higher areas characterized by a high clay content (47 \%, Baraloto et al.~2021) and have a high water drainage.
+\item
+  Seasonally flooded habitats are located in the valleys, with a maximum slope of 1\% and are characterized by relatively more fertile soils compared to terra firme forests (Baraloto et al.~2011). These soils are sandy (65\%, Baraloto et al.~2021) and interestingly richer in phosphorus (Ferry et al.~2010; Baraloto et al.~2021). In SF forest, Tthe water table is never observed to descend below 60 cm depth, remaining at the soil surface for at least two consecutive months each year (Baraloto et al.~2007; Ferry et al.~2010) during the rainy season. The classification for waterlogged habitat may be loose and not as precise as for the \emph{terra firme}, but it does not impact the sampling. \emph{in natura}, we assess if the tree is really in a waterlogged habitat or not.
+\end{itemize}
+
+\emph{How do we define seasonally flooded soils?} On maps, pixels located at an altitude difference of less than 2 m from the altitude of the nearest surface run-off of the same catchment area. \textbf{Pixels situés à moins de 2m de dénivelé du plus proche écoulement de surface appartenant au même bassin versant}. Surface run-off corresponds to pixels receiving the waterflow of at least 75 pixels upstream. Everything is being calculated from the SRTM 30 m (after adjusting the basin area with fillings.)
+
+Gaelle information:
+
+\begin{itemize}
+\tightlist
+\item
+  utilisation couche sig onf
+\item
+  critere pente (inf 20° = BF, pente moins forte espece de lissage avec bc d'arbres en BF, durcissement des criteres, affiner et bien tomber dans du BF) \emph{comment: SRTM pente 20° à 30m ne correspond pas n'ont plus à la pente sur le terrain, il y a une imprecision. but again in natura we make sure the tree is really in the corresponding habitat.}
+\item
+  distance à la crique (inf 50m) (marginale)
+\end{itemize}
+
+\textbf{Soil nutrient availability} is another important driver of species distribution and plant community assembly in these forests (Quesada et al.~2012; Baldeck et al.~2013; Oliveira et al.~2019; Fortunel et al.~2020; Baraloto et al.~2021). The pre-Cambrian rocks of the Guiana Shield have been exposed to weathering and erosion for over 2 billion years, which has produced highly and therefore originate overall nutrient-poor soils (Flores et al.~2020; Grau et al.~2017; Soong et al.~2020). TF soils are richer in organic matter than SF, while SF soils havewhich distinguishes itself with a higher phosphorus content (Ferry et al.~2010).
+
+The habitat classification of the tree species are based on all the past project achieved and mostly on HABITAT ONF project.
+
+\includegraphics{_main_files/figure-latex/Soil analyses-1.pdf}
+
+\textbf{Topographic} variables are strong proxies for soil hydrology, which correlates with a combination of physico-chemical properties. A new hydrological index that accounts for both variations in climate and soil / topography across sites by combining the concept of MCWD with the one of Relative Extractable Water (e.g.~Wagner et al.~2011) or Plant Available Water capacity (Nepstad et al.~2004, Ouédraogo et al.~2016). For Paracou, there is the topography classification established by Allié, Pélissier et al., 2015. \emph{Sylvain}: The topographic wetness index (𝑇𝑊𝐼), identifies water accumulation areas. TWI was derived from 185 a 1-m resolution digital elevation model built based on data from a LiDAR campaign done in 186 2015 using SAGA-GIS (Conrad et al.~2015).
+
+\hypertarget{species}{%
+\section{Species}\label{species}}
+
+\begin{itemize}
+\item
+  \textbf{Specialist} species are species that have a habitat preference, either for \emph{terra firme} soils or for seasonally flooded soils in French Guiana.
+\item
+  \textbf{Generalist} species are here defined as species able to thrive in the two contrasting habitats, they are regionally widespread and abundant species.
+\end{itemize}
+
+\textbf{Indicator Species Analysis}
+
+We explored the degree of habitat preference using \textbf{Indicator Species Analysis} (Dufrene \& Legendre 1997). It takes account of both relative abundance and relative frequencies of each species across the two main habitats in French Guiana, seasonally flooded forest and Terra firme forests.
+
+Habitat preferences were determined based on (Baraloto et al.~2021) study. The Dufrene and Legendre method (Dufrêne and Legendre 1997) was used as a measure of habitat association for each species in each habitat, while taking into account spatial auto-correlation with the MSR method (Wagner and Dray 2015). This measure, named IndVal for Indicator value, scales from 0 to 1 and integrates both the relative frequency of each species across plots in a given habitat and its relative abundance in each habitat. Out of the 654 species identified from (Baraloto et al.~2021), we only considered the 5 \% highest Indval values in each habitat to qualify them as specialists of a habitat. This corresponded to a threshold of IndValSF specialist ≥ 0.200 for SF specialists and IndValTF specialist ≥ 0.259 for TF specialists. Those with an equal or lower IndVal in both habitats were considered without any habitat preference and therefore called generalists.
+
+Species with high IndVals means that the species prefers the habitat (but not exclusive, hence the word \textbf{preference}), but are also a high probability of being sampled in the given habitat.
+
+We also wanted to maximize the phylogeny to get a greater picture, having specialists and generalists in the main clades: (Rosids, Asterids, Magnoliids). This would allow us to assess whether the different strategies to drought tolerance can be extend to the species of the same clade.
+
+We thus studied 21 tropical tree species, which included 6 generalist species, 9 SF specialist species, and 6 TF specialist species.
+
+\begin{verbatim}
+## [1] "Taxonomic classification not consistent between sp.list and tree."
+##           genus family_in_sp.list family_in_tree
+## 33 Chaetocarpus          Peraceae  Euphorbiaceae
+## 41       Cordia        Cordiaceae   Boraginaceae
+## [1] "Note: 2 taxa fail to be binded to the tree,"
+## [1] "Indet.Indet._Indet."      "Indet.Indet._sp.3Guyafor"
+\end{verbatim}
+
+\includegraphics{_main_files/figure-latex/Species phylo-1.pdf}
+
+\includegraphics{_main_files/figure-latex/Indval-1.pdf} \includegraphics{_main_files/figure-latex/Indval-2.pdf} \includegraphics{_main_files/figure-latex/Indval-3.pdf}
+
+\emph{More details about IndVal} :
+
+IndVal used by other projects (ex. INSERER BIBLIO TerSteege et al 2013). The relative abundance and the relative frequency must be combined by multiplication because they represent independent information about the species distribution. X100 for a percentage. The index is max when all individuals of a species are found in a single group of sites or when the species occurs in all sites of that group. The statistical significance of the species indicator values is evaluated using a randominization procedure. Significance of habitat association was estimated by a Monte Carlo procedure that reassigns species densities and frequencies to habitats 1000 times. It therefore gives an ecological meaning as it compares the typologies.
+
+\emph{Other indicators} :
+
+\begin{itemize}
+\tightlist
+\item
+  Contrary to \textbf{TWINSPAN}, this indicator index for a given species is independent of other species relative abundances and there is no need for pseudospecies
+\item
+  Species richness (sensitive to several factors)
+\item
+  Oliviera species association to the topographic and edaphic gradient : weighted the HAND or P concentration of the plot by the abundance of the species in the plot. Divided by the number of individuals of the species in all plots.
+\end{itemize}
+
+\hypertarget{individuals}{%
+\section{Individuals}\label{individuals}}
+
+The individuals were selected with a DBH value between the 10th and the 90th percentile of the species' distribution pattern, in order to have a sampling that best reflects the forest structure. In this percentile interval, species were randomly selected for sampling.
+
+\emph{Total individuals collected for the paper.}
+
+\begin{table}
+
+\caption{(\#tab:Individuals per species collected in the three sampling sites.)Individuals per species collected on the 3 sites}
+\centering
+\begin{tabular}[t]{l|>{}l|>{}l|r|r|r|>{}r}
+\hline
+\textbf{Family} & \textbf{Genus} & \textbf{Species} & \textbf{Paracou} & \textbf{Bafog} & \textbf{Kaw} & \textbf{Total}\\
+\hline
+Fabaceae & \em{Bocoa} & \em{prouacensis} & 15 & 10 & 3 & \cellcolor[HTML]{666;}{\textcolor{white}{56}}\\
+\hline
+Meliaceae & \em{Carapa} & \em{surinamensis} & 10 & 1 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{22}}\\
+\hline
+Euphorbiaceae & \em{Conceveiba} & \em{guianensis} & 20 & 16 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{72}}\\
+\hline
+Fabaceae & \em{Dicorynia} & \em{guianensis} & 6 & 6 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{24}}\\
+\hline
+Fabaceae & \em{Eperua} & \em{falcata} & 10 & 0 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{40}}\\
+\hline
+Lecythidaceae & \em{Eschweilera} & \em{coriacea} & 10 & 10 & 0 & \cellcolor[HTML]{666;}{\textcolor{white}{40}}\\
+\hline
+Lecythidaceae & \em{Gustavia} & \em{hexapetala} & 5 & 9 & 5 & \cellcolor[HTML]{666;}{\textcolor{white}{38}}\\
+\hline
+Chrysobalanaceae & \em{Hymenopus} & \em{heteromorphus} & 22 & 14 & 8 & \cellcolor[HTML]{666;}{\textcolor{white}{88}}\\
+\hline
+Myristicaceae & \em{Iryanthera} & \em{hostmannii} & 9 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Myristicaceae & \em{Iryanthera} & \em{sagotiana} & 5 & 5 & 9 & \cellcolor[HTML]{666;}{\textcolor{white}{38}}\\
+\hline
+Bignoniaceae & \em{Jacaranda} & \em{copaia subsp. copaia} & 20 & 13 & 15 & \cellcolor[HTML]{666;}{\textcolor{white}{96}}\\
+\hline
+Salicacea & \em{Laetia} & \em{procera} & 9 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Chrysobalanaceae & \em{Licania} & \em{membranacea} & 5 & 4 & 5 & \cellcolor[HTML]{666;}{\textcolor{white}{28}}\\
+\hline
+Metteniusaceae & \em{Poraqueiba} & \em{guianensis} & 11 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{62}}\\
+\hline
+Burseraceae & \em{Protium} & \em{opacum subsp. rabelianum} & 10 & 0 & 11 & \cellcolor[HTML]{666;}{\textcolor{white}{42}}\\
+\hline
+Burseraceae & \em{Protium} & \em{stevensonii} & 12 & 12 & 1 & \cellcolor[HTML]{666;}{\textcolor{white}{50}}\\
+\hline
+Fabaceae & \em{Pterocarpus} & \em{officinalis} & 10 & 10 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{60}}\\
+\hline
+Clusiaceae & \em{Symphonia} & \em{globulifera} & 10 & 9 & 10 & \cellcolor[HTML]{666;}{\textcolor{white}{58}}\\
+\hline
+Fabaceae & \em{Tachigali} & \em{melinonii} & 16 & 15 & 13 & \cellcolor[HTML]{666;}{\textcolor{white}{88}}\\
+\hline
+Myristicaceae & \em{Virola} & \em{michelii} & 5 & 7 & 6 & \cellcolor[HTML]{666;}{\textcolor{white}{36}}\\
+\hline
+Myristicaceae & \em{Virola} & \em{surinamensis} & 6 & 10 & 9 & \cellcolor[HTML]{666;}{\textcolor{white}{50}}\\
+\hline
+\cellcolor[HTML]{666;}{\textcolor{white}{Total}} & \cellcolor[HTML]{666;}{\textcolor{white}{\em{-}}} & \cellcolor[HTML]{666;}{\textcolor{white}{\em{-}}} & \cellcolor[HTML]{666;}{\textcolor{white}{226}} & \cellcolor[HTML]{666;}{\textcolor{white}{181}} & \cellcolor[HTML]{666;}{\textcolor{white}{145}} & \cellcolor[HTML]{666;}{\textcolor{white}{\cellcolor[HTML]{666;}{1104}}}\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{sampling-strategy}{%
+\section{Sampling strategy}\label{sampling-strategy}}
+
+\begin{itemize}
+\tightlist
+\item
+  Maps were produced by QGIS software
+\item
+  \href{../Metradica_Paracou/Document/Protocol/Field.Rmd}{\textbf{Field} protocol}
+\item
+  Fill the fieldworksheet \href{../Metradica_Paracou/Document/Protocol/Feuille_terrain_releve.xlsx}{\textbf{Fieldworksheet}}
+\item[$\square$]
+  Assess tree and branch height
+\item[$\square$]
+  Assess tree and branch Dawkins : \includegraphics{../Metradica_Paracou/Document/Protocol/Dawkins.png}
+\end{itemize}
+
+\hypertarget{traits}{%
+\chapter{Traits}\label{traits}}
+
+To guarantee that measurements were carried out on healthy leaves, we assessed chlorophyll fluorescence with a fluorescence meter (Mini-PAM II, WALZ, Effeltrich, Germany), which measures the maximum quantum yield of photosystem II (Fv/Fm). Only leaves with a FvFm value above 0.65 were considered for the study. Knowing that the sampled leaves were healthy, we then measured nine leaf functional traits (Table 1) related to resource investment strategies through light interception and carbon assimilation (Wright et al.~2004) or hydraulic functioning (Rosas et al.~2019) :
+
+\begin{itemize}
+\tightlist
+\item
+  leaf chemistry (C, N, K, P)
+\item
+  leaf saturated water content (LSWC, g.g-1),
+\item
+  leaf water potential at which leaf cells lose turgor (TLP, MPa),
+\item
+  leaf minimum conductance (gmin, mmol.m-2.s-1),
+\item
+  major vein length density (MajVLA, mm.mm-2)
+\item
+  stomatal density (SD, mm-2)
+\end{itemize}
+
+\hypertarget{water--and-carbon-related-traits}{%
+\section{Water- and carbon-related traits}\label{water--and-carbon-related-traits}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{LSWC} : Leaf-saturated water content (g g−1) was calculated as the mass of leaf water (WT -- WD) divided by leaf dry mass (WD).
+\item
+  \textbf{\(TLP\)}: leaf water potential at which leaf cells lose turgor (MPa), a key drought tolerance trait.
+\item
+  \textbf{\(g_{min}\)}: leaf minimum conductance \(mmol.m^{-2}.s^{-1}\) taking into account water losses through the cuticle and incompletely closed stomata. A key drought-avoidance trait.
+\item
+  \textbf{Stomatal characteristics (size, density)}: morphological characteristic at the crossroads between water loss and the maximum rate of photosynthesis.(\emph{INSERER BIBLIO Julio V. Schneider 2016})
+\item
+  \textbf{Nervation density}: determining the capacity of water supply in leaves. (\emph{INSERER BIBLIO Julio V. Schneider 2016})
+\item
+  \textbf{Leaf chemistry} : To assess the leaves' concentration in carbon, nitrogen and phosphorous.
+\end{itemize}
+
+\hypertarget{additional-traits}{%
+\section{Additional traits}\label{additional-traits}}
+
+\begin{itemize}
+\item
+  \textbf{LA}: leaf area \(cm^{2}\) : carbo- acquisition related trait which informs on the light capture strategy.
+\item
+  \textbf{\(\frac{Fv}{Fm}\)}: maximum quantum yield of photosystem II, which reflects photosynthesis efficiency (\(\mu mol . m^{-2} . s^{-1}/ \mu mol . m^{-2} . s^{-1}\)). It is an indicator of photosynthetic performance, as it has been shown to be sensitive to drought constraints in tropical forests (\emph{INSERER BIBLIO Manzi et al 2021}) but decline after other leaf hydraulic traits (\emph{INSERER BIBLIO Trueba et al 2019}).
+\item
+  \textbf{Pmidday}: Water potential at the driest point of the day.
+\item
+  \textbf{\(\delta\) 18 O and \(\delta\) 13 C} : Informs patterns of carbon and water use, related to water use efficiency. (\emph{INSERER BIBLIO Farquhar et al 1989}) Measured in Vienna.
+\end{itemize}
+
+\emph{Trait table}
+
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-2}Table 1. Leaf functional traits.}
+\centering
+\begin{tabular}[t]{l|l|l|l|l}
+\hline
+\textbf{Trait} & \textbf{Abbreviation} & \textbf{Unit} & \textbf{Type} & \textbf{Mechanisms}\\
+\hline
+Carbon concentration & C & % & Chemical & Resource capture & defense\\
+\hline
+Potassium concentration & K & g.kg<sup>-1</sup> & Chemical & Resource capture & water-use efficiency\\
+\hline
+Phosphorous concentration & P & g.kg<sup>-1</sup> & Chemical & Resource capture\\
+\hline
+Nitrogen concentration & N & % & Chemical & Resource capture & defense\\
+\hline
+Minimal conductance & <i>gmin</i> & mmol.m<sup>-2</sup>.s<sup>-1</sup> & Water-related & Water loss\\
+\hline
+Turgor loss point & TLP & MPa & Water-related & Drought resistance\\
+\hline
+Leaf saturated water content & LSWC & g.g<sup>-1</sup> & Water-related & Water capacitance\\
+\hline
+Major vein length density & MajVLA & cm.cm<sup>-2</sup> & Water & carbon related & Water, sugar and hormone transport; 
+mechinical support\\
+\hline
+Stomatal density & SD & mm<sup>-2</sup> & Water & carbon related & Carbon uptake & water status\\
+\hline
+\end{tabular}
+\end{table}
+
+\hypertarget{protocols}{%
+\section{Protocols}\label{protocols}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{./Documents/Protocol/Field.Rmd}{\textbf{Field} protocol}
+\item
+  \href{./Documents/Protocol/Protocole_Ptlp.pdf}{\textbf{\(\pi_{TLP}\)} protocol}
+\item
+  \href{./Documents/Protocol/RWC_Boisseaux.docx}{\textbf{RWC} protocol}
+\item
+  \href{./Documents/Protocol/Analyse\%20Stomates_Marion.docx}{\textbf{Stomata} protocol}
+\item
+  \href{./Documents/Protocol/Fluo_Bellifa.docx}{\textbf{FvFm} protocol}
+\item
+  \href{./Documents/Protocol/Gmin\%20protocol.docx}{\textbf{gmin} protocol}
+\item
+  \href{./Documents/Protocol/ProtocolLeafVeins_MB_2.docx}{\textbf{leaf venation} protocol}
+\end{itemize}
+
+\hypertarget{organisation}{%
+\section{Organisation}\label{organisation}}
+
+\begin{itemize}
+\tightlist
+\item
+  Day 1
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Fresh
+
+    \begin{itemize}
+    \tightlist
+    \item
+      On field: Pmidday
+    \item
+      scan gmin leaves
+    \item
+      fresh weight RWC
+    \item
+      \textbf{\(g_{min}\)} weight\\
+    \item
+      \textbf{Stomatal density} nail polish (3 replicates per indivual)
+    \item
+      \textbf{\(\frac{Fv}{Fm}\)}
+    \end{itemize}
+  \item
+    Day 2
+
+    \begin{itemize}
+    \tightlist
+    \item
+      saturated weight RWC
+    \item
+      \textbf{\(g_{min}\)} finish weights (at least 2 points next day)
+    \item
+      \textbf{\(\pi_{TLP}\)}
+    \end{itemize}
+  \item
+    Day 5 (+72h)
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Dry weight RWC
+    \end{itemize}
+  \end{itemize}
+\item
+  Later on :
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Stomatal observation and density counts
+  \item
+    Measure of vein densities
+  \item
+    Chemistry of dry-grinded leaves
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{results}{%
+\chapter{Results}\label{results}}
+
+\hypertarget{distribution-of-major-traits}{%
+\section{Distribution of major traits}\label{distribution-of-major-traits}}
+
+A focus on the frequency distribution of traits of individuals within communities allows scaling up from organism to ecosystem level and assessing how ecological communities and ecosystems respond to climate drivers (Garnier et al 2016; Liu et al 2020).
+
+The shape of trait distribution could have the potential to reveal the ecological significance of trends and tradeoffs in traits at the species level. A focus on the \emph{mean } and the \emph{variance} of the community trait distribution is rooted in the
+concept of phenotype-environment matching and environmental optimality, where species' relative abundance is mediated by their traits, that is, ``community assembly by trait selection''. To understand how community trait composition is affected by ecological processes.
+
+\begin{itemize}
+\tightlist
+\item
+  use of community-weighted trait metrics CWM
+\item
+  variance
+\item
+  mean
+\item
+  skewness (symmetry)
+\item
+  kurtosis (measure of tailness with heavy tail referring to outliers)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Metradica }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Dataset/OUTPUT\_cleaning/ALL/Final\_Metradica\_OUT\_30112022.csv"}\NormalTok{)}
+
+\NormalTok{sub\_data\_TF }\OtherTok{\textless{}{-}}\NormalTok{ Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Dicorynia\_guianensis"}\NormalTok{, }\StringTok{"Iryanthera\_sagotiana"}\NormalTok{, }\StringTok{"Gustavia\_hexapetala"}\NormalTok{, }\StringTok{"Licania\_membranacea"}\NormalTok{, }\StringTok{"Poraqueiba\_guianensis"}\NormalTok{, }\StringTok{"Virola\_michelii"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(Habitat }\SpecialCharTok{==} \StringTok{"TF"}\NormalTok{)}
+
+\NormalTok{sub\_data\_SF }\OtherTok{\textless{}{-}}\NormalTok{ Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Eschweilera\_coriacea"}\NormalTok{,}\StringTok{"Eperua\_falcata"}\NormalTok{, }\StringTok{"Iryanthera\_hostmannii"}\NormalTok{, }\StringTok{"Laetia\_procera"}\NormalTok{, }\StringTok{"Protium\_opacum subsp. rabelianum"}\NormalTok{, }\StringTok{"Pterocarpus\_officinalis"}\NormalTok{, }\StringTok{"Symphonia\_globulifera"}\NormalTok{, }\StringTok{"Virola\_surinamensis"}\NormalTok{, }\StringTok{"Carapa\_surinamensis"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{filter}\NormalTok{(Habitat }\SpecialCharTok{==} \StringTok{"BF"}\NormalTok{)}
+
+\NormalTok{sub\_data\_G }\OtherTok{\textless{}{-}}\NormalTok{  Metradica }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Name }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Bocoa\_prouacensis"}\NormalTok{, }\StringTok{"Conceveiba\_guianensis"}\NormalTok{, }\StringTok{"Jacaranda\_copaia subsp. copaia"}\NormalTok{, }\StringTok{"Hymenopus\_heteromorphus"}\NormalTok{, }\StringTok{"Protium\_stevensonii"}\NormalTok{, }\StringTok{"Tachigali\_melinonii"}\NormalTok{))}
+
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(sub\_data\_TF, sub\_data\_SF, sub\_data\_G)}
+
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Type=} \FunctionTok{ifelse}\NormalTok{(Name }\SpecialCharTok{==} \StringTok{\textquotesingle{}Virola\_michelii\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}TF\textquotesingle{}}\NormalTok{,Type))}
+
+\NormalTok{sub\_data }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Type=} \FunctionTok{ifelse}\NormalTok{(Name }\SpecialCharTok{==} \StringTok{\textquotesingle{}Eschweilera\_coriacea\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}BF\textquotesingle{}}\NormalTok{,Type))}
+
+\NormalTok{Metradica }\OtherTok{\textless{}{-}}\NormalTok{ sub\_data }\CommentTok{\#552 indv}
+
+
+\NormalTok{Subdata\_shapiro }\OtherTok{\textless{}{-}} \FunctionTok{slice\_sample}\NormalTok{(Metradica, }\AttributeTok{n=}\DecValTok{30}\NormalTok{) }\CommentTok{\# Shapiro test is used for small sample size (n=30)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{water-traits}{%
+\subsection{Water traits}\label{water-traits}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{verbatim}
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+\end{verbatim}
+
+The πtlp values in our data set were on average less negative than those previously reported in the literature (for moist tropical forests (Fig. 1) (Maréchaux 2015). There are several possible explanations for such a pattern, one of them being that as they conducted their measurements at the peak of the dry season, we also measured πtlp at the peak of the dry season, but 2020-2021 dry seasons were ``wetter'' than usual. Plants often acclimate πtlp during drought periods, through the accumulation of cell solutes, or osmotic adjustment. Such an adjustment results in a lowering of πtlp and can contribute to drought tolerance in vegetation world-wide (Wright et al.~1992; Abrams \& Kubiske 1994; Cao 2000; Merchant et al.~2007; Zhu \& Cao 2009; Bartlett, Scoffoni \& Sack 2012b; Bartlett et al.~2014).
+
+\#\#\#Vein traits
+\includegraphics{_main_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{verbatim}
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+## [1] "Data is normal"
+\end{verbatim}
+
+\hypertarget{chemistry-traits}{%
+\subsection{Chemistry traits}\label{chemistry-traits}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+Nitrogen data is not normal{[}1{]}
+X.S data is not normal{[}1{]}
+Mg..g.kg. data is not normal{[}1{]}
+Ca..g.kg. data is not normal{[}1{]}
+
+\hypertarget{dbh}{%
+\subsection{DBH}\label{dbh}}
+
+\includegraphics{_main_files/figure-latex/DBH-1.pdf} \includegraphics{_main_files/figure-latex/DBH-2.pdf} \includegraphics{_main_files/figure-latex/DBH-3.pdf}
+
+\hypertarget{crown-position}{%
+\subsection{Crown position}\label{crown-position}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-8-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-8-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-8-3.pdf}
+
+\hypertarget{treedawkins}{%
+\subsection{TreeDawkins}\label{treedawkins}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-9-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-9-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-9-3.pdf}
+
+\hypertarget{gmin}{%
+\section{Gmin}\label{gmin}}
+
+The capacity to retain water will become increasingly important for survival of tropical trees. Along with other plant hydraulic traits, cuticle conductance may strongly affect survival during droughts (Cochard, 2020).
+
+\includegraphics{_main_files/figure-latex/gmin-plot-1.pdf} \includegraphics{_main_files/figure-latex/gmin-plot-2.pdf}
+
+\emph{interpretation} Across all species and all sites, gmin averaged 4.02 mmol.m-2.s-1. Gmin varied significantly among species (F-statistic: 18.10326, p-value: \textless{} 2.2204e-16). Across sites, gmin ranged from 3.08 mmol m--2 s--1 in Paracou to 3.60 mmol m--2 s--1 in Kaw to 5.47 mmol.m-2.m-1 i Bafog and site differences were significant (F-statistic: 50.0139, p-value: \textless{} 2.2204e-16).
+
+It is unclear whether a higher gmin in the Bafog site is assigned to stomatal opening or a higher permeability of the cuticle. We may need to consider soil water access as an additional factor to understand the pattern.
+
+\emph{literature} Slot et al 2021 found across 24 tropical species an average gmin of 4.0 mmol m--2 s--1. Large differences among species in cuticular water loss have the potential to contribute to differential mortality during drought, phenomena that are increasingly common in the tropics (Rifai et al 2019)
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{compare with stomatal density}
+\item
+  \textbf{see if more trichomes for bafog site that could explain why these species can afford to have a higher gmin?}
+\end{itemize}
+
+\hypertarget{lswc}{%
+\section{LSWC}\label{lswc}}
+
+One of the direct results of the regulation of stomatal movement is the reduction of water loss through transpiration by adjusting the leaf stomatal conductance, to achieve a high water-use efficiency and prevent embolism, which is called isohydric behavior. In contrast, the leaf stomatal conductance is kept at a relatively high level to maintain efficiently photosynthesis, which is known as anisohydric behavior (Roman et al., 2015). Therefore, LSWC reflect the plant's response to drought. (Zhou et al 2021)
+
+\includegraphics{_main_files/figure-latex/LSWC plot1-1.pdf} \includegraphics{_main_files/figure-latex/LSWC plot1-2.pdf} \includegraphics{_main_files/figure-latex/LSWC plot1-3.pdf}
+
+\hypertarget{tlp}{%
+\section{TLP}\label{tlp}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-10-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-10-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-10-3.pdf}
+
+Leaf turgor loss point (πtlp) indicates the capacity of a plant to maintain cell turgor pressure during dehydration, which has been proven to be strongly predictive of the plant response to drought.
+
+\begin{itemize}
+\item
+  The variability in πtlp among species indicates the potential for a
+  range of species responses to drought within Amazonian forest communities.
+\item
+  For \emph{Symphonia globulifera} we couldn't exclude first- and second-order veins (that may have resulted in apoplastic dilution that would lead to less negative osmometer values (Kikuta \& Richter 1992)). Eventhough it does not appear to be an outlier, we still have too keep in mind that the overall values would be more negative.
+\item
+  We found lower TLP values (less negative) for 7 species (above - 1.6 MPa):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \emph{Dicorynia guianensis} (as Maréchaux et al 2015)
+  \item
+    \emph{Eschweleira coriacea } (as Maréchaux et al 2015)
+  \item
+    \emph{Hymenopus heteromorphus}
+  \item
+    \emph{Iryanthera sagotiana}
+  \item
+    \emph{Iryanthera hostmannii}
+  \item
+    \emph{Jacaranda copaia subsp. copaia}
+  \item
+    \emph{Pterocarpus officinalis}
+  \end{itemize}
+\item
+  We found higher TLP values (more negative) for 10 species (below - 1.87 MPa) including \emph{Voucapoua americana} and both \emph{Protium} species like Maréchaux et al 2015. Protium species have been found in more seasonally dry forests across the Amazonia (Ter Steege et al 2006).
+\end{itemize}
+
+\emph{Litterature}
+* The paper by Zhu et al.~(2018) in this issue of Tree Physiology provides a meta-analysis of TLP and its relationship to a range of hydraulic traits linked to drought tolerance, as well as to leaf economic traits, across an impressive 389 species (of which, data for 240 are published for the first time) from nine major forest types in China.
+
+*adjustments in leaf structure in response to seasonal water deficit (Niinemets 2001, Mitchell et al.~2008) and altered nutrient concentrations (Villagra et al.~2013) drive changes in leaf water relations traits, including TLP. Blackman 2018
+
+*This plant functional trait represents the leaf water potential that induces wilting. Leaves with a more negative πtlp (measured in MPa) remain turgid at more negative water potentials and tend to maintain critical processes, such as leaf hydraulic conductance, stomatal conductance and photosynthetic gas exchange, under drier conditions (Cheung, Tyree \& Dainty 1975; Abrams, Kubiske \& Steiner 1990; Brodribb et al.~2003; Bartlett, Scoffoni \& Sack 2012b; Guyot, Scoffoni \& Sack 2012). Thus, a more negative value for πtlp contributes to greater leaf-level drought tolerance and therefore also plant-level drought tolerance.
+
+\hypertarget{majvla}{%
+\section{MajVLA}\label{majvla}}
+
+\includegraphics{_main_files/figure-latex/unnamed-chunk-11-1.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-11-2.pdf} \includegraphics{_main_files/figure-latex/unnamed-chunk-11-3.pdf}
+
+\hypertarget{waterlogging-litterature}{%
+\chapter{Waterlogging litterature}\label{waterlogging-litterature}}
+
+\begin{itemize}
+\tightlist
+\item
+  From \textbf{Abiotic Stress Physiology of Horticultural Crops} \emph{edited by N.K. Srinivasa Rao, K.S. Shivashankara, R.H. Laxman}
+\end{itemize}
+
+Section 1.3 : one of the earliest responses to soil flooding is a reduction in stomatal conductance, inhibition of stomatal aperture. Low O2 level may also reduce hydraulic conductivity and csqtly decrease root permeability. This descrease in hydraulic permeability may b liked to aqaporins {[}\ldots{]} limiting water uptake and this leading to internal water deficit. Oxygen deficiency generally induces a rapid reduction in the rate of photoS which is generally considered as the result of reduced stomatal aperture, decrease in leaf chloro content + early leaf senescence and a reduction in LA. Waterlogged soils reduce the translocation of photoS product from `source' to `sink' root. As a result, the maintenance of photoS acitivity and accumulation of soluble sugar in roots are clearly important adaptations to flooding.
+
+Plant responses to waterlogging include low stomatal conductance, decrease in leaf, root, and shoot dev't, changes in osmotic potential and nu uptake, reduced chloro content and photoS.
+
+The oxygen diffusion is 10,000 times slower in waterlogged soils as compared to aerated soil.
+
+The decrease in O evel in soils affects the bioavailability of nu and as well as the ability of root systems to uptake and transport water + mineral nu. Waterlogging also causes inhibition of N-uptake from the soil and reducedleaf concentrations of N, P, K, Ca, Mg in avocado + pea.
+
+\hypertarget{general-potential-hypotheses}{%
+\chapter{general potential hypotheses}\label{general-potential-hypotheses}}
+
+with waterlogging: i should find a decrease of stomatal conductance corrolated with an increase of leaf water potential.
+
+\hypertarget{part-part-four-notes}{%
+\part{Part four : Notes}\label{part-part-four-notes}}
+
+\hypertarget{section}{%
+\chapter{26/01/2022}\label{section}}
+
+Metradica meeting
+
+Presents:
+
+\begin{itemize}
+\tightlist
+\item
+  Ghislain
+\item
+  Clément\\
+\item
+  Sabrina
+\item
+  Damien\\
+\item
+  Jeanne
+\item
+  Marion
+\end{itemize}
+
+Objectives:
+
+1- les données 13C\\
+2- les modèles joints
+
+\textbf{Notes:}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+\end{enumerate}
+
+L'estimation de l'efficience d'utilisation de l'eau intrinsèque peut être obtenue à l'aide de msures directes des échanges gazeux entre feuille et atm. Farquar 1982 propose un modèle simple reliant WUE (water use efficiency) à la discrimination isotopique du C au cours de la photosynthèse.
+
+Relation WUE et \(\delta\) 13C positive.
+
+Drivers de la compo iso:
+
+\begin{itemize}
+\tightlist
+\item
+  Lumière (feuille d'ombre valeurs 13C nettement plus négatives)
+\item
+  génétique
+\item
+  sécheresse atm + sol
+\item
+  VPD
+\item
+  teneur en mx du sol
+\item
+  ontogénie de l'individu
+\item
+  conductance hydraulique
+\end{itemize}
+
+Attention: la compo iso n'est pas un trait lié à la sécheresse. Il caractérise \emph{l'acclimation} à la sécheresse. Il est utile pour une expé en serre de comparer le \(\delta\) 13C entre le groupe controle et le groupe dry. Une espèce sensible: on trouvera une forte différence vs.~une espèce peu sensible, une faible différence. Et le \emph{delta} ser aun trait de réponse à la sécheresse.
+
+Travaux de Damien:
+
+\begin{itemize}
+\tightlist
+\item
+  16 parcelles à travers la Guyane
+\item
+  9-10 sites\\
+\item
+  \textasciitilde100 arbres / parcelles
+\item
+  \textasciitilde1600 valeurs de compo iso de feuille d'arbres dominant
+\item
+  70 espèces différentes avec qq indet. par site; total de 392 espèces identifiées
+\item
+  Moyenne valeur \(\delta\) 13C \textasciitilde{} -30 \%0 pour les forêts en Guyane
+\item
+  Lorsque le climat est le même, on observe le même fonctionnement
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+\end{enumerate}
+
+Avant nous procédions par espèces, le but des modèles joints: faire avec plusieurs espèces en même temps.Les modèles joints de distribution des espèces permettent d'estimer la niche des espèces, de prédire leur distribution, tout en prenant en compte les intéractions entre espèces. Ils peuvent être utilisés pour déterminer les communautés ou assemblages d'espèces et comment ces assemblages changent spatialement, selon des gradients environnementaux.
+
+Prendre en compte: la co-occurence des espèces + relation trait-env't pour déterminer la présence d'une espèce sur 1 site.
+
+\begin{figure}
+\centering
+\includegraphics{../Metradica_Paracou/Document/Pictures/ModeleJoint.png}
+\caption{Modèle joint}
+\end{figure}
+
+Si l'on inclu les données 13C dans les modèles joints: on s'attend à une abscence de réponse.
+
+  \bibliography{book.bib,packages.bib}
+
+\end{document}

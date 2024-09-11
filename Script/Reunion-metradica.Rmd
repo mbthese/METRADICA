@@ -1,0 +1,1145 @@
+---
+title: "ReunionMEtradica"
+author: "Marion Boisseaux"
+date: "16/06/2022"
+output: html_document
+---
+
+# Libraries
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+```
+
+# Data
+
+```{r message=FALSE, warning=FALSE}
+
+Metradica <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  select(Code, Genus, Species, Name, Habitat, Forest, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth, TreeHeight, TreeDawkins, TWI_JC) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight)) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TreeHeight"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+#levels(Habitat) <- list(SF  = "BF")
+#Phylo <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1KBppmJ2SBLMao0qeRwb0xBOvv5mYJrHunbAQCpdz5qU/edit#gid=0", range = "summary") %>% select(Order, Family, Genus)
+
+
+#Metradica <- left_join(Metradica_log, Phylo, by = 'Genus') %>% relocate(Order, Family, .after = Code)
+
+#Metradica_log <- Metradica_log %>% subset( Code != "674")
+
+
+
+```
+
+# PCA
+
+To characterize the functional trait space in each habitat, we performed a Principal Component Analysis (PCA) with trait values at the individual level (i.e. each score in the PCA refers to an individual tree),  to analyze trait covariation and to reveal the relationships between traits. 
+
+Using the among PCA, a “classic” PCA, we aim to evaluate trait syndroms characterizing species strategies. For the within PCA, all the gravity centers are placed back at the origin and the individuals are being represented with a maximal variance. We eliminate the species effect to study the individual strategies. The among-PCA searches the axes at the center of gravity and emphasizes on the differences between groups (here, species) whereas the within-PCA searches for the shared-axes in each group.
+
+```{r}
+
+res.PCA<-PCA(Metradica[, c(1:18)][,-c(1,2,3,4,5,7,8,18)],quali.sup=c(1),graph=FALSE)
+
+# Visualize eigenvalues/variances
+fviz_screeplot(res.PCA, addlabels = TRUE, ylim = c(0, 50)) # 70 % de notre jeu de données est expliqué avec les 4
+
+# dim 1-2 
+
+## variables
+fviz_pca_var(res.PCA, axes = c(3,4), col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))+
+ theme_classic() 
+
+## Biplot 1,2
+fviz_pca_biplot(res.PCA,axes = c(1,2),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+## dim 3,4
+fviz_pca_biplot(res.PCA,axes = c(3,4),  col.var='contrib', gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), label="var",  repel = TRUE # Avoid text overlapping
+                )  + ylim(-4,4) + theme_classic()
+
+
+## Forest
+res.PCA<-PCA(Metradica[, c(1:18)][,-c(1,2,3,4,5,7,8,18)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set1")   #ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+
+fviz_pca_biplot(res.PCA, axes = c(1,2), label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")  + ylim(-0.4,0.4)+ xlim(-0.4,0.4) + theme_classic() 
+
+## HabitatType
+res.PCA<-PCA(Metradica[, c(1:18)][,-c(1,2,3,4,5,6,7,18)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")   #ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+
+## Habitat de collecte
+res.PCA<-PCA(Metradica[, c(1:18)][,-c(1,2,3,4,6,7,8,18)],quali.sup=c(1),graph=FALSE)
+fviz_pca_biplot(res.PCA, label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2") + ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+fviz_pca_biplot(res.PCA, axes = c(3,4), label="var", habillage = c(1),  repel = TRUE # Avoid text overlapping)
+                ,addEllipses=TRUE, ellipse.level=0.95) + scale_color_brewer(palette="Set2")   #ylim(-0.2,0.2)+ xlim(-0.2,0.2)
+  + theme_classic() 
+
+
+```
+# Correlation plot
+
+```{r corrplotTraits, fig.cap="ACorrelation of leaf traits."}
+dplyr::select(Metradica_log, -Code, -Genus, -Species, -Name, -Forest, -Habitat, -Type, -HabitatType, -TreeDawkins) %>% 
+  cor() %>% 
+  corrplot::corrplot.mixed()
+```
+
+# 1 - Differences between habitats ? 
+
+## A - TF vs BF
+
+## gmin habitat collected
+```{r}
+# Global test
+
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_gmin<-lm(Gmin ~ Habitat,  data = Metradica)
+autoplot(Model_gmin)
+summary(Model_gmin)
+anova(Model_gmin) 
+
+tukey <- HSD.test(aov(Model_gmin), trt = 'Habitat') 
+
+#plot
+
+stat.test.gmin<- aov(lm(Gmin~Habitat, data=Metradica)) %>% tukey_hsd() 
+
+gmin <- ggboxplot(data = Metradica,x = "Habitat", y = "Gmin", fill = "Habitat") + 
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+                                                                       
+gmin
+```
+
+## TLP habitat collected
+```{r}
+# Global test
+
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_TLP<-lm(TLP ~ Habitat,  data = Metradica)
+autoplot(Model_TLP)
+summary(Model_TLP)
+anova(Model_TLP) 
+
+tukey <- HSD.test(aov(Model_TLP), trt = 'Habitat') 
+
+#plot
+
+stat.test.TLP<- aov(lm(TLP~Habitat, data=Metradica)) %>% tukey_hsd() 
+
+TLP <- ggboxplot(data = Metradica,x = "Habitat", y = "TLP", fill = "Habitat") + 
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.TLP, label = "p.adj.signif",
+                       y.position = c(-0.1), hide.ns = TRUE)
+                                                                       
+TLP
+```
+
+## LSWC habitat collected
+
+```{r}
+# Global test
+
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_LSWC<-lm(LSWC ~ Habitat,  data = Metradica)
+autoplot(Model_LSWC)
+summary(Model_LSWC)
+anova(Model_LSWC) 
+
+tukey <- HSD.test(aov(Model_LSWC), trt = 'Habitat') 
+
+#plot
+
+stat.test.LSWC<- aov(lm(LSWC~Habitat, data=Metradica)) %>% tukey_hsd() 
+
+LSWC <- ggboxplot(data = Metradica,x = "Habitat", y = "LSWC", fill = "Habitat") + 
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Leaf saturated water content (g.g)", 
+ fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.LSWC, label = "p.adj.signif",
+                       y.position = c(1.3), hide.ns = TRUE)
+                                                                       
+LSWC
+```
+
+## MajVLA habitat collected
+
+```{r}
+# Global test
+
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_MajVLA<-lm(MajVLA ~ Habitat,  data = Metradica)
+autoplot(Model_MajVLA)
+summary(Model_MajVLA)
+anova(Model_MajVLA) 
+
+tukey <- HSD.test(aov(Model_MajVLA), trt = 'Habitat') 
+
+#plot
+
+stat.test.MajVLA<- aov(lm(MajVLA~Habitat, data=Metradica)) %>% tukey_hsd() 
+
+MajVLA <- ggboxplot(data = Metradica,x = "Habitat", y = "MajVLA", fill = "Habitat") + 
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Major vein density (mm.mm-2)", 
+ fill = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.MajVLA, label = "p.adj.signif",
+                       y.position = c(3), hide.ns = TRUE)
+                                                                       
+MajVLA
+```
+
+```{r Summary tlp, gmin, vein, lswc}
+library(ggpubr)
+
+ggarrange(TLP, gmin, LSWC, MajVLA, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+
+## B - Trait ~ TWI 
+
+## gmin 
+```{r}
+
+#plot
+
+gmin <- ggscatter(data = Metradica,x = "TWI_JC", y = "Gmin", color = "Habitat", 
+                  add = "reg.line",  # Add regression line)
+                  add.params = list(color = "Habitat", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Habitat), label.x = 10, size = 6) +
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = "Topographic wetness index", y = "Minimal conductance (mmol.m-2.s-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+     
+                                                        
+gmin
+```
+
+## TLP 
+```{r}
+
+#plot
+
+TLP <- ggscatter(data = Metradica,x = "TWI_JC", y = "TLP", color = "Habitat", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Habitat", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                 ) +
+  stat_cor(aes(color = Habitat), label.x = 10, size = 6)+
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = "Topographic wetness index", y = "Turgor loss point (MPa)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+TLP
+```
+
+## LSWC 
+```{r}
+
+#plot
+
+LSWC <- ggscatter(data = Metradica,x = "TWI_JC", y = "LSWC", color = "Habitat", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Habitat", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Habitat), label.x = 10, size = 6) +
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = "Topographic wetness index", y = "Leaf saturated water content (g.g-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+LSWC
+```
+
+## MajVLA 
+```{r}
+
+#plot
+
+MajVLA <- ggscatter(data = Metradica,x = "TWI_JC", y = "MajVLA", color = "Habitat", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Habitat", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Habitat), label.x = 10, size = 6)+
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = "Topographic wetness index", y = "Major vein density (mm.mm-2)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+MajVLA
+```
+
+```{r Summary tlp, gmin, vein, lswc}
+library(ggpubr)
+
+ggarrange(TLP, gmin, LSWC, MajVLA, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+
+## C - Strategies in each habitat
+
+```{r}
+test <- Metradica %>% filter(Habitat == 'TF') %>% filter(Type =='TF')
+
+
+gmin_TF <- ggscatter(data = test,x = "TWI_JC", y = "Gmin", color = "Name", 
+                  add = "reg.line",  # Add regression line)
+                  add.params = list(color = "Name", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Name), label.x = 10, size = 6) +
+ labs(x = "Topographic wetness index", y = "Minimal conductance (mmol.m-2.s-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+gmin_TF
+test <- Metradica %>% filter(Habitat == 'BF') %>% filter(Type =='BF')
+
+
+gmin_SF <- ggscatter(data = test,x = "TWI_JC", y = "Gmin", color = "Name", 
+                  add = "reg.line",  # Add regression line)
+                  add.params = list(color = "Name", fill = "lightgray"), # Customize reg. line
+                  conf.int = FALSE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Name), label.x = 12, size = 6) +
+ labs(x = "Topographic wetness index", y = "Minimal conductance (mmol.m-2.s-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+gmin_SF
+
+ggarrange(gmin_TF, gmin_SF, ncol=2, nrow=1, common.legend = TRUE, legend="bottom", labels = c('Terra firme specialists', 'Seasoanlly flooded specialists'))
+
+```
+
+
+
+# 2- Habitat preference 
+
+
+## A - Trait ~ TWI 
+
+## gmin 
+```{r}
+
+#plot
+
+gmin <- ggscatter(data = Metradica,x = "TWI_JC", y = "Gmin", color = "Type", 
+                  add = "reg.line",  # Add regression line)
+                  add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Type), label.x = 12, size = 6) +
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404", 
+      Generalist = "#53db46"
+    )) +
+ labs(x = "Topographic wetness index", y = "Minimal conductance (mmol.m-2.s-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+     
+                                                        
+gmin
+```
+
+## TLP 
+```{r}
+
+#plot
+
+TLP <- ggscatter(data = Metradica,x = "TWI_JC", y = "TLP", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                 ) +
+  stat_cor(aes(color = Type), label.x = 10, size = 6)+
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404",
+      Generalist = "#53db46"
+    )) +
+ labs(x = "Topographic wetness index", y = "Turgor loss point (MPa)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+TLP
+```
+
+## LSWC 
+```{r}
+
+#plot
+
+LSWC <- ggscatter(data = Metradica,x = "TWI_JC", y = "LSWC", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Type), label.x = 12, size = 6) +
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404",
+      Generalist = "#53db46"
+    )) +
+ labs(x = "Topographic wetness index", y = "Leaf saturated water content (g.g-1)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+LSWC
+```
+
+## MajVLA 
+```{r}
+
+#plot
+
+MajVLA <- ggscatter(data = Metradica,x = "TWI_JC", y = "MajVLA", color = "Type", 
+                  add = "reg.line",  # Add regressin line)
+                  add.params = list(color = "Type", fill = "lightgray"), # Customize reg. line
+                  conf.int = TRUE, # Add confidence interval
+                  ) +
+  stat_cor(aes(color = Type), label.x = 12, size = 6)+
+  scale_color_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404",
+      Generalist = "#53db46"
+    )) +
+ labs(x = "Topographic wetness index", y = "Major vein density (mm.mm-2)") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 15), 
+ plot.caption = element_text(size = 15), axis.title.y = element_text(size = 15), axis.title.x = element_text(size = 15)) + theme(axis.title = element_text(size = 15)) 
+    
+                                                                  
+MajVLA
+```
+
+```{r Summary tlp, gmin, vein, lswc}
+library(ggpubr)
+
+ggarrange(TLP, gmin, LSWC, MajVLA, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+
+## B- Boxplot generalist BF vs generalist TF ? 
+## gmin
+
+```{r}
+
+
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_gmin<-lm(Gmin ~ HabitatType,  data = Metradica)
+autoplot(Model_gmin)
+summary(Model_gmin)
+anova(Model_gmin) 
+
+tukey <- HSD.test(aov(Model_gmin), trt = 'HabitatType') 
+
+#plot
+
+stat.test.gmin<- aov(lm(Gmin~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+gmin <- ggboxplot(data = Metradica,x = "HabitatType", y = "Gmin", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(5), hide.ns = TRUE)
+                                                                       
+gmin
+```
+
+
+
+## TLP
+
+```{r}
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_TLP<-lm(TLP ~ HabitatType,  data = Metradica)
+autoplot(Model_TLP)
+summary(Model_TLP)
+anova(Model_TLP) 
+
+tukey <- HSD.test(aov(Model_TLP), trt = 'HabitatType') 
+
+#plot
+
+stat.test.TLP<- aov(lm(TLP~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+TLP <- ggboxplot(data = Metradica,x = "HabitatType", y = "TLP", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.TLP, label = "p.adj.signif",
+                       y.position = c(0, 0.2), hide.ns = TRUE)
+                                                                       
+TLP
+```
+
+##LSWC
+
+```{r}
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_LSWC<-lm(LSWC ~ HabitatType,  data = Metradica)
+autoplot(Model_LSWC)
+summary(Model_LSWC)
+anova(Model_LSWC) 
+
+tukey <- HSD.test(aov(Model_LSWC), trt = 'HabitatType') 
+
+#plot
+
+stat.test.LSWC<- aov(lm(LSWC~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+LSWC <- ggboxplot(data = Metradica,x = "HabitatType", y = "LSWC", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Leaf saturated water content (g.g-1)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.LSWC, label = "p.adj.signif",
+                       y.position = c(1.2, 1.4,1.6), hide.ns = TRUE)
+                                                                       
+LSWC
+```
+
+##MajVLA
+```{r}
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_MajVLA<-lm(MajVLA ~ HabitatType,  data = Metradica)
+autoplot(Model_MajVLA)
+summary(Model_MajVLA)
+anova(Model_MajVLA) 
+
+tukey <- HSD.test(aov(Model_MajVLA), trt = 'HabitatType') 
+
+#plot
+
+stat.test.MajVLA<- aov(lm(MajVLA~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+MajVLA <- ggboxplot(data = Metradica,x = "HabitatType", y = "MajVLA", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Major vein density (mm.mm-2)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.MajVLA, label = "p.adj.signif",
+                       y.position = c(2.8, 3,3.2), hide.ns = TRUE)
+                                                                       
+MajVLA
+```
+
+```{r Summary tlp, gmin, vein, lswc}
+
+ggarrange(TLP, gmin, LSWC, MajVLA, ncol=2, nrow=2, common.legend = TRUE, legend="bottom", labels = c('A', 'B', 'C', 'D'))
+```
+
+
+# 3- ITV
+
+### CV
+```{r}
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+} 
+
+cv <- Metradica %>% 
+  group_by(Type) %>% 
+  summarise_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth"), funs(cv))
+
+cv <- bind_rows(cv,
+                ungroup(cv) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Type = "mean"))
+
+cv_long <- reshape2::melt(cv, "Type", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+
+cv_long %>%  
+  filter(Type != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Type)) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 2, col = "black",
+            data = filter(cv_long, Type == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab(expression(CV[4])) +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+```
+
+## CV table
+
+```{r cvsptab}
+knitr::kable(cv, caption = "Coefficients of variation ($CV_4$) across each species.", digits = 3) 
+```
+
+# 4- Partitionnement variance
+
+```{r}
+#Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth
+
+data <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica")  %>% 
+  select(Code, Genus, Species, Name, Habitat, Forest, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, MidribWidth, SecundaryWidth) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth"), log) %>% 
+  na.omit()
+
+varcomp.gmin<-varcomp(lme(Gmin~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1) 
+
+varcomp.tlp<-varcomp(lme(TLP~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+varcomp.LA<-varcomp(lme(LA~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+varcomp.SLA<-varcomp(lme(SLA~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+varcomp.LSWC<-varcomp(lme(LSWC~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+varcomp.MajVLA<-varcomp(lme(MajVLA~1,random=~1|Forest/Habitat/Species, data = data, na.action = na.omit),1)
+
+vars <- bind_rows(varcomp.gmin, varcomp.tlp, varcomp.LA, varcomp.SLA, varcomp.LSWC, varcomp.MajVLA) %>% mutate(Trait = "")
+
+#library(rio)
+#export(vars, "vars.csv")
+
+vars <- read_delim("vars_traits.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+
+vars <- reshape2::melt(vars, "Trait", variable.name = "level", value.name = "variance") 
+
+```
+
+
+```{r}
+
+library(paletteer) 
+paletteer_d("RColorBrewer::GnBu")
+
+ggplot(vars, aes(fill=level, y=variance, x=Trait)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_manual(
+    values = list(
+      Forest = "#A8DDB5FF",
+      Habitat = "#2B8CBEFF",
+      Species = "#e0b1e3",
+      Residual = "#516363"
+    )) + 
+  theme_minimal() +
+  labs(x = "", y = "Portion of total variance (%)")
+```
+
+
+
+### Par habitat : Trait en fonction du gradient de précipitation
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_MajVLA<-lm(MajVLA ~ HabitatType,  data = Metradica)
+autoplot(Model_MajVLA)
+summary(Model_MajVLA)
+anova(Model_MajVLA) 
+
+tukey <- HSD.test(aov(Model_MajVLA), trt = 'HabitatType') 
+
+#plot
+
+stat.test.MajVLA<- aov(lm(MajVLA~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+MajVLA <- ggboxplot(data = Metradica,x = "HabitatType", y = "MajVLA", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Turgor loss point (MPa)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.MajVLA, label = "p.adj.signif",
+                       y.position = c(30), hide.ns = TRUE)
+                                                                       
+MajVLA
+
+# trait across precipitation gradient
+
+test <- Metradica %>% filter(Habitat == 'TF')
+
+
+test$HabitatType <- as.factor(test$HabitatType)
+test$Forest <- as.factor(test$Forest)
+test$Forest<- ordered(test$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test$Name <- as.factor(test$Name)
+Model_MajVLA2<-lm(MajVLA ~ Forest,  data = test)
+autoplot(Model_MajVLA2)
+summary(Model_MajVLA2)
+anova(Model_MajVLA2) 
+
+tukey <- HSD.test(aov(Model_MajVLA2), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.MajVLA2<- aov(lm(MajVLA~Forest, data=test)) %>% tukey_hsd() 
+
+
+#plot habitat TF 
+ggboxplot(data = test,x = "Forest", y = "MajVLA", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      TFGeneralist = "#141313",
+      TFTF = "#ff0000" 
+      
+    )) +
+ labs(title = "Terra firme accross precipitation gradient", x = "Annual Precipitation (mm.an-1)", y = "Turgor loss point (MPa)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.MajVLA2, label = "p.adj.signif",
+                       y.position = c(3,2.5), hide.ns = TRUE)
+                 
+#BF
+test2 <- Metradica %>% filter(Habitat == 'BF')
+
+
+test2$HabitatType <- as.factor(test2$HabitatType)
+test2$Forest <- as.factor(test2$Forest)
+test2$Forest<- ordered(test2$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test2$Name <- as.factor(test2$Name)
+Model_MajVLA3<-lm(MajVLA ~ Forest,  data = test2)
+autoplot(Model_MajVLA3)
+summary(Model_MajVLA3)
+anova(Model_MajVLA3) 
+
+tukey <- HSD.test(aov(Model_MajVLA3), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.MajVLA3<- aov(lm(MajVLA~Forest, data=test2)) %>% tukey_hsd() 
+
+
+#plot habitat BF 
+ggboxplot(data = test2,x = "Forest", y = "MajVLA", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BFGeneralist = "#141313",
+      BFBF = "#ff0000" 
+      
+    )) +
+ labs(title = "SFF across precipiation gradient", x = "Annual precipitation (mm.an-1)", y = "Turgor loss point (MPa)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.MajVLA2, label = "p.adj.signif",
+                       y.position = c(3,2.5), hide.ns = TRUE)
+
+```
+
+
+### Par habitat : Trait en fonction du gradient de précipitation
+```{r}
+
+# Global test
+
+Metradica$HabitatType <- as.factor(Metradica$HabitatType)
+Metradica$Habitat <- as.factor(Metradica$Habitat)
+Metradica$Forest <- as.factor(Metradica$Forest)
+Metradica$Name <- as.factor(Metradica$Name)
+Model_gmin<-lm(Gmin ~ HabitatType,  data = Metradica)
+autoplot(Model_gmin)
+summary(Model_gmin)
+anova(Model_gmin) 
+
+tukey <- HSD.test(aov(Model_gmin), trt = 'HabitatType') 
+
+#plot
+
+stat.test.gmin<- aov(lm(Gmin~HabitatType, data=Metradica)) %>% tukey_hsd() 
+
+gmin <- ggboxplot(data = Metradica_log,x = "HabitatType", y = "Gmin", fill = "Type", color = "Habitat") +
+  scale_fill_manual(
+    values = list(
+      BF = "#6DB4EE",
+      Generalist = "#B6F09A",
+      TF = "#b58404"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BF = "#6DB4EE",
+      TF = "#b58404"
+    )) +
+ labs(x = " ", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Habitat preference", color = "Habitat collected") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 20L)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin, label = "p.adj.signif",
+                       y.position = c(30), hide.ns = TRUE)
+                                                                       
+gmin
+
+# trait across precipitation gradient
+
+test <- Metradica %>% filter(Habitat == 'TF')
+
+
+test$HabitatType <- as.factor(test$HabitatType)
+test$Forest <- as.factor(test$Forest)
+test$Forest<- ordered(test$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test$Name <- as.factor(test$Name)
+Model_gmin2<-lm(Gmin ~ Forest,  data = test)
+autoplot(Model_gmin2)
+summary(Model_gmin2)
+anova(Model_gmin2) 
+
+tukey <- HSD.test(aov(Model_gmin2), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.gmin2<- aov(lm(Gmin~Forest, data=test)) %>% tukey_hsd() 
+
+
+#plot habitat TF 
+ggboxplot(data = test,x = "Forest", y = "Gmin", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      TFGeneralist = "#141313",
+      TFTF = "#ff0000" 
+      
+    )) +
+ labs(title = "Terra firme accross precipitation gradient", x = "Annual Precipitation (mm.an-1)", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin2, label = "p.adj.signif",
+                       y.position = c(4,3.5), hide.ns = TRUE)
+                 
+#BF
+test2 <- Metradica %>% filter(Habitat == 'BF')
+
+
+test2$HabitatType <- as.factor(test2$HabitatType)
+test2$Forest <- as.factor(test2$Forest)
+test2$Forest<- ordered(test2$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test2$Name <- as.factor(test2$Name)
+Model_gmin3<-lm(Gmin ~ Forest,  data = test2)
+autoplot(Model_gmin3)
+summary(Model_gmin3)
+anova(Model_gmin3) 
+
+tukey <- HSD.test(aov(Model_gmin3), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.gmin3<- aov(lm(Gmin~Forest, data=test2)) %>% tukey_hsd() 
+
+
+#plot habitat TF 
+ggboxplot(data = test2,x = "Forest", y = "Gmin", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BFGeneralist = "#141313",
+      BFBF = "#ff0000" 
+      
+    )) +
+ labs(title = "SFF across precipiation gradient", x = "Annual precipitation (mm.an-1)", y = "Minimal conductance (mmol.m-2.s-1)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.gmin2, label = "p.adj.signif",
+                       y.position = c(4,3.5), hide.ns = TRUE)
+
+# trait across precipitation gradient
+
+test <- Metradica %>% filter(Habitat == 'TF')
+
+
+test$HabitatType <- as.factor(test$HabitatType)
+test$Forest <- as.factor(test$Forest)
+test$Forest<- ordered(test$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test$Name <- as.factor(test$Name)
+Model_TLP2<-lm(TLP ~ Forest,  data = test)
+autoplot(Model_TLP2)
+summary(Model_TLP2)
+anova(Model_TLP2) 
+
+tukey <- HSD.test(aov(Model_TLP2), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.TLP2<- aov(lm(TLP~Forest, data=test)) %>% tukey_hsd() 
+
+
+#plot habitat TF 
+ggboxplot(data = test,x = "Forest", y = "TLP", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      TFGeneralist = "#141313",
+      TFTF = "#ff0000" 
+      
+    )) +
+ labs(title = "Terra firme accross precipitation gradient", x = "Annual Precipitation (mm.an-1)", y = "Turgor loss point (MPa)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.TLP2, label = "p.adj.signif",
+                       y.position = c(0), hide.ns = TRUE)
+                 
+#BF
+test2 <- Metradica %>% filter(Habitat == 'BF')
+
+
+test2$HabitatType <- as.factor(test2$HabitatType)
+test2$Forest <- as.factor(test2$Forest)
+test2$Forest<- ordered(test2$Forest, levels=c('Bafog', 'Paracou', 'Kaw'))
+test2$Name <- as.factor(test2$Name)
+Model_TLP3<-lm(TLP ~ Forest,  data = test2)
+autoplot(Model_TLP3)
+summary(Model_TLP3)
+anova(Model_TLP3) 
+
+tukey <- HSD.test(aov(Model_TLP3), trt = 'Forest') #le TF de bafog est diff des autres !!!
+
+stat.test.TLP3<- aov(lm(TLP~Forest, data=test2)) %>% tukey_hsd() 
+
+
+#plot habitat BF 
+ggboxplot(data = test2,x = "Forest", y = "TLP", fill = "Forest", color = "HabitatType") + scale_x_discrete(labels = c('1500','3000','4000')) +
+  scale_fill_manual(
+    values = list(
+      Bafog = "#eb4934",
+      Paracou = "#d9c40d",
+      Kaw = "#0dc4d9"
+    )) + 
+  scale_colour_manual(
+    values = list(
+      BFGeneralist = "#141313",
+      BFBF = "#ff0000" 
+      
+    )) +
+ labs(title = "SFF across precipiation gradient", x = "Annual precipitation (mm.an-1)", y = "Turgor loss point (MPa)", 
+ fill = "Precipitation", color = "Habitat preference") +
+ theme_minimal() +
+ theme(plot.subtitle = element_text(size = 19L), 
+ plot.caption = element_text(size = 10), axis.title.y = element_text(size = 10), axis.title.x = element_text(size = 10)) + theme(axis.title = element_text(size = 10))  + 
+  stat_pvalue_manual(stat.test.TLP2, label = "p.adj.signif",
+                       y.position = c(0), hide.ns = TRUE)
+
+```
+
+```
+

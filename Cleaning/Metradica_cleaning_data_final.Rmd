@@ -1,0 +1,431 @@
+---
+title: "Cleaning"
+author: "Marion Boisseaux"
+date: "2022-10-15"
+output: html_document
+---
+
+# R environement for this code
+
+
+*R version used 4.2.1*
+*Packages are managed by an renv.lock for this project.*
+
+##librairies
+```{r eval=FALSE, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(readr)
+```
+
+
+# Introduction
+
+Data cleaning of Metradica files from the four campaigns were done throught the trait data cleaning R project with Daniela Krebber. This script calls all the output clean files with the outliers removed. This script aims at combining all the traits of the Metradica campaign in one csv file to be ready for analyses:
+
+1- Paracou
+
+**Paracou **: 9 of these permanent forest plots were subjected to 3 different forest exploitation treatments. Out of 9, 3 plots served as control plots. In 1992, 3 additional biodiversity / control plots of 6.25 ha in size and one 25 ha plot were established. Within these plots all trees with a diameter at breast height (DBH) above 10 cm were mapped. Species richness at Paracou ranges between 150 and 200 species per hectare. Since the establishment of the permanent forest plots, tree inventories take place at Paracou, recording tree status (alive or dead) and the DBH to the nearest 0.5 cm. Samplings were done in plots 6, 11, 13, 14, 15, and 16 from the 23/10/2020-7/12/2020 and from 13/09/2021- 17/09/2021. 244 trees sampled but 240 individuals with values. Lost 4 individuals (bota error usually).
+2- Bafog
+
+**Bafog**: 5 permanent plots monitored of the ONF institute. Samplings were done in plots 2, 3, 4, and 5 and off plots from the 1<sup>st</sup> to  16<sup>th</sup> of March 2021.  
+
+3- Kaw
+
+
+**Est**: Samplings were done in plots KawGuyafor (1 ha) and Trésor from the 4<sup>th</sup> to  23<sup>rd</sup> of October 2021. Some trees were also sampled outside the plots. 
+
+4- Paracou FTH
+
+For this second campaign, the purpose was to complete the sampling of the first field campaign at Paracou's site. This was done through the HydroITV project (*sylvainschmitt.github.io/hydroITV/*) carried out in September 2021. Only 35 individuals from the 100 sampled for the HydroITV project were common to the Metradica project.
+
+
+#Traits
+
+## fvfm
+
+Eliminate individual M147, B415, K537
+
+```{r Metradica fvfm}
+fvfm_paracou <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/fvfm.csv") %>% select(Code, FVFM) %>% rename(fvfm = FVFM) %>% mutate(Code = paste0("M", Code))
+#beware we eliminated individual 147 because leaves were not healthy
+
+
+fvfm_bafog <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Bafog/fvfm.csv") %>% select(Code, FvFm) %>% rename(fvfm = FvFm) %>% mutate(Code = paste0("B", Code))
+#beware we eliminated individual 415 because leaves were not healthy
+
+fvfm_kaw <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Kaw/fvfm.csv") %>% select(Code, fvfm) %>% mutate(Code = paste0("K", Code))
+#beware we eliminated individual 537 because leaves were not healthy
+
+
+fvfm_fth <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Clean_Paracou/FTH_fvfm.csv") %>% select(Code, fvfm) %>% mutate(Code = paste0("F", Code))
+
+fvfm_all <- rbind(fvfm_paracou, fvfm_fth)
+fvfm_all <- rbind(fvfm_all, fvfm_bafog)
+fvfm_all <- rbind(fvfm_all, fvfm_kaw)
+
+#remove at the very end the three individuals
+
+fvfm_all <- fvfm_all[ !(fvfm_all$Code %in% c("M157","B415","K537", "M25", "M26")), ] #na
+
+
+```
+
+## gmin
+```{r Metradica gmin}
+
+gmin_metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Gmin/output/100_Gmin_ALL_Projects_clean_OUT.csv") %>% 
+  filter(Name_Project == "Metradica") %>%
+  select(RWCnr_original, idTree, spName_CorrBota, Genus_CorrBota, Species_CorrBota, Family_CorrBota, gmin, Name_Site, Habitat, Type) %>%
+  
+  rename(Code = RWCnr_original,
+         Name= spName_CorrBota,
+         Genus = Genus_CorrBota, 
+         Species = Species_CorrBota,
+         Family = Family_CorrBota)
+
+gmin_metradica$idTree <- as.character(gmin_metradica$idTree)
+
+which(is.na(gmin_metradica$Code))
+which(is.na(gmin_metradica$Habitat))
+which(is.na(gmin_metradica$Type))
+gmin_metradica$Code[which((is.na(gmin_metradica$idTree)))] #normal
+
+gmin_metradica$Type[gmin_metradica$Type == "Generalists"] <- "Generalist"
+
+```
+
+
+
+## tlp
+
+We assessed the leaf turgor loss point, $\pi_{tlp}$ in MPa, from a previously established relationship with the osmotic potential at full hydration, $\pi_{osm}$ in MPa. $\pi_{osm}$ is linked to the equilibrium solute concentration value $C_0$ (in mmol.kg^{-1}) directly measured with a vapor pressure osmometer (Vapro 5600, Wescor, Logan, UT). This is referred as the *osmometer method* (Bartlett et al. 2012a; Maréchaux et al. 2016).
+
+From $C_0$ to $\pi_{osm}$ to $\pi_{tlp}$
+
+The equilibrium solute concentration value $C_0$ (in mmol.kg^{-1}) was recorded from the osmometer when the difference between two consecutive measurements fell below 5 mmol.kg^{-1}. This value was converted to $\pi_{osm}$ values using the van't Hoff equation:  
+ 
+ $\pi_{osm}$ = $(-2.5/1000)$x$C_0$
+ 
+  where the numerator of the first term represents RxT = 2.5 L.MPa.mol^{-1}^ at 25°C, with R the ideal gas constant and T the temperature in Kelvin degrees.
+  
+The value $\pi_{osm}$ was then converted to $\pi_{tlp}$ using the following Bartlett et al 2012 equation:  
+ 
+$\pi_{tlp}$= ( 0.799x $\pi_{osm}$ ) -0.665
+
+```{r Metradica tlp}
+
+tlp_metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/PTLP/output/100_PTLP_ALL_Projects_clean_OUT.csv") %>% 
+  filter(Name_Project == "Metradica") %>%
+  select(RWCnr_original, idTree, spName_CorrBota, Genus_CorrBota, Species_CorrBota, Family_CorrBota, ptlp_Bartlett2012, ptlp_Marechaux2016, Name_Site, Habitat, Type) %>%
+  
+  rename(Code = RWCnr_original,
+         Name= spName_CorrBota,
+         Genus = Genus_CorrBota, 
+         Species = Species_CorrBota,
+         Family = Family_CorrBota)
+
+which(is.na(tlp_metradica$Code))
+which(is.na(tlp_metradica$Habitat))
+which(is.na(tlp_metradica$Type))
+tlp_metradica$Code[which((is.na(tlp_metradica$idTree)))] #normal
+
+```
+
+
+## majvla
+
+The leaf is a critical component in the plant water transport system, accounting for 30% or more of whole-plant hydraulic resistance (Sack and Holbrook, 2006). Leaf venation architecture has numerous common functions across plant species—see Sack & Scoffoni, 2013 for review. Briefly, the leaf venation serves for mechanical support (Niklas, 1999), sugar and hormone transport in the phloem (Kehr & Buhtz, 2008), and, via the xylem, the replacement of water lost to transpiration when the stomata open for photosynthesis (Sack & Holbrook, 2006). However, venation architecture is highly diverse across species (Uhl & Mosbrugger, 1999; Roth-Nebelsick et al., 2001; Sack & Frole, 2006; Ellis et al., 2009; Brodribb et al., 2010). In dicotyledons, the leaf venation system typically consists of three orders of major veins and up to five higher orders of minor veins embedded in the mesophyll, with the vein orders arranged in a hierarchy; lower order veins are larger in diameter, with greater xylem conduit numbers and sizes, whereas higher order veins have greater length per leaf area (VLA; Sack & Holbrook, 2006; McKown et al., 2010). Total leaf VLA has been shown to correlate with maximum hydraulic conductance and photosynthetic rate per area across species (Sack & Frole, 2006; Brodribb et al., 2007) and tends to be higher for species growing in high light. Major VLA has been found to play a role in determining the damage tolerance of the vein system, and in leaf drought tolerance (Sack et al., 2008; Scoffoni et al., 2011).
+
+
+Leaf area (LA, mm2 ) 
+Major vein density (Major VLA, mm/mm2) : vein length per unit area 
+Sum of vein densities for 1°, 2° and 3° veins (mm mm-2)
+Double sided lamp flatbed scanner
+ImageJ
+
+Measurements from Scoffoni's Lab. These measures were calculated by a student group project from January - March 2022.
+
+```{r Metradica MajVLA}
+
+majvla_metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Vein/output/Metradica_All_vein_clean_OUTLIER_REMOVAL.csv") %>%
+  select(Code, DateField, Plot, SubPlot, FieldNbr, midribVLA, SecondaryVLA, TertiaryVLA, MajVLA) 
+
+
+which(is.na(majvla_metradica$Code))
+which(is.na(majvla_metradica$Habitat))
+which(is.na(majvla_metradica$Type))
+majvla_metradica$Code[which((is.na(majvla_metradica$idTree)))] #normal
+
+```
+
+
+## chemistry
+
+```{r Chemistry Paracou}
+library(readr)
+#chemistry from all sites
+chem_metradica <- read_csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/Chemistry.csv") %>%
+  filter(Site %in% c("Paracou", "Bafog", "Kawforest", "FTH.Paracou")) %>%
+  select(-Commentaires, -`Remark Sample`, -Weight_mg_CNS, -Weight_g_trace)
+
+chem_metradica_Paracou <- chem_metradica %>% filter(Site == "Paracou") %>%
+  mutate(RWCnr = paste0("M", Code))
+
+chem_metradica_Bafog <- chem_metradica %>% filter(Site == "Bafog") %>%
+  mutate(RWCnr = paste0("B", Code))
+
+chem_metradica_Kaw <- chem_metradica %>% filter(Site == "Kawforest") %>%
+  mutate(RWCnr = paste0("K", Code))
+
+chem_metradica_FTH <- chem_metradica %>% filter(Site == "FTH.Paracou") %>%
+  mutate(RWCnr = paste0("F", Code))
+
+chem_metradica_all <- full_join(chem_metradica_Paracou, chem_metradica_FTH)
+chem_metradica_all <- full_join(chem_metradica_all, chem_metradica_Bafog)
+chem_metradica_all <- full_join(chem_metradica_all, chem_metradica_Kaw)
+
+chem_metradica_all$Site[chem_metradica_all$Site == "Kawforest"] <- "Kaw"
+chem_metradica_all$Site[chem_metradica_all$Site == "FTH.Paracou"] <- "Paracou"
+
+chem_metradica_all <- chem_metradica_all %>% select(-Code, -Site, -Genus, -Species)
+chem_metradica_all <- chem_metradica_all %>% rename(Code = RWCnr)
+
+```
+
+
+## lswc
+
+The relative water content (RWC; %) was calculated as (fresh weight - dry weight) / (turgid weight - dry weight) * 100. 
+
+```{r Metradica LSWC}
+
+lswc_metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/RWC/output/100_RWC_ALL_Projects_clean_OUT.csv") %>% 
+  filter(Name_Project == "Metradica") %>%
+  select(RWCnr_original, LSWC.per) %>%
+  rename(Code = RWCnr_original)
+
+```
+
+## stomata
+
+From the labelStoma app developped by Angela Casado. LabelStoma is a graphical image tool for automatically detecting stomata in images. All info are referenced in her Github : https://github.com/ancasag/labelStoma
+
+After counting all stomata from paracou campaign and FTH, she adapted the weights of labelStoma for me to recognize the same species of the bafog and kaw campaign. 
+
+Once all stomata are counted, labelStoma generates excel files where it tells how many stomata are in each image. 
+
+I am using *labelStoma* for the annotation.
+After all annotated images, I will generate the excel to calculte the stomatal density using *labelStomaMarion*, as it has the scale option I want.
+
+```{r Metradica Stomata}
+
+stomata_metradica <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Trait_Data_Cleaning/traits/input/Stomata/input/Metradica/output/Metradica_All_stomata_clean.csv") %>%  #there are still some outliers beware!
+  select(Code, SD) 
+
+```
+
+
+
+
+
+## joining traits - ALL campaign
+
+```{r Summary Paracou}
+
+Metradica <- full_join(tlp_metradica, gmin_metradica, by = c("Code", "idTree", "Name", "Genus", "Species", "Family", "Name_Site", "Habitat",
+"Type"))
+
+Metradica2 <- full_join(Metradica, majvla_metradica)
+
+Metradica3 <- full_join(Metradica2, chem_metradica_all, by = "Code")
+
+Metradica4 <- full_join(Metradica3, lswc_metradica, by = "Code")
+
+Metradica5 <- full_join(Metradica4, stomata_metradica, by = "Code")
+
+Metradica6 <- full_join(Metradica5, fvfm_all, by = "Code")
+
+
+#table_join <- Metradica_suite5 %>% anti_join(Metradica_suite4, "Code") #to check
+
+
+# Individuals erreur bota 
+Metradica_OUT <- Metradica6[ !(Metradica6$Code %in% c("B273", "M25", "M58", "M59", "K532", "K533", "K509", "K568", "K569", "K581")), ]
+
+Metradica_OUT_2 <- Metradica_OUT[ ! (Metradica_OUT$Code %in% c( "M147", "B416", "B429", "B430", "B261", "K537")), ] #either erreur bota, or fvfm too low
+
+#checks
+Metradica_OUT_2$Code[which((duplicated(Metradica_OUT_2$Code)))] #normal
+
+which(is.na(Metradica_OUT_2$Code))
+Metradica_OUT_2$Code[which(is.na(Metradica_OUT_2$Habitat))]
+Metradica_OUT_2$Code[which(is.na(Metradica_OUT_2$Plot))]
+which(is.na(Metradica_OUT_2$Type))
+
+#update for B316
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "B316"] <- 3
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "B316"] <- 20
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "B316"] <- 49
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "B316"] <- "2021-03-04T00:00:00Z"
+
+#update for B269
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "B269"] <- 3
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "B269"] <- 41
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "B269"] <- 36
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "B269"] <- "2021-03-02T00:00:00Z"
+
+#update for B306
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "B306"] <- 3
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "B306"] <- 44
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "B306"] <- 24
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "B306"] <- "2021-03-03T00:00:00Z"
+
+#update for B455
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "B455"] <- 3
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "B455"] <- 58
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "B455"] <- 18
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "B455"] <- "2021-03-17T00:00:00Z"
+
+#update for K490
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K490"] <- "Kaw"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K490"] <- 1
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K490"] <- 471
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K490"] <- "10/05/2021"
+
+#update for K521
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K521"] <- "Kaw"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K521"] <- "H"
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K521"] <- 24
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K521"] <- "10/07/2021"
+
+#update for K556
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K556"] <- "Malou"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K556"] <- "H"
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K556"] <- 89
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K556"] <- "10/08/2021"
+
+#update for K563
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K563"] <- "Crique Gabrielle"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K563"] <- "H"
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K563"] <- 70
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K563"] <- "10/11/2021"
+
+#update for K578
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K578"] <- "Tresor"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K578"] <- "H"
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K578"] <- 10
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K578"] <- "10/12/2021"
+
+#update for K571
+Metradica_OUT_2$Plot[Metradica_OUT_2$Code == "K571"] <- "Crique Gabrielle"
+Metradica_OUT_2$SubPlot[Metradica_OUT_2$Code == "K571"] <- "H"
+Metradica_OUT_2$FieldNbr[Metradica_OUT_2$Code == "K571"] <- 80
+Metradica_OUT_2$DateField[Metradica_OUT_2$Code == "K571"] <- "10/11/2021"
+
+
+Metradica_OUT_2 <- Metradica_OUT_2 %>% rename(LSWC = LSWC.per, 
+                                              Gmin = gmin,
+                                              TLP = ptlp_Bartlett2012,
+                                              Forest = Name_Site,
+                                              Phosphorous = `P (g/kg)`,
+                                              Potassium = `K (g/kg)`,
+                                              Carbon = `%C`,
+                                              Nitrogen = `%N`) 
+                                              
+                                              
+                                       
+```
+
+
+
+
+#Final trait data
+
+without DBH, CWD, TWI, Hauteur, Dawkins, Gmax
+
+```{r}
+write.csv(Metradica_OUT_2, "Metradica_trait_OUT.csv")
+```
+
+# Add DBH, TWI, Dawkins, Hauteurs
+
+```{r}
+Lastinfo <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Metradica_TWI_DBH_UTM.csv") %>% select(Code, idTree, Xutm, Yutm, Latitude, Longitude, DBH, TWI)
+
+traits <- read.csv("C://Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Metradica_trait_OUT.csv") 
+  
+traits$Code <- str_sub(traits$Code, 2,-1)
+traits$Code <- as.integer(traits$Code)
+
+Final_Metradica_OUT_30112022 <- left_join(traits, Lastinfo, by="Code")
+
+#table_join <- Lastinfo %>% anti_join(traits, "Code") #to check
+
+write.csv(Final_Metradica_OUT_30112022, "Final_Metradica_OUT_30112022.csv")
+```
+
+
+
+VI - Additional traits
+
+
+## Gmax
+
+Theoretical maximum stomatal conductance in $$mol H_2O m^{-2} s^{-1}$$ 
+
+
+$$ g_{max} = \frac{SD*d_w*amax} {v * (pd + \pi/2 * sqrt(amax/ \pi))} $$
+For normalization of the values, the constants *dw* and *v* represent the values at 25°C (24.9 × 10−6 m2 s−1) and 24.4 × 10−3 m3 mol−1, respectively). *pd* or *l*. amax was calculated as π(*StomatalPoreLength*/2)^2 , according to Franks et al. (2009) for a fully opened stomata was taken as L/4 assuming guard cells inflate to circular
+cross-section (Franks et al., 2009).
+
+pd = is the depth of the stomatal pore (m, approximated as W/2 for fully inflated guard cells (Franks & Farquhar (2007)) = pore depth of fully opened stomata = W/2 => m
+
+Small stomatal size can provide a reduction in total leaf pore area and might also facilitate faster aperture response (Franks and Beerling, 2009; Drake et al., 2013; Lawson and Blatt, 2014). 
+
+```{r}
+Gmax_subset_data <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Gmax/Stomates_gmax.csv",fileEncoding = "Windows-1252") %>%
+  rename(Code = Code_ind, StomatalPoreLength=lp..mm., StomatalLength=L..mm., StomatalWidth=W..mm.) %>%
+  select(Code, Stomate, -Species, StomatalPoreLength, StomatalLength, StomatalWidth)
+
+StomatalDensity <-  read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Final_Metradica_OUT_30112022.csv") %>%
+  select(Code, Genus, Species, Name, Gmin, SD)
+
+Gmax_subset_data <- left_join(Gmax_subset_data, StomatalDensity, by = "Code")
+
+#calculate SS
+
+Gmax_subset_data <- Gmax_subset_data %>%
+  mutate(SS= StomatalLength * StomatalWidth) %>%
+  mutate(amax = pi*((StomatalPoreLength/1000)/2)^2) %>% #en mètre en divisant par 1000
+  mutate(pd = (StomatalWidth/1000)/2) %>% #en mètre en divisant par 1000
+  mutate(gmax = (SD*(10^6)*24.9*10^(-6)*amax)/((24.4*10^(-3))*(pd+(pi/2)*sqrt(amax/pi))))
+
+#mean gmax per individual
+
+Gmax_subset_data <- Gmax_subset_data %>%
+  group_by(Code) %>%
+  summarise(gmax_mean_indv = mean(gmax))
+
+#merge with the data
+
+Gmax_subset_data <- left_join(Gmax_subset_data, StomatalDensity) %>%
+  na.omit()
+
+Gmax <- Gmax_subset_data %>%
+  select(Code, gmax_mean_indv) %>%
+  rename(gmax= gmax_mean_indv)
+
+#there are 149 individuals for whom gmax has been calculated.
+```
+
+##merge gmax with final metradica
+```{r}
+Metradica <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Final_Metradica_OUT_30112022.csv") 
+
+Metradica <- left_join(Metradica, Gmax)
+
+write_csv(Metradica, "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica_OUT_301122_gmax.csv")
+```
+

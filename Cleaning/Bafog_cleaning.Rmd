@@ -1,0 +1,166 @@
+---
+title: "Cleaning Bafog"
+author: "Marion Boisseaux"
+date: "16/02/2022"
+output: word_document
+---
+
+# Cleaning individual information
+
+```{r Individuals_Bafog, eval=FALSE, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(rio)
+Individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/RWC/RWC_METRADICA_BAFOG_25_03_21.xlsx",  sheet = "RWC")
+
+Habitat <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Scoffoni/Scoffoni_Bafog.xlsx", 
+    sheet = "Summary_bafog")
+
+Individuals <- Individuals %>% select(Unique_Code, Date_Field, Plot, Subplot, idTree, Field_Nr, Species_Name)
+
+Individuals <- Individuals %>% rename(Code =Unique_Code ,DateField =  Date_Field ,  FieldNbr= Field_Nr )
+
+Individuals <- Individuals %>% mutate(Forest = "Bafog", TreeHeight = NA,	TreeDawkins= NA,	BranchHeight= NA,	BranchDawkins= NA,	CrownPosition= NA,	CommentField= NA)
+
+Bafog_individuals <- left_join(Individuals, Habitat, by="Code")
+
+#export(Bafog_individuals, "Bafog_individuals.csv")
+
+```
+
+Importing complete dataset, ready for cleaning.
+
+```{r eval=FALSE, include=FALSE}
+library(readxl)
+Bafog_individuals <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Bafog_individuals.xlsx", 
+    sheet = "Bafog_individuals")
+```
+
+
+# Trait cleaning
+
+## LSWC Trait
+
+Leaf-saturated water content (LSWC; g.g−1) was calculated as the mass of leaf water (SW – DW) divided by leaf dry mass (DW).
+
+```{r eval=FALSE, include=FALSE}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+
+RWC_raw <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/RWC/RWC_METRADICA_BAFOG_25_03_21.xlsx",  sheet = "RWC")
+
+RWC <- RWC_raw %>% select(Unique_Code, FW, SW, DW, Comment_Lab) %>% rename(Code =Unique_Code)
+
+Bafog_Traits <- left_join(Bafog_individuals, RWC, by = "Code") %>% mutate(LSWC = (SW-DW)/DW)
+
+```
+
+## FvFm
+
+```{r eval=FALSE, include=FALSE}
+library(readxl)
+FvFm <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/FvFm - cahier/Bafog_FvFm.xlsx")
+FvFm <- FvFm %>% rename(FvFm = `Fv/Fm`) %>% select(-Comment_FvFm)
+Bafog_Traits <- left_join(Bafog_Traits, FvFm, by = "Code")
+```
+
+## gmin
+
+LA calculated with ImageJ (Marion Boisseaux) script and manual detour (Alice Bordes) for 8 species.
+
+Check resolution of images.
+```{r}
+path <- list.files("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/0_Scan_bafog")
+resolution <- exiftoolr::exif_read(paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/0_Scan_bafog/",path),tags = "XResolution")
+ResolutionProblems <- resolution %>% filter(XResolution!=1328)
+
+```
+
+All images 1328 ppp qui correspond à 1600 dpi. 
+* Except 3 scans 1325 ppp. Code : 261, 264, 266. 
+* Except 8 scans 1200 ppp. Code : 249, 276, 295, 317, 374, 383, 401, 410. These leaves were too big for the double sided scans, so we scaned with a lesser resolution (800 dpi) one side. 
+
+Note: PPI describes the resolution in pixels of a digital image whereas DPI describes the amount of ink dots on a printed image. Though PPI largely refers to screen display, it also affects the print size of your design and thus the quality of the output.
+
+
+```{r}
+library(readxl)
+library(dplyr)
+LA_gmin <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/scan/Species_LeafAreaGmin_Alice.xlsx",   col_types = c("text", "numeric", "numeric", 
+        "numeric", "skip"))
+
+LA_gmin %>%
+  mutate(Resolution_dpi = if_else(Resolution_ppp == 1328, 1600, 0))
+
+
+LA_gmin <- LA_gmin %>%
+  mutate(Resolution_dpi = 
+           case_when(
+    Resolution_ppp == 1328 ~ "1600", 
+    Resolution_ppp == 1325 ~ "1600",
+    Resolution_ppp == 1200 ~ "1200"))
+
+LA_gmin$Resolution_dpi <- as.numeric(LA_gmin$Resolution_dpi)
+
+LA_gmin <- LA_gmin %>%mutate(PixelArea = coalesce(TotalArea, ManualArea))
+
+```
+
+Calculate pixel² in cm²
+
+Formula: PixelArea/(resolution_dpi^2)*(2.54^2)
+```{r}
+library(rio)
+LA_gmin <- LA_gmin %>% 
+  mutate(LA = 
+  PixelArea/(Resolution_dpi^2)*(2.54^2) )
+
+LA_gmin <- LA_gmin %>% relocate(Resolution_dpi, .after = Resolution_ppp)
+
+export(LA_gmin, "LA_gmin.csv")
+```
+
+With Daniela's function, calculte gmin for all bafog individuals. 
+```{r}
+gmin <- read_delim("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/g_min/Gmin_withLA.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+gmin <- gmin %>% rename(LA= Leaf_area, gmin = gmin.slope_function) %>% select(Code, LA, gmin)
+
+Bafog_Traits <- left_join(Bafog_Traits, gmin, by = "Code")
+```
+
+
+## ptlp
+-> daniela takes à partir du 5th run (including 5th)
+-> plot all the values and look at the outliers visually, check back to comments, and add columns saying why if i take it out
+-> keep track of what you do!
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library("purrr")
+
+Ptlp <- list.files(path = "C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Metradica_Bafog/Rawdata/Donnees_clean/Ptlp/", pattern = "*.csv", full.names = TRUE) %>% 
+  lapply(read_delim, delim = ";", escape_double = FALSE, trim_ws = TRUE) %>%                              
+  reduce(full_join)
+
+Ptlp <- Ptlp %>% mutate(Posmo=(-2.5/1000)*C0) %>% mutate(Ptlp=(0.799*Posmo)-0.665) %>% rename(Code = Unique_Code)
+
+Ptlp <- Ptlp %>% select(Code, Ptlp)
+Bafog_Traits <- left_join(Bafog_Traits, Ptlp, by = "Code")
+
+```
+
+
+#export Bafog data (but not clean, maybe go through it again with Dnaiela's functions)
+
+```{r}
+library(rio)
+
+export(Bafog_Traits, "Bafog.csv")
+
+```
+

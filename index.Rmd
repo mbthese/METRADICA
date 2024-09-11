@@ -1,0 +1,30 @@
+--- 
+title: "Metradica"
+author: "Marion Boisseaux"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This is a minimal example of using the bookdown package to write a book.
+  The HTML output format for this example is bookdown::gitbook,
+  set in the _output.yml file.
+link-citations: yes
+github-repo: mbthese/METRADICA
+---
+
+# About
+
+Welcome to the *Metradica* project Github.
+
+This repository supports all code and documentation about the project.
+
+The global objectives of *Metradica* are to estimate species vulnerability to climate change and predict shifts in species distribution from species traits. The project is lead by Clement Stahl and Ghislain Vieilledent.
+
+It combines: current species distribution, hydrological indices, climatic predictions, and use a few key traits at the individual level in innovative models (joint species distribution model; JSDMs), in order to better understand the processes by which species interact with their environment.
+
+Part of my PhD project is included in the METRADICA strategic project. **Mechanistic traits to predict shifts in tree species abundance and distribution with climate change in the Amazonian forest.**
+
+Have a nice reading !

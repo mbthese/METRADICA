@@ -1,0 +1,114 @@
+---
+title: "Stomata_Metradica_Check"
+author: "Marion Boisseaux"
+date: "2022-11-26"
+output: html_document
+---
+
+
+```{r}
+stomata <- read.csv("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/Final/Metradica.csv") %>%
+  select(Code, Forest, Habitat, Type, Name, SD, Comment_Stomata) %>% na.omit()
+```
+
+#Outlier checks for the stomata
+
+```{r}
+
+
+library(ggplot2)
+
+stomata_all_plot <- ggplot(stomata) +
+  aes(
+    x = Name,
+    y = SD,
+    fill = Name
+  ) +
+  geom_boxplot() +
+  theme_minimal()  +
+  scale_fill_hue(direction = 1) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+  ggtitle("Stomata_all_FTH")
+
+forest_stomata <- ggplot(stomata) +
+ aes(x = Name, y = SD, fill = Forest) +
+ geom_boxplot() +
+ theme_minimal() +
+ theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+ scale_fill_hue(direction = 1) 
+ 
+
+habitat_stomata <- ggplot(stomata) +
+ aes(x = Name, y = SD, fill = Habitat) +
+ geom_boxplot() +
+   theme_minimal() +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+ scale_fill_hue(direction = 1)
+
+
+#save plots
+ggsave(stomata_all_plot,file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/stomata_checks/Species_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+
+ggsave(forest_stomata, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/stomata_checks/Forest_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+ggsave(habitat_stomata,file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/stomata_checks/Habitat_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+Name <- unique(stomata$Name) 
+#Families <- c("Fabaceae")
+
+for (i in Name) {
+
+stomata_Plotting <- stomata %>% filter(Name == i)
+############# WITHOUT LABELS
+PlotFam <- ggplot(data = stomata_Plotting, aes(x = Name, y=SD)) + 
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    
+ scale_y_continuous(breaks = seq(from = 0.0, to = 700, by = 50), limits = c(0, 700))+
+  
+   geom_point(aes(color = Forest), size = 2.5) +
+  scale_colour_manual(values = c("Paracou"="darkgreen", "Bafog"="blue", "Kaw" = "red"))  +
+
+  ggtitle(paste0(i, ": stomata"))
+print(PlotFam)
+
+################# WITH LABELS 
+
+stomata_label <- ggplot(data = stomata_Plotting, aes(x = Name, y=SD)) + 
+  #geom_boxplot(aes()) +
+  theme(axis.text.x  = element_text(angle=90, vjust=0.5)) +
+    #ylim(-3.5, -1)+
+  scale_y_continuous(breaks = seq(from = 0.0, to =700, by = 20), limits = c(0, 700))+
+  
+  
+  geom_point(aes(color = Forest), size = 2.5) +
+  scale_colour_manual(values = c("Paracou"="darkgreen", "Bafog"="blue", "Kaw" = "red"))  +
+  
+  
+ggnewscale::new_scale_fill() + 
+  
+ ggrepel::geom_label_repel(aes(label = Code, fill = as.factor(Comment_Stomata)),   
+                               data = stomata_Plotting,
+                  
+                   nudge_y       = 0 ,
+                   nudge_x       = 0,
+                 size          = 2,
+                  box.padding   = 1,
+                  point.padding = 0.5,
+                  
+                  segment.size  = 0.3,
+                  segment.color = "black",
+                  direction     = "both") +
+  ggtitle(paste0(i, ": stomata"))
+
+
+#print(PlotFam)  
+print(stomata_label)
+
+
+
+ggsave(stomata_label, file = paste0("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/METRADICAproject/Cleaning/checks/stomata_checks/" , i, "_Stomata.jpg"), width = 35, height = 20, units = "cm")
+
+}
+```
+

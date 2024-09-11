@@ -1,0 +1,217 @@
+---
+title: "ITV"
+author: "Marion Boisseaux"
+date: "08/09/2022"
+output: html_document
+---
+# Libraries
+
+```{r librairies_results}
+library(tidyverse)
+library(ggfortify)
+library(dplyr)
+library(factoextra)
+library(FactoMineR)
+library(Factoshiny)
+library(corrplot) 
+library(ggpubr)
+library(ggfortify)
+library(agricolae)
+library(rstatix)
+library(kableExtra)
+library(V.PhyloMaker)
+library(ggfortify)
+library(ggtree)
+library(readxl)
+library(lme4)
+library(ggeffects) #draw plots of models
+library(nlme)
+library(sjPlot) #for plotting lmer and glmer mods
+library(gridExtra)
+library(rio)
+library(vegan)
+```
+
+# Data
+
+```{r Data_results, message=FALSE, warning=FALSE}
+
+#not log
+
+Data <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=738111573", range = "Metradica") %>% 
+  dplyr::select(Code, Genus, Species, Name, Forest, Habitat, Type, HabitatType, Gmin, TLP, LA, SLA, LSWC, MajVLA, StomatalDensity, K, P, C, N, TreeHeight, BranchHeight, TreeDawkins, BranchDawkins, DBH, TWI) %>% 
+  mutate(TreeHeight = as.numeric(TreeHeight), BranchHeight = as.numeric(BranchHeight)) 
+
+#log
+Metradica_log <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1rOl9sZl3A055GTajMcZxrJL_Ozx2bJfM_VEBdcpkD00/edit#gid=1375896520", range = "Metradica") %>% 
+  select(Code, Genus, Species, Name, Habitat, Type, HabitatType,Forest, Gmin, TLP, LA, SLA, LSWC, MajVLA, K, P, C, N, MidribWidth, SecundaryWidth, DBH, TWI) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "K", "P", "C", "N"), abs) %>% 
+  mutate_at(c("Gmin","TLP" ,"LA", "SLA", "LSWC", "MajVLA", "MidribWidth", "SecundaryWidth", "TWI","K", "P", "C", "N"), log) %>% 
+  mutate(TLP = -TLP) %>% 
+  na.omit() 
+
+```
+
+
+# CV
+```{r}
+
+
+cv <- function(traits){
+  if(any(is.na(traits)))
+    traits=traits[!is.na(traits)]
+  N=length(traits)
+  y_bar=mean(traits)
+  s2_hat=var(traits)
+  cv_2=s2_hat/y_bar^2
+  cv_1=sqrt(cv_2)
+  gamma_1=sum(((traits-y_bar)/s2_hat^0.5)^3)/N
+  gamma_2=sum(((traits-y_bar)/s2_hat^0.5)^4)/N
+  bias=cv_2^(3/2)/N*(3*cv_2^0.5-2*gamma_1)
+  bias2=cv_1^3/N-cv_1/4/N-cv_1^2*gamma_1/2/N-cv_1*gamma_2/8/N
+  cv1=sd(traits)/mean(traits)
+  cv4=cv_1-bias2
+  re=cv4
+  return(re)
+} 
+data <- Metradica_log
+
+# For generalists
+
+
+subdata_G <- data %>% subset(Type=="Generalist")
+cv_G <- subdata_G %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "SLA", "MidribWidth", "SecundaryWidth", "K", "C", "N", "P"), funs(cv))
+
+cv_G <- bind_rows(cv_G,
+                ungroup(cv_G) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_G <- reshape2::melt(cv_G, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_G$Type <- c("Generalist")
+
+cv_long_G %>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_G, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+
+# For TF specialist
+
+
+subdata_SP_TF <- data %>% filter(Type == "TF")
+
+subdata_SP_TF <- subdata_SP_TF %>% filter(Name != "Casearia_javitensis")
+
+cv_TF <- subdata_SP_TF %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "SLA", "MidribWidth", "SecundaryWidth", "K", "C", "N", "P"), funs(cv))
+
+cv_TF <- bind_rows(cv_TF,
+                ungroup(cv_TF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_TF <- reshape2::melt(cv_TF, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_TF$Type <- c("TF")
+
+cv_long_TF%>% 
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_TF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+ 
+
+# For BF specialist
+BFSp <- data %>% filter(Type == "BF")
+
+cv_BF <- BFSp %>% 
+  group_by(Name) %>% 
+  summarise_at(c("Gmin","TLP", "LSWC", "MajVLA", "LA", "SLA", "MidribWidth", "SecundaryWidth", "K", "C", "N", "P"), funs(cv))
+
+cv_BF <- bind_rows(cv_BF,
+                ungroup(cv_BF) %>% 
+                  summarise_all(mean) %>% 
+                  mutate(Name = "mean")) 
+
+cv_long_BF <- reshape2::melt(cv_BF, "Name", variable.name = "trait", value.name = "CV") %>% 
+  mutate(trait = recode(trait, "Ptlp" = "pi[TLP]", "gmin" = "g[min]"))
+
+cv_long_BF$Type <- c("BF")
+
+ cv_long_BF%>%  
+  filter(Name != "mean") %>% 
+  ggplot(aes(x = trait, y = CV)) +
+  geom_boxplot() +
+  geom_jitter(aes(col = Name), size=3) +
+  geom_text(aes(label = paste0(round(CV, 2)*100, "%")), y = 1.25, col = "black",
+            data = filter(cv_long_BF, Name == "mean")) +
+  theme(axis.title.x = element_blank(), axis.text.x = element_text()) +
+  ylab("Coefficient of variation") +
+  scale_color_discrete("") +
+  scale_x_discrete(labels = scales::label_parse())
+
+
+cv_tot <- bind_rows(cv_long_G, cv_long_BF, cv_long_TF)
+
+# plot all 
+cv_tot %>% mutate(CV =CV*100)%>%
+  filter(Name != "mean") %>% 
+  filter(CV>0)%>%
+  ggplot(aes(x = trait, y = CV, fill = Type, alpha=0.4)) +
+  #scale_color_manual(values = c("Iryanthera_hostmannii"= "#6DB4EE", "Laetia_procera"= "#6DB4EE", "Protium_opacum subsp. rabelianum"= "#6DB4EE", "Pterocarpus_officinalis"= "#6DB4EE", "Symphonia_globulifera"= "#6DB4EE", "Virola_surinamensis"= "#6DB4EE","Casearia_javitensis" ="#b58404", "Dicorynia_guianensis"="#b58404", "Iryanthera_sagotiana"="#b58404", "Gustavia_hexapetala"="#b58404", "Licania_membranacea"="#b58404", "Poraqueiba_guianensis"="#b58404", "Vouacapoua_americana"="#b58404", "Bocoa_prouacensis"="#34e042", "Eschweilera_coriacea"="#34e042", "Conceveiba_guianensis"="#34e042", "Virola_michelii"="#34e042", "Protium_stevensonii"="#34e042", "Hymenopus_heteromorphus"="#34e042", "Jacaranda_copaia subsp. copaia"="#34e042"))+
+  geom_jitter() + 
+  geom_boxplot(alpha=0.7)+
+  scale_fill_manual("Habitat\npreference", values = c("#6DB4EE", "#34e042",  "#b58404")) +
+  scale_shape_discrete("Habitat\npreference") +
+  ggtitle("Coefficient of variation %")+
+  theme(axis.title.x = element_blank(), axis.text.x = element_text())+
+  theme(plot.title = element_text(size=14, face="bold")) +
+  ylab("") + xlab("")+
+    theme_minimal()
+
+# Anova on CV
+#We want to know if there is any significant difference between the average cv for each trait for the three habitat preferences.
+
+kruskal.test(CV ~ Type, data = cv_tot)
+
+cv_tot2<- cv_tot %>% filter(Name != "mean") %>% select(-Name) %>% filter(trait =="TLP")
+View(cv_tot2)
+
+pairwise.wilcox.test(cv_tot2$CV, cv_tot2$Type,
+                 p.adjust.method = "BH")
+
+
+#nothing is significant except for LSWC: BF and Generalists
+  
+
+
+```
+
+## CV table
+
+```{r cvsptab}
+knitr::kable(cv, caption = "Coefficients of variation ($CV_4$) across each species.", digits = 3) 
+```
+
+
+

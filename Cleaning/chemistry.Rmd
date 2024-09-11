@@ -1,0 +1,53 @@
+---
+title: "Chemistry"
+author: "Marion Boisseaux"
+date: "22/08/2022"
+output: html_document
+---
+
+# Library
+
+```{r}
+library(dplyr)
+library(readxl)
+library(googlesheets)
+library(googledrive)
+library(rio)
+```
+
+# Data 
+
+```{r}
+
+CNS <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/2209-IC-CS_resultats.xlsx", 
+    sheet = "Results-2209-IC-CS_EA")
+
+CNS <- CNS %>% rename( Weight_mg_CNS = `Weight (mg)`) %>%  select(-`Codex SilvaTech`)
+
+
+trace_element <- read_excel("C:/Users/marion.boisseaux/Dropbox/Mon PC (Jaboty20)/Documents/METRADICA/Divers/Grinding/2209-IC-CS_resultats.xlsx", 
+    sheet = "Results-2209-IC-CS_ICP")
+
+trace_element <- trace_element %>% rename( Weight_g_trace = `Weight (g)`, Genus = Espèce) %>%
+  select(-`Codex SilvaTech`)
+
+Chemistry <- left_join(CNS, trace_element) %>% rename(Code = Unique_Code)
+
+
+```
+
+# Exporting csv
+
+```{r}
+export(Chemistry, "Chemistry.csv")
+```
+
+
+
+
+
+
+
+
+
+
